@@ -59,6 +59,14 @@
   }
 
   define = function(..., id, force = F) {
+    wrapper = function(id) {
+      invisible(
+        list(
+          id = id,
+          eval = function() .eval(id)
+          )
+        )
+      }
     if(missing(id)) {
       frame_files = Filter(Negate(is.null), lapply(sys.frames(), function(x) x$ofile))
       if(length(frame_files) > 0) {
@@ -70,7 +78,7 @@
     }
 
     if(id %in% names(.register) & !force)
-      return(invisible(id))
+      return(wrapper(id))
 
     args = list(...)
     nargs = length(args)
@@ -94,7 +102,7 @@
       instance = NULL
     )
 
-    invisible(id)
+    wrapper(id)
   }
 
   .graph = function() {
@@ -137,8 +145,9 @@
     }
   }
   .load = function(id, force = F) {
-    if((!(id %in% names(.register)) | force) & id != "module") {
-      id = source(.denormalize(id))$value
+    # TODO: optimization could be done here to avoid multiple source calls on a file
+    if((!(id %in% names(.register)) | force) & !(id %in% c("module", "__runtime__"))) {
+      id = source(.denormalize(id))$value$id
     }
     for(dep in .register[[id]]$dependencies) {
       .load(dep, force)
@@ -148,9 +157,6 @@
     .load(id, force)
     order = .order(id)
     for(id in order[order != "module"]) {
-#       if(!(id %in% names(.register))) {
-#         id = source(.denormalize(id))$value
-#       }
       module = .register[[id]]
       if(is.null(module$instance) | force) {
         if(length(module$dependencies) > 0) {
@@ -172,11 +178,10 @@
         .register[[id]] <<- module
       }
     }
-    invisible(.register[[id]]$instance)
+    .register[[id]]$instance
   }
   run = function(...) {
-    id = define(..., force = T)
-    invisible(.eval(id))
+    define(..., force = T)$eval()
   }
   undef = function(id) {
     .register[[id]] <<- NULL
@@ -197,7 +202,7 @@
 
 .modulr$define(id="require", function() {
   function(file) {
-    id = source(file)$value
+    id = source(file)$value$id
     invisible(modulr$.eval(id))
   }
 })
