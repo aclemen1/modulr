@@ -1,5 +1,5 @@
 # modulr
----
+
 `modulr` is an R implementation of the Module Pattern with the following main goals:
 
   * modules are pieces of code, encapsulated into useful singleton units which do not pollute the environment,
@@ -9,7 +9,7 @@
 `modulr` is widely inspired from `RequireJS` and `AngularJS` for Javascript.
 
 You can install the latest development version of `modulr` from github with
-```r
+``` r
 if (packageVersion("devtools") < 1.6) {
   install.packages("devtools")
 }
@@ -22,7 +22,7 @@ If you encounter a clear bug, please file a minimal reproducible example on gith
 
 To get started with `modulr`, let us consider the following minimal example:
 
-```r
+``` r
 require("modulr")
 
 # define a module named "greeter" which provides 
