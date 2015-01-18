@@ -1,5 +1,7 @@
 # modulr
 
+__TODO: create a .Rmd file to produce this .md file__
+
 `modulr` is an R implementation of the Module Pattern with the following main goals:
 
   * modules are pieces of code, encapsulated into useful singleton units which do not pollute the environment,

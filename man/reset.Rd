@@ -2,11 +2,11 @@
 % Please edit documentation in R/modulr.R
 \name{reset}
 \alias{reset}
-\title{Reset all modules.}
+\title{Remove all module definitions.}
 \usage{
 reset()
 }
 \description{
-Reset all modules.
+Remove all module definitions.
 }
 

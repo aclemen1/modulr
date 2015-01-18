@@ -1,265 +1,406 @@
-#' modulr -- A Module Pattern for R
+#' modulr -- Module Pattern and DI in R
 #'
-#' modulr is an R implementation of the Module Pattern that allows you to encapsulate pieces of code into useful singleton units, namely modules that register their capabilities, export values and rely on other modules dependencies. modulr is widely inspired from RequireJS for Javascript and the work of James Burke and other contributors.
+#' modulr is a Module Pattern and Dependency Injection implementation in R.
+#' Module Pattern and DI allows you to encapsulate pieces of code into useful singleton units,
+#' namely modules that register their capabilities, export values and rely on other modules as dependencies.
+#' modulr is widely inspired from RequireJS and AngularJS for Javascript.
 #'
 #' @docType package
 #' @name modulr
 #' @author Alain Clément-Pavon <\email{alain.clement-pavon@@unil.ch}>
 
-.modulr = (function() {
+# library(stringr)
+# library(pooh)
+NULL
 
-  .register = list()
+RESERVED_NAMES <- c("modulr")
 
-  .config = list()
+modulr_env <- new.env()
 
-  .internals = function() {
+assign("register", list(), pos = modulr_env)
+assign("configuration", list(), pos = modulr_env)
+
+
+#' Configure modulr.
+#'
+#' @export
+
+configure <- function(configuration) {
+  assign("configuration", configuration, pos = modulr_env)
+}
+
+
+.resolve_mapping <- function(name, scope_name) {
+  mappings <- get("configuration", pos = modulr_env)$mappings[[scope_name]]
+  if(is.null(mappings)) return(name)
+
+  candidates <- Map(function(map) {
+    start_end_pos <- str_locate(name, map)
     list(
-      register = .register,
-      config = .config
-      )
-  }
-
-  configure = function(config) {
-    .config <<- config
-  }
-
-  .is_normal = function(s) {
-    !grepl(".R$", s, ignore.case = T)
-  }
-
-  .normalize = function(path) {
-    .withSlash = function(s) {
-      if(substr(s, nchar(s), nchar(s)) != "/") return(paste0(s, "/"))
-      s
-    }
-    id = path
-    idx = sapply(names(.config$paths), function(name) startsWith(path, .withSlash(.config$paths[[name]])))
-    if(any(idx)) {
-      lens = sapply(.config$paths[idx], nchar)
-      name = names(.config$paths)[idx][which(lens == max(lens))]
-      id = sub(.withSlash(.config$paths[[name]]), .withSlash(name), path)
-    }
-    sub("\\.[[:alnum:]]*$", "", id)
-  }
-
-  .denormalize = function(id) {
-    if(!.is_normal(id)) return(id)
-    .withSlash = function(s) {
-      if(substr(s, nchar(s), nchar(s)) != "/") return(paste0(s, "/"))
-      s
-    }
-    path = id
-    idx = sapply(names(.config$paths), function(name) startsWith(id, .withSlash(name)))
-    if(any(idx)) {
-      lens = sapply(names(.config$paths)[idx], nchar)
-      name = names(.config$paths)[idx][which(lens == max(lens))]
-      path = paste0(sub(.withSlash(name), .withSlash(.config$paths[[name]]), id), ".R")
-    }
-    path
-  }
-
-  define = function(..., id, force = F) {
-    wrapper = function(id) {
-      invisible(
-        list(
-          id = id,
-          eval = function() .eval(id)
-          )
-        )
-      }
-    if(missing(id)) {
-      frame_files = Filter(Negate(is.null), lapply(sys.frames(), function(x) x$ofile))
-      if(length(frame_files) > 0) {
-        frame_file = frame_files[[length(frame_files)]]
-        id = .normalize(frame_file)
-      } else {
-        id = "__runtime__"
-      }
-    }
-
-    if(id %in% names(.register) & !force)
-      return(wrapper(id))
-
-    args = list(...)
-    nargs = length(args)
-    factory = args[[nargs]]
-    fargs = formals(factory)
-    nfargs = length(fargs)
-    dependencies = list()
-
-    if(nargs == 1) { # factory (args?)
-      if(nfargs > 0) dependencies = as.list(names(fargs)) # factory (args+)
-    } else if(nargs - 1 == nfargs) { # dependencies, factory (args?)
-      dependencies = args[1:nfargs]
-    } else {
-      stop("Dependencies and arguments mismatch.")
-    }
-
-    .register[[id]] <<- list(
-      id = id,
-      dependencies = dependencies,
-      factory = factory,
-      instance = NULL
+      map = map
+      , start = start_end_pos[1]
+      , end = start_end_pos[2]
     )
+  }, names(mappings))
 
-    wrapper(id)
-  }
+  candidates <- Filter(function(candidate) {
+    candidate$start == 1
+  }, candidates)
 
-  .graph = function() {
-    to = unlist(lapply(.register, function(r) {
-      if(length(r$dependencies) > 0) {
-        rep(r$id, length(r$dependencies))
-      } else {
-        NULL
-      }
-    }))
-    from = unlist(lapply(.register, function(r) {
-      if(length(r$dependencies) > 0) {
-        as.vector(r$dependencies)
-      } else {
-        NULL
-      }
-    }))
-    list(from = from, to = to)
+  if(length(candidates) == 0) return(name)
+
+  maximum_length <- max(unlist(Map(function(candidate) {
+    candidate$end
+  }, candidates)))
+
+  candidates <- Filter(function(candidate) {
+    candidate$end == maximum_length
+  }, candidates)
+
+  if(length(candidates) > 1) warning(
+    "More than one matching mapping. ",
+    "Considering only the first occurence.")
+
+  matching_map <- candidates[[1]]$map
+
+  str_replace(name, matching_map, mappings[[matching_map]])
+
+}
+
+.make_path <- function(path) {
+  if(str_sub(path, -1) != "/") path <- paste0(path, "/")
+  path
+}
+
+.split_filename <- function(filename) {
+  components <- str_split(filename, "/")[[1]]
+  basename <- tail(components, 1)
+  basename_components <- str_split(basename, "\\.")[[1]]
+  if(length(basename_components) > 1) {
+    extension <- tail(basename_components, 1)
+    name <- paste(head(basename_components, length(basename_components) - 1), collapse = ".")
+  } else {
+    extension <- ""
+    name <- basename_components
   }
-  .sub_graph = function(id, graph) {
-    if(missing(graph)) {
-      graph = .graph()
+  path <- paste(
+    head(components, length(components) - 1),
+    collapse = "/")
+  list(
+    filename = filename
+    , path = path
+    , basename = basename
+    , name = name
+    , extension = extension
+  )
+}
+
+.resolve_path <- function(name, scope_name) {
+  configuration <- get("configuration", pos = modulr_env)
+
+  if(missing(scope_name)) injected_name <- name else
+    injected_name <- .resolve_mapping(name, scope_name)
+
+  splitted_injected_name <- .split_filename(injected_name)
+  injected_namespace <- splitted_injected_name$path
+  injected_basename <- splitted_injected_name$basename
+
+  candidates <- Map(function(namespace) {
+    path <- .split_filename(.make_path(namespace))$path
+    start_end_pos <- str_locate(injected_namespace, path)
+    list(
+      namespace = namespace
+      , start = start_end_pos[1]
+      , end = start_end_pos[2]
+    )
+  },
+  names(configuration$paths))
+
+  candidates <- Filter(function(candidate) {
+    candidate$start == 1
+  }, candidates)
+
+  if(length(candidates) == 0) return(injected_name)
+
+  maximum_length <- max(unlist(Map(function(candidate) {
+    candidate$end
+  }, candidates)))
+
+  candidates <- Filter(function(candidate) {
+    candidate$end == maximum_length
+  }, candidates)
+
+  if(length(candidates) > 1) warning(
+    "More than one matching namespace. ",
+    "Considering only the first occurence.")
+
+  matching_namespace <- candidates[[1]]$namespace
+
+  str_replace(injected_name, matching_namespace,
+              normalizePath(configuration$paths[[matching_namespace]]))
+}
+
+.is_defined <- function(name) {
+  !is.null(get("register", pos = modulr_env)[[name]])
+}
+
+
+#' Load module.
+#'
+#' @export
+
+load <- function(name, scope_name, force_reload = F) {
+  if(!.is_defined(name) | force_reload) {
+    if(missing(scope_name)) path <- .resolve_path(name) else
+      path <- .resolve_path(name, scope_name)
+    # TODO: implement .Rmd sourcing as well
+    message(
+      "Module '", name, "' not yet defined or force reload. Trying to load it from ",
+      path, ".R (and .Rmd soon).")
+    source(paste0(path, ".R"))
+    return(paste0(path, ".R"))
+  }
+}
+
+
+#' Reload module.
+#'
+#' @export
+
+reload <- function(name, scope_name)
+  load(name, scope_name, force_reload = T)
+
+
+#' Redefine module.
+#'
+#' @export
+
+redefine <- reload
+
+# make sure all dependent modules are defined
+.define_all_dependent_modules <- function(name, force_reload_all = F) {
+  visited_dependencies <- list()
+  iteration <- function(name, scope_name) {
+    if(!(name %in% visited_dependencies)) {
+      load(name, scope_name, force_reload_all)
+      visited_dependencies <<- c(visited_dependencies, name)
+      Map(function(dependency) iteration(dependency, name),
+          get("register", pos = modulr_env)[[name]]$dependencies)
     }
-    from = c(); to = c()
-    to_ = id
-    while(length(to_) > 0) {
-      to__ = graph$from[graph$to %in% to_]
-      from = c(from, to__)
-      to = c(to, graph$to[graph$to %in% to_])
-      to_ = to__
+  }
+  iteration(name)
+  unlist(visited_dependencies)
+}
+
+.build_dependency_graph <- function(all_dependencies) {
+  from <- c()
+  to <- c()
+  for(name in all_dependencies) {
+    dependencies <- get("register", pos = modulr_env)[[name]]$dependencies
+    if(length(dependencies) > 0) {
+      array <- rbind(unlist(dependencies), name, deparse.level = 0)
+      from <- c(from, array[1, ])
+      to <- c(to, array[2, ])
     }
-    list(from = from, to = to)
-  }
-  .order = function(id) {
-    graph = .sub_graph(id)
-    if(length(graph$from) > 0) {
-      pooh::tsort(graph$from, graph$to)
-    } else {
-      id
-    }
-  }
-  .load = function(id, force = F) {
-    # TODO: optimization could be done here to avoid multiple source calls on a file
-    if((!(id %in% names(.register)) | force) & !(id %in% c("module", "__runtime__"))) {
-      id = source(.denormalize(id))$value$id
-    }
-    for(dep in .register[[id]]$dependencies) {
-      .load(dep, force)
-    }
-  }
-  .eval = function(id, force = F) {
-    .load(id, force)
-    order = .order(id)
-    for(id in order[order != "module"]) {
-      module = .register[[id]]
-      if(is.null(module$instance) | force) {
-        if(length(module$dependencies) > 0) {
-          args = lapply(.register[[id]]$dependencies, function(dep_id) {
-            if(dep_id == "module") { # special module
-              list(
-                config = function() {
-                  .config$config[[id]]
-                }
-              )
-            } else {
-              .register[[dep_id]]$instance
-            }
-          })
-          module$instance = do.call(module$factory, args = args)
-        } else {
-          module$instance = module$factory()
-        }
-        .register[[id]] <<- module
-      }
-    }
-    .register[[id]]$instance
-  }
-  run = function(...) {
-    define(..., force = T)$eval()
-  }
-  undef = function(id) {
-    .register[[id]] <<- NULL
-  }
-  reset = function() {
-    .register <<- list()
   }
   list(
-    define = define,
-    run = run,
-    .eval = .eval,
-    configure = configure,
-    reset = reset,
-    undef = undef,
-    .internals = .internals
+    from = from,
+    to = to
   )
-})()
+}
 
-.modulr$define(id="require", function() {
-  function(file) {
-    id = source(file)$value$id
-    invisible(modulr$.eval(id))
+.topological_sort <- function(graph) {
+  if(length(graph$from) > 0)
+    pooh::tsort(graph$from, graph$to)
+}
+
+
+#' Instanciate a module.
+#'
+#' @export
+
+instanciate <- function(name,
+                        force_reinstanciate = F,
+                        force_redefine_reinstanciate = F,
+                        force_reinstanciate_all = F,
+                        force_redefine_reinstanciate_all = F) {
+  all_dependencies <- .define_all_dependent_modules(name,
+    force_redefine_reinstanciate_all)
+  if(!force_redefine_reinstanciate_all & force_redefine_reinstanciate)
+    redefine(name)
+  dependency_graph <- .build_dependency_graph(all_dependencies)
+  ordered_names <- .topological_sort(dependency_graph)
+  if(is.null(ordered_names)) ordered_names <- name
+  register <- get("register", pos = modulr_env)
+  for(ordered_name in ordered_names) {
+    module <- register[[ordered_name]]
+    if(  !module$instanciated
+       | force_reinstanciate_all
+       | force_redefine_reinstanciate_all
+       | (force_reinstanciate & ordered_name == name)) {
+      env = new.env()
+      assign(".__name__", ordered_name, pos = env)
+      if(length(module$dependencies) > 0) {
+        args <- lapply(module$dependencies, function(name) register[[name]]$instance)
+        # tricky bug solution, see below
+        module$instance <- evalq(do.call(eval(parse(text=deparse(module$factory))),
+                                         args = args), envir = env)
+      } else {
+        # the deparse %>% parse %>% eval trick solves the following bug
+        # WOKS:
+        # module$instance <- evalq(do.call(function() {get("variable", pos = env)}, args = list()), envir = env)
+        # DOES NOT WORK:
+        # f <- function() {get("variable", pos = env)}
+        # module$instance <- evalq(do.call(f, args = list()), envir = env)
+        # WORKAROUND:
+        # module$instance <- evalq(do.call(eval(parse(text=deparse(f))), args = list()), envir = env)
+        module$instance <- evalq(do.call(eval(parse(text=deparse(module$factory))),
+                                         args = list()), envir = env)
+      }
+      module$instanciated <- T
+      register[[ordered_name]] <- module
+      assign("register", register, pos = modulr_env)
+      if (!(ordered_name %in% RESERVED_NAMES))
+        message("Module '", ordered_name, "' instanciated.")
+    }
   }
-})
+
+  get("register", pos = modulr_env)[[name]]$instance
+}
+
+#' Reinstanciate a module.
+#'
+#' @export
+
+reinstanciate <- function(name)
+  instanciate(name, force_reinstanciate = T)
+
+
+#' Get module defininition.
+#'
+#' @export
+get_definition <- function(name) {
+  wrapper = function(force_reinstanciate = F,
+                     force_redefine_reinstanciate = F,
+                     force_reinstanciate_all = F,
+                     force_redefine_reinstanciate_all = F)
+    instanciate(name,
+                force_reinstanciate = force_reinstanciate,
+                force_redefine_reinstanciate = force_redefine_reinstanciate,
+                force_reinstanciate_all = force_reinstanciate_all,
+                force_redefine_reinstanciate_all =
+                  force_redefine_reinstanciate_all)
+
+  invisible(wrapper)
+}
 
 #' Define a module.
 #'
-#' @param id  module id
-#' @param ... dependencies and factory function
-#' @return module factory singleton (invisible)
+#' @param name  the module name, given as a character string.
+#' @param dependencies  the list of module dependencies, given as module names.
+#' @param factory the factory function.
+#' @return a wrapper function around the module instanciation.
 #' @examples
-#' define(id = "module_1", function() {
+#' # define "module_1"
+#' define("module_1", list(), function() {
 #'  message("Module 1"); "value 1"})
-#' define(id = "module_2", "module_1", function(m1) {
+#'
+#' # define "module_2"
+#' m2 <- define("module_2", list("module_1"), function(m1) {
 #'  message("Module 2 with one dependency"); paste(m1, "value 2")})
-#' @export
-define = .modulr$define
-
-
-#' Configure the runtime environment.
 #'
-#' @param config  configuration
+#' # instanciate "module_2"
+#' m2()
 #' @export
-configure = .modulr$configure
+
+define <- function(name, dependencies, factory) {
+  if(exists(".__filename__", where = parent.frame())) {
+    message("Module imported.")
+    filename = get(".__filename__", pos = parent.frame())
+    print(filename)
+  }
+
+  register <- get("register", pos = modulr_env)
+
+  register[[name]]$name <- name
+  register[[name]]$dependencies <- dependencies
+  register[[name]]$factory <- factory
+  register[[name]]$instance <- NULL
+  register[[name]]$instanciated <- F
+
+  assign("register", register, pos = modulr_env)
+
+  if(!(name %in% RESERVED_NAMES))
+    message("Module '", name, "' defined.")
+
+  get_definition(name)
+}
 
 
-#' Run a module.
+#' Remove all module definitions.
 #'
-#' @param id  module id
-#' @param ... dependencies and factory function
-#' @return module factory singleton (invisible)
 #' @export
-run = .modulr$run
 
+reset <- function() {
+  assign("register", NULL, pos = modulr_env)
+  init()
+}
 
-#' Reset all modules.
+#' Undefine module.
 #'
 #' @export
-reset = .modulr$reset
 
+undefine <- function(name) {
+  if(!(name %in% RESERVED_NAMES)) {
+    register <- get("register", pos = modulr_env)
+    register[[name]] <- NULL
+    assign("register", register, pos = modulr_env)
+  }
+}
 
-#' Undefine a module.
+#' Syntactic sugar to require dependencies, to be used in conjunction with \%provides\%.
 #'
-#' @param id  module id
 #' @export
-undef = .modulr$undef
+`%requires%` = function(lhs, rhs) {
+  list(name=as.character(lhs), dependencies=as.list(rhs))
+}
 
-
-#' Evaluate a module.
+#' Syntactic sugar to provide a factory, can be used in conjunction with \%requires\%.
 #'
-#' @param id  module id
-#' @return module factory singleton (invisible)
 #' @export
-.eval = .modulr$.eval
+`%provides%` = function(lhs, rhs) {
+  if(!is.function(rhs))
+    stop("Type mismatch, factory needed on RHS.")
+  if(is.list(lhs)) {
+    if(!identical(names(lhs), c("name", "dependencies")))
+      stop("Type mismatch, dependencies needed on LHS.")
+    name <- lhs$name
+    dependencies <- lhs$dependencies
+  } else {
+    name <- as.character(lhs)
+    dependencies <- list()
+  }
+  factory <- rhs
+  do.call(define, args = list(name, dependencies, factory), envir = parent.frame())
+}
 
 
-#' Get internals
-#'
-#' @return list of internals
-#' @export
-.internals = .modulr$.internals
+define_modulr = function() {
+  define("modulr", list(), function() {
+    list(
+        get_parameters = function() {
+          configuration = get("configuration", pos = modulr_env)
+          configuration$parameters[[get(".__name__", pos = parent.frame())]]
+        }
+      , get_name = function() {
+          get(".__name__", pos = parent.frame())
+        }
+    )
+  })
+}
+
+init = function() {
+  define_modulr()
+}
+
+init()

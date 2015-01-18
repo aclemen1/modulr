@@ -1,12 +1,11 @@
 Package: modulr
 Type: Package
-Title: modulr -- Module Pattern Implementation for R
-Version: 1.0
-Date: 2015-01-16
+Title: modulr -- Module Pattern and DI in R
+Version: 0.1.0
+Date: 2015-01-18
 Author: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
 Maintainer: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
-Description: modulr is an R implementation of the celebrated Module Pattern that allows you to encapsulate pieces of code into useful singleton units, namely modules that register their capabilities, export values and rely on other modules dependencies. modulr is widely inspired from RequireJS for Javascript, work of James Burke and other contributors from the Open Source Community.
-Depends: gdata, pooh
-Suggests: dplyr, magrittr, DBI, ROracle
+Description: modulr is a Module Pattern and Dependency Injection implementation in R.
+Depends: stringr, pooh
 License: MIT
 Encoding: UTF-8

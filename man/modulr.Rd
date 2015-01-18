@@ -2,27 +2,16 @@
 % Please edit documentation in R/modulr.R
 \docType{package}
 \name{modulr}
-\alias{.modulr}
 \alias{modulr}
 \alias{modulr-package}
-\title{modulr -- A Module Pattern for R}
-\format{\preformatted{List of 7
- $ define    :function (..., id, force = F)  
- $ run       :function (...)  
- $ .eval     :function (id, force = F)  
- $ configure :function (config)  
- $ reset     :function ()  
- $ undef     :function (id)  
- $ .internals:function ()  
-}}
-\usage{
-.modulr
-}
+\title{modulr -- Module Pattern and DI in R}
 \description{
-modulr is an R implementation of the Module Pattern that allows you to encapsulate pieces of code into useful singleton units, namely modules that register their capabilities, export values and rely on other modules dependencies. modulr is widely inspired from RequireJS for Javascript and the work of James Burke and other contributors.
+modulr is a Module Pattern and Dependency Injection implementation in R.
+Module Pattern and DI allows you to encapsulate pieces of code into useful singleton units,
+namely modules that register their capabilities, export values and rely on other modules as dependencies.
+modulr is widely inspired from RequireJS and AngularJS for Javascript.
 }
 \author{
 Alain Clément-Pavon <\email{alain.clement-pavon@unil.ch}>
 }
-\keyword{datasets}
 

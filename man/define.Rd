@@ -4,23 +4,31 @@
 \alias{define}
 \title{Define a module.}
 \usage{
-define(..., id, force = F)
+define(name, dependencies, factory)
 }
 \arguments{
-\item{...}{dependencies and factory function}
+\item{name}{the module name, given as a character string.}
 
-\item{id}{module id}
+\item{dependencies}{the list of module dependencies, given as module names.}
+
+\item{factory}{the factory function.}
 }
 \value{
-module factory singleton (invisible)
+a wrapper function around the module instanciation.
 }
 \description{
 Define a module.
 }
 \examples{
-define(id = "module_1", function() {
+# define "module_1"
+define("module_1", list(), function() {
  message("Module 1"); "value 1"})
-define(id = "module_2", "module_1", function(m1) {
+
+# define "module_2"
+m2 <- define("module_2", list("module_1"), function(m1) {
  message("Module 2 with one dependency"); paste(m1, "value 2")})
+
+# instanciate "module_2"
+m2()
 }
 
