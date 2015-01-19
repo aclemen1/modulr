@@ -1,8 +1,7 @@
-"unisis/dwh" %requires% list("unisis/dwh/get_connection", "modulr") %provides%
-  function(get_connection, modulr) {
+"unisis/dwh" %requires% list("unisis/dwh/get_connection") %provides%
+  function(get_connection) {
 
     require("DBI")
-    require("dplyr")
 
     get_all_tables <- function() {
       connection <- get_connection()

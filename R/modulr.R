@@ -153,15 +153,22 @@ load <- function(name, scope_name, force_reload = F) {
   if(!.is_defined(name) | force_reload) {
     if(missing(scope_name)) path <- .resolve_path(name) else
       path <- .resolve_path(name, scope_name)
-    # TODO: implement .Rmd sourcing as well
+    # TODO: implement .Rmd sourcing as well (see purl())
     message(
-      "Module '", name, "' not yet defined or force reload. Trying to load it from ",
-      path, ".R (and .Rmd soon).")
-    source(paste0(path, ".R"))
-    return(paste0(path, ".R"))
+      "Module '", name, "' not yet defined or force reload.")
+    if(file.exists(paste0(path, ".Rmd"))) {
+      message("Loading file '", path, ".Rmd'.")
+      source(knit(paste0(path, ".Rmd"), output = tempfile(), tangle = T))
+      return(paste0(path, ".Rmd"))
+    } else if(file.exists(paste0(path, ".R"))) {
+      message("Loading file '", path, ".R'.")
+      source(paste0(path, ".R"))
+      return(paste0(path, ".R"))
+    } else
+      warning("File not found.")
+    NULL
   }
 }
-
 
 #' Reload module.
 #'
