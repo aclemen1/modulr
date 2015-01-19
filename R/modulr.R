@@ -153,9 +153,6 @@ load <- function(name, scope_name, force_reload = F) {
   if(!.is_defined(name) | force_reload) {
     if(missing(scope_name)) path <- .resolve_path(name) else
       path <- .resolve_path(name, scope_name)
-    # TODO: implement .Rmd sourcing as well (see purl())
-    message(
-      "Module '", name, "' not yet defined or force reload.")
     if(file.exists(paste0(path, ".Rmd"))) {
       message("Loading file '", path, ".Rmd'.")
       source(knit(paste0(path, ".Rmd"), output = tempfile(), tangle = T))
@@ -165,7 +162,7 @@ load <- function(name, scope_name, force_reload = F) {
       source(paste0(path, ".R"))
       return(paste0(path, ".R"))
     } else
-      warning("File not found.")
+      warning("File '", path, ".R[md]' not found.")
     NULL
   }
 }
@@ -241,6 +238,8 @@ instanciate <- function(name,
   register <- get("register", pos = modulr_env)
   for(ordered_name in ordered_names) {
     module <- register[[ordered_name]]
+    if(is.null(module))
+      stop("Module not defined.")
     if(  !module$instanciated
        | force_reinstanciate_all
        | force_redefine_reinstanciate_all
