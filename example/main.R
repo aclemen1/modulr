@@ -1,38 +1,19 @@
 library(modulr)
+reset()
 
 # Configuration
-configure(list(
-  # Namespace ==> path correspondances
-  paths = list(
-    "unisis" = "example/lib/unisis" # register UNISIS modules installation
-    ),
-  # Modules parameters
-  parameters = list(
-    "unisis/dwh/get_connection" = list(
-      configs = list(
-        dev = list(
-          host = "devcog.unil.ch",
-          port = 1521,
-          service_name = "Sinfpildev.unil.ch",
-          username = "unisis",
-          password = "unisis35"
-          ),
-        prod = list(
-          host = "prdcog.unil.ch",
-          port = 1521,
-          service_name = "Sinfpilprd.unil.ch",
-          username = "unisis",
-          password = "unisis35"
-          )
-        ),
-      stage = "dev"
-      )
-    )
-  ))
+paths_config$set(
+  "unisis" = "example/lib/unisis",
+  "test" = "example"
+  )
+
+module_config("unisis/dwh/get_connection")$set(
+#   stage = "dev"
+  )
 
 # Main module
-.main <- "main" %requires% list("unisis/dwh", "modulr") %provides%
-  function(dwh, modulr) {
+.main <- "main" %requires% list("unisis/dwh") %provides%
+  function(dwh) {
     all_tables <<- dwh$get_all_tables()
     rawub <<- dwh$get_table("RAWUB")
     NULL

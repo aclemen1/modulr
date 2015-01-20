@@ -18,16 +18,72 @@ RESERVED_NAMES <- c("modulr")
 modulr_env <- new.env()
 
 assign("register", list(), pos = modulr_env)
-assign("configuration", list(), pos = modulr_env)
+assign("configuration", list(modules=list()), pos = modulr_env)
 
 
 #' Configure modulr.
 #'
 #' @export
 
-configure <- function(configuration) {
-  assign("configuration", configuration, pos = modulr_env)
+# configure <- function(configuration) {
+#   assign("configuration", configuration, pos = modulr_env)
+# }
+
+.config <- function(scope) {
+  set <- function(..., drop = T) {
+    options_list = list(...)
+    if(is.null(names(options_list))
+       & length(options_list) == 1
+       & is.list(options_list[[1]]))
+      options_list <- options_list[[1]]
+    if(length(options_list) == 0) return()
+    configuration <- base::get("configuration", pos = modulr_env)
+    if(is.null(configuration[[scope]])) {
+      configuration[[scope]] <- options_list
+    } else {
+      for(key in names(options_list))
+        if(is.null(configuration[[scope]][[key]]) | drop)
+          configuration[[scope]][[key]] <- options_list[[key]]
+    }
+    assign("configuration", configuration, pos = modulr_env)
+  }
+  get <- function(key) {
+    base::get("configuration", pos = modulr_env)[[scope]][[key]]
+  }
+  get_all <- function() {
+    base::get("configuration", pos = modulr_env)[[scope]]
+  }
+  list(
+    set = set,
+    get = get,
+    get_all = get_all
+    )
 }
+
+#' All configurations.
+#'
+#' @export
+get_all_configs <- function() get("configuration", pos = modulr_env)
+
+#' Paths configuration.
+#'
+#' @export
+paths_config <-
+  .config("paths")
+
+
+#' Maps configuration.
+#'
+#' @export
+maps_config <-
+  .config("maps")
+
+
+#' Mmodule configuration.
+#'
+#' @export
+module_config <- function(name)
+  .config(c("modules", name))
 
 
 .resolve_mapping <- function(name, scope_name) {
@@ -145,20 +201,20 @@ configure <- function(configuration) {
 }
 
 
-#' Load module.
+#' Import module.
 #'
 #' @export
 
-load <- function(name, scope_name, force_reload = F) {
-  if(!.is_defined(name) | force_reload) {
+import <- function(name, scope_name, force_reimport = F) {
+  if(!.is_defined(name) | force_reimport) {
     if(missing(scope_name)) path <- .resolve_path(name) else
       path <- .resolve_path(name, scope_name)
     if(file.exists(paste0(path, ".Rmd"))) {
-      message("Loading file '", path, ".Rmd'.")
+      message("Importing file '", path, ".Rmd'.")
       source(knit(paste0(path, ".Rmd"), output = tempfile(), tangle = T))
       return(paste0(path, ".Rmd"))
     } else if(file.exists(paste0(path, ".R"))) {
-      message("Loading file '", path, ".R'.")
+      message("Importing file '", path, ".R'.")
       source(paste0(path, ".R"))
       return(paste0(path, ".R"))
     } else
@@ -167,26 +223,26 @@ load <- function(name, scope_name, force_reload = F) {
   }
 }
 
-#' Reload module.
+#' Reimport module.
 #'
 #' @export
 
-reload <- function(name, scope_name)
-  load(name, scope_name, force_reload = T)
+reimport <- function(name, scope_name)
+  import(name, scope_name, force_reimport = T)
 
 
 #' Redefine module.
 #'
 #' @export
 
-redefine <- reload
+redefine <- reimport
 
 # make sure all dependent modules are defined
-.define_all_dependent_modules <- function(name, force_reload_all = F) {
+.define_all_dependent_modules <- function(name, force_reimport_all = F) {
   visited_dependencies <- list()
   iteration <- function(name, scope_name) {
     if(!(name %in% visited_dependencies)) {
-      load(name, scope_name, force_reload_all)
+      import(name, scope_name, force_reimport_all)
       visited_dependencies <<- c(visited_dependencies, name)
       Map(function(dependency) iteration(dependency, name),
           get("register", pos = modulr_env)[[name]]$dependencies)
@@ -239,7 +295,7 @@ instanciate <- function(name,
   for(ordered_name in ordered_names) {
     module <- register[[ordered_name]]
     if(is.null(module))
-      stop("Module not defined.")
+      stop("Module '", ordered_name, "' not defined.")
     if(  !module$instanciated
        | force_reinstanciate_all
        | force_redefine_reinstanciate_all
@@ -394,13 +450,10 @@ undefine <- function(name) {
 define_modulr = function() {
   define("modulr", list(), function() {
     list(
-        get_parameters = function() {
-          configuration = get("configuration", pos = modulr_env)
-          configuration$parameters[[get(".__name__", pos = parent.frame())]]
-        }
-      , get_name = function() {
-          get(".__name__", pos = parent.frame())
-        }
+      get_module_config = function()
+        module_config(get(".__name__", pos = parent.frame()))$get_all(),
+      get_module_name = function()
+        get(".__name__", pos = parent.frame())
     )
   })
 }
