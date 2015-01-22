@@ -1,28 +1,50 @@
+
+## ----libraries-----------------------------------------------------------
 library(modulr)
-reset()
 
-# Configuration
+
+## ----configuration-------------------------------------------------------
 paths_config$set(
-  "unisis" = "example/lib/unisis",
-  "test" = "example"
+  "unisis" = "lib/unisis"
   )
 
-module_config("unisis/dwh/get_connection")$set(
-#   stage = "dev"
+"unisis/dwh/get_connection" %has_option% list(
+   #stage = "dev"
   )
 
+
+## ----definition----------------------------------------------------------
 # Main module
-.main <- "main" %requires% list("unisis/dwh") %provides%
-  function(dwh) {
-    all_tables <<- dwh$get_all_tables()
-    rawub <<- dwh$get_table("RAWUB")
+.main <- "main" %requires% list("unisis/dwh/raw/table") %provides%
+  function(raw_table) {
+    all_tables <<- raw_table$get_all()
+    rawub <<- raw_table$get("UB")
+#    rawadresses <<- raw_table$get("ADRESSES")
     NULL
   }
 
-# Main module instanciation
-.main()
-.main(force_reinstanciate=T) # will reload the tables
-#.main(force_reinstanciate_all = T)
 
-# Objects in the environment
-print(ls())
+## ----instanciation, message=FALSE, results='hide'------------------------
+.main()
+
+
+## ----output--------------------------------------------------------------
+print(all_tables)
+
+
+## ----output2-------------------------------------------------------------
+str(rawub)
+
+
+## ----output3-------------------------------------------------------------
+#print(head(rawadresses))
+
+
+## ------------------------------------------------------------------------
+toto <- "toto" %provides% (
+  toto_factory <- function() {
+    "Hello World"
+    })
+
+
+

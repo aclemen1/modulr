@@ -33,10 +33,10 @@ assign("configuration", list(modules=list()), pos = modulr_env)
   set <- function(..., drop = T) {
     options_list = list(...)
     if(is.null(names(options_list))
-       & length(options_list) == 1
-       & is.list(options_list[[1]]))
-      options_list <- options_list[[1]]
-    if(length(options_list) == 0) return()
+       & length(options_list) == 1)
+      if(is.list(options_list[[1]]))
+        options_list <- options_list[[1]]
+    if(length(options_list) == 0) return(invisible(NULL))
     configuration <- base::get("configuration", pos = modulr_env)
     if(is.null(configuration[[scope]])) {
       configuration[[scope]] <- options_list
@@ -79,11 +79,25 @@ maps_config <-
   .config("maps")
 
 
-#' Mmodule configuration.
+#' Module options.
 #'
 #' @export
-module_config <- function(name)
+module_option <- function(name)
   .config(c("modules", name))
+
+#' Syntactic sugar for setting default module options.
+#'
+#' @export
+`%has_default_option%` = function(lhs, rhs) {
+  module_option(as.character(lhs))$set(as.list(rhs), drop = F)
+}
+
+#' Syntactic sugar for setting module options.
+#'
+#' @export
+`%has_option%` = function(lhs, rhs) {
+  module_option(as.character(lhs))$set(as.list(rhs), drop = T)
+}
 
 
 .resolve_mapping <- function(name, scope_name) {
@@ -211,7 +225,10 @@ import <- function(name, scope_name, force_reimport = F) {
       path <- .resolve_path(name, scope_name)
     if(file.exists(paste0(path, ".Rmd"))) {
       message("Importing file '", path, ".Rmd'.")
-      source(knit(paste0(path, ".Rmd"), output = tempfile(), tangle = T))
+      unnamed_chunk_label_opts = opts_knit$get("unnamed.chunk.label")
+      opts_knit$set("unnamed.chunk.label" = paste("modulr", name, sep="/"))
+      source(knit(paste0(path, ".Rmd"), output = tempfile(fileext = ".R"), tangle = T, quiet = T))
+      opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
       return(paste0(path, ".Rmd"))
     } else if(file.exists(paste0(path, ".R"))) {
       message("Importing file '", path, ".R'.")
@@ -450,8 +467,8 @@ undefine <- function(name) {
 define_modulr = function() {
   define("modulr", list(), function() {
     list(
-      get_module_config = function()
-        module_config(get(".__name__", pos = parent.frame()))$get_all(),
+      get_module_options = function()
+        module_option(get(".__name__", pos = parent.frame()))$get_all(),
       get_module_name = function()
         get(".__name__", pos = parent.frame())
     )

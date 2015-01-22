@@ -1,0 +1,75 @@
+---
+title: "unisis/dwh/connection"
+author: "Alain Clément-Pavon"
+date: "2015-01-21"
+output: html_document
+---
+
+# Initialization
+
+```{r}
+library(modulr)
+```
+
+# Default options
+
+```{r}
+"unisis/dwh/connection" %has_default_option% list(
+  configs = list(
+    dev = list(
+      host = "devcog.unil.ch",
+      port = 1521,
+      service_name = "Sinfpildev.unil.ch",
+      username = "unisis",
+      password = "unisis35"
+    ),
+    prod = list(
+      host = "prdcog.unil.ch",
+      port = 1521,
+      service_name = "Sinfpilprd.unil.ch",
+      username = "unisis",
+      password = "unisis35"
+    )
+  ),
+  stage = "prod"
+)
+```
+
+# Definition
+
+```{r}
+"unisis/dwh/connection" %requires% list("modulr") %provides% (
+  connection_factory <- function(modulr) {
+    require(DBI)
+    require(ROracle)
+    get <- function() {
+      options <- modulr$get_module_options()
+
+      driver <- dbDriver("Oracle")
+
+      host <- options$configs[[options$stage]]$host
+      port <- options$configs[[options$stage]]$port
+      service_name <- options$configs[[options$stage]]$service_name
+
+      connect_string <- paste(
+        "(DESCRIPTION=",
+        "(ADDRESS=(PROTOCOL=tcp)(HOST=", host, ")(PORT=", port, "))",
+        "(CONNECT_DATA=(SERVICE_NAME=", service_name, ")))", sep = "")
+
+      connection_handler <- dbConnect(
+        driver,
+        username = options$configs[[options$stage]]$username,
+        password = options$configs[[options$stage]]$password,
+        dbname = connect_string)
+      
+      return(connection_handler)
+      }
+    disconnect <- function(connection_handler)
+      dbDisconnect(connection_handler)
+    list(
+      get = get,
+      disconnect = disconnect
+      )
+    })
+```
+
