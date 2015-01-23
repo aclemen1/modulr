@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Title: modulr -- Module Pattern and DI in R
+Title: Module Pattern and DI in R
 Version: 0.1.0
 Date: 2015-01-18
 Author: Alain Clément-Pavon <alain.clement-pavon@unil.ch>

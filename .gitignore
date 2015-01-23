@@ -1,2 +1,7 @@
 packrat/lib*/
 .Rproj.user
+.Rhistory
+tmp/
+example/
+demo/
+TODO.md
