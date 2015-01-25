@@ -220,7 +220,7 @@ module_option <- function(name)
 #' @export
 
 import <- function(name, scope_name, force_reimport = F) {
-  if(!.is_defined(name) | force_reimport) {
+  if(!(name %in% RESERVED_NAMES) & (!.is_defined(name) | force_reimport)) {
     if(missing(scope_name)) path <- .resolve_path(name) else
       path <- .resolve_path(name, scope_name)
     if(file.exists(paste0(path, ".Rmd"))) {
