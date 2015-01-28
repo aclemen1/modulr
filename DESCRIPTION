@@ -6,6 +6,6 @@ Date: 2015-01-18
 Author: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
 Maintainer: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
 Description: modulr is a Module Pattern and Dependency Injection implementation in R.
-Depends: knitr, stringr, pooh
+Depends: knitr, pooh, stringr
 License: MIT
 Encoding: UTF-8

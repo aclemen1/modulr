@@ -9,9 +9,11 @@
 #' @name modulr
 #' @author Alain Clément-Pavon <\email{alain.clement-pavon@@unil.ch}>
 
-# library(stringr)
-# library(pooh)
 NULL
+
+library(knitr)
+library(pooh)
+library(stringr)
 
 RESERVED_NAMES <- c("modulr")
 
@@ -223,17 +225,17 @@ import <- function(name, scope_name, force_reimport = F) {
   if(!(name %in% RESERVED_NAMES) & (!.is_defined(name) | force_reimport)) {
     if(missing(scope_name)) path <- .resolve_path(name) else
       path <- .resolve_path(name, scope_name)
-    if(file.exists(paste0(path, ".Rmd"))) {
-      message("Importing file '", path, ".Rmd'.")
-      unnamed_chunk_label_opts = opts_knit$get("unnamed.chunk.label")
-      opts_knit$set("unnamed.chunk.label" = paste("modulr", name, sep="/"))
-      source(knit(paste0(path, ".Rmd"), output = tempfile(fileext = ".R"), tangle = T, quiet = T))
-      opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
-      return(paste0(path, ".Rmd"))
-    } else if(file.exists(paste0(path, ".R"))) {
+    if(file.exists(paste0(path, ".R"))) {
       message("Importing file '", path, ".R'.")
       source(paste0(path, ".R"))
       return(paste0(path, ".R"))
+    } else if(file.exists(paste0(path, ".Rmd"))) {
+      message("Importing file '", path, ".Rmd'.")
+      unnamed_chunk_label_opts = knitr::opts_knit$get("unnamed.chunk.label")
+      knitr::opts_knit$set("unnamed.chunk.label" = paste("modulr", name, sep="/"))
+      source(knitr::knit(paste0(path, ".Rmd"), output = tempfile(fileext = ".R"), tangle = T, quiet = T))
+      knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
+      return(paste0(path, ".Rmd"))
     } else
       warning("File '", path, ".R[md]' not found.")
     NULL
