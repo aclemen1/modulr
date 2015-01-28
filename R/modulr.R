@@ -88,6 +88,7 @@ maps_config <-
 #' @export
 enable_auto_redefine_and_reinstanciate <- function(name) {
   module_option(name)$set(".__redefine_and_reinstanciate__" = T)
+  module_option(name)$set(".__reinstanciate__" = F)
 }
 
 
@@ -96,6 +97,7 @@ enable_auto_redefine_and_reinstanciate <- function(name) {
 #' @export
 enable_auto_reinstanciate <- function(name) {
   module_option(name)$set(".__reinstanciate__" = T)
+  module_option(name)$set(".__redefine_and_reinstanciate__" = F)
 }
 
 
@@ -104,6 +106,7 @@ enable_auto_reinstanciate <- function(name) {
 #' @export
 disable_auto_redefine_and_reinstanciate <- function(name) {
   module_option(name)$set(".__redefine_and_reinstanciate__" = F)
+  module_option(name)$set(".__reinstanciate__" = F)
 }
 
 
@@ -111,6 +114,7 @@ disable_auto_redefine_and_reinstanciate <- function(name) {
 #'
 #' @export
 disable_auto_reinstanciate <- function(name) {
+  module_option(name)$set(".__redefine_and_reinstanciate__" = F)
   module_option(name)$set(".__reinstanciate__" = F)
 }
 
@@ -360,7 +364,7 @@ instanciate <- function(name,
       module_option(ordered_name)$get(".__redefine_and_reinstanciate__")
     if(is.null(redefine_and_reinstanciate_mode))
       redefine_and_reinstanciate_mode <- F
-    else if(redefine_and_reinstanciate_mode)
+    else if(redefine_and_reinstanciate_mode & ordered_name != name)
       message("Module '", ordered_name,
               "' auto-redefinition and reinstanciation enabled.")
     reinstanciate_mode <-
@@ -369,7 +373,8 @@ instanciate <- function(name,
       reinstanciate_mode <- F
     else if(reinstanciate_mode)
       message("Module '", ordered_name, "' auto-reinstanciation enabled.")
-    if(!force_redefine_reinstanciate_all & redefine_and_reinstanciate_mode)
+    if(!force_redefine_reinstanciate_all & redefine_and_reinstanciate_mode
+       & ordered_name != name)
       redefine(ordered_name)
     module <- register[[ordered_name]]
     if(is.null(module))
