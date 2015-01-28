@@ -6,14 +6,14 @@
 \title{Paths configuration.}
 \format{\preformatted{List of 3
  $ set    :function (..., drop = T)  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 35 10 51 3 10 3 35 51
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x206c248> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 36 10 52 3 10 3 36 52
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x177f200> 
  $ get    :function (key)  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 56 10 58 3 10 3 56 58
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x206c248> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 57 10 59 3 10 3 57 59
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x177f200> 
  $ get_all:function ()  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 52 14 55 3 14 3 52 55
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x206c248> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 53 14 56 3 14 3 53 56
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x177f200> 
 }}
 \usage{
 paths_config

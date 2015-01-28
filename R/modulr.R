@@ -322,7 +322,8 @@ instanciate <- function(name, debug = F, force = F) {
         register[[name]]$reinstanciate_children
       })))
     if(reinstanciated_by_parent) {
-      message("Module '", ordered_name, "' reinstanciated by parent.")
+      if(module$instanciated & ordered_name != name)
+        message("Module '", ordered_name, "' needs reinstanciation by parent.")
       module$reinstanciate_children <- T
     }
     if(!module$instanciated
@@ -534,7 +535,7 @@ define <- function(name, dependencies, factory) {
     register[[name]]$reinstanciate_children <- T
 
     if(!(name %in% RESERVED_NAMES))
-      message("Module '", name, "' defined. (", register[[name]]$signature, ")")
+      message("Module '", name, "' defined.")
   } else {
     previous_signature <- register[[name]]$signature
     signature <- digest(c(
@@ -548,8 +549,7 @@ define <- function(name, dependencies, factory) {
       register[[name]]$instanciated <- F
       register[[name]]$reinstanciate_children <- T
       if(!(name %in% RESERVED_NAMES))
-        message("Module '", name, "' redefined. (",
-                previous_signature, " --> ", signature, ")")
+        message("Module '", name, "' changed.")
     } else {
       register[[name]]$reinstanciate_children <- F
       if(!(name %in% RESERVED_NAMES))
