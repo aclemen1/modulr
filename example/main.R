@@ -14,7 +14,7 @@ paths_config$set(
    stage = "dev"
   )
 
-"unisis/dwh/connection" %>% disable_auto_redefine_and_reinstanciate
+"unisis/dwh/connection" %>% enable_auto_redefine_and_reinstanciate
 "main" %>% enable_auto_reinstanciate
 
 ## ----definition----------------------------------------------------------

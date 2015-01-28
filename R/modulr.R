@@ -374,8 +374,10 @@ instanciate <- function(name,
     else if(reinstanciate_mode)
       message("Module '", ordered_name, "' auto-reinstanciation enabled.")
     if(!force_redefine_reinstanciate_all & redefine_and_reinstanciate_mode
-       & ordered_name != name)
+       & ordered_name != name) {
       redefine(ordered_name)
+      register <- get("register", pos = modulr_env)
+    }
     module <- register[[ordered_name]]
     if(is.null(module))
       stop("Module '", ordered_name, "' not defined.")
