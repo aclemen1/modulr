@@ -1,17 +1,21 @@
 
 ## ----libraries-----------------------------------------------------------
 library(modulr)
+library(magrittr)
+#reset()
 
 
 ## ----configuration-------------------------------------------------------
 paths_config$set(
-  "unisis" = "lib/unisis"
+  "unisis" = "example/lib/unisis"
   )
 
 "unisis/dwh/get_connection" %has_option% list(
-   #stage = "dev"
+   stage = "dev"
   )
 
+"unisis/dwh/connection" %>% undebug
+"main" %>% undebug
 
 ## ----definition----------------------------------------------------------
 # Main module
@@ -25,6 +29,7 @@ paths_config$set(
 
 
 ## ----instanciation, message=FALSE, results='hide'------------------------
+rm("all_tables")
 .main()
 
 

@@ -49,11 +49,12 @@ assign("configuration", list(modules=list()), pos = modulr_env)
     }
     assign("configuration", configuration, pos = modulr_env)
   }
-  get <- function(key) {
-    base::get("configuration", pos = modulr_env)[[scope]][[key]]
-  }
   get_all <- function() {
-    base::get("configuration", pos = modulr_env)[[scope]]
+    config <- base::get("configuration", pos = modulr_env)
+    config[[scope[1]]][[scope[2]]]
+  }
+  get <- function(key) {
+    get_all()[[key]]
   }
   list(
     set = set,
@@ -67,6 +68,7 @@ assign("configuration", list(modules=list()), pos = modulr_env)
 #' @export
 get_all_configs <- function() get("configuration", pos = modulr_env)
 
+
 #' Paths configuration.
 #'
 #' @export
@@ -79,6 +81,22 @@ paths_config <-
 #' @export
 maps_config <-
   .config("maps")
+
+
+#' Enable module debugging.
+#'
+#' @export
+debug <- function(name) {
+  module_option(name)$set(".__debug__" = T)
+}
+
+
+#' Disable module debugging.
+#'
+#' @export
+undebug <- function(name) {
+  module_option(name)$set(".__debug__" = NULL)
+}
 
 
 #' Module options.
@@ -236,7 +254,7 @@ import <- function(name, scope_name, force_reimport = F) {
       source(knitr::knit(paste0(path, ".Rmd"), output = tempfile(fileext = ".R"), tangle = T, quiet = T))
       knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
       return(paste0(path, ".Rmd"))
-    } else
+    } else if (!.is_defined(name))
       warning("File '", path, ".R[md]' not found.")
     NULL
   }
@@ -303,19 +321,26 @@ instanciate <- function(name,
                         force_redefine_reinstanciate = F,
                         force_reinstanciate_all = F,
                         force_redefine_reinstanciate_all = F) {
+  debug_mode <- module_option(name)$get(".__debug__")
+  if(is.null(debug_mode)) debug_mode <- F
   all_dependencies <- .define_all_dependent_modules(name,
     force_redefine_reinstanciate_all)
-  if(!force_redefine_reinstanciate_all & force_redefine_reinstanciate)
+  if(!force_redefine_reinstanciate_all &
+       (force_redefine_reinstanciate | debug_mode))
     redefine(name)
   dependency_graph <- .build_dependency_graph(all_dependencies)
   ordered_names <- .topological_sort(dependency_graph)
   if(is.null(ordered_names)) ordered_names <- name
   register <- get("register", pos = modulr_env)
   for(ordered_name in ordered_names) {
+    debug_mode <- module_option(ordered_name)$get(".__debug__")
+    if(is.null(debug_mode)) debug_mode <- F
+    if(!force_redefine_reinstanciate_all & debug_mode)
+      redefine(ordered_name)
     module <- register[[ordered_name]]
     if(is.null(module))
       stop("Module '", ordered_name, "' not defined.")
-    if(  !module$instanciated
+    if(  !module$instanciated | debug_mode
        | force_reinstanciate_all
        | force_redefine_reinstanciate_all
        | (force_reinstanciate & ordered_name == name)) {
@@ -462,7 +487,8 @@ undefine <- function(name) {
     dependencies <- list()
   }
   factory <- rhs
-  do.call(define, args = list(name, dependencies, factory), envir = parent.frame())
+  do.call(define, args = list(name, dependencies, factory),
+          envir = parent.frame())
 }
 
 
