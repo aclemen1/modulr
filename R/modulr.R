@@ -83,19 +83,35 @@ maps_config <-
   .config("maps")
 
 
-#' Enable module debugging.
+#' Enable module auto redefinition.
 #'
 #' @export
-debug <- function(name) {
-  module_option(name)$set(".__debug__" = T)
+enable_auto_redefine_and_reinstanciate <- function(name) {
+  module_option(name)$set(".__redefine_and_reinstanciate__" = T)
 }
 
 
-#' Disable module debugging.
+#' Enable module auto reinstanciation.
 #'
 #' @export
-undebug <- function(name) {
-  module_option(name)$set(".__debug__" = NULL)
+enable_auto_reinstanciate <- function(name) {
+  module_option(name)$set(".__reinstanciate__" = T)
+}
+
+
+#' Disable module auto redefinition.
+#'
+#' @export
+disable_auto_redefine_and_reinstanciate <- function(name) {
+  module_option(name)$set(".__redefine_and_reinstanciate__" = F)
+}
+
+
+#' Disable module auto reinstanciation.
+#'
+#' @export
+disable_auto_reinstanciate <- function(name) {
+  module_option(name)$set(".__reinstanciate__" = F)
 }
 
 
@@ -321,36 +337,57 @@ instanciate <- function(name,
                         force_redefine_reinstanciate = F,
                         force_reinstanciate_all = F,
                         force_redefine_reinstanciate_all = F) {
-  debug_mode <- module_option(name)$get(".__debug__")
-  if(is.null(debug_mode)) debug_mode <- F
-  all_dependencies <- .define_all_dependent_modules(name,
-    force_redefine_reinstanciate_all)
+  redefine_and_reinstanciate_mode <-
+    module_option(name)$get(".__redefine_and_reinstanciate__")
+  if(is.null(redefine_and_reinstanciate_mode))
+    redefine_and_reinstanciate_mode <- F
+  else if(redefine_and_reinstanciate_mode)
+    message("Module '", name,
+            "' auto-redefinition and reinstanciation enabled.")
   if(!force_redefine_reinstanciate_all &
-       (force_redefine_reinstanciate | debug_mode))
+       (force_redefine_reinstanciate | redefine_and_reinstanciate_mode))
     redefine(name)
+  all_dependencies <-
+    .define_all_dependent_modules(
+      name,
+      force_redefine_reinstanciate_all)
   dependency_graph <- .build_dependency_graph(all_dependencies)
   ordered_names <- .topological_sort(dependency_graph)
   if(is.null(ordered_names)) ordered_names <- name
   register <- get("register", pos = modulr_env)
   for(ordered_name in ordered_names) {
-    debug_mode <- module_option(ordered_name)$get(".__debug__")
-    if(is.null(debug_mode)) debug_mode <- F
-    if(!force_redefine_reinstanciate_all & debug_mode)
+    redefine_and_reinstanciate_mode <-
+      module_option(ordered_name)$get(".__redefine_and_reinstanciate__")
+    if(is.null(redefine_and_reinstanciate_mode))
+      redefine_and_reinstanciate_mode <- F
+    else if(redefine_and_reinstanciate_mode)
+      message("Module '", ordered_name,
+              "' auto-redefinition and reinstanciation enabled.")
+    reinstanciate_mode <-
+      module_option(ordered_name)$get(".__reinstanciate__")
+    if(is.null(reinstanciate_mode))
+      reinstanciate_mode <- F
+    else if(reinstanciate_mode)
+      message("Module '", ordered_name, "' auto-reinstanciation enabled.")
+    if(!force_redefine_reinstanciate_all & redefine_and_reinstanciate_mode)
       redefine(ordered_name)
     module <- register[[ordered_name]]
     if(is.null(module))
       stop("Module '", ordered_name, "' not defined.")
-    if(  !module$instanciated | debug_mode
+    if(!module$instanciated
+       | reinstanciate_mode | redefine_and_reinstanciate_mode
        | force_reinstanciate_all
        | force_redefine_reinstanciate_all
        | (force_reinstanciate & ordered_name == name)) {
       env = new.env()
       assign(".__name__", ordered_name, pos = env)
       if(length(module$dependencies) > 0) {
-        args <- lapply(module$dependencies, function(name) register[[name]]$instance)
+        args <- lapply(module$dependencies,
+                       function(name) register[[name]]$instance)
         # tricky bug solution, see below
-        module$instance <- evalq(do.call(eval(parse(text=deparse(module$factory))),
-                                         args = args), envir = env)
+        module$instance <- evalq(do.call(
+          eval(parse(text=deparse(module$factory))),
+          args = args), envir = env)
       } else {
         # the deparse %>% parse %>% eval trick solves the following bug
         # WOKS:
@@ -360,8 +397,9 @@ instanciate <- function(name,
         # module$instance <- evalq(do.call(f, args = list()), envir = env)
         # WORKAROUND:
         # module$instance <- evalq(do.call(eval(parse(text=deparse(f))), args = list()), envir = env)
-        module$instance <- evalq(do.call(eval(parse(text=deparse(module$factory))),
-                                         args = list()), envir = env)
+        module$instance <- evalq(do.call(
+          eval(parse(text=deparse(module$factory))),
+          args = list()), envir = env)
       }
       module$instanciated <- T
       register[[ordered_name]] <- module

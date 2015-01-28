@@ -2,7 +2,7 @@
 ## ----libraries-----------------------------------------------------------
 library(modulr)
 library(magrittr)
-#reset()
+reset()
 
 
 ## ----configuration-------------------------------------------------------
@@ -14,8 +14,8 @@ paths_config$set(
    stage = "dev"
   )
 
-"unisis/dwh/connection" %>% undebug
-"main" %>% undebug
+"unisis/dwh/connection" %>% disable_auto_redefine_and_reinstanciate
+"main" %>% enable_auto_reinstanciate
 
 ## ----definition----------------------------------------------------------
 # Main module
