@@ -43,6 +43,7 @@ library(modulr)
     require(DBI)
     require(ROracle)
     get <- function() {
+      message("*** Hello World ***")
       options <- modulr$get_module_options()
 
       driver <- dbDriver("Oracle")

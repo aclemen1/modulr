@@ -61,13 +61,13 @@ library(RUnit)
       })
     }
 
-instanciate("unisis/dwh/table.test")
+#instanciate("unisis/dwh/table.test")
 
-test.table <- "unisis/dwh/table.test" %requires%
-  list("unisis/dwh/table.mock") %provides%
-  function(table) {
-    checkEquals(table$get_all(), data.frame(owner="a", table_name="b"))
-    checkEquals(table$get(""), data.frame(c1="a", c2="c"))
-    }
+#test.table <- "unisis/dwh/table.test" %requires%
+#  list("unisis/dwh/table.mock") %provides%
+#  function(table) {
+#    checkEquals(table$get_all(), data.frame(owner="a", table_name="b"))
+#    checkEquals(table$get(""), data.frame(c1="a", c2="c"))
+#    }
 ```
 

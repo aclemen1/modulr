@@ -14,6 +14,7 @@ NULL
 library(knitr)
 library(pooh)
 library(stringr)
+library(digest)
 
 RESERVED_NAMES <- c("modulr")
 
@@ -81,42 +82,6 @@ paths_config <-
 #' @export
 maps_config <-
   .config("maps")
-
-
-#' Enable module auto redefinition.
-#'
-#' @export
-enable_auto_redefine_and_reinstanciate <- function(name) {
-  module_option(name)$set(".__redefine_and_reinstanciate__" = T)
-  module_option(name)$set(".__reinstanciate__" = F)
-}
-
-
-#' Enable module auto reinstanciation.
-#'
-#' @export
-enable_auto_reinstanciate <- function(name) {
-  module_option(name)$set(".__reinstanciate__" = T)
-  module_option(name)$set(".__redefine_and_reinstanciate__" = F)
-}
-
-
-#' Disable module auto redefinition.
-#'
-#' @export
-disable_auto_redefine_and_reinstanciate <- function(name) {
-  module_option(name)$set(".__redefine_and_reinstanciate__" = F)
-  module_option(name)$set(".__reinstanciate__" = F)
-}
-
-
-#' Disable module auto reinstanciation.
-#'
-#' @export
-disable_auto_reinstanciate <- function(name) {
-  module_option(name)$set(".__redefine_and_reinstanciate__" = F)
-  module_option(name)$set(".__reinstanciate__" = F)
-}
 
 
 #' Module options.
@@ -336,56 +301,33 @@ redefine <- reimport
 #'
 #' @export
 
-instanciate <- function(name,
-                        force_reinstanciate = F,
-                        force_redefine_reinstanciate = F,
-                        force_reinstanciate_all = F,
-                        force_redefine_reinstanciate_all = F) {
-  redefine_and_reinstanciate_mode <-
-    module_option(name)$get(".__redefine_and_reinstanciate__")
-  if(is.null(redefine_and_reinstanciate_mode))
-    redefine_and_reinstanciate_mode <- F
-  else if(redefine_and_reinstanciate_mode)
-    message("Module '", name,
-            "' auto-redefinition and reinstanciation enabled.")
-  if(!force_redefine_reinstanciate_all &
-       (force_redefine_reinstanciate | redefine_and_reinstanciate_mode))
+instanciate <- function(name, debug = F, force = F) {
+  if(debug)
     redefine(name)
   all_dependencies <-
     .define_all_dependent_modules(
       name,
-      force_redefine_reinstanciate_all)
+      debug)
   dependency_graph <- .build_dependency_graph(all_dependencies)
   ordered_names <- .topological_sort(dependency_graph)
   if(is.null(ordered_names)) ordered_names <- name
-  register <- get("register", pos = modulr_env)
   for(ordered_name in ordered_names) {
-    redefine_and_reinstanciate_mode <-
-      module_option(ordered_name)$get(".__redefine_and_reinstanciate__")
-    if(is.null(redefine_and_reinstanciate_mode))
-      redefine_and_reinstanciate_mode <- F
-    else if(redefine_and_reinstanciate_mode & ordered_name != name)
-      message("Module '", ordered_name,
-              "' auto-redefinition and reinstanciation enabled.")
-    reinstanciate_mode <-
-      module_option(ordered_name)$get(".__reinstanciate__")
-    if(is.null(reinstanciate_mode))
-      reinstanciate_mode <- F
-    else if(reinstanciate_mode)
-      message("Module '", ordered_name, "' auto-reinstanciation enabled.")
-    if(!force_redefine_reinstanciate_all & redefine_and_reinstanciate_mode
-       & ordered_name != name) {
-      redefine(ordered_name)
-      register <- get("register", pos = modulr_env)
-    }
+    register <- get("register", pos = modulr_env)
     module <- register[[ordered_name]]
     if(is.null(module))
       stop("Module '", ordered_name, "' not defined.")
+    reinstanciated_by_parent <- any(unlist(lapply(
+      module$dependencies,
+      function(name) {
+        register[[name]]$reinstanciate_children
+      })))
+    if(reinstanciated_by_parent) {
+      message("Module '", ordered_name, "' reinstanciated by parent.")
+      module$reinstanciate_children <- T
+    }
     if(!module$instanciated
-       | reinstanciate_mode | redefine_and_reinstanciate_mode
-       | force_reinstanciate_all
-       | force_redefine_reinstanciate_all
-       | (force_reinstanciate & ordered_name == name)) {
+       | reinstanciated_by_parent
+       | ((debug | force) & ordered_name == name)) {
       env = new.env()
       assign(".__name__", ordered_name, pos = env)
       if(length(module$dependencies) > 0) {
@@ -416,33 +358,140 @@ instanciate <- function(name,
     }
   }
 
+  for(name in ordered_names) {
+    register <- get("register", pos = modulr_env)
+    register[[name]]$reinstanciate_children <- F
+    assign("register", register, pos = modulr_env)
+  }
+
+
   get("register", pos = modulr_env)[[name]]$instance
 }
+
+# instanciate <- function(name,
+#                         force_reinstanciate = F,
+#                         force_redefine_reinstanciate = F,
+#                         force_reinstanciate_all = F,
+#                         force_redefine_reinstanciate_all = F) {
+#   redefine_and_reinstanciate_mode <-
+#     module_option(name)$get(".__redefine_and_reinstanciate__")
+#   if(is.null(redefine_and_reinstanciate_mode))
+#     redefine_and_reinstanciate_mode <- F
+#   else if(redefine_and_reinstanciate_mode)
+#     message("Module '", name,
+#             "' auto-redefinition and reinstanciation enabled.")
+#   if(!force_redefine_reinstanciate_all &
+#        (force_redefine_reinstanciate | redefine_and_reinstanciate_mode))
+#     redefine(name)
+#   all_dependencies <-
+#     .define_all_dependent_modules(
+#       name,
+#       force_redefine_reinstanciate_all)
+#   dependency_graph <- .build_dependency_graph(all_dependencies)
+#   ordered_names <- .topological_sort(dependency_graph)
+#   if(is.null(ordered_names)) ordered_names <- name
+#   register <- get("register", pos = modulr_env)
+#   for(ordered_name in ordered_names) {
+#     redefine_and_reinstanciate_mode <-
+#       module_option(ordered_name)$get(".__redefine_and_reinstanciate__")
+#     if(is.null(redefine_and_reinstanciate_mode))
+#       redefine_and_reinstanciate_mode <- F
+#     else if(redefine_and_reinstanciate_mode & ordered_name != name)
+#       message("Module '", ordered_name,
+#               "' auto-redefinition and reinstanciation enabled.")
+#     reinstanciate_mode <-
+#       module_option(ordered_name)$get(".__reinstanciate__")
+#     if(is.null(reinstanciate_mode))
+#       reinstanciate_mode <- F
+#     else if(reinstanciate_mode)
+#       message("Module '", ordered_name, "' auto-reinstanciation enabled.")
+#     if(!force_redefine_reinstanciate_all & redefine_and_reinstanciate_mode
+#        & ordered_name != name) {
+#       redefine(ordered_name)
+#       register <- get("register", pos = modulr_env)
+#     }
+#     module <- register[[ordered_name]]
+#     if(is.null(module))
+#       stop("Module '", ordered_name, "' not defined.")
+#     if(!module$instanciated
+#        | reinstanciate_mode | redefine_and_reinstanciate_mode
+#        | force_reinstanciate_all
+#        | force_redefine_reinstanciate_all
+#        | (force_reinstanciate & ordered_name == name)) {
+#       env = new.env()
+#       assign(".__name__", ordered_name, pos = env)
+#       if(length(module$dependencies) > 0) {
+#         args <- lapply(module$dependencies,
+#                        function(name) register[[name]]$instance)
+#         # tricky bug solution, see below
+#         module$instance <- evalq(do.call(
+#           eval(parse(text=deparse(module$factory))),
+#           args = args), envir = env)
+#       } else {
+#         # the deparse %>% parse %>% eval trick solves the following bug
+#         # WOKS:
+#         # module$instance <- evalq(do.call(function() {get("variable", pos = env)}, args = list()), envir = env)
+#         # DOES NOT WORK:
+#         # f <- function() {get("variable", pos = env)}
+#         # module$instance <- evalq(do.call(f, args = list()), envir = env)
+#         # WORKAROUND:
+#         # module$instance <- evalq(do.call(eval(parse(text=deparse(f))), args = list()), envir = env)
+#         module$instance <- evalq(do.call(
+#           eval(parse(text=deparse(module$factory))),
+#           args = list()), envir = env)
+#       }
+#       module$instanciated <- T
+#       register[[ordered_name]] <- module
+#       assign("register", register, pos = modulr_env)
+#       if (!(ordered_name %in% RESERVED_NAMES))
+#         message("Module '", ordered_name, "' instanciated.")
+#     }
+#   }
+#
+#   get("register", pos = modulr_env)[[name]]$instance
+# }
 
 #' Reinstanciate a module.
 #'
 #' @export
 
 reinstanciate <- function(name)
-  instanciate(name, force_reinstanciate = T)
+  instanciate(name, force = T)
 
 
 #' Get module defininition.
 #'
 #' @export
 get_definition <- function(name) {
-  wrapper = function(force_reinstanciate = F,
-                     force_redefine_reinstanciate = F,
-                     force_reinstanciate_all = F,
-                     force_redefine_reinstanciate_all = F)
+  wrapper = function(debug = F,
+                     force = F)
     instanciate(name,
-                force_reinstanciate = force_reinstanciate,
-                force_redefine_reinstanciate = force_redefine_reinstanciate,
-                force_reinstanciate_all = force_reinstanciate_all,
-                force_redefine_reinstanciate_all =
-                  force_redefine_reinstanciate_all)
-
+                debug = debug,
+                force = force)
   invisible(wrapper)
+}
+
+# get_definition <- function(name) {
+#   wrapper = function(force_reinstanciate = F,
+#                      force_redefine_reinstanciate = F,
+#                      force_reinstanciate_all = F,
+#                      force_redefine_reinstanciate_all = F)
+#     instanciate(name,
+#                 force_reinstanciate = force_reinstanciate,
+#                 force_redefine_reinstanciate = force_redefine_reinstanciate,
+#                 force_reinstanciate_all = force_reinstanciate_all,
+#                 force_redefine_reinstanciate_all =
+#                   force_redefine_reinstanciate_all)
+#
+#   invisible(wrapper)
+# }
+
+.signature <- function(name) {
+  register <- get("register", pos = modulr_env)
+  module <- register[[name]]
+  digest(c(
+    deparse(module$dependencies),
+    deparse(module$factory)), "sha1")
 }
 
 #' Define a module.
@@ -473,16 +522,42 @@ define <- function(name, dependencies, factory) {
 
   register <- get("register", pos = modulr_env)
 
-  register[[name]]$name <- name
-  register[[name]]$dependencies <- dependencies
-  register[[name]]$factory <- factory
-  register[[name]]$instance <- NULL
-  register[[name]]$instanciated <- F
+  if(is.null(register[[name]])) {
+    register[[name]]$name <- name
+    register[[name]]$dependencies <- dependencies
+    register[[name]]$factory <- factory
+    register[[name]]$signature <- digest(c(
+      deparse(dependencies),
+      deparse(factory)), "sha1")
+    register[[name]]$instance <- NULL
+    register[[name]]$instanciated <- F
+    register[[name]]$reinstanciate_children <- T
+
+    if(!(name %in% RESERVED_NAMES))
+      message("Module '", name, "' defined. (", register[[name]]$signature, ")")
+  } else {
+    previous_signature <- register[[name]]$signature
+    signature <- digest(c(
+      deparse(dependencies),
+      deparse(factory)), "sha1")
+    if(signature != previous_signature) {
+      register[[name]]$dependencies <- dependencies
+      register[[name]]$factory <- factory
+      register[[name]]$signature <- signature
+      register[[name]]$instance <- NULL
+      register[[name]]$instanciated <- F
+      register[[name]]$reinstanciate_children <- T
+      if(!(name %in% RESERVED_NAMES))
+        message("Module '", name, "' redefined. (",
+                previous_signature, " --> ", signature, ")")
+    } else {
+      register[[name]]$reinstanciate_children <- F
+      if(!(name %in% RESERVED_NAMES))
+        message("Module '", name, "' unchanged.")
+    }
+  }
 
   assign("register", register, pos = modulr_env)
-
-  if(!(name %in% RESERVED_NAMES))
-    message("Module '", name, "' defined.")
 
   get_definition(name)
 }

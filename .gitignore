@@ -1,6 +1,7 @@
 packrat/lib*/
 .Rproj.user
 .Rhistory
+.RData
 tmp/
 example/
 demo/

@@ -14,8 +14,8 @@ paths_config$set(
    stage = "dev"
   )
 
-"unisis/dwh/connection" %>% enable_auto_redefine_and_reinstanciate
-"main" %>% enable_auto_reinstanciate
+#"unisis/dwh/connection" %>% enable_auto_redefine_and_reinstanciate
+#"main" %>% enable_auto_reinstanciate
 
 ## ----definition----------------------------------------------------------
 # Main module
@@ -23,14 +23,14 @@ paths_config$set(
   function(raw_table) {
     all_tables <<- raw_table$get_all()
     rawub <<- raw_table$get("UB")
-#    rawadresses <<- raw_table$get("ADRESSES")
+#   rawadresses <<- raw_table$get("ADRESSES")
     NULL
   }
 
 
 ## ----instanciation, message=FALSE, results='hide'------------------------
-rm("all_tables")
-.main()
+#rm("all_tables")
+.main(debug=T)
 
 
 ## ----output--------------------------------------------------------------

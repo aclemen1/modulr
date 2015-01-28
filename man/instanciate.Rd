@@ -4,8 +4,7 @@
 \alias{instanciate}
 \title{Instanciate a module.}
 \usage{
-instanciate(name, force_reinstanciate = F, force_redefine_reinstanciate = F,
-  force_reinstanciate_all = F, force_redefine_reinstanciate_all = F)
+instanciate(name, debug = F, force = F)
 }
 \description{
 Instanciate a module.
