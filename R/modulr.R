@@ -452,13 +452,30 @@ instanciate <- function(name, debug = F, force = F) {
 #   get("register", pos = modulr_env)[[name]]$instance
 # }
 
-#' Reinstanciate a module.
+.instanciate <- function(lhs, rhs, debug)
+  assign(as.character(substitute(lhs)),
+         instanciate(rhs, debug = debug), pos = 1)
+.swap <- function(f) function(lhs, rhs) f(rhs, lhs)
+
+#' Syntactic sugar to instanciate a module.
 #'
 #' @export
+`%<<=%` <- function(lhs, rhs) .instanciate(lhs, rhs, T)
 
-reinstanciate <- function(name)
-  instanciate(name, force = T)
+#' Syntactic sugar to instanciate a module.
+#'
+#' @export
+`%=>>%` <- .swap(`%<<=%`)
 
+#' Syntactic sugar to instanciate a module.
+#'
+#' @export
+`%<=%` <- function(lhs, rhs) .instanciate(lhs, rhs, F)
+
+#' Syntactic sugar to instanciate a module.
+#'
+#' @export
+`%=>%` <- .swap(`%<=%`)
 
 #' Get module defininition.
 #'
