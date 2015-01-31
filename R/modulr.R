@@ -261,7 +261,7 @@ redefine <- reimport
 
 # make sure all dependent modules are defined
 .define_all_dependent_modules <- function(name, force_reimport_all = F) {
-  visited_dependencies <- list(name)
+  visited_dependencies <- list()
   iteration <- function(name, scope_name) {
     if(!(name %in% visited_dependencies)) {
       import(name, scope_name, force_reimport_all)
@@ -302,8 +302,6 @@ redefine <- reimport
 #' @export
 
 instanciate <- function(name, debug = F, force = F) {
-  if(debug)
-    redefine(name)
   all_dependencies <-
     .define_all_dependent_modules(
       name,
@@ -455,30 +453,38 @@ instanciate <- function(name, debug = F, force = F) {
 #' Syntactic sugar to instanciate a module.
 #'
 #' @export
-`%<<=%` <- function(lhs, rhs)
-  assign(as.character(substitute(lhs)),
+`%<<=%` <- function(lhs, rhs) {
+  variable_name <- as.character(substitute(lhs))
+  assign(variable_name,
          instanciate(rhs, debug = T), pos = 1)
+}
 
 #' Syntactic sugar to instanciate a module.
 #'
 #' @export
-`%=>>%` <- function(lhs, rhs)
-  assign(as.character(substitute(rhs)),
+`%=>>%` <- function(lhs, rhs) {
+  variable_name <- as.character(substitute(rhs))
+  assign(variable_name,
          instanciate(lhs, debug = T), pos = 1)
+}
 
 #' Syntactic sugar to instanciate a module.
 #'
 #' @export
-`%<=%` <- function(lhs, rhs)
-  assign(as.character(substitute(lhs)),
+`%<=%` <- function(lhs, rhs) {
+  variable_name <- as.character(substitute(lhs))
+  assign(variable_name,
          instanciate(rhs, debug = F), pos = 1)
+}
 
 #' Syntactic sugar to instanciate a module.
 #'
 #' @export
-`%=>%` <- function(lhs, rhs)
-  assign(as.character(substitute(rhs)),
-         instanciate(lhs, debug = T), pos = 1)
+`%=>%` <- function(lhs, rhs) {
+  variable_name <- as.character(substitute(rhs))
+  assign(variable_name,
+         instanciate(lhs, debug = F), pos = 1)
+}
 
 #' Get module defininition.
 #'
