@@ -637,14 +637,33 @@ undefine <- function(name) {
           envir = parent.frame())
 }
 
+#' Get internals
+#'
+#' @export
+.internals <- function() {
+  list(
+    env = modulr_env,
+    register = get("register", pos = modulr_env),
+    configuration = get("configuration", pos = modulr_env)
+    )
+}
 
-define_modulr = function() {
+define_modulr <- function() {
   define("modulr", list(), function() {
     list(
       get_module_options = function()
         module_option(get(".__name__", pos = parent.frame()))$get_all(),
       get_module_name = function()
-        get(".__name__", pos = parent.frame())
+        get(".__name__", pos = parent.frame()),
+      get_filename = function() {
+        name <- get(".__name__", pos = parent.frame())
+        .resolve_path(name)
+      },
+      get_dirname = function() {
+        name <- get(".__name__", pos = parent.frame())
+        dirname(.resolve_path(name))
+      }
+
     )
   })
 }
