@@ -11,11 +11,6 @@
 
 NULL
 
-library(knitr)
-library(pooh)
-library(stringr)
-library(digest)
-
 RESERVED_NAMES <- c("modulr")
 
 modulr_env <- new.env()
