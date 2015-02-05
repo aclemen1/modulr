@@ -18,6 +18,7 @@ modulr_env <- new.env()
 assign("register", list(), pos = modulr_env)
 assign("configuration", list(modules=list()), pos = modulr_env)
 assign("message_handler", NULL, pos = modulr_env)
+assign("message_closed", "", pos = modulr_env)
 
 .reverse <- function(x) sapply(lapply(strsplit(x, NULL), rev), paste,
                                collapse="")
@@ -60,36 +61,34 @@ message_open <- function(announce, output = T,
     args = list(...)
   )
   assign("message_handler", handler, pos = modulr_env)
+  assign("message_closed", "", pos = modulr_env)
   .message_reopen(handler)
 }
 
-message_info <- function(...) {
+.message <- function(f, type = "INFO", ...) {
   handler <- get("message_handler", pos = modulr_env)
-  if(!is.null(handler))
-    message_close("INFO")
-  message(...)
-  .message_reopen(handler)
+  closed <- get("message_closed", pos = modulr_env)
+  if(!is.null(handler) & closed != type) {
+    message_close(type)
+    assign("message_handler", handler, pos = modulr_env)
+    assign("message_closed", type, pos = modulr_env)
+  }
+  f(...)
 }
 
-message_warn <- function(...) {
-  handler <- get("message_handler", pos = modulr_env)
-  if(!is.null(handler))
-    message_close("WARNING")
-  warning(..., immediate. = T)
-  .message_reopen(handler)
-}
-
-message_stop <- function(...) {
-  handler <- get("message_handler", pos = modulr_env)
-  if(!is.null(handler))
-    message_close("STOP")
-  stop(...)
-  .message_reopen(handler)
-}
+message_info <- function(...) .message(message, type = "INFO", ...)
+message_warn <- function(...) .message(
+  function(...) warning(..., immediate. = T), type = "WARN", ...)
+message_stop <- function(...) .message(stop, type = "STOP", ...)
 
 message_close <- function(result) {
   handler <- get("message_handler", pos = modulr_env)
-  if(!is.null(handler))
+  if(!is.null(handler)) {
+    closed <- get("message_closed", pos = modulr_env)
+    if(closed != "") {
+      .message_reopen(handler)
+      assign("message_closed", "", pos = modulr_env)
+    }
     if(handler$output) {
       cut <- do.call(.cuts, args =
                        c(list(result, revert = T, width = handler$width),
@@ -110,6 +109,7 @@ message_close <- function(result) {
       if(length(cut$first_lines) > 0)
         message(cut$first_lines)
     }
+  }
   assign("message_handler", NULL, pos = modulr_env)
 }
 
