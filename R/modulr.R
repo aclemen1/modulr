@@ -45,19 +45,20 @@ assign("message_closed", "", pos = modulr_env)
   if(!is.null(handler))
     if(handler$output) {
       if(!is.null(handler$first_lines))
-        message(handler$first_lines)
-      message(handler$last_line, appendLF = F)
+        #message(handler$first_lines)
+        cat(handler$first_lines, sep="\n")
+      #message(handler$last_line, appendLF = F)
+      cat(handler$last_line, sep="")
     }
 }
 
-message_open <- function(announce, output = T,
-                     width = 0.9 * getOption("width"), ...) {
-  cut <- .cuts(announce, width = width, ...)
+message_open <- function(announce, output = T, ...) {
+  cut <- .cuts(paste0("[", Sys.time(), "] ", announce),
+               width = getOption("width"), ...)
   handler <- list(
     first_lines = cut$first_lines,
     last_line = cut$last_line,
     output = output,
-    width = width,
     args = list(...)
   )
   assign("message_handler", handler, pos = modulr_env)
@@ -76,10 +77,28 @@ message_open <- function(announce, output = T,
   f(...)
 }
 
-message_info <- function(...) .message(message, type = "INFO", ...)
-message_warn <- function(...) .message(
-  function(...) warning(..., immediate. = T), type = "WARN", ...)
-message_stop <- function(...) .message(stop, type = "STOP", ...)
+.dots_print <- function(...) {
+  handler <- get("message_handler", pos = modulr_env)
+  if(is.null(handler))
+    prefix = paste0("[", Sys.time(), "] ")
+  else
+    prefix = ""
+  cat(unlist(strwrap(paste0(prefix, ...),
+                     width=getOption("width"))),
+      sep = "\n")
+}
+
+message_info <- function(...) .message(.dots_print, type = "INFO", ...)
+message_warn <- function(...) .message(.dots_print, type = "WARN", ...)
+message_stop <- function(...) {
+  .message(.dots_print, type = "STOP", ...)
+  stop()
+}
+
+# message_info <- function(...) .message(message, type = "INFO", ...)
+# message_warn <- function(...) .message(
+#   function(...) warning(..., immediate. = T), type = "WARN", ...)
+# message_stop <- function(...) .message(stop, type = "STOP", ...)
 
 message_close <- function(result) {
   handler <- get("message_handler", pos = modulr_env)
@@ -91,23 +110,27 @@ message_close <- function(result) {
     }
     if(handler$output) {
       cut <- do.call(.cuts, args =
-                       c(list(result, revert = T, width = handler$width),
+                       c(list(result, revert = T, width = getOption("width")),
                          handler$args))
-      n_dots <- handler$width - nchar(handler$last_line) - nchar(cut$last_line)
+      n_dots <-
+        getOption("width") - nchar(handler$last_line) - nchar(cut$last_line)
       if(n_dots<3) {
         dots <-
           paste(
-            paste(rep(".", max(0, handler$width - nchar(handler$last_line))),
+            paste(rep(".", max(0,
+                               getOption("width") - nchar(handler$last_line))),
                   collapse=""),
-            paste(rep(".", max(3, handler$width - nchar(cut$last_line))),
+            paste(rep(".", max(3, getOption("width") - nchar(cut$last_line))),
                   collapse=""),
             sep = "\n")
       } else {
         dots <- rep(".", n_dots)
       }
-      message(dots, cut$last_line)
+      #message(dots, cut$last_line)
+      cat(dots, cut$last_line, "\n", sep="")
       if(length(cut$first_lines) > 0)
-        message(cut$first_lines)
+        #message(cut$first_lines)
+        cat(cut$first_lines, "\n", sep="")
     }
   }
   assign("message_handler", NULL, pos = modulr_env)
