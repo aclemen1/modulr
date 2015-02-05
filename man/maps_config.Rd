@@ -6,14 +6,14 @@
 \title{Maps configuration.}
 \format{\preformatted{List of 3
  $ set    :function (..., drop = T)  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 31 10 47 3 10 3 31 47
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x1d3f5e8> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 126 10 142 3 10 3 126 142
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3c7f2f0> 
  $ get    :function (key)  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 52 10 54 3 10 3 52 54
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x1d3f5e8> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 147 10 149 3 10 3 147 149
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3c7f2f0> 
  $ get_all:function ()  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 48 14 51 3 14 3 48 51
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x1d3f5e8> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 143 14 146 3 14 3 143 146
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3c7f2f0> 
 }}
 \usage{
 maps_config

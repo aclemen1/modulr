@@ -17,6 +17,101 @@ modulr_env <- new.env()
 
 assign("register", list(), pos = modulr_env)
 assign("configuration", list(modules=list()), pos = modulr_env)
+assign("message_handler", NULL, pos = modulr_env)
+
+.reverse <- function(x) sapply(lapply(strsplit(x, NULL), rev), paste,
+                               collapse="")
+
+.cuts <- function(string, revert = F, ...) {
+  if(revert) string <- .reverse(string)
+  lines <- unlist(strwrap(string, simplify = F, ...))
+  last_line <- tail(lines, 1L)
+  if(length(lines) > 1) {
+    first_lines <- paste(head(lines, -1), collapse = "\n")
+  } else first_lines <- NULL
+  if(revert) {
+    first_lines <- sapply(first_lines, .reverse)
+    last_line <- .reverse(last_line)
+  }
+  list(
+    first_lines = first_lines,
+    last_line = last_line
+  )
+}
+
+.message_reopen <- function() {
+  handler <- get("message_handler", pos = modulr_env)
+  if(!is.null(handler))
+    if(handler$output) {
+      if(!is.null(handler$first_lines))
+        message(handler$first_lines)
+      message(handler$last_line, appendLF = F)
+    }
+}
+
+message_open <- function(announce, output = T,
+                     width = 0.9 * getOption("width"), ...) {
+  cut <- .cuts(announce, width = width, ...)
+  handler <- list(
+    first_lines = cut$first_lines,
+    last_line = cut$last_line,
+    output = output,
+    width = width,
+    args = list(...)
+  )
+  assign("message_handler", handler, pos = modulr_env)
+  .message_reopen()
+}
+
+message_info <- function(...) {
+  handler <- get("message_handler", pos = modulr_env)
+  if(!is.null(handler))
+    message_close("INFO")
+  message(...)
+  .message_reopen()
+}
+
+message_warn <- function(...) {
+  handler <- get("message_handler", pos = modulr_env)
+  if(!is.null(handler))
+    message_close("WARNING")
+  warning(...)
+  .message_reopen()
+}
+
+message_stop <- function(...) {
+  handler <- get("message_handler", pos = modulr_env)
+  if(!is.null(handler))
+    message_close("STOP")
+  stop(...)
+  .message_reopen()
+}
+
+message_close <- function(result) {
+  handler <- get("message_handler", pos = modulr_env)
+  if(!is.null(handler))
+    if(handler$output) {
+      cut <- do.call(.cuts, args =
+                       c(list(result, revert = T, width = handler$width),
+                         handler$args))
+      n_dots <- handler$width - nchar(handler$last_line) - nchar(cut$last_line)
+      if(n_dots<3) {
+        dots <-
+          paste(
+            paste(rep(".", max(0, handler$width - nchar(handler$last_line))),
+                  collapse=""),
+            paste(rep(".", max(3, handler$width - nchar(cut$last_line))),
+                  collapse=""),
+            sep = "\n")
+      } else {
+        dots <- rep(".", n_dots)
+      }
+      message(dots, cut$last_line)
+      if(length(cut$first_lines) > 0)
+        message(cut$first_lines)
+    }
+  assign("message_handler", NULL, pos = modulr_env)
+}
 
 
 #' Configure modulr.
@@ -224,18 +319,22 @@ import <- function(name, scope_name, force_reimport = F) {
     if(missing(scope_name)) path <- .resolve_path(name) else
       path <- .resolve_path(name, scope_name)
     if(file.exists(paste0(path, ".R"))) {
-      message("Importing file '", path, ".R'.")
+#       message_open(sprintf("Module '%s'", name))
+#       message_close("Found in .R file ")
       source(paste0(path, ".R"))
       return(paste0(path, ".R"))
     } else if(file.exists(paste0(path, ".Rmd"))) {
-      message("Importing file '", path, ".Rmd'.")
+#       message_open(sprintf("Module '%s'", name))
+#       message_close("Found in .Rmd file")
       unnamed_chunk_label_opts = knitr::opts_knit$get("unnamed.chunk.label")
       knitr::opts_knit$set("unnamed.chunk.label" = paste("modulr", name, sep="/"))
       source(knitr::knit(paste0(path, ".Rmd"), output = tempfile(fileext = ".R"), tangle = T, quiet = T))
       knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
       return(paste0(path, ".Rmd"))
-    } else if (!.is_defined(name))
-      warning("File '", path, ".R[md]' not found.")
+    } else if (!.is_defined(name)) {
+      message_open(sprintf("Module '%s'", name))
+      message_close(sprintf("Not found", path))
+    }
     NULL
   }
 }
@@ -315,13 +414,16 @@ instanciate <- function(name, debug = F, force = F) {
         register[[name]]$reinstanciate_children
       })))
     if(reinstanciated_by_parent) {
-      if(module$instanciated & ordered_name != name)
-        message("Module '", ordered_name, "' needs reinstanciation by parent.")
+#       if(module$instanciated & ordered_name != name) {
+#         message("Module '", ordered_name, "' needs reinstanciation by parent.")
+#       }
       module$reinstanciate_children <- T
     }
     if(!module$instanciated
        | reinstanciated_by_parent
        | ((debug | force) & ordered_name == name)) {
+      if (!(ordered_name %in% RESERVED_NAMES))
+        message_open(sprintf("Module '%s'", ordered_name))
       env = new.env()
       assign(".__name__", ordered_name, pos = env)
       if(length(module$dependencies) > 0) {
@@ -344,11 +446,15 @@ instanciate <- function(name, debug = F, force = F) {
           eval(parse(text=deparse(module$factory))),
           args = list()), envir = env)
       }
+      if (!(ordered_name %in% RESERVED_NAMES))
+        if(module$instanciated | !module$first_instance)
+          message_close("Re-Instanciated")
+        else
+          message_close("Instanciated")
       module$instanciated <- T
+      module$first_instance <- F
       register[[ordered_name]] <- module
       assign("register", register, pos = modulr_env)
-      if (!(ordered_name %in% RESERVED_NAMES))
-        message("Module '", ordered_name, "' instanciated.")
     }
   }
 
@@ -357,7 +463,6 @@ instanciate <- function(name, debug = F, force = F) {
     register[[name]]$reinstanciate_children <- F
     assign("register", register, pos = modulr_env)
   }
-
 
   get("register", pos = modulr_env)[[name]]$instance
 }
@@ -536,11 +641,14 @@ get_definition <- function(name) {
 #' @export
 
 define <- function(name, dependencies, factory) {
-  if(exists(".__filename__", where = parent.frame())) {
-    message("Module imported.")
-    filename = get(".__filename__", pos = parent.frame())
-    print(filename)
-  }
+#   if(exists(".__filename__", where = parent.frame())) {
+#     message("Module imported.")
+#     filename = get(".__filename__", pos = parent.frame())
+#     print(filename)
+#   }
+
+  if(!(name %in% RESERVED_NAMES))
+    message_open(sprintf("Module '%s'", name))
 
   register <- get("register", pos = modulr_env)
 
@@ -553,10 +661,11 @@ define <- function(name, dependencies, factory) {
       deparse(factory)), "sha1")
     register[[name]]$instance <- NULL
     register[[name]]$instanciated <- F
+    register[[name]]$first_instance <- T
     register[[name]]$reinstanciate_children <- T
 
     if(!(name %in% RESERVED_NAMES))
-      message("Module '", name, "' defined.")
+      message_close("Defined")
   } else {
     previous_signature <- register[[name]]$signature
     signature <- digest(c(
@@ -568,13 +677,14 @@ define <- function(name, dependencies, factory) {
       register[[name]]$signature <- signature
       register[[name]]$instance <- NULL
       register[[name]]$instanciated <- F
+      register[[name]]$first_instance <- F
       register[[name]]$reinstanciate_children <- T
       if(!(name %in% RESERVED_NAMES))
-        message("Module '", name, "' changed.")
+        message_close("Changed and re-defined")
     } else {
       register[[name]]$reinstanciate_children <- F
       if(!(name %in% RESERVED_NAMES))
-        message("Module '", name, "' unchanged.")
+        message_close("Unchanged")
     }
   }
 
@@ -589,8 +699,10 @@ define <- function(name, dependencies, factory) {
 #' @export
 
 reset <- function() {
+  message_open("Package 'modulr'")
   assign("register", NULL, pos = modulr_env)
   init()
+  message_close("Reset")
 }
 
 #' Undefine module.
@@ -657,9 +769,13 @@ define_modulr <- function() {
       get_dirname = function() {
         name <- get(".__name__", pos = parent.frame())
         dirname(.resolve_path(name))
-      }
-
-    )
+      },
+      message_open = message_open,
+      message_info = message_info,
+      message_warn = message_warn,
+      message_stop = message_stop,
+      message_close = message_close
+      )
   })
 }
 
@@ -668,3 +784,4 @@ init = function() {
 }
 
 init()
+
