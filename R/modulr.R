@@ -260,7 +260,7 @@ module_option <- function(name)
   )
 }
 
-.resolve_path <- function(name, scope_name) {
+resolve_path <- function(name, scope_name) {
   configuration <- get("configuration", pos = modulr_env)
 
   if(missing(scope_name)) injected_name <- name else
@@ -316,8 +316,8 @@ module_option <- function(name)
 
 import <- function(name, scope_name, force_reimport = F) {
   if(!(name %in% RESERVED_NAMES) & (!.is_defined(name) | force_reimport)) {
-    if(missing(scope_name)) path <- .resolve_path(name) else
-      path <- .resolve_path(name, scope_name)
+    if(missing(scope_name)) path <- resolve_path(name) else
+      path <- resolve_path(name, scope_name)
     if(file.exists(paste0(path, ".R"))) {
 #       message_open(sprintf("Module '%s'", name))
 #       message_close("Found in .R file ")
@@ -764,12 +764,13 @@ define_modulr <- function() {
         get(".__name__", pos = parent.frame()),
       get_filename = function() {
         name <- get(".__name__", pos = parent.frame())
-        .resolve_path(name)
+        resolve_path(name)
       },
       get_dirname = function() {
         name <- get(".__name__", pos = parent.frame())
-        dirname(.resolve_path(name))
+        dirname(resolve_path(name))
       },
+      resolve_path = resolve_path,
       message_open = message_open,
       message_info = message_info,
       message_warn = message_warn,
