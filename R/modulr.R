@@ -39,8 +39,8 @@ assign("message_handler", NULL, pos = modulr_env)
   )
 }
 
-.message_reopen <- function() {
-  handler <- get("message_handler", pos = modulr_env)
+.message_reopen <- function(handler) {
+  assign("message_handler", handler, pos = modulr_env)
   if(!is.null(handler))
     if(handler$output) {
       if(!is.null(handler$first_lines))
@@ -60,7 +60,7 @@ message_open <- function(announce, output = T,
     args = list(...)
   )
   assign("message_handler", handler, pos = modulr_env)
-  .message_reopen()
+  .message_reopen(handler)
 }
 
 message_info <- function(...) {
@@ -68,15 +68,15 @@ message_info <- function(...) {
   if(!is.null(handler))
     message_close("INFO")
   message(...)
-  .message_reopen()
+  .message_reopen(handler)
 }
 
 message_warn <- function(...) {
   handler <- get("message_handler", pos = modulr_env)
   if(!is.null(handler))
     message_close("WARNING")
-  warning(...)
-  .message_reopen()
+  warning(..., immediate. = T)
+  .message_reopen(handler)
 }
 
 message_stop <- function(...) {
@@ -84,7 +84,7 @@ message_stop <- function(...) {
   if(!is.null(handler))
     message_close("STOP")
   stop(...)
-  .message_reopen()
+  .message_reopen(handler)
 }
 
 message_close <- function(result) {
