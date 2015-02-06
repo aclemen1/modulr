@@ -54,7 +54,7 @@ assign("message_closed", "", pos = modulr_env)
 
 message_open <- function(announce, output = T, ...) {
   cut <- .cuts(paste0("[", Sys.time(), "] ", announce),
-               width = getOption("width"), ...)
+               width = 0.9 * getOption("width"), ...)
   handler <- list(
     first_lines = cut$first_lines,
     last_line = cut$last_line,
@@ -84,7 +84,7 @@ message_open <- function(announce, output = T, ...) {
   else
     prefix = ""
   cat(unlist(strwrap(paste0(prefix, ...),
-                     width=getOption("width"))),
+                     width=0.9 * getOption("width"))),
       sep = "\n")
 }
 
@@ -110,17 +110,17 @@ message_close <- function(result) {
     }
     if(handler$output) {
       cut <- do.call(.cuts, args =
-                       c(list(result, revert = T, width = getOption("width")),
+                       c(list(result, revert = T, width = 0.9 * getOption("width")),
                          handler$args))
       n_dots <-
-        getOption("width") - nchar(handler$last_line) - nchar(cut$last_line)
+        0.9 * getOption("width") - nchar(handler$last_line) - nchar(cut$last_line)
       if(n_dots<3) {
         dots <-
           paste(
             paste(rep(".", max(0,
-                               getOption("width") - nchar(handler$last_line))),
+                               0.9 * getOption("width") - nchar(handler$last_line))),
                   collapse=""),
-            paste(rep(".", max(3, getOption("width") - nchar(cut$last_line))),
+            paste(rep(".", max(3, 0.9 * getOption("width") - nchar(cut$last_line))),
                   collapse=""),
             sep = "\n")
       } else {

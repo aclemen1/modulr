@@ -7,13 +7,13 @@
 \format{\preformatted{List of 3
  $ set    :function (..., drop = T)  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 149 10 165 3 10 3 149 165
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3c12198> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x2a87f78> 
  $ get    :function (key)  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 170 10 172 3 10 3 170 172
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3c12198> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x2a87f78> 
  $ get_all:function ()  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 166 14 169 3 14 3 166 169
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3c12198> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x2a87f78> 
 }}
 \usage{
 paths_config
