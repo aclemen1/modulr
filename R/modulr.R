@@ -490,88 +490,6 @@ instanciate <- function(name, debug = F, force = F) {
   get("register", pos = modulr_env)[[name]]$instance
 }
 
-# instanciate <- function(name,
-#                         force_reinstanciate = F,
-#                         force_redefine_reinstanciate = F,
-#                         force_reinstanciate_all = F,
-#                         force_redefine_reinstanciate_all = F) {
-#   redefine_and_reinstanciate_mode <-
-#     module_option(name)$get(".__redefine_and_reinstanciate__")
-#   if(is.null(redefine_and_reinstanciate_mode))
-#     redefine_and_reinstanciate_mode <- F
-#   else if(redefine_and_reinstanciate_mode)
-#     message("Module '", name,
-#             "' auto-redefinition and reinstanciation enabled.")
-#   if(!force_redefine_reinstanciate_all &
-#        (force_redefine_reinstanciate | redefine_and_reinstanciate_mode))
-#     redefine(name)
-#   all_dependencies <-
-#     .define_all_dependent_modules(
-#       name,
-#       force_redefine_reinstanciate_all)
-#   dependency_graph <- .build_dependency_graph(all_dependencies)
-#   ordered_names <- .topological_sort(dependency_graph)
-#   if(is.null(ordered_names)) ordered_names <- name
-#   register <- get("register", pos = modulr_env)
-#   for(ordered_name in ordered_names) {
-#     redefine_and_reinstanciate_mode <-
-#       module_option(ordered_name)$get(".__redefine_and_reinstanciate__")
-#     if(is.null(redefine_and_reinstanciate_mode))
-#       redefine_and_reinstanciate_mode <- F
-#     else if(redefine_and_reinstanciate_mode & ordered_name != name)
-#       message("Module '", ordered_name,
-#               "' auto-redefinition and reinstanciation enabled.")
-#     reinstanciate_mode <-
-#       module_option(ordered_name)$get(".__reinstanciate__")
-#     if(is.null(reinstanciate_mode))
-#       reinstanciate_mode <- F
-#     else if(reinstanciate_mode)
-#       message("Module '", ordered_name, "' auto-reinstanciation enabled.")
-#     if(!force_redefine_reinstanciate_all & redefine_and_reinstanciate_mode
-#        & ordered_name != name) {
-#       redefine(ordered_name)
-#       register <- get("register", pos = modulr_env)
-#     }
-#     module <- register[[ordered_name]]
-#     if(is.null(module))
-#       stop("Module '", ordered_name, "' not defined.")
-#     if(!module$instanciated
-#        | reinstanciate_mode | redefine_and_reinstanciate_mode
-#        | force_reinstanciate_all
-#        | force_redefine_reinstanciate_all
-#        | (force_reinstanciate & ordered_name == name)) {
-#       env = new.env()
-#       assign(".__name__", ordered_name, pos = env)
-#       if(length(module$dependencies) > 0) {
-#         args <- lapply(module$dependencies,
-#                        function(name) register[[name]]$instance)
-#         # tricky bug solution, see below
-#         module$instance <- evalq(do.call(
-#           eval(parse(text=deparse(module$factory))),
-#           args = args), envir = env)
-#       } else {
-#         # the deparse %>% parse %>% eval trick solves the following bug
-#         # WOKS:
-#         # module$instance <- evalq(do.call(function() {get("variable", pos = env)}, args = list()), envir = env)
-#         # DOES NOT WORK:
-#         # f <- function() {get("variable", pos = env)}
-#         # module$instance <- evalq(do.call(f, args = list()), envir = env)
-#         # WORKAROUND:
-#         # module$instance <- evalq(do.call(eval(parse(text=deparse(f))), args = list()), envir = env)
-#         module$instance <- evalq(do.call(
-#           eval(parse(text=deparse(module$factory))),
-#           args = list()), envir = env)
-#       }
-#       module$instanciated <- T
-#       register[[ordered_name]] <- module
-#       assign("register", register, pos = modulr_env)
-#       if (!(ordered_name %in% RESERVED_NAMES))
-#         message("Module '", ordered_name, "' instanciated.")
-#     }
-#   }
-#
-#   get("register", pos = modulr_env)[[name]]$instance
-# }
 
 #' Syntactic sugar to instanciate a module.
 #'
@@ -734,9 +652,25 @@ reset <- function() {
 
 undefine <- function(name) {
   if(!(name %in% RESERVED_NAMES)) {
+    message_open(sprintf("Module '%s'", name))
     register <- get("register", pos = modulr_env)
     register[[name]] <- NULL
     assign("register", register, pos = modulr_env)
+    message_close("Undefined")
+  }
+}
+
+#' Touch module.
+#'
+#' @export
+
+touch <- function(name) {
+  if(!(name %in% RESERVED_NAMES)) {
+    message_open(sprintf("Module '%s'", name))
+    register <- get("register", pos = modulr_env)
+    register[[name]]$signature <- 0
+    assign("register", register, pos = modulr_env)
+    message_close("Touched")
   }
 }
 
