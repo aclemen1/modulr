@@ -794,11 +794,9 @@ define_modulr <- function() {
         dirname(resolve_path(name))
       },
       resolve_path = resolve_path,
-      message_open = message_open,
       message_info = message_info,
       message_warn = message_warn,
-      message_stop = message_stop,
-      message_close = message_close
+      message_stop = message_stop
       )
   })
 }
