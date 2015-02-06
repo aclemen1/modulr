@@ -92,7 +92,7 @@ message_info <- function(...) .message(.dots_print, type = "INFO", ...)
 message_warn <- function(...) .message(.dots_print, type = "WARN", ...)
 message_stop <- function(...) {
   .message(.dots_print, type = "STOP", ...)
-  stop()
+  stop("modulr stopped.", call. = F)
 }
 
 # message_info <- function(...) .message(message, type = "INFO", ...)
