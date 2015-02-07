@@ -1,6 +1,10 @@
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage("\n",
-    "Enjoy Dependency Injection and Module Pattern in R with modulr!", "\n")
+  packageStartupMessage(
+    "\n",
+    "Let's modules address complication, and\n",
+    "Dependency Injection manage complexity.\n",
+    "\n",
+    "             -- The modulr Team\n")
 }
 
 .onLoad <- function(libname, pkgname) {

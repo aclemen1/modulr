@@ -7,13 +7,13 @@
 \format{\preformatted{List of 3
  $ set    :function (..., drop = T)  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 10 10 26 3 10 3 10 26
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3585eb0> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x35f3330> 
  $ get    :function (key)  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 31 10 33 3 10 3 31 33
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3585eb0> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x35f3330> 
  $ get_all:function ()  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 27 14 30 3 14 3 27 30
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x3585eb0> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x35f3330> 
 }}
 \usage{
 maps_config
