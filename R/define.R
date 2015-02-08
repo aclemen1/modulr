@@ -113,8 +113,8 @@ define <- function(name, dependencies, factory) {
 reset <- function() {
   message_open("Package 'modulr'")
   assign("register", NULL, pos = modulr_env)
-  init()
   message_close("Reset")
+  .onLoad()
 }
 
 #' Undefine module.
