@@ -26,7 +26,11 @@
   }
   get_all <- function() {
     config <- base::get("configuration", pos = modulr_env)
-    config[[scope[1]]][[scope[2]]]
+    if(is.na(scope[2])) {
+      config[[scope[1]]]
+    } else {
+      config[[scope[1]]][[scope[2]]]
+    }
   }
   get <- function(key) {
     get_all()[[key]]
