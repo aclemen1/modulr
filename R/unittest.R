@@ -15,7 +15,10 @@ run_tests <- function() {
     suite_path <- suites[[suite_name]]
     test_suite <- defineTestSuite(
       suite_name,
-      dirs = suite_path,
+      dirs = unique(dirname(list.files(suite_path,
+                                       recursive = T,
+                                       full.names = T,
+                                       all.files = F))),
       testFileRegexp = ".+\\.R$",
       testFuncRegexp = "^test\\..+")
     test_result <- runTestSuite(test_suite)
