@@ -140,6 +140,7 @@ touch <- function(name) {
     message_open(sprintf("Module '%s'", name))
     register <- get("register", pos = modulr_env)
     register[[name]]$signature <- 0
+    register[[name]]$reinstanciate_children <- T
     assign("register", register, pos = modulr_env)
     message_close("Touched")
   }
