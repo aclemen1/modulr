@@ -10,6 +10,16 @@ get_definition <- function(name) {
   invisible(wrapper)
 }
 
+#' Get module factory.
+#'
+#' @export
+get_factory <- function(name) {
+  register <- get("register", pos = modulr_env)
+  if(!is.null(register[[name]])) {
+    return(register[[name]]$factory)
+  }
+}
+
 # get_definition <- function(name) {
 #   wrapper = function(force_reinstanciate = F,
 #                      force_redefine_reinstanciate = F,
