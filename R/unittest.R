@@ -19,7 +19,7 @@ run_tests <- function() {
                                        recursive = T,
                                        full.names = T,
                                        all.files = F))),
-      testFileRegexp = ".+\\.R$",
+      testFileRegexp = ".*[^_]\\.R$",
       testFuncRegexp = "^test\\..+")
     test_result <- runTestSuite(test_suite)
     printTextProtocol(test_result)
