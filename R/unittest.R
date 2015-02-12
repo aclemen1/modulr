@@ -7,8 +7,8 @@ run_tests <- function() {
   # pour qu'un tangle ait lieu sur les Rmd
 
   runit_options <- getOption("RUnit")
-  #runit_options$silent = T
-  #runit_options$verbose = 0
+  runit_options$silent = T
+  runit_options$verbose = 0
   options("RUnit" = runit_options)
   suites <- paths_config$get_all()
   for(suite_name in names(suites)) {
