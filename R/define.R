@@ -152,6 +152,7 @@ touch <- function(name) {
     register[[name]]$signature <- 0
     register[[name]]$reinstanciate_children <- T
     assign("register", register, pos = modulr_env)
+    module_option(name)$unset()
     message_close("Touched")
   }
 }

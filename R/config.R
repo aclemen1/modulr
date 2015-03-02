@@ -7,6 +7,11 @@
 # }
 
 .config <- function(scope) {
+  unset <- function() {
+    configuration <- base::get("configuration", pos = modulr_env)
+    configuration[[scope]] <- NULL
+    assign("configuration", configuration, pos = modulr_env)
+  }
   set <- function(..., drop = T) {
     options_list = list(...)
     if(is.null(names(options_list))
@@ -36,6 +41,7 @@
     get_all()[[key]]
   }
   list(
+    unset = unset,
     set = set,
     get = get,
     get_all = get_all
