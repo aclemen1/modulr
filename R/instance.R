@@ -81,7 +81,7 @@ instanciate <- function(name, debug = F, force = F) {
 `%<<=%` <- function(lhs, rhs) {
   variable_name <- as.character(substitute(lhs))
   assign(variable_name,
-         instanciate(rhs, debug = T), pos = 1)
+         instanciate(rhs, debug = T), pos = parent.frame())
 }
 
 #' Syntactic sugar to instanciate a module.
@@ -90,7 +90,7 @@ instanciate <- function(name, debug = F, force = F) {
 `%=>>%` <- function(lhs, rhs) {
   variable_name <- as.character(substitute(rhs))
   assign(variable_name,
-         instanciate(lhs, debug = T), pos = 1)
+         instanciate(lhs, debug = T), pos = parent.frame())
 }
 
 #' Syntactic sugar to instanciate a module.
@@ -99,7 +99,7 @@ instanciate <- function(name, debug = F, force = F) {
 `%<=%` <- function(lhs, rhs) {
   variable_name <- as.character(substitute(lhs))
   assign(variable_name,
-         instanciate(rhs, debug = F), pos = 1)
+         instanciate(rhs, debug = F), pos = parent.frame())
 }
 
 #' Syntactic sugar to instanciate a module.
@@ -108,5 +108,5 @@ instanciate <- function(name, debug = F, force = F) {
 `%=>%` <- function(lhs, rhs) {
   variable_name <- as.character(substitute(rhs))
   assign(variable_name,
-         instanciate(lhs, debug = F), pos = 1)
+         instanciate(lhs, debug = F), pos = parent.frame())
 }
