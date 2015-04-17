@@ -14,9 +14,21 @@ define_modulr <- function() {
         dirname(resolve_path(name))
       },
       resolve_path = resolve_path,
-      message_info = message_info,
-      message_warn = message_warn,
-      message_stop = message_stop
+      message_info = function(...)
+        message_info(
+          ...,
+          module_name = tryCatch(get(".__name__", pos = parent.frame()),
+                                 error = function(e) NULL)),
+      message_warn = function(...)
+        message_warn(
+          ...,
+          module_name = tryCatch(get(".__name__", pos = parent.frame()),
+                                 error = function(e) NULL)),
+      message_stop = function(...)
+        message_stop(
+          ...,
+          module_name = tryCatch(get(".__name__", pos = parent.frame()),
+                                 error = function(e) NULL))
     )
   })
 }

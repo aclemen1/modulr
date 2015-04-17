@@ -31,7 +31,8 @@
 }
 
 message_open <- function(announce, output = T, ...) {
-  cut <- .cuts(paste0("[", Sys.time(), "] ", announce),
+  cut <- .cuts(paste0("[", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "] ",
+                      announce),
                width = 0.9 * getOption("width"), ...)
   handler <- list(
     first_lines = cut$first_lines,
@@ -55,15 +56,44 @@ message_open <- function(announce, output = T, ...) {
   f(...)
 }
 
-.dots_print <- function(...) {
+.format_module_name <- function(name, width = 12) {
+  if(is.null(name)) name <- "_(detached)_"
+  if(nchar(name) <= width) {
+    name
+  } else {
+    name <- str_replace(name, "^/", "")
+    components <- unlist(str_split(name, "/"))
+    if(length(components) == 1) {
+      sprintf("…/%s…", str_sub(name, start = 1, end = width - 3))
+    } else {
+      last <- tail(components, 1L)
+      .format_module_name(
+        if(nchar(last) + 1 >= width)
+          sprintf("/%s", last)
+        else
+          sprintf("…%s", str_sub(name, start = -(width - 1)))
+      )
+    }
+  }
+}
+
+.dots_print <- function(..., module_name = NULL) {
   handler <- get("message_handler", pos = modulr_env)
   if(is.null(handler))
-    prefix = paste0("[", Sys.time(), "] ")
+    prefix <- sprintf(
+      "[%s@%s] ",
+      format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
+      str_replace_all(
+        sprintf("%14s",
+                sprintf("'%s'", .format_module_name(module_name, width = 12))),
+        " ", "_")
+      )
   else
     prefix = ""
-  cat(unlist(strwrap(paste0(prefix, ...),
-                     width=0.9 * getOption("width"))),
-      sep = "\n")
+  cat(Filter(nchar, unlist(strwrap(
+    str_replace_all(paste0(prefix, ...), "\n", "\n\n"),
+    width=0.9 * getOption("width")))),
+    sep = "\n")
 }
 
 message_info <- function(...) .message(.dots_print, type = "INFO", ...)
