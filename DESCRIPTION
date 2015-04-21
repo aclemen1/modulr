@@ -1,8 +1,8 @@
 Package: modulr
 Type: Package
 Title: Module Pattern and DI in R
-Version: 0.1.1
-Date: 2015-04-17
+Version: 0.1.2
+Date: 2015-04-21
 Author: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
 Maintainer: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
 Description: modulr is a Module Pattern and Dependency Injection implementation in R.

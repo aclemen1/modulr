@@ -4,7 +4,7 @@
 \alias{run_tests}
 \title{Unit tests.}
 \usage{
-run_tests()
+run_tests(module_name)
 }
 \description{
 Unit tests.
