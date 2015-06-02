@@ -38,7 +38,7 @@ get_factory <- function(name) {
 .signature <- function(name) {
   register <- get("register", pos = modulr_env)
   module <- register[[name]]
-  digest(c(
+  digest::digest(c(
     deparse(module$dependencies),
     deparse(module$factory)), "sha1")
 }
