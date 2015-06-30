@@ -1,11 +1,11 @@
 Package: modulr
 Type: Package
 Title: Module Pattern and DI in R
-Version: 0.1.3
-Date: 2015-04-21
+Version: 0.1.4
+Date: 2015-06-30
 Author: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
 Maintainer: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
 Description: modulr is a Module Pattern and Dependency Injection implementation in R.
-Depends: knitr, pooh, igraph, graphics, grDevices, digest, stringr, utils, stats, RUnit
+Depends: knitr, pooh, graphics, grDevices, digest, stringr, utils, stats, RUnit, circlize
 License: MIT
 Encoding: UTF-8
