@@ -1,22 +1,28 @@
-# modulr -- A Dependency Injection (DI) Framework for R
+# modulr — A Dependency Injection (DI) Framework for R
 
 ## Raison d'être
 
-The `modulr` package aims for a clear separation between code complication and complexity in R, highlighting the core purpose and behaviour of objects (application code), and hiding their construction and wiring (infrastructure code). It allows to break down sequential programs into discrete, modular units that are loosely coupled (minimizing impact of significant changes to the internals of a module on other ones), simple to develop, test, re-use and share in a wide range of situations.
+The `modulr` package is a Dependency Injection (DI) Framework for R. As every DI framework, it aims for a clear separation between code complication and complexity, highlighting the core purpose and behaviour of objects (application code), and hiding their construction and wiring (infrastructure code). By design, `modulr` allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share in a wide range of situations.
 
-# Pros
+## Pros
 
-  * modules are more reusable
-  * modules are more testable
-  * modules are more readable
-  * modules are easier to maintain
-  * modules allow for more SOLID (Single responsibility, Open-closed, Liskov substitution, Interface segregation and Dependency inversion) code
+  * modules are easy (and fun) to develop,
+  * modules are easy to test,
+  * modules are easy to read,
+  * modules are easy to reuse,
+  * modules are easy to share,
+  * modules are easy to maintain, and
+  * modules force (a bit) to keep up with good practices.
 
-# Acknowledgment
+## Acknowledgments
 
-`modulr` is widely inspired from `RequireJS` and `AngularJS` for Javascript.
+The `modulr` package has been developed by the University of Lausanne in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements. 
 
-# Installation
+The `modulr` package is in production for several months as by July 2015, with unprecedented results and great adoption among various distributed teams. Therefore, it is an honour to open the code and share it with the vibrant community of R developers, researchers, teachers and users.
+
+The `modulr` package for R is deeply inspired from `AngularJS` and `RequireJS` for Javascript, as well as `guice` for Java.
+
+## Installation
 
 You can install the latest development version of `modulr` from github with
 ``` r
