@@ -14,7 +14,7 @@ The `modulr` package is a Dependency Injection (DI) Framework for R. By design, 
   * modules are easy to maintain, and
   * modules force (a bit) to keep up with good practices.
 
-## Acknowledgments
+## Genesis
 
 `modulr` has been developed by the University of Lausanne in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements. 
 
