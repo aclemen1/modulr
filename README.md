@@ -1,14 +1,22 @@
-# modulr
+# modulr -- A Dependency Injection (DI) Framework for R
 
-__TODO: create a .Rmd file to produce this .md file__
+## Raison d'être
 
-`modulr` is an R implementation of the Module Pattern with the following main goals:
+The `modulr` package aims for a clear separation between code complication and complexity in R, highlighting the core purpose and behaviour of objects (application code), and hiding their construction and wiring (infrastructure code). It allows to break down sequential programs into discrete, modular units that are loosely coupled (minimizing impact of significant changes to the internals of a module on other ones), simple to develop, test, re-use and share in a wide range of situations.
 
-  * modules are pieces of code, encapsulated into useful singleton units which do not pollute the environment,
-  * modules can register their capabilities and export values, and
-  * modules can be injected into other modules to expand and combine their capabilities.
+# Pros
+
+  * modules are more reusable
+  * modules are more testable
+  * modules are more readable
+  * modules are easier to maintain
+  * modules allow for more SOLID (Single responsibility, Open-closed, Liskov substitution, Interface segregation and Dependency inversion) code
+
+# Acknowledgment
 
 `modulr` is widely inspired from `RequireJS` and `AngularJS` for Javascript.
+
+# Installation
 
 You can install the latest development version of `modulr` from github with
 ``` r
