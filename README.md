@@ -16,19 +16,18 @@ The `modulr` package is a Dependency Injection (DI) Framework for R. As every DI
 
 ## Acknowledgments
 
-The `modulr` package has been developed by the University of Lausanne in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements. 
+`modulr` has been developed by the University of Lausanne in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements. 
 
-The `modulr` package is in production for several months as by July 2015, with unprecedented results and great adoption among various distributed teams. Therefore, it is an honour to open the code and share it with the vibrant community of R developers, researchers, teachers and users.
+`modulr` is in production for several months as by July 2015, with unprecedented results and great adoption among various teams. Therefore, it is an honour to open the code and share it with the vibrant community of R users, teachers, researchers, and developers.
 
-The `modulr` package for R is deeply inspired from `AngularJS` and `RequireJS` for Javascript, as well as `guice` for Java.
+`modulr` is deeply inspired from `AngularJS` and `RequireJS` for Javascript, as well as `guice` for Java.
 
 ## Installation
 
 You can install the latest development version of `modulr` from github with
 ``` r
-if (packageVersion("devtools") < 1.6) {
-  install.packages("devtools")
-}
+install.packages("devtools") # if not already installed
+library(devtools)
 devtools::install_github("aclemen1/modulr")
 ```
 
