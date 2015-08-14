@@ -1,11 +1,11 @@
 Package: modulr
 Type: Package
-Title: Module Pattern and DI in R
-Version: 0.1.4
-Date: 2015-06-30
+Title: A Dependency Injection (DI) Framework for R
+Version: 0.1.6
+Date: 2015-08-14
 Author: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
 Maintainer: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
-Description: modulr is a Module Pattern and Dependency Injection implementation in R.
-Depends: knitr, pooh, graphics, grDevices, digest, stringr, utils, stats, RUnit, circlize
+Description: The `modulr` package is a Dependency Injection (DI) Framework for R. By design, `modulr` allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share in a wide range of situations. As every DI framework, it aims for a clear separation between code complication and complexity, highlighting the core purpose and behaviour of objects (application code), and hiding their construction and wiring (infrastructure code).
+Depends: knitr, graphics, grDevices, digest, stringr, utils, RUnit, networkD3, stats
 License: MIT
 Encoding: UTF-8

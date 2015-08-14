@@ -14,4 +14,5 @@
   assign("message_closed", "", pos = modulr_env)
 
   define_modulr()
+  activate_breadcrumbs()
 }

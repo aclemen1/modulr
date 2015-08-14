@@ -69,12 +69,17 @@ define <- function(name, dependencies, factory) {
   #     print(filename)
   #   }
 
-  if(!(name %in% RESERVED_NAMES))
-    message_open(sprintf("Module '%s'", name))
-
   register <- get("register", pos = modulr_env)
 
   if(is.null(register[[name]])) {
+    if(!(name %in% RESERVED_NAMES))
+      message_meta(sprintf("defining [%s] ...",
+                           name), level = 1)
+
+    if(length(dependencies) != length(formals(factory))) {
+      stop("Dependencies mismatch.", call. = F)
+    }
+
     register[[name]]$name <- name
     register[[name]]$dependencies <- dependencies
     register[[name]]$factory <- factory
@@ -85,15 +90,20 @@ define <- function(name, dependencies, factory) {
     register[[name]]$instanciated <- F
     register[[name]]$first_instance <- T
     register[[name]]$reinstanciate_children <- T
-
-    if(!(name %in% RESERVED_NAMES))
-      message_close("Defined")
   } else {
     previous_signature <- register[[name]]$signature
     signature <- digest(c(
       deparse(dependencies),
       deparse(factory)), "sha1")
     if(signature != previous_signature) {
+      if(!(name %in% RESERVED_NAMES))
+        message_meta(sprintf("re-defining [%s] ...",
+                             name), level = 1)
+
+      if(length(dependencies) != length(formals(factory))) {
+        stop("Dependencies mismatch.", call. = F)
+      }
+
       register[[name]]$dependencies <- dependencies
       register[[name]]$factory <- factory
       register[[name]]$signature <- signature
@@ -101,12 +111,8 @@ define <- function(name, dependencies, factory) {
       register[[name]]$instanciated <- F
       register[[name]]$first_instance <- F
       register[[name]]$reinstanciate_children <- T
-      if(!(name %in% RESERVED_NAMES))
-        message_close("Changed and re-defined")
     } else {
       register[[name]]$reinstanciate_children <- F
-      if(!(name %in% RESERVED_NAMES))
-        message_close("Unchanged")
     }
   }
 
@@ -121,9 +127,8 @@ define <- function(name, dependencies, factory) {
 #' @export
 
 reset <- function() {
-  message_open("Package 'modulr'")
+  message_meta("resetting package")
   assign("register", NULL, pos = modulr_env)
-  message_close("Reset")
   .onLoad()
 }
 
@@ -133,11 +138,10 @@ reset <- function() {
 
 undefine <- function(name) {
   if(!(name %in% RESERVED_NAMES)) {
-    message_open(sprintf("Module '%s'", name))
+    message_meta(sprintf("undefining [%s]", name), level = 1)
     register <- get("register", pos = modulr_env)
     register[[name]] <- NULL
     assign("register", register, pos = modulr_env)
-    message_close("Undefined")
   }
 }
 
@@ -147,13 +151,12 @@ undefine <- function(name) {
 
 touch <- function(name) {
   if(!(name %in% RESERVED_NAMES)) {
-    message_open(sprintf("Module '%s'", name))
+    message_meta(sprintf("touching [%s]", name), level = 1)
     register <- get("register", pos = modulr_env)
     register[[name]]$signature <- 0
     register[[name]]$reinstanciate_children <- T
     assign("register", register, pos = modulr_env)
     module_option(name)$unset()
-    message_close("Touched")
   }
 }
 

@@ -14,3 +14,12 @@ NULL
 RESERVED_NAMES <- c("modulr")
 
 modulr_env <- new.env()
+
+install_error <- function() {
+  current_error <- deparse(getOption("error"))
+  options(error = function() {
+    message("modulr error info: ")
+    show_breadcrumbs()
+    eval(parse(text = `current_error`))
+  })
+}

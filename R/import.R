@@ -20,8 +20,9 @@ import <- function(name, scope_name, force_reimport = F) {
       knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
       return(paste0(path, ".Rmd"))
     } else if (!.is_defined(name)) {
-      message_open(sprintf("Module '%s'", name))
-      message_close(sprintf("Not found", path))
+      message_meta(sprintf("%s not found", name))
+      #message_open(announce = sprintf("Module '%s'", name))
+      #message_close(sprintf("Not found", path))
     }
     NULL
   }
