@@ -7,6 +7,7 @@ The `modulr` package is a Dependency Injection (DI) Framework for R. By design, 
 ## Pros
 
   * modules are easy (and fun) to develop,
+  * modules are easy to debug,
   * modules are easy to test,
   * modules are easy to read,
   * modules are easy to reuse,
@@ -18,7 +19,7 @@ The `modulr` package is a Dependency Injection (DI) Framework for R. By design, 
 
 `modulr` has been developed by the University of Lausanne in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements. 
 
-`modulr` is in production for several months as by July 2015, with unprecedented results and great adoption among various teams. Therefore, it is an honour to open the code and share it with the vibrant community of R users, teachers, researchers, and developers.
+`modulr` is in production for several months as by August 2015, with unprecedented results and great adoption among various teams. Therefore, we are thrilled to open the code and share it with the vibrant community of R users, teachers, researchers, and developers.
 
 `modulr` is deeply inspired from `AngularJS` and `RequireJS` for Javascript, as well as `guice` for Java.
 
@@ -68,3 +69,7 @@ main$eval()
   3. The third `define()` call is intended to produce the main module. Its name is `__runtime__` and is a reserved word. This module depends on `greeter` and `who`, two modules which singleton instances are __injected__ as `g` and `w`, respectively. The module then uses these components to print a greeting message `g(w)`.
   4. The module instance is evaluated with `$eval()`.
 
+## Code of Conduct
+
+This project adheres to the [Open Code of Conduct][code-of-conduct]. By participating, you are expected to honor this code.
+[code-of-conduct]: http://todogroup.org/opencodeofconduct/#modulr/alain.clement-pavon@unil.ch
