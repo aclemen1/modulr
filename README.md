@@ -17,11 +17,11 @@ The `modulr` package is a Dependency Injection (DI) Framework for R. By design, 
 
 ## Genesis
 
-`modulr` has been developed by the University of Lausanne in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements. 
+`modulr` has been developed by the [University of Lausanne](http://www.unil.ch) in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements. 
 
 `modulr` is in production for several months as by August 2015, with unprecedented results and great adoption among various teams. Therefore, we are thrilled to open the code and share it with the vibrant community of R users, teachers, researchers, and developers.
 
-`modulr` is deeply inspired from `AngularJS` and `RequireJS` for Javascript, as well as `guice` for Java.
+`modulr` is deeply inspired from [AngularJS](https://angularjs.org/) and [RequireJS](http://requirejs.org) for Javascript, as well as [guice](https://github.com/google/guice) for Java.
 
 ## Installation
 
@@ -34,35 +34,57 @@ devtools::install_github("aclemen1/modulr")
 
 If you encounter a clear bug, please file a minimal reproducible example on github.
 
-## A minimal example
+## A short example
 
-To get started with `modulr`, let us consider the following minimal example:
+To get started with `modulr`, let us consider the following situation. Suppose that a university needs to compute its student-teacher ratio. This requires to gather at least a dataset about students and a dataset about teachers. Due to the organization of the university, suppose furthermore that these datasets are accessible, kept and/or maintained by different people. Alice, say, knows everything about students, when teachers have no secret for Bob. To start with our calculation of a student-teacher ratio, let's ask Alice to provide us with a usable dataset.
 
 ``` r
-require("modulr")
+library(modulr)
 
-# define a module named "greeter" which provides 
-# a one parameter function returning a greeting string.
-define(id="greeter", function() {
-    function(who) {
-        sprintf("Hello %s", who)
-    }
-})
-
-# define a module named "who" which provides a string
-define(id="who", function() {
-    "World"
-})
-
-# define a module into which both "greeter" and "who" are injected
-# and used to print a greeting message.
-main = define("greeter", "who", function(g, w) {
-    print(g(w))
-})
-
-# evaluate the main module instance
-main$eval()
+# This module provides a dataset relating students and their inscriptions to courses.
+# Alice is the maintainer of this module.
+"data/students" %provides%
+  function() {
+    students <- data.frame(
+      id = c(1, 2, 2, 3, 3, 3),
+      course = c("maths", "maths", "physics", "maths", "physics", "chemistry"),
+      stringsAsFactors = F)
+    return(students)
+  }
 ```
+
+The anatomy of this module is very simple: "data/student" is its name and the body of the function following the `%provides%` operator (which is part of a _syntactic sugar_ for the more verbose function `define`) contains its core functionality, namely returning the required data frame.
+
+In parallel, let's ask Bob to provide us with a similar module.
+
+``` r
+# This module provides a dataset relating teachers and their courses.
+# Bob is the maintainer of this module.
+"data/teachers" %provides%
+  function() {
+    teachers <- data.frame(
+      id = c(1, 2, 3),
+      course = c("maths", "physics", "chemistry"),
+      stringsAsFactors = F)
+    return(teachers)
+  }
+```
+
+Now that we have these two modules at our disposal, let's combine them into another module that will return a student-teacher ratio.
+
+``` r
+"bad_stat/student_teacher_ratio" %requires%
+  list(
+    students = "data/students",
+    teachers = "data/teachers"
+  ) %provides%
+  function(students, teachers) {
+    ratio <- length(unique(students$id)) / length(unique(teachers$id))
+    return(ratio)
+  }
+```
+
+The `%requires%` operator allows us to specify on which modules we rely.
 
   1. The first `define()` call registers a new module named `greeter`. This module has no dependency and provides a one parameter function which returns a greeting string. Once defined, this module can be injected into other modules. It will behave like a __singleton__, i.e. only one instance of the module `greeter` is produced and reused.
   2. The second `define()` call registers a new module named `who`. This module has no dependency and provides a single string.
