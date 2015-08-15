@@ -36,7 +36,7 @@
       #       select(-to) %>%
       #       mutate(deps_idx = ifelse(is.na(from), deps_idx, deps_idx + 1))
       if(max(nodes$deps_idx) > node_length) {
-        stop("Cycle detected.")
+        stop("Cycle detected.", call. = F)
       }
     }
     nodes <- aggregate(deps_idx ~ node, data = nodes, max)

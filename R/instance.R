@@ -32,7 +32,7 @@ instanciate <- function(name, debug = F, force = F) {
         register <- get("register", pos = modulr_env)
         module <- register[[ordered_name]]
         if(is.null(module))
-          stop("Module '", ordered_name, "' not defined.")
+          stop("Module '", ordered_name, "' not defined.", call. = F)
         reinstanciated_by_parent <- any(unlist(lapply(
           module$dependencies,
           function(name) {

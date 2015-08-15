@@ -172,10 +172,10 @@ touch <- function(name) {
 #' @export
 `%provides%` = function(lhs, rhs) {
   if(!is.function(rhs))
-    stop("Type mismatch, factory needed on RHS.")
+    stop("Type mismatch, factory needed on RHS.", call. = F)
   if(is.list(lhs)) {
     if(!identical(names(lhs), c("name", "dependencies")))
-      stop("Type mismatch, dependencies needed on LHS.")
+      stop("Type mismatch, dependencies needed on LHS.", call. = F)
     name <- lhs$name
     dependencies <- lhs$dependencies
   } else {
