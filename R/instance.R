@@ -42,6 +42,7 @@ instanciate <- function(name, debug = F, force = F) {
           module$reinstanciate_children <- T
         }
         if(!module$instanciated
+           | module$reinstanciate_children
            | reinstanciated_by_parent
            | ((debug | force) & ordered_name == name)) {
           if (!(ordered_name %in% RESERVED_NAMES))
