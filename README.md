@@ -55,7 +55,15 @@ library(modulr)
 
 The anatomy of this module is very simple: "data/student" is its name and the body of the function following the `%provides%` operator (which is part of a _syntactic sugar_ for the more verbose function `define`) contains its core functionality, namely returning the required data frame.
 
-In parallel, let's ask Bob to provide us with a similar module.
+The output of the code evaluation looks something like this.
+
+``` text
+[2015-08-15 21:19:31.498098] * defining [data/students] ...
+```
+
+It is important to note that no intrinsic computation took place in this **definition** process. The DI framework simply **registered** the module, relaying the actual evaluation of its body to another **instanciation** stage, as we'll see below.
+
+In parallel, let's ask Bob to provide us with a similar module regarding the teachers.
 
 ``` r
 # This module provides a dataset relating teachers and their courses.
@@ -70,7 +78,11 @@ In parallel, let's ask Bob to provide us with a similar module.
   }
 ```
 
-Now that we have these two modules at our disposal, let's combine them into another module that will return a student-teacher ratio.
+``` text
+[2015-08-15 21:24:23.233071] * defining [data/teachers] ...
+```
+
+Now that we have these two modules at our disposal, let's combine them into another module that returns a student-teacher ratio.
 
 ``` r
 "bad_stat/student_teacher_ratio" %requires%
@@ -84,7 +96,38 @@ Now that we have these two modules at our disposal, let's combine them into anot
   }
 ```
 
-The `%requires%` operator allows us to specify on which modules we rely.
+``` text
+[2015-08-15 21:24:54.698591] * defining [bad_stat/student_teacher_ratio] ...
+```
+
+The `%requires%` operator allows us to specify the modules we rely on for the calculation we provide. This list of **dependencies** assigns some arbitrary and ephemeral names to the required modules. These are those names that are then used to call objects into which the results of the required modules are **injected**, and then available for use in the body of the module's definition.
+
+It is now time to see the DI framework in action.
+
+``` r
+ratio %<=% "bad_stat/student_teacher_ratio"
+```
+
+``` text
+[2015-08-15 21:25:27.932335] instanciating [bad_stat/student_teacher_ratio] ...
+[2015-08-15 21:25:27.952811] * requiring 3 modules on 2 layers
+[2015-08-15 21:25:27.994193] ** resolving layer 1/2: 2 module(s) ...
+[2015-08-15 21:25:27.994990] *** instanciating [data/students] ...
+[2015-08-15 21:25:28.032663] *** instanciating [data/teachers] ...
+[2015-08-15 21:25:28.070723] ** resolving layer 2/2: 1 module(s) ...
+[2015-08-15 21:25:28.071461] *** instanciating [bad_stat/student_teacher_ratio] ...
+[2015-08-15 21:25:28.115746] * DONE in 0.122 secs
+```
+
+We say that the `%<=%` operator **instanciates** the module given on its right-hand side. Obviously, there are three modules involved in this process, namely `[data/student]` and `[data/teachers]` which are independent on a first _layer_, and `[bad_stat/student_teacher_ration]` which depends on them on a second layer. Under the hood, the framework figures out the directed acyclic graph (DAG) of the dependencies and computes a topological sort, grouped by independent modules into layers. All the modules are then evaluated in order and the final result is assigned to the left-hand side of the `%<=%` operator.
+
+``` r
+print(ratio)
+```
+
+``` text
+[1] 1
+```
 
   1. The first `define()` call registers a new module named `greeter`. This module has no dependency and provides a one parameter function which returns a greeting string. Once defined, this module can be injected into other modules. It will behave like a __singleton__, i.e. only one instance of the module `greeter` is produced and reused.
   2. The second `define()` call registers a new module named `who`. This module has no dependency and provides a single string.
