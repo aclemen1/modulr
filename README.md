@@ -55,7 +55,7 @@ library(modulr)
 
 The anatomy of this module is very simple: "data/student" is its name and the body of the function following the `%provides%` operator (which is part of a _syntactic sugar_ for the more verbose function `define`) contains its core functionality, namely returning the required data frame.
 
-The output of the code evaluation looks something like this.
+The output message of the code evaluation looks something like this.
 
 ``` text
 [2015-08-15 21:19:31.498098] * defining [data/students] ...
@@ -100,7 +100,7 @@ Now that we have these two modules at our disposal, let's combine them into anot
 [2015-08-15 21:24:54.698591] * defining [bad_stat/student_teacher_ratio] ...
 ```
 
-The `%requires%` operator allows us to specify the modules we rely on for the calculation we provide. This list of **dependencies** assigns some arbitrary and ephemeral names to the required modules. These are those names that are then used to call objects into which the results of the required modules are **injected**, and then available for use in the body of the module's definition.
+The `%requires%` operator allows us to specify the modules we rely on for the calculation we provide. This list of **dependencies** assigns some arbitrary and ephemeral names to the required modules. These are those names that are then used to call objects into which the results of the required modules are **injected**, and available for use in the body of the module's definition.
 
 It is now time to see the DI framework in action.
 
@@ -128,11 +128,6 @@ print(ratio)
 ``` text
 [1] 1
 ```
-
-  1. The first `define()` call registers a new module named `greeter`. This module has no dependency and provides a one parameter function which returns a greeting string. Once defined, this module can be injected into other modules. It will behave like a __singleton__, i.e. only one instance of the module `greeter` is produced and reused.
-  2. The second `define()` call registers a new module named `who`. This module has no dependency and provides a single string.
-  3. The third `define()` call is intended to produce the main module. Its name is `__runtime__` and is a reserved word. This module depends on `greeter` and `who`, two modules which singleton instances are __injected__ as `g` and `w`, respectively. The module then uses these components to print a greeting message `g(w)`.
-  4. The module instance is evaluated with `$eval()`.
 
 ## Code of Conduct
 
