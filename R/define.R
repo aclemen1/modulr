@@ -89,7 +89,7 @@ define <- function(name, dependencies, factory) {
     register[[name]]$instance <- NULL
     register[[name]]$instanciated <- F
     register[[name]]$first_instance <- T
-    register[[name]]$reinstanciate_children <- T
+    register[[name]]$timestamp <- Sys.time()
   } else {
     previous_signature <- register[[name]]$signature
     signature <- digest(c(
@@ -110,9 +110,7 @@ define <- function(name, dependencies, factory) {
       register[[name]]$instance <- NULL
       register[[name]]$instanciated <- F
       register[[name]]$first_instance <- F
-      register[[name]]$reinstanciate_children <- T
-    } else {
-      register[[name]]$reinstanciate_children <- F
+      register[[name]]$timestamp <- Sys.time()
     }
   }
 
@@ -153,9 +151,14 @@ touch <- function(name) {
   if(!(name %in% RESERVED_NAMES)) {
     message_meta(sprintf("touching [%s]", name), level = 1)
     register <- get("register", pos = modulr_env)
-    register[[name]]$signature <- 0
-    register[[name]]$reinstanciate_children <- T
+#    register[[name]]$signature <- 0
+#     register[[name]]$reinstanciate_children <- T
+    register[[name]]$instance <- NULL
+    register[[name]]$instanciated <- F
+
+    register[[name]]$timestamp <- Sys.time()
     assign("register", register, pos = modulr_env)
+
     module_option(name)$unset()
   }
 }

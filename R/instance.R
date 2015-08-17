@@ -19,78 +19,67 @@ instanciate <- function(name, debug = F, force = F) {
             length(unlist(layered_names)),
             length(layered_names)),
     level = 1)
-  specs <- system.time({
-    for(layer in names(layered_names)) {
-      layer_idx <- as.numeric(layer)
-      ordered_names <- layered_names[[layer]]
-      message_meta(sprintf("resolving layer %d/%d: %d module(s) ...",
-                           layer_idx, length(layered_names),
-                           length(ordered_names)),
-                   level = 2)
-      for(ordered_name_idx in c(1:length(ordered_names))) {
-        ordered_name <- ordered_names[ordered_name_idx]
-        register <- get("register", pos = modulr_env)
-        module <- register[[ordered_name]]
-        if(is.null(module))
-          stop("Module '", ordered_name, "' not defined.", call. = F)
-        reinstanciated_by_parent <- any(unlist(lapply(
-          module$dependencies,
-          function(name) {
-            register[[name]]$reinstanciate_children
-          })))
-        if(reinstanciated_by_parent) {
-          module$reinstanciate_children <- T
+  for(layer in names(layered_names)) {
+    layer_idx <- as.numeric(layer)
+    ordered_names <- layered_names[[layer]]
+    message_meta(sprintf("resolving layer %d/%d: %d module(s) ...",
+                         layer_idx, length(layered_names),
+                         length(ordered_names)),
+                 level = 2)
+    for(ordered_name_idx in c(1:length(ordered_names))) {
+      ordered_name <- ordered_names[ordered_name_idx]
+      register <- get("register", pos = modulr_env)
+      module <- register[[ordered_name]]
+      if(is.null(module))
+        stop("Module '", ordered_name, "' not defined.", call. = F)
+      reinstanciated_by_parent <- any(unlist(lapply(
+        module$dependencies,
+        function(name) {
+          register[[name]]$timestamp >= module$timestamp
+        })))
+      if(!module$instanciated
+         | reinstanciated_by_parent
+         | ((debug | force) & ordered_name == name)) {
+        if (!(ordered_name %in% RESERVED_NAMES))
+          if(module$instanciated | !module$first_instance)
+            message_meta(sprintf("re-instanciating [%s] ...",
+                                 ordered_name),
+                         level = 3)
+          else
+            message_meta(sprintf("instanciating [%s] ...",
+                                 ordered_name),
+                         level = 3)
+        env = new.env()
+        assign(".__name__", ordered_name, pos = env)
+        if(length(module$dependencies) > 0) {
+          args <- lapply(module$dependencies,
+                         function(name) register[[name]]$instance)
+          # tricky bug solution, see below
+          module$instance <- evalq(do.call(
+            eval(parse(text=deparse(module$factory))),
+            args = args), envir = env)
+        } else {
+          # the deparse %>% parse %>% eval trick solves the following bug
+          # WORKS:
+          # module$instance <- evalq(do.call(function() {get("variable", pos = env)}, args = list()), envir = env)
+          # DOES NOT WORK:
+          # f <- function() {get("variable", pos = env)}
+          # module$instance <- evalq(do.call(f, args = list()), envir = env)
+          # WORKAROUND:
+          # module$instance <- evalq(do.call(eval(parse(text=deparse(f))), args = list()), envir = env)
+          module$instance <- evalq(do.call(
+            eval(parse(text=deparse(module$factory))),
+            args = list()), envir = env)
         }
-        if(!module$instanciated
-           | module$reinstanciate_children
-           | reinstanciated_by_parent
-           | ((debug | force) & ordered_name == name)) {
-          if (!(ordered_name %in% RESERVED_NAMES))
-            if(module$instanciated | !module$first_instance)
-              message_meta(sprintf("re-instanciating [%s] ...",
-                                   ordered_name),
-                           level = 3)
-            else
-              message_meta(sprintf("instanciating [%s] ...",
-                                   ordered_name),
-                           level = 3)
-          env = new.env()
-          assign(".__name__", ordered_name, pos = env)
-          if(length(module$dependencies) > 0) {
-            args <- lapply(module$dependencies,
-                           function(name) register[[name]]$instance)
-            # tricky bug solution, see below
-            module$instance <- evalq(do.call(
-              eval(parse(text=deparse(module$factory))),
-              args = args), envir = env)
-          } else {
-            # the deparse %>% parse %>% eval trick solves the following bug
-            # WORKS:
-            # module$instance <- evalq(do.call(function() {get("variable", pos = env)}, args = list()), envir = env)
-            # DOES NOT WORK:
-            # f <- function() {get("variable", pos = env)}
-            # module$instance <- evalq(do.call(f, args = list()), envir = env)
-            # WORKAROUND:
-            # module$instance <- evalq(do.call(eval(parse(text=deparse(f))), args = list()), envir = env)
-            module$instance <- evalq(do.call(
-              eval(parse(text=deparse(module$factory))),
-              args = list()), envir = env)
-          }
-          module$instanciated <- T
-          module$first_instance <- F
-          register[[ordered_name]] <- module
-          assign("register", register, pos = modulr_env)
-        }
+        module$instanciated <- T
+        module$first_instance <- F
+
+        module$timestamp <- Sys.time()
+        register[[ordered_name]] <- module
+        assign("register", register, pos = modulr_env)
       }
     }
-    for(name in unlist(layered_names)) {
-      register <- get("register", pos = modulr_env)
-      register[[name]]$reinstanciate_children <- F
-      assign("register", register, pos = modulr_env)
-    }
-  })
-  message_meta(sprintf("DONE in %.3f secs", specs[["elapsed"]]),
-               level = 1)
+  }
 
   get("register", pos = modulr_env)[[name]]$instance
 }
