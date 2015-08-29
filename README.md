@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/aclemen1/modulr.svg)](https://travis-ci.org/aclemen1/modulr)
+
 # modulr — A Dependency Injection (DI) Framework for R
 
 ## Raison d'être
