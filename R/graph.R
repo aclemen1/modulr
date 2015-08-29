@@ -20,12 +20,10 @@ dependency_graph <- function(name, include_special = T) {
     }, universe))
     if(!include_special) {
       deps <-
-        subset(
-          deps,
-          !(deps$from %in% RESERVED_NAMES | deps$to %in% RESERVED_NAMES))
+        deps[, !(deps$from %in% RESERVED_NAMES | deps$to %in% RESERVED_NAMES)]
     }
     if(isTRUE(nrow(deps) > 0)) {
-      nodes <- .topological_sort_with_layer(subset(deps, select = -c("value")))
+      nodes <- .topological_sort_with_layer(deps[, names(deps) != "value"])
       deps$source <- as.integer(factor(deps$module, levels = nodes$node)) - 1
       deps$target <- as.integer(factor(deps$dependency, levels = nodes$node)) - 1
       return(networkD3::sankeyNetwork(

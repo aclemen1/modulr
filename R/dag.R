@@ -31,7 +31,7 @@
     while(!all(is.na(nodes$dependency))) {
       names(nodes)[names(nodes) == "dependency"] <- "module"
       nodes <- merge(nodes, graph, by = "module", all.x = T)
-      nodes <- subset(nodes, select = -c("module"))
+      nodes <- nodes[, names(nodes) != "module"]
       nodes <- transform(nodes, deps_idx =
                            ifelse(is.na(nodes$dependency), nodes$deps_idx,
                                   nodes$deps_idx + 1))
