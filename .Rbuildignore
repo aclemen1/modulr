@@ -4,7 +4,10 @@
 .Rprofile
 inst/db
 man-roxygen
-NEWS\.md
+^NEWS\.md
 ^cran-comments\.md$
 ^README\.Rmd$
 ^README-.*\.png$
+^lib/
+tmp/
+data/

@@ -4,13 +4,13 @@
 modulr — A Dependency Injection (DI) Framework for R
 ====================================================
 
-Raison d'être
--------------
+Description
+-----------
 
 The `modulr` package is a Dependency Injection (DI) Framework for R. By design, `modulr` allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share in a wide range of situations. As every DI framework, it aims for a clear separation between code complication and complexity, highlighting the core purpose and behaviour of objects (application code), and hiding their construction and wiring (infrastructure code).
 
-Pros
-----
+Advantages
+----------
 
 -   modules are easy (and fun) to develop,
 -   modules are easy to debug,
@@ -21,7 +21,7 @@ Pros
 -   modules are easy to maintain, and
 -   modules force (a bit) to keep up with good practices.
 
-Genesis
+History
 -------
 
 `modulr` has been developed by the [University of Lausanne](http://www.unil.ch) in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements.
@@ -33,13 +33,22 @@ Genesis
 Installation
 ------------
 
-You can install the latest development version of `modulr` from github with
+You can install:
+
+-   the latest released version from CRAN with
 
 ``` r
-install.packages("devtools") # if not already installed
-library(devtools)
-devtools::install_github("aclemen1/modulr")
+install.packages("modulr")
 ```
+
+-   the latest development version from github with
+
+    ``` r
+    if (packageVersion("devtools") < 1.6) {
+      install.packages("devtools")
+    }
+    devtools::install_github("aclemen1/modulr")
+    ```
 
 If you encounter a clear bug, please file a minimal reproducible example on github.
 
@@ -61,7 +70,7 @@ library(modulr)
       stringsAsFactors = F)
     return(students)
   }
-#> [2015-08-29 12:56:52.773166] defining [data/students] ...
+#> [2015-08-29 14:13:06.026829] defining [data/students] ...
 ```
 
 The anatomy of this module is very simple: "data/student" is its name and the body of the function following the `%provides%` operator (which is part of a *syntactic sugar* for the more verbose function `define`) contains its core functionality, namely returning the required data frame.
@@ -81,7 +90,7 @@ In parallel, let's ask Bob to provide us with a similar module regarding the tea
       stringsAsFactors = F)
     return(teachers)
   }
-#> [2015-08-29 12:56:52.779129] defining [data/teachers] ...
+#> [2015-08-29 14:13:06.032962] defining [data/teachers] ...
 ```
 
 Now that we have these two modules at our disposal, let's combine them into another module that returns a student-teacher ratio.
@@ -96,7 +105,7 @@ Now that we have these two modules at our disposal, let's combine them into anot
     ratio <- length(unique(students$id)) / length(unique(teachers$id))
     return(ratio)
   }
-#> [2015-08-29 12:56:52.784539] defining [bad_stat/student_teacher_ratio] ...
+#> [2015-08-29 14:13:06.038770] defining [bad_stat/student_teacher_ratio] ...
 ```
 
 The `%requires%` operator allows us to specify the modules we rely on for the calculation we provide. This list of **dependencies** assigns some arbitrary and ephemeral names to the required modules. These are those names that are then used to call objects into which the results of the required modules are **injected**, and available for use in the body of the module's definition.
@@ -105,12 +114,12 @@ It is now time to see the DI framework in action.
 
 ``` r
 ratio %<=% "bad_stat/student_teacher_ratio"
-#> [2015-08-29 12:56:52.789377] making [bad_stat/student_teacher_ratio] ...
-#> [2015-08-29 12:56:52.789813] * checking definitions ...
-#> [2015-08-29 12:56:52.801996] * found 2 dependencies(s) with 3 modules(s) on 2 layer(s)
-#> [2015-08-29 12:56:52.803051] ** making [data/students] ...
-#> [2015-08-29 12:56:52.804428] ** making [data/teachers] ...
-#> [2015-08-29 12:56:52.806004] ** making [bad_stat/student_teacher_ratio] ...
+#> [2015-08-29 14:13:06.043649] making [bad_stat/student_teacher_ratio] ...
+#> [2015-08-29 14:13:06.044099] * checking definitions ...
+#> [2015-08-29 14:13:06.056997] * found 2 dependencies(s) with 3 modules(s) on 2 layer(s)
+#> [2015-08-29 14:13:06.058026] ** making [data/students] ...
+#> [2015-08-29 14:13:06.059385] ** making [data/teachers] ...
+#> [2015-08-29 14:13:06.060976] ** making [bad_stat/student_teacher_ratio] ...
 ```
 
 We say that the `%<=%` operator **instanciates** the module given on its right-hand side. Obviously, there are three modules involved in this process, namely `[data/student]` and `[data/teachers]` which are independent on a first *layer*, and `[bad_stat/student_teacher_ration]` which depends on them on a second layer. Under the hood, the framework figures out the directed acyclic graph (DAG) of the dependencies and computes a topological sort, grouped by independent modules into layers. All the modules are then evaluated in order and the final result is assigned to the left-hand side of the `%<=%` operator.

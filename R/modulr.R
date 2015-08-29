@@ -9,8 +9,6 @@
 #' @name modulr
 #' @author Alain Clément-Pavon <\email{alain.clement-pavon@@unil.ch}>
 
-NULL
-
 RESERVED_NAMES <- c("modulr")
 
 modulr_env <- new.env(parent = emptyenv())

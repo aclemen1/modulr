@@ -2,9 +2,15 @@
 % Please edit documentation in R/modulr.R
 \docType{package}
 \name{modulr}
+\alias{RESERVED_NAMES}
 \alias{modulr}
 \alias{modulr-package}
 \title{modulr -- Module Pattern and DI in R}
+\format{\preformatted{ chr "modulr"
+}}
+\usage{
+RESERVED_NAMES
+}
 \description{
 modulr is a Module Pattern and Dependency Injection implementation in R.
 Module Pattern and DI allows you to encapsulate pieces of code into useful singleton units,
@@ -14,4 +20,5 @@ modulr is widely inspired from RequireJS and AngularJS for Javascript.
 \author{
 Alain Clément-Pavon <\email{alain.clement-pavon@unil.ch}>
 }
+\keyword{datasets}
 

@@ -29,18 +29,19 @@
                         deps_idx = 1,
                         stringsAsFactors = F)
     while(!all(is.na(nodes$dependency))) {
-      names(nodes)[names(nodes)=="dependency"] <- "module"
+      names(nodes)[names(nodes) == "dependency"] <- "module"
       nodes <- merge(nodes, graph, by = "module", all.x = T)
-      nodes <- subset(nodes, select = -module)
+      nodes <- subset(nodes, select = -c("module"))
       nodes <- transform(nodes, deps_idx =
-                           ifelse(is.na(dependency), deps_idx, deps_idx + 1))
+                           ifelse(is.na(nodes$dependency), nodes$deps_idx,
+                                  nodes$deps_idx + 1))
 
       if(max(nodes$deps_idx) > node_length) {
         stop("Cycle detected.", call. = F)
       }
     }
     nodes <- aggregate(deps_idx ~ node, data = nodes, max)
-    names(nodes)[names(nodes)=="deps_idx"] <- "layer"
+    names(nodes)[names(nodes) == "deps_idx"] <- "layer"
     nodes <- nodes[order(nodes$layer),]
     row.names(nodes) <- seq_len(nrow(nodes))
 

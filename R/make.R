@@ -1,3 +1,5 @@
+#' Make module
+#'
 #' @export
 # TODO: write documentation
 make <- function(name) {

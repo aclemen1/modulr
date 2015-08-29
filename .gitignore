@@ -6,10 +6,7 @@ src/*.o-*
 .Rhistory
 .RData
 tmp/
-example/
-demo/
-lib/
-TODO.md
+/lib/
 inst/doc
 *.Rds
 vignettes/*.R

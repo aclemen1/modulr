@@ -8,7 +8,7 @@ output:
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
-  collapse = T,
+  collapse = TRUE,
   comment = "#>",
   fig.path = "README-"
 )
@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 
 # modulr — A Dependency Injection (DI) Framework for R
 
-## Raison d'être
+## Description
 
 The `modulr` package is a Dependency Injection (DI) Framework for R. By design, `modulr` allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share in a wide range of situations. As every DI framework, it aims for a clear separation between code complication and complexity, highlighting the core purpose and behaviour of objects (application code), and hiding their construction and wiring (infrastructure code). 
 
-## Pros
+## Advantages
 
   * modules are easy (and fun) to develop,
   * modules are easy to debug,
@@ -33,7 +33,7 @@ The `modulr` package is a Dependency Injection (DI) Framework for R. By design, 
   * modules are easy to maintain, and
   * modules force (a bit) to keep up with good practices.
 
-## Genesis
+## History
 
 `modulr` has been developed by the [University of Lausanne](http://www.unil.ch) in Switzerland. The main goal of this package was to support the production of the institutional statistics and sets of indicators. Streamlined industrialization of data-related processes, agility, reusability and coding with fun in a distributed development environment were the first requirements. 
 
@@ -43,10 +43,19 @@ The `modulr` package is a Dependency Injection (DI) Framework for R. By design, 
 
 ## Installation
 
-You can install the latest development version of `modulr` from github with
+You can install:
+
+* the latest released version from CRAN with
+
 ``` r
-install.packages("devtools") # if not already installed
-library(devtools)
+install.packages("modulr")
+```
+
+* the latest development version from github with
+``` r
+if (packageVersion("devtools") < 1.8) {
+  install.packages("devtools")
+}
 devtools::install_github("aclemen1/modulr")
 ```
 

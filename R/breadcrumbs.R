@@ -17,6 +17,8 @@
   any(grepl("\\.\\_\\_breadcrumbs\\_\\_\\(\"installed\"\\)", format(handler)))
 }
 
+#' Activate breadcrumbs
+#'
 #' @export
 # TODO: write documentation
 activate_breadcrumbs <- function() {
@@ -32,7 +34,7 @@ activate_breadcrumbs <- function() {
         eval(parse(text = deparse(handler)))
       }
     }
-    options(setNames(list(wrapper), "error"))
+    options(stats::setNames(list(wrapper), "error"))
   }
 }
 
