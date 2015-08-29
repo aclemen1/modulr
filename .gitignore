@@ -1,8 +1,15 @@
-packrat/lib*/
+*.o
+src/*.o-*
+*.so
+*.dll
 .Rproj.user
 .Rhistory
 .RData
 tmp/
 example/
 demo/
+lib/
 TODO.md
+inst/doc
+*.Rds
+vignettes/*.R

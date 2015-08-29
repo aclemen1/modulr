@@ -1,11 +1,11 @@
+#' @export
 .__breadcrumbs__ <- function(void, verbose = T) {
   bc <- unique(
     unlist(
       Filter(function(x) !is.na(x) & !(x %in% c("modulr")),
              lapply(sys.frames(), function(frame) {
-               unlist(mget(".__name__", envir = frame,
-                           ifnotfound = NA, inherits = T),
-                      use.names = F)
+               get0(".__name__", envir = frame,
+                    ifnotfound = NA, inherits = T)
              }))))
   if(length(bc) & verbose)
     message(sprintf("modulr breadcrumbs: %s",
@@ -14,13 +14,11 @@
 }
 
 .is_installed_bc <- function(handler = getOption("error")) {
-  handler <- getOption("error")
   any(grepl("\\.\\_\\_breadcrumbs\\_\\_\\(\"installed\"\\)", format(handler)))
 }
 
-#' Activate breadcrumbs
-#'
 #' @export
+# TODO: write documentation
 activate_breadcrumbs <- function() {
   handler <- getOption("error")
   if(!.is_installed_bc(handler)) {
@@ -34,7 +32,7 @@ activate_breadcrumbs <- function() {
         eval(parse(text = deparse(handler)))
       }
     }
-    options(error = wrapper)
+    options(setNames(list(wrapper), "error"))
   }
 }
 

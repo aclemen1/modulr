@@ -4,7 +4,7 @@
 \alias{import}
 \title{Import module.}
 \usage{
-import(name, scope_name, force_reimport = F)
+import(name)
 }
 \description{
 Import module.

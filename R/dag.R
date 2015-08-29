@@ -1,40 +1,40 @@
-.build_dependency_graph <- function(all_dependencies) {
-  from <- c()
-  to <- c()
+# We need to figure out the directed acyclic graph (DAG) of the dependencies.
+.build_dependency_graph <- function(all_dependencies = c()) {
+  dependency <- c()
+  module <- c()
   for(name in all_dependencies) {
     dependencies <- get("register", pos = modulr_env)[[name]]$dependencies
-    if(length(dependencies) > 0) {
-      array <- rbind(unlist(dependencies), name, deparse.level = 0)
-      from <- c(from, array[1, ])
-      to <- c(to, array[2, ])
+    if(isTRUE(length(dependencies) > 0)) {
+      array <- rbind(unlist(lapply(dependencies, .resolve_mapping, name)),
+                     name, deparse.level = 0)
+      dependency <- c(dependency, array[1, ])
+      module <- c(module, array[2, ])
     }
   }
   data.frame(
-    from = from,
-    to = to,
+    module = module,
+    dependency = dependency,
     stringsAsFactors = F
   )
 }
 
+# A topological sort, grouped by independent modules into layers.
 .topological_sort_with_layer <- function(graph) {
-  if(nrow(graph)) {
+  if(isTRUE(nrow(graph) > 0)) {
     node <- unique(unlist(graph, use.names = F))
     node_length <- length(node)
 
     nodes <- data.frame(node = node,
-                        from = node,
+                        dependency = node,
                         deps_idx = 1,
                         stringsAsFactors = F)
-    while(!all(is.na(nodes$from))) {
-      names(nodes)[names(nodes)=="from"] <- "to"
-      nodes <- merge(nodes, graph, by = "to", all.x = T)
-      nodes <- subset(nodes, select = -to)
-      nodes <- transform(nodes, deps_idx = ifelse(is.na(from), deps_idx, deps_idx + 1))
-      #     nodes <- nodes %>%
-      #       rename(to = from) %>%
-      #       left_join(graph, by = "to") %>%
-      #       select(-to) %>%
-      #       mutate(deps_idx = ifelse(is.na(from), deps_idx, deps_idx + 1))
+    while(!all(is.na(nodes$dependency))) {
+      names(nodes)[names(nodes)=="dependency"] <- "module"
+      nodes <- merge(nodes, graph, by = "module", all.x = T)
+      nodes <- subset(nodes, select = -module)
+      nodes <- transform(nodes, deps_idx =
+                           ifelse(is.na(dependency), deps_idx, deps_idx + 1))
+
       if(max(nodes$deps_idx) > node_length) {
         stop("Cycle detected.", call. = F)
       }
@@ -42,19 +42,14 @@
     nodes <- aggregate(deps_idx ~ node, data = nodes, max)
     names(nodes)[names(nodes)=="deps_idx"] <- "layer"
     nodes <- nodes[order(nodes$layer),]
-    #   nodes <- nodes %>%
-    #     select(-from) %>%
-    #     group_by(node) %>%
-    #     summarize(layer = max(deps_idx)) %>%
-    #     ungroup %>%
-    #     arrange(layer)
+    row.names(nodes) <- seq_len(nrow(nodes))
 
     nodes
   }
 }
 
 .topological_sort_by_layers <- function(graph) {
-  if(nrow(graph)) {
+  if(isTRUE(nrow(graph) > 0)) {
     nodes <- .topological_sort_with_layer(graph)
     layers <- with(nodes, split(node, layer))
     layers

@@ -1,11 +1,41 @@
 Package: modulr
 Type: Package
+Version: 0.1.7
 Title: A Dependency Injection (DI) Framework for R
-Version: 0.1.6
-Date: 2015-08-14
-Author: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
-Maintainer: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
-Description: The `modulr` package is a Dependency Injection (DI) Framework for R. By design, `modulr` allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share in a wide range of situations. As every DI framework, it aims for a clear separation between code complication and complexity, highlighting the core purpose and behaviour of objects (application code), and hiding their construction and wiring (infrastructure code).
-Depends: knitr, graphics, grDevices, digest, stringr, utils, RUnit, networkD3, stats
-License: MIT
+Description: A DI framework to break down sequential programs into discrete,
+  modular units that are loosely coupled, simple to develop, test, reuse and
+  share in a wide range of situations.
+Authors@R: c(
+  person(
+    given = "Alain", family = "Clément-Pavon",
+    email = "alain.clement-pavon@unil.ch", role = c("aut", "cre")),
+  person(
+    given = "Raphaël", family = "Conradin",
+    email = "raphael.conradin@unil.ch", role = "ctb"),
+  person(
+    given = "Jean-Moïse", family = "Rochat",
+    email = "jean-moise.rochat@unil.ch", role = "ctb"),
+  person(
+    given = "Anne-Laure", family = "Aeby",
+    email = "anne-laure.aeby@unil.ch", role = "ctb"),
+  person(
+    given = "University of Lausanne", role = "cph")
+  )
+URL: https://github.com/aclemen1/modulr
+BugReports: https://github.com/aclemen1/modulr/issues
+Depends:
+  R (>= 2.9)
+Imports:
+  knitr (>= 1.10.5),
+  digest,
+  stringr,
+  RUnit,
+  networkD3,
+  utils,
+  stats
+Suggests:
+  testthat
+VignetteBuilder: knitr
+LazyData:yes
+License: MIT + file LICENSE
 Encoding: UTF-8

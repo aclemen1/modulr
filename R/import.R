@@ -1,58 +1,46 @@
 #' Import module.
 #'
 #' @export
+# TODO: write documentation
+import <- function(name) {
+  if(!(name %in% RESERVED_NAMES)) {
+    path <- .resolve_path(name)
 
-import <- function(name, scope_name, force_reimport = F) {
-  if(!(name %in% RESERVED_NAMES) & (!.is_defined(name) | force_reimport)) {
-    if(missing(scope_name)) path <- resolve_path(name) else
-      path <- resolve_path(name, scope_name)
-    if(file.exists(paste0(path, ".R"))) {
-      #       message_open(sprintf("Module '%s'", name))
-      #       message_close("Found in .R file ")
-      source(paste0(path, ".R"))
-      return(paste0(path, ".R"))
-    } else if(file.exists(paste0(path, ".Rmd"))) {
-      #       message_open(sprintf("Module '%s'", name))
-      #       message_close("Found in .Rmd file")
-      unnamed_chunk_label_opts = knitr::opts_knit$get("unnamed.chunk.label")
-      knitr::opts_knit$set("unnamed.chunk.label" = paste("modulr", name, sep="/"))
-      source(knitr::knit(paste0(path, ".Rmd"), output = tempfile(fileext = ".R"), tangle = T, quiet = T))
-      knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
-      return(paste0(path, ".Rmd"))
-    } else if (!.is_defined(name)) {
-      message_meta(sprintf("%s not found", name))
-      #message_open(announce = sprintf("Module '%s'", name))
-      #message_close(sprintf("Not found", path))
+    if(!is.null(path)) {
+      if(tolower(tools::file_ext(path)) == "r") {
+        source(path)
+      } else if(tolower(tools::file_ext(path)) == "rmd") {
+        unnamed_chunk_label_opts = knitr::opts_knit$get("unnamed.chunk.label")
+        knitr::opts_knit$set("unnamed.chunk.label" =
+                               paste("modulr", name, sep="/"))
+        source(knitr::knit(path,
+                           output = tempfile(fileext = ".R"),
+                           tangle = T, quiet = T))
+        knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
+      }
     }
-    NULL
+
+    if (!.is_defined(name)) {
+      message_stop(sprintf("%s not found", name))
+    }
+
+    return(path)
   }
 }
 
-#' Reimport module.
-#'
-#' @export
-
-reimport <- function(name, scope_name)
-  import(name, scope_name, force_reimport = T)
-
-
-#' Redefine module.
-#'
-#' @export
-
-redefine <- reimport
-
+# We need to know if a module is already defined.
 .is_defined <- function(name) {
   !is.null(get("register", pos = modulr_env)[[name]])
 }
 
-
-# make sure all dependent modules are defined
-.define_all_dependent_modules <- function(name, force_reimport_all = F) {
+# We need to make sure all dependent modules of a given module are defined.
+# TODO: test that
+.define_all_dependent_modules <- function(name) {
   visited_dependencies <- list()
-  iteration <- function(name, scope_name) {
+  iteration <- function(name, scope_name = NULL) {
+    name <- .resolve_mapping(name, scope_name)
     if(!(name %in% visited_dependencies)) {
-      import(name, scope_name, force_reimport_all)
+      import(name)
       visited_dependencies <<- c(visited_dependencies, name)
       Map(function(dependency) iteration(dependency, name),
           get("register", pos = modulr_env)[[name]]$dependencies)

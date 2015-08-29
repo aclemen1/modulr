@@ -13,13 +13,8 @@ NULL
 
 RESERVED_NAMES <- c("modulr")
 
-modulr_env <- new.env()
+modulr_env <- new.env(parent = emptyenv())
 
-install_error <- function() {
-  current_error <- deparse(getOption("error"))
-  options(error = function() {
-    message("modulr error info: ")
-    show_breadcrumbs()
-    eval(parse(text = `current_error`))
-  })
+verbosity <- function(value) {
+  assign("verbosity_level", value, pos = modulr_env)
 }

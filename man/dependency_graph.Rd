@@ -4,7 +4,7 @@
 \alias{dependency_graph}
 \title{Dependency graph}
 \usage{
-dependency_graph(include_special = T)
+dependency_graph(name, include_special = T)
 }
 \description{
 Dependency graph

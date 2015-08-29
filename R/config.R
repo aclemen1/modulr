@@ -1,11 +1,4 @@
-#' Configure modulr.
-#'
-#' @export
-
-# configure <- function(configuration) {
-#   assign("configuration", configuration, pos = modulr_env)
-# }
-
+# A helper function to set, get and unset values in configuration scopes.
 .config <- function(scope) {
   unset <- function() {
     configuration <- base::get("configuration", pos = modulr_env)
@@ -18,14 +11,19 @@
        & length(options_list) == 1)
       if(is.list(options_list[[1]]))
         options_list <- options_list[[1]]
-    if(length(options_list) == 0) return(invisible(NULL))
+    if(isTRUE(length(options_list) == 0)) return(invisible(NULL))
     configuration <- base::get("configuration", pos = modulr_env)
     if(is.null(configuration[[scope]])) {
       configuration[[scope]] <- options_list
     } else {
-      for(key in names(options_list))
-        if(is.null(configuration[[scope]][[key]]) | drop)
-          configuration[[scope]][[key]] <- options_list[[key]]
+      if(is.null(names(options_list))) {
+        if(isTRUE(drop))
+          configuration[[scope]] <- options_list
+      } else {
+        for(key in names(options_list))
+          if(is.null(configuration[[scope]][[key]]) | isTRUE(drop))
+            configuration[[scope]][[key]] <- options_list[[key]]
+      }
     }
     assign("configuration", configuration, pos = modulr_env)
   }
@@ -38,7 +36,8 @@
     }
   }
   get <- function(key) {
-    get_all()[[key]]
+    if(!is.null(key))
+      get_all()[[key]]
   }
   list(
     unset = unset,
@@ -51,26 +50,36 @@
 #' All configurations.
 #'
 #' @export
+# TODO: write documentation
 get_all_configs <- function() get("configuration", pos = modulr_env)
 
+
+#' Root configuration.
+#'
+#' @export
+# TODO: write documentation
+root_config <-
+  .config(".__root__")
 
 #' Paths configuration.
 #'
 #' @export
+# TODO: write documentation
 paths_config <-
-  .config("paths")
+  .config(".__paths__")
 
 
 #' Maps configuration.
 #'
 #' @export
+# TODO: write documentation
 maps_config <-
-  .config("maps")
-
+  .config(".__maps__")
 
 #' Module options.
 #'
 #' @export
+# TODO: write documentation
 module_option <- function(name)
   .config(c("modules", name))
 

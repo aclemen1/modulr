@@ -1,3 +1,49 @@
+message_meta <- function(msg, expr = NULL, verbosity = 0, ...) {
+
+  verbosity_level <- get0("verbosity_level", envir = modulr_env,
+                          ifnotfound = +Inf)
+  verbose <- verbosity <= verbosity_level
+
+  level <- get0(".message_level", envir = modulr_env, ifnotfound = 0)
+  on.exit(assign(".message_level", level, pos = modulr_env))
+
+  if(!is.null(msg) & verbose) {
+    message(sprintf(
+      "[%s] ",
+      format(Sys.time(), format = "%Y-%m-%d %H:%M:%OS6")),
+      appendLF = F)
+    if(level > 0) {
+      message(sprintf(
+        "%s ",
+        paste(rep("*", level), collapse="")),
+        appendLF = F)
+    }
+    message(msg, appendLF = T)
+  }
+
+  if(verbose) assign(".message_level", level + 1, pos = modulr_env)
+  if(!is.null(expr)) eval(expr)
+}
+
+
+.set_message_level <- function(level) {
+  assign("message_level", max(0, level), pos = modulr_env)
+}
+
+.get_message_level <- function() {
+  get0("message_level", envir = modulr_env, ifnotfound = 0)
+}
+
+.reset_message_level <- function() .set_message_level(0)
+
+.increment_message_level <- function() {
+  .set_message_level(.get_message_level() + 1)
+}
+
+.decrement_message_level <- function() {
+  .set_message_level(.get_message_level() - 1)
+}
+
 .parse_message_args <- function(...) {
   kwargs <- list(...)
   if(length(kwargs) == 0) {
@@ -11,23 +57,6 @@
   return(c(list(core = core), others))
 }
 
-message_meta <- function(...) {
-  kwargs <- .parse_message_args(...)
-  if(length(kwargs$core)) {
-    message(sprintf(
-      "[%s] ",
-      format(Sys.time(), format = "%Y-%m-%d %H:%M:%OS6")),
-      appendLF = F)
-    if("level" %in% names(kwargs)) {
-      message(sprintf(
-        "%s ",
-        paste(rep("*", kwargs$level), collapse="")),
-        appendLF = F)
-    }
-    message(kwargs$core, appendLF = T)
-  }
-}
-
 .message <- function(...) {
   kwargs <- .parse_message_args(...)
   if(length(kwargs$core)) {
@@ -37,9 +66,10 @@ message_meta <- function(...) {
         "[%s] ",
         #format(Sys.time(), format = "%Y-%m-%d %H:%M:%OS6"),
         kwargs$module_name))
-      if("level" %in% names(kwargs)) {
+      level <- .get_message_level()
+      if(level > 0) {
         out <- paste0(out, sprintf(
-          "%s ", paste(rep("*", kwargs$level), collapse="")))
+          "%s ", paste(rep("*", level), collapse="")))
       }
     }
     out <- paste0(out, paste0(kwargs$core, collapse = ""))

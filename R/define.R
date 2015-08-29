@@ -1,46 +1,19 @@
-#' Get module defininition.
-#'
-#' @export
-get_definition <- function(name) {
-  wrapper = function(debug = F,
-                     force = F)
-    instanciate(name,
-                debug = debug,
-                force = force)
-  invisible(wrapper)
-}
-
-#' Get module factory.
-#'
-#' @export
-get_factory <- function(name) {
-  register <- get("register", pos = modulr_env)
-  if(!is.null(register[[name]])) {
-    return(register[[name]]$factory)
-  }
-}
-
-# get_definition <- function(name) {
-#   wrapper = function(force_reinstanciate = F,
-#                      force_redefine_reinstanciate = F,
-#                      force_reinstanciate_all = F,
-#                      force_redefine_reinstanciate_all = F)
-#     instanciate(name,
-#                 force_reinstanciate = force_reinstanciate,
-#                 force_redefine_reinstanciate = force_redefine_reinstanciate,
-#                 force_reinstanciate_all = force_reinstanciate_all,
-#                 force_redefine_reinstanciate_all =
-#                   force_redefine_reinstanciate_all)
-#
-#   invisible(wrapper)
-# }
-
+# In order to know if a module definition has changed,
+# we compute a signature of it with a cryptographic hash.
 .signature <- function(name) {
+
   register <- get("register", pos = modulr_env)
+
   module <- register[[name]]
-  digest::digest(c(
-    deparse(module$dependencies),
-    deparse(module$factory)), "sha1")
+
+  if(!is.null(module)) {
+    return(digest::digest(c(
+      deparse(module$dependencies),
+      deparse(module$factory)),
+      "sha1"))
+  }
+
+  invisible(NULL)
 }
 
 #' Define a module.
@@ -61,13 +34,15 @@ get_factory <- function(name) {
 #' # instanciate "module_2"
 #' m2()
 #' @export
-
+# TODO: write the documentation
 define <- function(name, dependencies, factory) {
-  #   if(exists(".__filename__", where = parent.frame())) {
-  #     message("Module imported.")
-  #     filename = get(".__filename__", pos = parent.frame())
-  #     print(filename)
-  #   }
+
+  if(!(is.character(name) & isTRUE(length(name) == 1)))
+     stop("Type mismatch, string expected for name.", call. = F)
+  if(!(is.list(dependencies) | is.null(dependencies)))
+     stop("Type mismatch, list expected for dependencies.", call. = F)
+  if(!is.function(factory))
+     stop("Type mismatch, function expected for factory.", call. = F)
 
   register <- get("register", pos = modulr_env)
 
@@ -76,23 +51,26 @@ define <- function(name, dependencies, factory) {
       message_meta(sprintf("defining [%s] ...",
                            name), level = 1)
 
-    if(length(dependencies) != length(formals(factory))) {
-      stop("Dependencies mismatch.", call. = F)
+    if(is.null(dependencies)) dependencies <- list()
+    if(isTRUE(length(dependencies) != length(formals(factory)))) {
+      stop("Cardinality mismatch, ",
+           "number of dependencies and factory formals expected to be equal.",
+           call. = F)
     }
 
     register[[name]]$name <- name
     register[[name]]$dependencies <- dependencies
     register[[name]]$factory <- factory
-    register[[name]]$signature <- digest(c(
+    register[[name]]$signature <- digest::digest(c(
       deparse(dependencies),
       deparse(factory)), "sha1")
     register[[name]]$instance <- NULL
     register[[name]]$instanciated <- F
     register[[name]]$first_instance <- T
     register[[name]]$timestamp <- Sys.time()
-  } else {
+  } else if(!(name %in% RESERVED_NAMES)) {
     previous_signature <- register[[name]]$signature
-    signature <- digest(c(
+    signature <- digest::digest(c(
       deparse(dependencies),
       deparse(factory)), "sha1")
     if(signature != previous_signature) {
@@ -100,8 +78,10 @@ define <- function(name, dependencies, factory) {
         message_meta(sprintf("re-defining [%s] ...",
                              name), level = 1)
 
-      if(length(dependencies) != length(formals(factory))) {
-        stop("Dependencies mismatch.", call. = F)
+      if(isTRUE(length(dependencies) != length(formals(factory)))) {
+        stop("Cardinality mismatch, ",
+             "number of dependencies and factory formals expected to be equal.",
+             call. = F)
       }
 
       register[[name]]$dependencies <- dependencies
@@ -112,47 +92,86 @@ define <- function(name, dependencies, factory) {
       register[[name]]$first_instance <- F
       register[[name]]$timestamp <- Sys.time()
     }
+  } else {
+    return(invisible(NULL))
   }
 
   assign("register", register, pos = modulr_env)
 
-  get_definition(name)
+  invisible(function(...) make(name, ...))
+
 }
 
+#' Get module factory.
+#'
+#' @export
+# TODO: write documentation
+get_factory <- function(name) {
+
+  if(!(is.character(name) & isTRUE(length(name) == 1)))
+    stop("Type mismatch, string expected for name.", call. = F)
+
+  register <- get("register", pos = modulr_env)
+
+  module <- register[[name]]
+
+  if(!is.null(module)) {
+    return(module$factory)
+  }
+
+  invisible(NULL)
+}
 
 #' Remove all module definitions.
 #'
 #' @export
-
+# TODO: write documentation
 reset <- function() {
   message_meta("resetting package")
-  assign("register", NULL, pos = modulr_env)
   .onLoad()
+  invisible(T)
 }
 
 #' Undefine module.
 #'
 #' @export
+# TODO: write documentation
 
 undefine <- function(name) {
+
+  if(!(is.character(name) & isTRUE(length(name) == 1)))
+    stop("Type mismatch, string expected for name.", call. = F)
+
   if(!(name %in% RESERVED_NAMES)) {
     message_meta(sprintf("undefining [%s]", name), level = 1)
     register <- get("register", pos = modulr_env)
+    if(is.null(register[[name]])) return(invisible(NULL))
     register[[name]] <- NULL
     assign("register", register, pos = modulr_env)
+    return(invisible(T))
   }
+
+  invisible(NULL)
 }
 
 #' Touch module.
 #'
 #' @export
-
+# TODO: write documentation
 touch <- function(name) {
+
+  if(!(is.character(name) & isTRUE(length(name) == 1)))
+    stop("Type mismatch, string expected for name.", call. = F)
+
   if(!(name %in% RESERVED_NAMES)) {
     message_meta(sprintf("touching [%s]", name), level = 1)
     register <- get("register", pos = modulr_env)
-#    register[[name]]$signature <- 0
-#     register[[name]]$reinstanciate_children <- T
+
+    if(is.null(register[[name]])) {
+      message_warn("Module not found.")
+      return(invisible(NULL))
+    }
+
     register[[name]]$instance <- NULL
     register[[name]]$instanciated <- F
 
@@ -160,7 +179,11 @@ touch <- function(name) {
     assign("register", register, pos = modulr_env)
 
     module_option(name)$unset()
+
+    return(invisible(T))
   }
+
+  invisible(NULL)
 }
 
 #' Syntactic sugar to require dependencies, to be used in conjunction with \%provides\%.
@@ -175,10 +198,10 @@ touch <- function(name) {
 #' @export
 `%provides%` = function(lhs, rhs) {
   if(!is.function(rhs))
-    stop("Type mismatch, factory needed on RHS.", call. = F)
+    stop("Type mismatch, factory/function expected on RHS.", call. = F)
   if(is.list(lhs)) {
     if(!identical(names(lhs), c("name", "dependencies")))
-      stop("Type mismatch, dependencies needed on LHS.", call. = F)
+      stop("Type mismatch, dependencies/list expected on LHS.", call. = F)
     name <- lhs$name
     dependencies <- lhs$dependencies
   } else {

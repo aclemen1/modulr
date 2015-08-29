@@ -7,13 +7,14 @@ define_modulr <- function() {
         get(".__name__", pos = parent.frame()),
       get_filename = function() {
         name <- get(".__name__", pos = parent.frame())
-        resolve_path(name)
+        .resolve_path(name)
       },
       get_dirname = function() {
         name <- get(".__name__", pos = parent.frame())
-        dirname(resolve_path(name))
+        dirname(.resolve_path(name))
       },
-      resolve_path = resolve_path,
+      resolve_path = .resolve_path,
+      resolve_mapping = .resolve_mapping,
       message_info = function(...)
         message_info(
           ...,
@@ -31,4 +32,5 @@ define_modulr <- function() {
                                  error = function(e) NULL))
     )
   })
+  suppressMessages(make("modulr"))
 }
