@@ -4,6 +4,8 @@
 modulr — A Dependency Injection (DI) Framework for R
 ====================================================
 
+*Until the release of the forthcoming version 0.2.0, the documentation of the package is a work in progress. Thank you for your understanding.*
+
 Description
 -----------
 
@@ -26,22 +28,30 @@ Advantages
 Installation
 ------------
 
+<!---
 You can install:
 
--   the latest released version from CRAN with
+* the latest released version from CRAN with
 
 ``` r
 install.packages("modulr")
 ```
+* the latest released version from Github with
+``` r
+if (packageVersion("devtools") < 1.8) {
+  install.packages("devtools")
+}
+devtools::install_github("aclemen1/modulr")
+```
 
--   the latest development version from github with
-
-    ``` r
-    if (packageVersion("devtools") < 1.8) {
-      install.packages("devtools")
-    }
-    devtools::install_github("aclemen1/modulr")
-    ```
+* the latest _bleeding edge_ development version from Github with
+-->
+``` r
+if (packageVersion("devtools") < 1.8) {
+  install.packages("devtools")
+}
+devtools::install_github("aclemen1/modulr@devel")
+```
 
 If you encounter a clear bug, please [file a minimal reproducible example](https://github.com/aclemen1/modulr/issues).
 
@@ -63,7 +73,7 @@ library(modulr)
       stringsAsFactors = F)
     return(students)
   }
-#> [2015-08-29 17:03:17.390047] defining [data/students] ...
+#> [2015-08-29 17:23:10.167785] defining [data/students] ...
 ```
 
 The anatomy of this module is very simple: "data/student" is its name and the body of the function following the `%provides%` operator (which is part of a *syntactic sugar* for the more verbose function `define`) contains its core functionality, namely returning the required data frame.
@@ -83,7 +93,7 @@ In parallel, let's ask Bob to provide us with a similar module.
       stringsAsFactors = F)
     return(teachers)
   }
-#> [2015-08-29 17:03:17.396108] defining [data/teachers] ...
+#> [2015-08-29 17:23:10.174094] defining [data/teachers] ...
 ```
 
 Now that we have these two modules at our disposal, let's combine them into another module that returns a (bad) student-teacher ratio.
@@ -98,7 +108,7 @@ Now that we have these two modules at our disposal, let's combine them into anot
     ratio <- length(unique(students$id)) / length(unique(teachers$id))
     return(ratio)
   }
-#> [2015-08-29 17:03:17.401608] defining [bad_stat/student_teacher_ratio] ...
+#> [2015-08-29 17:23:10.178883] defining [bad_stat/student_teacher_ratio] ...
 ```
 
 The `%requires%` operator allows us to specify the modules we rely on for the calculation we provide. This list of **dependencies** assigns some arbitrary and ephemeral names to the required modules. These are those names that are then used to call objects into which the results of the required modules are **injected**, and available for use in the body of the module's definition.
@@ -107,12 +117,12 @@ It is now time to see the DI framework in action.
 
 ``` r
 ratio %<=% "bad_stat/student_teacher_ratio"
-#> [2015-08-29 17:03:17.406461] making [bad_stat/student_teacher_ratio] ...
-#> [2015-08-29 17:03:17.406915] * checking definitions ...
-#> [2015-08-29 17:03:17.418922] * found 2 dependencies(s) with 3 modules(s) on 2 layer(s)
-#> [2015-08-29 17:03:17.419910] ** making [data/students] ...
-#> [2015-08-29 17:03:17.421253] ** making [data/teachers] ...
-#> [2015-08-29 17:03:17.422813] ** making [bad_stat/student_teacher_ratio] ...
+#> [2015-08-29 17:23:10.183804] making [bad_stat/student_teacher_ratio] ...
+#> [2015-08-29 17:23:10.184298] * checking definitions ...
+#> [2015-08-29 17:23:10.195313] * found 2 dependencies(s) with 3 modules(s) on 2 layer(s)
+#> [2015-08-29 17:23:10.196316] ** making [data/students] ...
+#> [2015-08-29 17:23:10.197650] ** making [data/teachers] ...
+#> [2015-08-29 17:23:10.199223] ** making [bad_stat/student_teacher_ratio] ...
 ```
 
 We say that the `%<=%` operator **instanciates** the module given on its right-hand side. Obviously, there are three modules involved in this process, namely `[data/student]` and `[data/teachers]` which are independent on a first *layer*, and `[bad_stat/student_teacher_ration]` which depends on them on a second layer. Under the hood, the framework figures out the directed acyclic graph (DAG) of the dependencies and computes a topological sort, grouped by independent modules into layers. All the modules are then evaluated in order and the final result is assigned to the left-hand side of the `%<=%` operator.

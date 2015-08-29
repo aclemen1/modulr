@@ -18,6 +18,9 @@ knitr::opts_chunk$set(
 
 # modulr — A Dependency Injection (DI) Framework for R
 
+*Until the release of the forthcoming version 0.2.0, the documentation of 
+the package is a work in progress. Thank you for your understanding.*
+
 ## Description
 
 The `modulr` package is a Dependency Injection (DI) Framework for R. 
@@ -45,6 +48,7 @@ as well as [guice](https://github.com/google/guice) for Java.
 
 ## Installation
 
+<!---
 You can install:
 
 * the latest released version from CRAN with
@@ -52,13 +56,21 @@ You can install:
 ``` r
 install.packages("modulr")
 ```
-
-* the latest development version from github with
+* the latest released version from Github with
 ``` r
 if (packageVersion("devtools") < 1.8) {
   install.packages("devtools")
 }
 devtools::install_github("aclemen1/modulr")
+```
+
+* the latest _bleeding edge_ development version from Github with
+-->
+``` r
+if (packageVersion("devtools") < 1.8) {
+  install.packages("devtools")
+}
+devtools::install_github("aclemen1/modulr@devel")
 ```
 
 If you encounter a clear bug, please [file a minimal reproducible example](https://github.com/aclemen1/modulr/issues).
