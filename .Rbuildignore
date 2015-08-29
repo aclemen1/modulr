@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
-.Rprofile
 inst/db
 man-roxygen
 ^NEWS\.md

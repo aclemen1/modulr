@@ -1,7 +1,8 @@
 # modulr 0.2.0
 
-## Publication on CRAN and Github
+## First release
 
-Until now, modulr has been used by the Information System and Statistics Office
-of the University of Lausanne. This first release brings modulr to the vibrant 
-R Users Community.
+modulr is a Dependency Injection (DI) Framework for R. Until now, 
+modulr has been exclusively used by the Department of Information Systems and 
+Statistics at the University of Lausanne, Switzerland. This first release brings 
+modulr to the vibrant community of R Users.
