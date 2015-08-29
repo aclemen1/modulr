@@ -22,8 +22,9 @@ knitr::opts_chunk$set(
 
 # modulr — A Dependency Injection (DI) Framework for R
 
-*Until the release of the forthcoming version 0.2.0, the documentation of 
-the package is a work in progress. Thank you for your understanding.*
+*Until the release of the forthcoming stable version (0.2.0), the 
+documentation of the package is a work in progress. Thank you for your 
+understanding.*
 
 ## Description
 
@@ -155,7 +156,7 @@ used to call objects into which the results of the required modules are
 It is now time to see the DI framework in action.
 
 ```{r}
-ratio %<=% "bad_stat/student_teacher_ratio"
+bad_ratio %<=% "bad_stat/student_teacher_ratio"
 ```
 
 We say that the `%<=%` operator **makes** the module given on its 
@@ -184,8 +185,16 @@ All the modules are then evaluated in order and
 the final result is assigned to the left-hand side of the `%<=%` operator.
 
 ```{r}
-print(ratio)
+print(bad_ratio)
 ```
+
+## Real World Example
+
+This is the dependency graph of a module which exposes daily HR data for
+the University of Lausanne, Switzerland. All modules have been developed by
+four data scientists in three months. Although not shown here, many of these modules are reused for other purposes.
+
+![](README-fig3.png)
 
 ## Code of Conduct
 

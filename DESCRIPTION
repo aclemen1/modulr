@@ -2,9 +2,9 @@ Package: modulr
 Type: Package
 Version: 0.1.7.9000
 Title: A Dependency Injection (DI) Framework for R
-Description: A DI framework to break down sequential programs into discrete,
-  modular units that are loosely coupled, simple to develop, test, reuse and
-  share in a wide range of situations.
+Description: A Dependency Injection (DI) Framework to break down sequential
+  programs into discrete, modular units that are loosely coupled,
+  simple to develop, test, reuse, and share in a wide range of situations.
 Authors@R: c(
   person(
     given = "Alain", family = "Clément-Pavon",
