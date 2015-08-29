@@ -31,6 +31,8 @@ Imports:
   networkD3,
   stats
 Suggests:
+  dplyr,
+  htmltools,
   testthat
 License: MIT + file LICENSE
 Encoding: UTF-8
