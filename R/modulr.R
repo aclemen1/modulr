@@ -13,6 +13,6 @@ RESERVED_NAMES <- c("modulr")
 
 modulr_env <- new.env(parent = emptyenv())
 
-verbosity <- function(value) {
+set_verbosity <- function(value) {
   assign("verbosity", value, pos = modulr_env)
 }
