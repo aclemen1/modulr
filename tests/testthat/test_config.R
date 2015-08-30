@@ -14,34 +14,34 @@ test_that(".config returns a bunch of accessors", {
 
 test_that(".config alterates the configuration variable in the modulr env", {
   reset()
-  configuration <- get("configuration", pos = modulr_env)
-  expect_null(configuration[["scope"]])
+  config <- get("config", pos = modulr_env)
+  expect_null(config[["scope"]])
   cfg <- .config("scope")
   cfg$set("value")
-  configuration <- get("configuration", pos = modulr_env)
-  expect_equal(configuration[["scope"]], list("value"))
+  config <- get("config", pos = modulr_env)
+  expect_equal(config[["scope"]], list("value"))
 })
 
 test_that(".config$set is a setter", {
   reset()
   cfg <- .config("scope")
   cfg$set(list("c1" = "v1", "c2" = "v2"))
-  configuration <- get("configuration", pos = modulr_env)
-  expect_equal(configuration[["scope"]], list("c1" = "v1", "c2" = "v2"))
+  config <- get("config", pos = modulr_env)
+  expect_equal(config[["scope"]], list("c1" = "v1", "c2" = "v2"))
 })
 
 test_that(".config$set can drop and undrop values", {
   reset()
   cfg <- .config("scope")
   cfg$set(list("c1" = "v1", "c2" = "v2"))
-  configuration <- get("configuration", pos = modulr_env)
-  expect_equal(configuration[["scope"]], list("c1" = "v1", "c2" = "v2"))
+  config <- get("config", pos = modulr_env)
+  expect_equal(config[["scope"]], list("c1" = "v1", "c2" = "v2"))
   cfg$set(list("c1" = "v1bis"), drop = T)
-  configuration <- get("configuration", pos = modulr_env)
-  expect_equal(configuration[["scope"]], list("c1" = "v1bis", "c2" = "v2"))
+  config <- get("config", pos = modulr_env)
+  expect_equal(config[["scope"]], list("c1" = "v1bis", "c2" = "v2"))
   cfg$set(list("c1" = "v1ter"), drop = F)
-  configuration <- get("configuration", pos = modulr_env)
-  expect_equal(configuration[["scope"]], list("c1" = "v1bis", "c2" = "v2"))
+  config <- get("config", pos = modulr_env)
+  expect_equal(config[["scope"]], list("c1" = "v1bis", "c2" = "v2"))
 })
 
 test_that(".config$get is a getter", {
@@ -64,11 +64,11 @@ test_that(".config$unset is a destructor", {
   reset()
   cfg <- .config("scope")
   cfg$set("value")
-  configuration <- get("configuration", pos = modulr_env)
-  expect_equal(configuration[["scope"]], list("value"))
+  config <- get("config", pos = modulr_env)
+  expect_equal(config[["scope"]], list("value"))
   cfg$unset()
-  configuration <- get("configuration", pos = modulr_env)
-  expect_null(configuration[["scope"]])
+  config <- get("config", pos = modulr_env)
+  expect_null(config[["scope"]])
 })
 
 test_that("get_configs returns the whole configuration state", {
@@ -76,7 +76,7 @@ test_that("get_configs returns the whole configuration state", {
   cfg <- .config("scope")
   cfg$set("value")
   cfgs <- get_configs()
-  expect_equal(cfgs, get("configuration", pos = modulr_env))
+  expect_equal(cfgs, get("config", pos = modulr_env))
   expect_equal(cfgs$scope, list("value"))
 })
 

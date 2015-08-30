@@ -2,9 +2,9 @@
 .config <- function(scope) {
   if(missing(scope)) return(NULL)
   unset <- function() {
-    configuration <- base::get("configuration", pos = modulr_env)
-    configuration[[scope]] <- NULL
-    assign("configuration", configuration, pos = modulr_env)
+    config <- base::get("config", pos = modulr_env)
+    config[[scope]] <- NULL
+    assign("config", config, pos = modulr_env)
   }
   set <- function(..., drop = T) {
     options_list = list(...)
@@ -13,23 +13,23 @@
       if(is.list(options_list[[1]]))
         options_list <- options_list[[1]]
     if(isTRUE(length(options_list) == 0)) return(invisible(NULL))
-    configuration <- base::get("configuration", pos = modulr_env)
-    if(is.null(configuration[[scope]])) {
-      configuration[[scope]] <- options_list
+    config <- base::get("config", pos = modulr_env)
+    if(is.null(config[[scope]])) {
+      config[[scope]] <- options_list
     } else {
       if(is.null(names(options_list))) {
         if(isTRUE(drop))
-          configuration[[scope]] <- options_list
+          config[[scope]] <- options_list
       } else {
         for(key in names(options_list))
-          if(is.null(configuration[[scope]][[key]]) | isTRUE(drop))
-            configuration[[scope]][[key]] <- options_list[[key]]
+          if(is.null(config[[scope]][[key]]) | isTRUE(drop))
+            config[[scope]][[key]] <- options_list[[key]]
       }
     }
-    assign("configuration", configuration, pos = modulr_env)
+    assign("config", config, pos = modulr_env)
   }
   get_all <- function() {
-    config <- base::get("configuration", pos = modulr_env)
+    config <- base::get("config", pos = modulr_env)
     if(is.na(scope[2])) {
       config[[scope[1]]]
     } else {
@@ -52,7 +52,7 @@
 #'
 #' @export
 # TODO: write documentation
-get_configs <- function() get("configuration", pos = modulr_env)
+get_configs <- function() get("config", pos = modulr_env)
 
 #' Root configuration.
 #'

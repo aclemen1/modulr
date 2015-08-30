@@ -99,7 +99,7 @@
          is.null(scope_name)))
     stop("Type mismatch, string expected for scope.", call. = F)
 
-  configuration <- get("configuration", pos = modulr_env)
+  config <- get("config", pos = modulr_env)
 
   if(is.null(scope_name)) injected_name <- name else
     injected_name <- .resolve_mapping(name, scope_name)
