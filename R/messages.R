@@ -1,6 +1,6 @@
-message_meta <- function(msg, expr = NULL, verbosity = 0, ...) {
+.message_meta <- function(msg, expr = NULL, verbosity = 0, ...) {
 
-  verbosity_level <- get0("verbosity_level", envir = modulr_env,
+  verbosity_level <- get0("verbosity", envir = modulr_env,
                           ifnotfound = +Inf)
   verbose <- verbosity <= verbosity_level
 

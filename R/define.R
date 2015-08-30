@@ -48,7 +48,7 @@ define <- function(name, dependencies, factory) {
 
   if(is.null(register[[name]])) {
     if(!(name %in% RESERVED_NAMES))
-      message_meta(sprintf("defining [%s] ...",
+      .message_meta(sprintf("defining [%s] ...",
                            name), level = 1)
 
     if(is.null(dependencies)) dependencies <- list()
@@ -75,7 +75,7 @@ define <- function(name, dependencies, factory) {
       deparse(factory)), "sha1")
     if(signature != previous_signature) {
       if(!(name %in% RESERVED_NAMES))
-        message_meta(sprintf("re-defining [%s] ...",
+        .message_meta(sprintf("re-defining [%s] ...",
                              name), level = 1)
 
       if(isTRUE(length(dependencies) != length(formals(factory)))) {
@@ -127,7 +127,7 @@ get_factory <- function(name) {
 #' @export
 # TODO: write documentation
 reset <- function() {
-  message_meta("resetting package")
+  .message_meta("resetting package")
   .onLoad()
   invisible(T)
 }
@@ -143,7 +143,7 @@ undefine <- function(name) {
     stop("Type mismatch, string expected for name.", call. = F)
 
   if(!(name %in% RESERVED_NAMES)) {
-    message_meta(sprintf("undefining [%s]", name), level = 1)
+    .message_meta(sprintf("undefining [%s]", name), level = 1)
     register <- get("register", pos = modulr_env)
     if(is.null(register[[name]])) return(invisible(NULL))
     register[[name]] <- NULL
@@ -164,7 +164,7 @@ touch <- function(name) {
     stop("Type mismatch, string expected for name.", call. = F)
 
   if(!(name %in% RESERVED_NAMES)) {
-    message_meta(sprintf("touching [%s]", name), level = 1)
+    .message_meta(sprintf("touching [%s]", name), level = 1)
     register <- get("register", pos = modulr_env)
 
     if(is.null(register[[name]])) {

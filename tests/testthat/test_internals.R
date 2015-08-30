@@ -24,5 +24,5 @@ test_that(".internals$config returns the configurations", {
 })
 
 test_that(".internals$verbosity returns the verbosity level", {
-  expect_equal(.internals()$verbosity, modulr_env$verbosity_level)
+  expect_equal(.internals()$verbosity, modulr_env$verbosity)
 })

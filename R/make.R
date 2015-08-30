@@ -8,8 +8,8 @@ make <- function(name) {
     stop("Unauthorized make call from within a module.", call. = F)
   }
 
-  message_meta(sprintf("making [%s] ...", name), {
-    message_meta("checking definitions ...", {
+  .message_meta(sprintf("making [%s] ...", name), {
+    .message_meta("checking definitions ...", {
       all_dependencies <-
         .define_all_dependent_modules(name)
     }, verbosity = 2)
@@ -18,7 +18,7 @@ make <- function(name) {
     layered_names <- .topological_sort_by_layers(dependency_graph)
     if(length(layered_names) == 0) layered_names <- list(`1` = name)
 
-    message_meta(
+    .message_meta(
       sprintf("found %d dependencies(s) with %d modules(s) on %d layer(s)",
               nrow(dependency_graph),
               length(unlist(layered_names)),
@@ -44,7 +44,7 @@ make <- function(name) {
                | reinstanciated_by_parent
                | (ordered_name == name &
                     .signature(ordered_name) != .signature(name))) {
-              message_meta(sprintf("making [%s] ...", ordered_name), {
+              .message_meta(sprintf("making [%s] ...", ordered_name), {
                   env = new.env()
                   assign(".__name__", ordered_name, pos = env)
                   if(length(module$dependencies) > 0) {
