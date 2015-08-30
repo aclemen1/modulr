@@ -6,17 +6,17 @@
 \title{Root configuration.}
 \format{\preformatted{List of 4
  $ unset  :function ()  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 3 12 7 3 12 3 3 7
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x57ce408> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 4 12 8 3 12 3 4 8
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4ab0af8> 
  $ set    :function (..., drop = T)  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 8 10 29 3 10 3 8 29
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x57ce408> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 9 10 30 3 10 3 9 30
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4ab0af8> 
  $ get    :function (key)  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 38 10 41 3 10 3 38 41
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x57ce408> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 39 10 42 3 10 3 39 42
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4ab0af8> 
  $ get_all:function ()  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 30 14 37 3 14 3 30 37
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x57ce408> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 31 14 38 3 14 3 31 38
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4ab0af8> 
 }}
 \usage{
 root_config

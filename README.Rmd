@@ -182,13 +182,13 @@ dependency_graph("bad_stat/student_teacher_ratio")
 ![](README-fig1.png)
 
 All the modules are then evaluated in order and
-the final result is assigned to the left-hand side of the `%<=%` operator.
+the final result is assigned to the variable on the left-hand side of the `%<=%` operator.
 
 ```{r}
 print(bad_ratio)
 ```
 
-## Real World Example
+## A Real-World Usage
 
 This is the dependency graph of a module which exposes daily HR data for
 the University of Lausanne, Switzerland. All modules have been developed by

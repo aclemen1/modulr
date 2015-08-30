@@ -1,5 +1,6 @@
 # A helper function to set, get and unset values in configuration scopes.
 .config <- function(scope) {
+  if(missing(scope)) return(NULL)
   unset <- function() {
     configuration <- base::get("configuration", pos = modulr_env)
     configuration[[scope]] <- NULL
@@ -51,8 +52,7 @@
 #'
 #' @export
 # TODO: write documentation
-get_all_configs <- function() get("configuration", pos = modulr_env)
-
+get_configs <- function() get("configuration", pos = modulr_env)
 
 #' Root configuration.
 #'
@@ -86,13 +86,26 @@ module_option <- function(name)
 #' Syntactic sugar for setting default module options.
 #'
 #' @export
-`%has_default_option%` = function(lhs, rhs) {
+`%has_default_option%` <- function(lhs, rhs) {
   module_option(as.character(lhs))$set(as.list(rhs), drop = F)
+}
+
+#' Syntactic sugar for setting default module options.
+#'
+#' @export
+`%has_default_options%` <-
+  function(lhs, rhs) eval(substitute(`%has_default_option%`(lhs, rhs)),
+                          envir = parent.frame())
+
+#' Syntactic sugar for setting module options.
+#'
+#' @export
+`%has_option%` <- function(lhs, rhs) {
+  module_option(as.character(lhs))$set(as.list(rhs), drop = T)
 }
 
 #' Syntactic sugar for setting module options.
 #'
 #' @export
-`%has_option%` = function(lhs, rhs) {
-  module_option(as.character(lhs))$set(as.list(rhs), drop = T)
-}
+`%has_options%` <- function(lhs, rhs) eval(substitute(`%has_option%`(lhs, rhs)),
+                                  envir = parent.frame())
