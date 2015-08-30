@@ -28,8 +28,7 @@ Imports:
   digest,
   stringr,
   RUnit,
-  networkD3,
-  stats
+  networkD3
 Suggests:
   dplyr,
   htmltools,

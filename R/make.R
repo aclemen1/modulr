@@ -16,7 +16,7 @@ make <- function(name) {
 
     dependency_graph <- .build_dependency_graph(all_dependencies)
     layered_names <- .topological_sort_by_layers(dependency_graph)
-    if(length(layered_names) == 0) layered_names <- list(`1` = name)
+    if(is.null(layered_names)) layered_names <- list(`1` = name)
 
     .message_meta(
       sprintf("found %d dependencies(s) with %d modules(s) on %d layer(s)",
@@ -45,40 +45,40 @@ make <- function(name) {
                | (ordered_name == name &
                     .signature(ordered_name) != .signature(name))) {
               .message_meta(sprintf("making [%s] ...", ordered_name), {
-                  env = new.env()
-                  assign(".__name__", ordered_name, pos = env)
-                  if(length(module$dependencies) > 0) {
-                    args <-
-                      lapply(
-                        module$dependencies,
-                        function(name) {
-                          register[[.resolve_mapping(name, ordered_name)]]$instance
-                        }
-                      )
-                    # tricky bug solution, see below
-                    module$instance <- evalq(do.call(
-                      eval(parse(text=deparse(module$factory))),
-                      args = args), envir = env)
-                  } else {
-                    # the deparse %>% parse %>% eval trick solves the following bug
-                    # WORKS:
-                    # module$instance <- evalq(do.call(function() {get("variable", pos = env)}, args = list()), envir = env)
-                    # DOES NOT WORK:
-                    # f <- function() {get("variable", pos = env)}
-                    # module$instance <- evalq(do.call(f, args = list()), envir = env)
-                    # WORKAROUND:
-                    # module$instance <- evalq(do.call(eval(parse(text=deparse(f))), args = list()), envir = env)
-                    module$instance <- evalq(do.call(
-                      eval(parse(text=deparse(module$factory))),
-                      args = list()), envir = env)
-                  }
-                  module$instanciated <- T
-                  module$first_instance <- F
+                env = new.env()
+                assign(".__name__", ordered_name, pos = env)
+                if(length(module$dependencies) > 0) {
+                  args <-
+                    lapply(
+                      module$dependencies,
+                      function(name) {
+                        register[[.resolve_mapping(name, ordered_name)]]$instance
+                      }
+                    )
+                  # tricky bug solution, see below
+                  module$instance <- evalq(do.call(
+                    eval(parse(text=deparse(module$factory))),
+                    args = args), envir = env)
+                } else {
+                  # the deparse %>% parse %>% eval trick solves the following bug
+                  # WORKS:
+                  # module$instance <- evalq(do.call(function() {get("variable", pos = env)}, args = list()), envir = env)
+                  # DOES NOT WORK:
+                  # f <- function() {get("variable", pos = env)}
+                  # module$instance <- evalq(do.call(f, args = list()), envir = env)
+                  # WORKAROUND:
+                  # module$instance <- evalq(do.call(eval(parse(text=deparse(f))), args = list()), envir = env)
+                  module$instance <- evalq(do.call(
+                    eval(parse(text=deparse(module$factory))),
+                    args = list()), envir = env)
+                }
+                module$instanciated <- T
+                module$first_instance <- F
 
-                  module$timestamp <- Sys.time()
-                  register[[ordered_name]] <- module
-                  assign("register", register, pos = modulr_env)
-                }, verbosity = 1)
+                module$timestamp <- Sys.time()
+                register[[ordered_name]] <- module
+                assign("register", register, pos = modulr_env)
+              }, verbosity = 1)
             }
           }
         }

@@ -251,3 +251,9 @@ test_that("make calls are prohibited from within a module", {
   })
   expect_error(make(define))
 })
+
+test_that("make returns an instance", {
+  reset()
+  define("module", NULL, function() {function() "foo"})
+  expect_equal(make("module")(), "foo")
+})

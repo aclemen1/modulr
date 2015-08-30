@@ -1,4 +1,7 @@
+#' Get and show breadcrumbs
+#'
 #' @export
+# TODO: write documentation
 .__breadcrumbs__ <- function(void, verbose = T) {
   bc <- unique(
     unlist(
@@ -17,6 +20,12 @@
   any(grepl("\\.\\_\\_breadcrumbs\\_\\_\\(\"installed\"\\)", format(handler)))
 }
 
+#' Get and show breadcrumbs
+#'
+#' @export
+# TODO: write documentation
+breadcrumbs <- .__breadcrumbs__
+
 #' Activate breadcrumbs
 #'
 #' @export
@@ -31,14 +40,9 @@ activate_breadcrumbs <- function() {
     } else {
       wrapper <- function() {
         .__breadcrumbs__('installed')
-        eval(parse(text = deparse(handler)))
+        eval(parse(text = deparse(handler)), envir = parent.frame())
       }
     }
-    options(stats::setNames(list(wrapper), "error"))
+    options(error = wrapper)
   }
 }
-
-#' Get and show breadcrumbs
-#'
-#' @export
-breadcrumbs <- .__breadcrumbs__

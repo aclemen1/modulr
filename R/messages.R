@@ -58,17 +58,20 @@
 #' Outputs message information
 #'
 #' @export
+# TODO: write documentation
 message_info <- function(...)
   .message(..., fun = function(...) message(...))
 
 #' Outputs message warning
 #'
 #' @export
+# TODO: write documentation
 message_warn <- function(...)
   .message(..., fun = function(...) warning(..., immediate. = T, call. = F))
 
 #' Stops and outputs message
 #'
 #' @export
+# TODO: write documentation
 message_stop <- function(...)
   .message(..., fun = function(...) stop(..., call. = F))
