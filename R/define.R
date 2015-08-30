@@ -168,7 +168,7 @@ touch <- function(name) {
     register <- get("register", pos = modulr_env)
 
     if(is.null(register[[name]])) {
-      message_warn("Module not found.")
+      warning("Module not found.", call. = F, immediate. = T)
       return(invisible(NULL))
     }
 

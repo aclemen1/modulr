@@ -4,7 +4,7 @@
   assign("verbosity", +Inf, pos = modulr_env)
 
   root_config$set(c("module", "modules", "lib", "libs", "."))
-  define_modulr()
+  .define_modulr()
   activate_breadcrumbs()
 
   invisible()

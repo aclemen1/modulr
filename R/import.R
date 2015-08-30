@@ -21,7 +21,7 @@ import <- function(name) {
     }
 
     if (!.is_defined(name)) {
-      message_stop(sprintf("%s not found", name))
+      stop(sprintf("%s not found", name), call. = F)
     }
 
     return(path)

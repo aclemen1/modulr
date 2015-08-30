@@ -88,14 +88,14 @@ test_that(".message outputs module name if arg is passed on", {
     "module")
 })
 
-test_that("message_info calls .message(..., fun = message)", {
-  expect_message(message_info("hello world"), regexp = "hello world")
+test_that(".message_info calls .message(..., fun = message)", {
+  expect_message(.message_info("hello world"), regexp = "hello world")
 })
 
-test_that("message_warn calls .message(..., fun = warning)", {
-  expect_warning(message_warn("hello world"), regexp = "hello world")
+test_that(".message_warn calls .message(..., fun = warning)", {
+  expect_warning(.message_warn("hello world"), regexp = "hello world")
 })
 
-test_that("message_stop calls .message(..., fun = stop)", {
-  expect_error(message_stop("hello world"), regexp = "hello world")
+test_that(".message_stop calls .message(..., fun = stop)", {
+  expect_error(.message_stop("hello world"), regexp = "hello world")
 })
