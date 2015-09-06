@@ -105,7 +105,8 @@ define <- function(name, dependencies, factory) {
   }
 
   assign("register", register, pos = modulr_env)
-  assign(".Last.name", name, pos = modulr_env)
+  if(.is_regular_core(name))
+    assign(".Last.name", name, pos = modulr_env)
 
   invisible(function(...) make(name, ...))
 
@@ -179,6 +180,8 @@ touch <- function(name) {
   register[[name]]$timestamp <- Sys.time()
 
   assign("register", register, pos = modulr_env)
+  if(.is_regular(name))
+    assign(".Last.name", name, pos = modulr_env)
 
   module_option(name)$unset()
 

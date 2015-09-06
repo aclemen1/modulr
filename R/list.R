@@ -3,6 +3,7 @@
 list_modules <- function(regexp, all = T, wide = T, full = F,
                          cols = c(
                            "name",
+                           "type",
                            "calls",
                            "dependencies",
                            "requisitions",
@@ -17,6 +18,7 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
     is.character(cols) &&
       all(cols %in% c(
         "name",
+        "type",
         "calls",
         "dependencies",
         "requisitions",
@@ -46,10 +48,18 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
       signatures <- vapply(flat, get_signature, FUN.VALUE = "")
 
       modified <-
-        do.call(c, Map(function(name) register[[name]]$timestamp, flat))
+        format(
+          do.call(c, Map(function(name) register[[name]]$timestamp, flat)),
+          "%c")
 
       created <-
-        do.call(c, Map(function(name) register[[name]]$created, flat))
+        format(
+          do.call(c, Map(function(name) register[[name]]$created, flat)), "%c")
+
+      types <-
+        do.call(c, Map(function(name)
+          ifelse(register[[name]]$instanciated,
+                 typeof(register[[name]]$instance), NA_character_), flat))
 
       deparsed_factories <- Map(function(name) deparse(register[[name]]), flat)
 
@@ -58,7 +68,8 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
       chars <- vapply(deparsed_factories, function(factory) sum(nchar(factory)),
                       FUN.VALUE = 0)
 
-      durations <- do.call(c, Map(function(name) register[[name]]$duration, flat))
+      durations <-
+        do.call(c, Map(function(name) register[[name]]$duration, flat))
 
       inc <- table(Reduce(rbind, Map(function(name) {
         deps <- factor(unlist(register[[name]]$dependencies), levels = flat)
@@ -73,6 +84,7 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
 
       data <- data.frame(
         name = flat,
+        type = types,
         calls = calls,
         dependencies = deps,
         requisitions = reqs,

@@ -16,7 +16,7 @@
 
     out <- sprintf(
       "[%s] ",
-      format(Sys.time(), format = "%Y-%m-%d %H:%M:%OS6"))
+      format(Sys.time(), format = "%c"))
 
     if(level > 0) {
       out <- paste0(out, sprintf(
@@ -63,7 +63,7 @@
   if(length(kwargs$core)) {
 
     out <- sprintf("[%s%s] ",
-                   format(Sys.time(), format = "%Y-%m-%d %H:%M:%OS6"),
+                   format(Sys.time(), format = "%c"),
                    if("module_name" %in% names(kwargs)) {
                      sprintf(" %s", kwargs$module_name)
                      } else {""})

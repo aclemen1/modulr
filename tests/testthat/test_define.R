@@ -283,3 +283,36 @@ test_that("touch updates only non special modules", {
   expect_error(touch("modulr"))
 
 })
+
+test_that("define assigns the last regular core module name to .Last.name", {
+  reset()
+  expect_null(.Last.name)
+  define("module_1", NULL, function() {})
+  expect_equal(.Last.name, "module_1")
+  define("module_1/test/a/dependency", NULL, function() {})
+  expect_equal(.Last.name, "module_1")
+  define("module_1/mock/a/dependency", NULL, function() {})
+  expect_equal(.Last.name, "module_1")
+})
+
+test_that("reset resets .Last.name", {
+  reset()
+  expect_null(.Last.name)
+  define("module_1", NULL, function() {})
+  expect_equal(.Last.name, "module_1")
+  reset()
+  expect_null(.Last.name)
+})
+
+test_that("touch assigns the last regular module name to .Last.name", {
+  reset()
+  define("module_1", NULL, function() {})
+  define("module_2", NULL, function() {})
+  expect_equal(.Last.name, "module_2")
+  touch("module_1")
+  expect_equal(.Last.name, "module_1")
+  define("module_1/test/a/dependency", NULL, function() {})
+  expect_equal(.Last.name, "module_1")
+  touch("module_1/test/a/dependency")
+  expect_equal(.Last.name, "module_1/test/a/dependency")
+})

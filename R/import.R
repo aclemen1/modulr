@@ -1,5 +1,4 @@
 #' @export
-# TODO: à tester
 import_module <- function(name, url, signature = NULL, force = F, ...) {
 
   assertthat::assert_that(
@@ -67,10 +66,11 @@ import_module <- function(name, url, signature = NULL, force = F, ...) {
 
   }
 
+  invisible()
+
 }
 
 #' @export
-# TODO: test that
 `%imports%` <- function(lhs, rhs) {
 
   assertthat::assert_that(
@@ -92,7 +92,6 @@ import_module <- function(name, url, signature = NULL, force = F, ...) {
 }
 
 #' @export
-# TODO: test that
 `%signed%` <- function(lhs, rhs) {
 
   assertthat::assert_that(assertthat::is.string(lhs),

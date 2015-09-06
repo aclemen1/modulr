@@ -7,21 +7,21 @@ test_that("mappings are resolved", {
       "foo/bar" = "foo/bar_V2"
     ))
 
-  "foo/bar" %provides% function() return("bar")
-  "foo/bar_V2" %provides% function() return("bar_V2")
+  define("foo/bar", NULL, function() return("bar"))
+  define("foo/bar_V2", NULL, function() return("bar_V2"))
 
-  "some/module" %requires%
-    list(bar = "foo/bar") %provides% function(bar) {
+  define("some/module",
+    list(bar = "foo/bar"), function(bar) {
       return(bar)
-    }
+    })
 
-  "some/old_module" %requires%
-    list(bar = "foo/bar") %provides% function(bar) {
+  define("some/old_module",
+    list(bar = "foo/bar"), function(bar) {
       return(bar)
-    }
+    })
 
-  module %<=% "some/module"
-  old_module %<=% "some/old_module"
+  module <- make("some/module")
+  old_module <- make("some/old_module")
 
   expect_equal(module, "bar")
   expect_equal(old_module, "bar_V2")
@@ -256,4 +256,89 @@ test_that("make returns an instance", {
   reset()
   define("module", NULL, function() {function() "foo"})
   expect_equal(make("module")(), "foo")
+})
+
+test_that("make assigns the last regular module name to .Last.name", {
+  reset()
+  expect_null(.Last.name)
+  define("module_1", NULL, function() {})
+  make("module_1")
+  expect_equal(.Last.name, "module_1")
+  define("module_1/test/a/dependency", NULL, function() {})
+  make("module_1/test/a/dependency")
+  expect_equal(.Last.name, "module_1/test/a/dependency")
+})
+
+test_that("make_all makes all regular defined modules and returns results", {
+  reset()
+  define("module1", NULL, function() {"m1"})
+  define("module2", NULL, function() {"m2"})
+  expect_equal(make_all(), list("module1" = "m1", "module2" = "m2"))
+})
+
+test_that("make_tests makes all tests", {
+  reset()
+
+  "test_1" %provides% function() {"hello world"}
+
+  "test_1/mock" %provides% get_factory("test_1")
+
+  "test_1/test" %requires% list(test_1 = "test_1/mock") %provides%
+    function(test_1) {
+      library(testthat)
+      test_that("it is exactly equal", {
+        expect_equal(test_1, "hello world")
+      })
+    }
+
+  "test_1/2/test" %requires% list(test_1 = "test_1/mock") %provides%
+    function(test_1) {
+      library(testthat)
+      test_that("all is ok", {
+        expect_equal(tolower(test_1), "hello world")
+        expect_equal(toupper(test_1), "HELLO WORLD")
+      })
+    }
+
+  expect_null(make_tests())
+})
+
+test_that("make_tests fails on error", {
+  reset()
+
+  "test_1" %provides% function() {"hello world"}
+
+  "test_1/mock" %provides% get_factory("test_1")
+
+  "test_1/test" %requires% list(test_1 = "test_1/mock") %provides%
+    function(test_1) {
+      return(T)
+    }
+
+  "test_1/2/test" %requires% list(test_1 = "test_1/mock") %provides%
+    function(test_1) {
+      return(F)
+    }
+
+  expect_error(make_tests())
+})
+
+test_that("make_tests fails on malformed tests", {
+  reset()
+
+  "test_1" %provides% function() {"hello world"}
+
+  "test_1/mock" %provides% get_factory("test_1")
+
+  "test_1/test" %requires% list(test_1 = "test_1/mock") %provides%
+    function(test_1) {
+      return("malformed")
+    }
+
+  "test_1/2/test" %requires% list(test_1 = "test_1/mock") %provides%
+    function(test_1) {
+      return(T)
+    }
+
+  expect_error(make_tests())
 })

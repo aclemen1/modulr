@@ -1,4 +1,4 @@
-context("import")
+context("load")
 
 test_that(".is_defined return only T or F", {
   reset()

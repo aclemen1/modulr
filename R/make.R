@@ -2,7 +2,6 @@
 #'
 #' @export
 # TODO: write documentation
-# TODO: test .Last.name assignments
 make <- function(name) {
 
   if(exists(".__name__")) {
@@ -24,7 +23,8 @@ make <- function(name) {
 
     }, verbosity = 2)
 
-    assign(".Last.name", name, pos = modulr_env)
+    if(.is_regular(name))
+      assign(".Last.name", name, pos = modulr_env)
 
     register <- .internals()$register
 
@@ -142,7 +142,6 @@ make <- function(name) {
 }
 
 #' @export
-# TODO: test it
 # TODO: write documentation
 make_all <- function(regexp, all = F, error = stop, ...) {
 
@@ -151,15 +150,13 @@ make_all <- function(regexp, all = F, error = stop, ...) {
     assertthat::is.flag(all),
     is.function(error))
 
-  module_names <- list_modules(regexp, all, wide = F)
+  module_names <- list_modules(regexp, all = all, wide = F)
 
   rs <- list()
   for(name in module_names) {
 
     rs[[name]] <- tryCatch(make(name, ...),
-             error = error)
-
-    cat("\n")
+                           error = error)
 
   }
 
@@ -168,24 +165,52 @@ make_all <- function(regexp, all = F, error = stop, ...) {
 }
 
 #' @export
-# TODO: test it
 # TODO: write documentation
 make_tests <- function(...) {
 
-  rs <-
-    make_all(
-      "/test$", all = F,
-      error = function(e) {
-        message(sprintf("Error: %s", e$message))
-        return(F)
-      },
-      ...)
+  module_names <- list_modules("/tests?$", all = F, wide = F)
 
-  if(length(rs) > 0) stop("Test(s) failed.", call. = F)
+  rs <- list()
+  for(name in module_names) {
+
+    rs[[name]] <- tryCatch({
+
+      lrs <- make(name, ...)
+
+      assertthat::assert_that(
+        assertthat::is.flag(lrs) || is.null(lrs),
+        msg = "Test is not returning a boolean or NULL.")
+
+      if(!(is.null(lrs) || lrs))
+        stop("Test failed.")
+
+      invisible(T)
+
+    }, error = function(e) {
+
+      message(sprintf("Error: %s", e$message))
+
+      return(invisible(F))
+
+    })
+
+  }
+
+  if(!all(unlist(rs))) stop("FAILED.", call. = F)
+
+  if(sample(5, 1) == 1) {
+    message("PASSED. ", sample(.praise, 1), ".")
+  } else {
+    message("PASSED.")
+  }
 
   invisible()
 
 }
+
+#' @export
+# TODO: write documentation
+make_test <- make_tests
 
 #' Syntactic sugar to make a module.
 #'

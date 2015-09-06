@@ -27,6 +27,17 @@ assertthat::on_failure(.is_regular) <- function(call, env) {
   paste0(deparse(eval(call$name, envir = env)), " is special.")
 }
 
+# Test if a module has a regular name which is not intended for testing
+.is_regular_core <- function(name) {
+  .is_regular(name) &&
+    !grepl("/tests?$|/tests?/|/mocks?$|/mocks?/", name, ignore.case = T)
+}
+
+assertthat::on_failure(.is_regular_core) <- function(call, env) {
+  paste0(deparse(eval(call$name, envir = env)),
+         " is special or intended for testing purposes.")
+}
+
 # Test if a module name is special.
 .is_special <- function(name) {
   !.is_regular(name)
