@@ -1,6 +1,7 @@
 ---
 output:
-  md_document:
+  html_document:
+    keep_md: yes
     variant: markdown_github
 ---
 
@@ -168,7 +169,7 @@ graph (DAG) of the dependencies and computes a topological sort, grouped by
 independent modules into layers. 
 
 ```{r fig1, echo=F}
-dependency_graph("bad_stat/student_teacher_ratio") %>%
+graph_dependencies("bad_stat/student_teacher_ratio") %>%
   html_print %>%
   webshot(file = "README-fig1.png", selector = ".sankeyNetwork", delay = 2) %>%
   resize("730x") %>%
@@ -176,7 +177,7 @@ dependency_graph("bad_stat/student_teacher_ratio") %>%
 ```
 
 ```{r, echo=T, eval=F}
-dependency_graph("bad_stat/student_teacher_ratio")
+graph_dependencies("bad_stat/student_teacher_ratio")
 ```
 
 ![](README-fig1.png)
