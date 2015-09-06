@@ -1,19 +1,26 @@
-# In order to know if a module definition has changed,
-# we compute a signature of it with a cryptographic hash.
-.signature <- function(name) {
+# Compute a SHA-1 digest of an R object
+.hash <- function(object) {
 
-  register <- get("register", pos = modulr_env)
+  digest::digest(object, "sha1")
+
+}
+
+#' In order to know if a module definition has changed,
+#' we compute a signature of it with a cryptographic hash.
+#' @export
+# TODO: write documentation
+get_signature <- function(name) {
+
+  assertthat::assert_that(.is_defined(name))
+
+  register <- .internals()$register
 
   module <- register[[name]]
 
-  if(!is.null(module)) {
-    return(digest::digest(c(
-      deparse(module$dependencies),
-      deparse(module$factory)),
-      "sha1"))
-  }
+  .hash(c(
+    deparse(module$dependencies),
+    deparse(module$factory)))
 
-  invisible(NULL)
 }
 
 #' Define a module.
@@ -37,66 +44,68 @@
 # TODO: write the documentation
 define <- function(name, dependencies, factory) {
 
-  if(!(is.character(name) & isTRUE(length(name) == 1)))
-     stop("Type mismatch, string expected for name.", call. = F)
-  if(!(is.list(dependencies) | is.null(dependencies)))
-     stop("Type mismatch, list expected for dependencies.", call. = F)
-  if(!is.function(factory))
-     stop("Type mismatch, function expected for factory.", call. = F)
+  assertthat::assert_that(
+    assertthat::is.string(name),
+    is.function(factory),
+    is.null(dependencies) || (
+      is.list(dependencies) && (
+        setequal(names(dependencies), names(formals(factory))) || (
+          assertthat::are_equal(length(dependencies),
+                                length(formals(factory))) &&
+            is.null(names(dependencies))))))
 
-  register <- get("register", pos = modulr_env)
+  if(is.null(dependencies)) dependencies <- list()
 
-  if(is.null(register[[name]])) {
-    if(!(name %in% RESERVED_NAMES))
-      .message_meta(sprintf("defining [%s] ...",
-                           name), level = 1)
+  timestamp <- Sys.time()
 
-    if(is.null(dependencies)) dependencies <- list()
-    if(isTRUE(length(dependencies) != length(formals(factory)))) {
-      stop("Cardinality mismatch, ",
-           "number of dependencies and factory formals expected to be equal.",
-           call. = F)
-    }
+  register <- .internals()$register
+
+  if(.is_undefined(name)) {
+
+    if(.is_regular(name))
+      .message_meta(sprintf("defining [%s] ...", name))
 
     register[[name]]$name <- name
     register[[name]]$dependencies <- dependencies
     register[[name]]$factory <- factory
-    register[[name]]$signature <- digest::digest(c(
+    register[[name]]$signature <- .hash(c(
       deparse(dependencies),
-      deparse(factory)), "sha1")
+      deparse(factory)))
     register[[name]]$instance <- NULL
     register[[name]]$instanciated <- F
+    register[[name]]$calls <- 0
+    register[[name]]$duration <- NA_integer_
     register[[name]]$first_instance <- T
-    register[[name]]$timestamp <- Sys.time()
-  } else if(!(name %in% RESERVED_NAMES)) {
-    previous_signature <- register[[name]]$signature
-    signature <- digest::digest(c(
-      deparse(dependencies),
-      deparse(factory)), "sha1")
-    if(signature != previous_signature) {
-      if(!(name %in% RESERVED_NAMES))
-        .message_meta(sprintf("re-defining [%s] ...",
-                             name), level = 1)
+    register[[name]]$timestamp <- timestamp
+    register[[name]]$created <- timestamp
 
-      if(isTRUE(length(dependencies) != length(formals(factory)))) {
-        stop("Cardinality mismatch, ",
-             "number of dependencies and factory formals expected to be equal.",
-             call. = F)
-      }
+  } else if(.is_regular(name)) {
+
+    previous_signature <- register[[name]]$signature
+    signature <- .hash(c(
+      deparse(dependencies),
+      deparse(factory)))
+    if(signature != previous_signature) {
+
+      .message_meta(sprintf("re-defining [%s] ...", name))
 
       register[[name]]$dependencies <- dependencies
       register[[name]]$factory <- factory
       register[[name]]$signature <- signature
       register[[name]]$instance <- NULL
       register[[name]]$instanciated <- F
+      register[[name]]$calls <- 0
+      register[[name]]$duration <- NA_integer_
       register[[name]]$first_instance <- F
-      register[[name]]$timestamp <- Sys.time()
+      register[[name]]$timestamp <- timestamp
+
     }
   } else {
-    return(invisible(NULL))
+    assertthat::assert_that(.is_regular(name))
   }
 
   assign("register", register, pos = modulr_env)
+  assign(".Last.name", name, pos = modulr_env)
 
   invisible(function(...) make(name, ...))
 
@@ -108,18 +117,12 @@ define <- function(name, dependencies, factory) {
 # TODO: write documentation
 get_factory <- function(name) {
 
-  if(!(is.character(name) & isTRUE(length(name) == 1)))
-    stop("Type mismatch, string expected for name.", call. = F)
+  load_module(name)
 
-  register <- get("register", pos = modulr_env)
+  assertthat::assert_that(.is_defined(name))
 
-  module <- register[[name]]
+  .internals()$register[[name]]$factory
 
-  if(!is.null(module)) {
-    return(module$factory)
-  }
-
-  invisible(NULL)
 }
 
 #' Remove all module definitions.
@@ -127,9 +130,13 @@ get_factory <- function(name) {
 #' @export
 # TODO: write documentation
 reset <- function() {
+
   .message_meta("resetting package")
+
   .onLoad()
-  invisible(T)
+
+  invisible()
+
 }
 
 #' Undefine module.
@@ -139,19 +146,18 @@ reset <- function() {
 
 undefine <- function(name) {
 
-  if(!(is.character(name) & isTRUE(length(name) == 1)))
-    stop("Type mismatch, string expected for name.", call. = F)
+  assertthat::assert_that(.is_defined_regular(name))
 
-  if(!(name %in% RESERVED_NAMES)) {
-    .message_meta(sprintf("undefining [%s]", name), level = 1)
-    register <- get("register", pos = modulr_env)
-    if(is.null(register[[name]])) return(invisible(NULL))
-    register[[name]] <- NULL
-    assign("register", register, pos = modulr_env)
-    return(invisible(T))
-  }
+  register <- .internals()$register
 
-  invisible(NULL)
+  .message_meta(sprintf("undefining [%s]", name))
+
+  register[[name]] <- NULL
+
+  assign("register", register, pos = modulr_env)
+
+  invisible()
+
 }
 
 #' Touch module.
@@ -160,48 +166,52 @@ undefine <- function(name) {
 # TODO: write documentation
 touch <- function(name) {
 
-  if(!(is.character(name) & isTRUE(length(name) == 1)))
-    stop("Type mismatch, string expected for name.", call. = F)
+  assertthat::assert_that(.is_defined_regular(name))
 
-  if(!(name %in% RESERVED_NAMES)) {
-    .message_meta(sprintf("touching [%s]", name), level = 1)
-    register <- get("register", pos = modulr_env)
+  register <- .internals()$register
 
-    if(is.null(register[[name]])) {
-      warning("Module not found.", call. = F, immediate. = T)
-      return(invisible(NULL))
-    }
+  .message_meta(sprintf("touching [%s]", name))
 
-    register[[name]]$instance <- NULL
-    register[[name]]$instanciated <- F
+  register[[name]]$instance <- NULL
+  register[[name]]$instanciated <- F
+  register[[name]]$calls <- 0
+  register[[name]]$duration <- NA_integer_
+  register[[name]]$timestamp <- Sys.time()
 
-    register[[name]]$timestamp <- Sys.time()
-    assign("register", register, pos = modulr_env)
+  assign("register", register, pos = modulr_env)
 
-    module_option(name)$unset()
+  module_option(name)$unset()
 
-    return(invisible(T))
-  }
+  invisible()
 
-  invisible(NULL)
 }
 
 #' Syntactic sugar to require dependencies, to be used in conjunction with \%provides\%.
 #'
 #' @export
 `%requires%` = function(lhs, rhs) {
-  list(name=as.character(lhs), dependencies=as.list(rhs))
+
+  assertthat::assert_that(
+    assertthat::is.string(lhs),
+    is.list(rhs) || is.null(rhs)
+    )
+
+  list(name = lhs, dependencies = rhs)
+
 }
 
 #' Syntactic sugar to provide a factory, can be used in conjunction with \%requires\%.
 #'
 #' @export
 `%provides%` = function(lhs, rhs) {
-  if(!is.function(rhs))
-    stop("Type mismatch, factory/function expected on RHS.", call. = F)
+
+  assertthat::assert_that(
+    is.function(rhs),
+    assertthat::is.string(lhs) || (
+      is.list(lhs) &
+        setequal(names(lhs), c("name", "dependencies"))))
+
   if(is.list(lhs)) {
-    if(!identical(names(lhs), c("name", "dependencies")))
-      stop("Type mismatch, dependencies/list expected on LHS.", call. = F)
     name <- lhs$name
     dependencies <- lhs$dependencies
   } else {
@@ -209,6 +219,14 @@ touch <- function(name) {
     dependencies <- list()
   }
   factory <- rhs
-  do.call(define, args = list(name, dependencies, factory),
-          envir = parent.frame())
+
+  do.call(
+    define,
+    args =
+      list(name = name,
+           dependencies = dependencies,
+           factory = factory),
+    envir = parent.frame())
+
 }
+

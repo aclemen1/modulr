@@ -1,6 +1,7 @@
 #' Unit tests.
 #'
 #' @export
+# TODO: describe as OBSOLETE and unmaintained, kept for backwards compatibility
 run_tests <- function(module_name) {
   # TODO: forker https://github.com/cran/RUnit
   # et dans R/runit.r, adapter .sourceTestFile()

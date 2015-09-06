@@ -13,6 +13,12 @@ RESERVED_NAMES <- c("modulr")
 
 modulr_env <- new.env(parent = emptyenv())
 
+#' @export
+# TODO: write documentation
 set_verbosity <- function(value) {
+
+  assertthat::assert_that(assertthat::is.scalar(value))
+
   assign("verbosity", value, pos = modulr_env)
+
 }

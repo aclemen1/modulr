@@ -70,3 +70,5 @@ test_that("$message_stop outputs the module name", {
   module <- make("module_foobar")
   expect_error(module(), regexp = "module_foobar")
 })
+
+suppressMessages(reset())

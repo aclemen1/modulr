@@ -19,7 +19,7 @@ test_that("import finds and imports .R files", {
   on.exit(unlink(file))
 
   root_config$set(path)
-  module_file <- import(name)
+  module_file <- load_module(name)
 
   expect_equal(module_file, file)
 
@@ -41,7 +41,7 @@ test_that("import finds and imports .Rmd files", {
   #on.exit(unlink(file))
 
   root_config$set(path)
-  module_file <- import(name)
+  module_file <- load_module(name)
 
   expect_equal(module_file, file)
 
@@ -64,13 +64,13 @@ test_that("import re-imports modified .R files", {
   on.exit(unlink(file))
 
   root_config$set(path)
-  module_file <- import(name)
+  module_file <- load_module(name)
 
   timestamp <- Sys.time()
 
   module_text <- sprintf("define('%s', NULL, function() {'changed'})", name)
   write(module_text, file)
-  module_file <- import(name)
+  module_file <- load_module(name)
 
   register <- get("register", pos = modulr_env)
   module <- register[[name]]
@@ -93,13 +93,13 @@ test_that("import re-imports modified .Rmd files", {
   on.exit(unlink(file))
 
   root_config$set(path)
-  module_file <- import(name)
+  module_file <- load_module(name)
 
   timestamp <- Sys.time()
 
   module_text <- sprintf("```{r}\nlibrary(modulr)\ndefine('%s', NULL, function() {'changed'})\n```\n", name)
   write(module_text, file)
-  module_file <- import(name)
+  module_file <- load_module(name)
 
   register <- get("register", pos = modulr_env)
   module <- register[[name]]

@@ -9,8 +9,8 @@ test_that(".make_path returns with a trailing slash and only one", {
 })
 
 test_that(".parse_filename returns all the required stuff", {
-  expect_null(.parse_filename(NA))
-  expect_null(.parse_filename(NULL))
+  expect_error(.parse_filename(NA))
+  expect_error(.parse_filename(NULL))
   expect_equal(.parse_filename(""),
                list(
                  filename = "",

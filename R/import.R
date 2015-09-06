@@ -1,51 +1,103 @@
-#' Import module.
-#'
 #' @export
-# TODO: write documentation
-import <- function(name) {
-  if(!(name %in% RESERVED_NAMES)) {
-    path <- .resolve_path(name)
+# TODO: à tester
+import_module <- function(name, url, signature = NULL, force = F, ...) {
 
-    if(!is.null(path)) {
-      if(tolower(tools::file_ext(path)) == "r") {
-        source(path)
-      } else if(tolower(tools::file_ext(path)) == "rmd") {
-        unnamed_chunk_label_opts = knitr::opts_knit$get("unnamed.chunk.label")
-        knitr::opts_knit$set("unnamed.chunk.label" =
-                               paste("modulr", name, sep="/"))
-        source(knitr::knit(path,
-                           output = tempfile(fileext = ".R"),
-                           tangle = T, quiet = T))
-        knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
-      }
+  assertthat::assert_that(
+    .is_regular(name),
+    assertthat::is.string(url),
+    is.null(signature) || assertthat::is.string(signature),
+    assertthat::is.flag(force)
+  )
+
+  try(load_module(name), silent = T)
+
+  if(force && .is_defined(name))
+    undefine(name)
+
+  if(.is_undefined(name)) {
+
+    .message_meta(
+      sprintf(
+        "importing [%s] %sfrom %s ...",
+        name,
+        ifelse(!is.null(signature),
+               sprintf("with signature %s ", signature),
+               ""),
+        url))
+
+    result <- httr::GET(url, ...)
+
+    script <- httr::content(result, as = "text")
+
+    register <- .internals()$register
+
+    if(grepl("```\\s*\\{\\s*[rR]", script)) {
+      # Rmd import
+      unnamed_chunk_label_opts = knitr::opts_knit$get("unnamed.chunk.label")
+      knitr::opts_knit$set("unnamed.chunk.label" =
+                             paste("modulr", name, sep="/"))
+      script <- knitr::knit(text = script,
+                            tangle = T, quiet = T)
+      knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
     }
 
-    if (!.is_defined(name)) {
-      stop(sprintf("%s not found", name), call. = F)
+    tryCatch({
+      ev <- eval(parse(text = script),
+                 envir = parent.frame())
+      },
+      error = function(e) {
+        assign("register", register, pos = modulr_env)
+        e$message <- sprintf("%s. Rolling back.", e$message)
+        stop(e)
+      })
+
+    if(.is_undefined(name)) {
+      assign("register", register, pos = modulr_env)
+      stop(sprintf("No module named [%s] found. Rolling back.", name),
+           call. = F)
     }
 
-    return(path)
+    if(!is.null(signature) && isTRUE(get_signature(name) != signature)) {
+      assign("register", register, pos = modulr_env)
+      stop(sprintf("Signature mismatch. Rolling back.", name),
+           call. = F)
+    }
+
+    return(invisible(ev))
+
   }
+
 }
 
-# We need to know if a module is already defined.
-.is_defined <- function(name) {
-  !is.null(get("register", pos = modulr_env)[[name]])
-}
-
-# We need to make sure all dependent modules of a given module are defined.
+#' @export
 # TODO: test that
-.define_all_dependent_modules <- function(name) {
-  visited_dependencies <- list()
-  iteration <- function(name, scope_name = NULL) {
-    name <- .resolve_mapping(name, scope_name)
-    if(!(name %in% visited_dependencies)) {
-      import(name)
-      visited_dependencies <<- c(visited_dependencies, name)
-      Map(function(dependency) iteration(dependency, name),
-          get("register", pos = modulr_env)[[name]]$dependencies)
-    }
+`%imports%` <- function(lhs, rhs) {
+
+  assertthat::assert_that(
+    assertthat::is.string(rhs),
+    assertthat::is.string(lhs) || (
+      is.list(lhs) &
+        setequal(names(lhs), c("name", "signature"))))
+
+  if(is.list(lhs)) {
+    name <- lhs$name
+    signature <- lhs$signature
+  } else {
+    name <- lhs
+    signature <- NULL
   }
-  iteration(name)
-  unlist(visited_dependencies)
+
+  import_module(name = name, signature = signature, url = rhs, force = F)
+
+}
+
+#' @export
+# TODO: test that
+`%signed%` <- function(lhs, rhs) {
+
+  assertthat::assert_that(assertthat::is.string(lhs),
+                          assertthat::is.string(rhs))
+
+  list(name = lhs, signature = rhs)
+
 }
