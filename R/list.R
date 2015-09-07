@@ -27,7 +27,7 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
         "created",
         "modified",
         "duration",
-        "signature")))
+        "digest")))
 
   register <- .internals()$register
 
@@ -45,7 +45,7 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
 
     if(wide) {
 
-      signatures <- vapply(flat, get_signature, FUN.VALUE = "")
+      digests <- vapply(flat, get_digest, FUN.VALUE = "")
 
       modified <-
         format(
@@ -61,7 +61,8 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
           ifelse(register[[name]]$instanciated,
                  typeof(register[[name]]$instance), NA_character_), flat))
 
-      deparsed_factories <- Map(function(name) deparse(register[[name]]), flat)
+      deparsed_factories <-
+        Map(function(name) deparse(register[[name]]$factory), flat)
 
       lines <- vapply(deparsed_factories, length, FUN.VALUE = 0)
 
@@ -71,14 +72,9 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
       durations <-
         do.call(c, Map(function(name) register[[name]]$duration, flat))
 
-      inc <- table(Reduce(rbind, Map(function(name) {
-        deps <- factor(unlist(register[[name]]$dependencies), levels = flat)
-        data.frame(from=factor(rep(name, length(deps)), levels = flat), to=deps)
-      }, flat)))
-
-      deps <- diag(inc %*% t(inc))
-
-      reqs <- diag(t(inc) %*% inc)
+      adj <- .compute_adjacency_matrix(flat)
+      deps <- diag(adj %*% t(adj))
+      reqs <- diag(t(adj) %*% adj)
 
       calls <- do.call(c, Map(function(name) register[[name]]$calls, flat))
 
@@ -93,7 +89,7 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
         created = created,
         modified = modified,
         duration = durations,
-        signature = signatures,
+        digest = digests,
         stringsAsFactors = F,
         row.names = NULL)
 

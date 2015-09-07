@@ -6,10 +6,10 @@
 }
 
 #' In order to know if a module definition has changed,
-#' we compute a signature of it with a cryptographic hash.
+#' we compute a digest of it with a cryptographic hash.
 #' @export
 # TODO: write documentation
-get_signature <- function(name) {
+get_digest <- function(name) {
 
   assertthat::assert_that(.is_defined(name))
 
@@ -68,7 +68,7 @@ define <- function(name, dependencies, factory) {
     register[[name]]$name <- name
     register[[name]]$dependencies <- dependencies
     register[[name]]$factory <- factory
-    register[[name]]$signature <- .hash(c(
+    register[[name]]$digest <- .hash(c(
       deparse(dependencies),
       deparse(factory)))
     register[[name]]$instance <- NULL
@@ -81,17 +81,17 @@ define <- function(name, dependencies, factory) {
 
   } else if(.is_regular(name)) {
 
-    previous_signature <- register[[name]]$signature
-    signature <- .hash(c(
+    previous_digest <- register[[name]]$digest
+    digest <- .hash(c(
       deparse(dependencies),
       deparse(factory)))
-    if(signature != previous_signature) {
+    if(digest != previous_digest) {
 
       .message_meta(sprintf("re-defining [%s] ...", name))
 
       register[[name]]$dependencies <- dependencies
       register[[name]]$factory <- factory
-      register[[name]]$signature <- signature
+      register[[name]]$digest <- digest
       register[[name]]$instance <- NULL
       register[[name]]$instanciated <- F
       register[[name]]$calls <- 0

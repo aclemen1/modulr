@@ -17,6 +17,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "README-"
 )
+
+Sys.setlocale("LC_TIME", "en_DK.UTF-8")
 ```
 
 [![Build Status](https://travis-ci.org/aclemen1/modulr.svg)](https://travis-ci.org/aclemen1/modulr)

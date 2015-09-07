@@ -58,7 +58,7 @@ test_that("import_module fails on existing modules with different name", {
 
 })
 
-test_that("import_module fails on existing modules with different signature", {
+test_that("import_module fails on existing modules with different digest", {
   reset()
   define("module1_local", NULL, function() {})
   with_mock(
@@ -66,9 +66,9 @@ test_that("import_module fails on existing modules with different signature", {
     `httr::content` = function(...)
     {'define("module1", NULL, function() {})\nreturn(TRUE)'},
     expect_error(import_module("module1", "fake_url",
-                               signature = "unprobable")),
+                               digest = "unprobable")),
     expect_true(import_module("module1", "fake_url",
-                              signature = get_signature("module1_local")))
+                              digest = get_digest("module1_local")))
   )
 
   reset()
@@ -78,7 +78,7 @@ test_that("import_module fails on existing modules with different signature", {
     `httr::content` = function(...)
     {'define("module1", NULL, function() {})\nreturn(TRUE)'},
     expect_error(import_module("module1", "fake_url",
-                               signature = "unprobable"))
+                               digest = "unprobable"))
   )
   expect_equal(list_modules(wide = F), pre_list)
 
@@ -131,7 +131,7 @@ test_that("%signed% %imports% are syntactic sugars for `import_module`", {
     `httr::GET` = function(...) {},
     `httr::content` = function(...)
     {'define("module1", NULL, function() {})\n"foo"'},
-    import_module("module1", "fake_url", signature = get_signature("module"))
+    import_module("module1", "fake_url", digest = get_digest("module"))
   )
   reset()
   define("module", NULL, function() {})
@@ -139,7 +139,7 @@ test_that("%signed% %imports% are syntactic sugars for `import_module`", {
     `httr::GET` = function(...) {},
     `httr::content` = function(...)
     {'define("module1", NULL, function() {})\n"foo"'},
-    "module1" %signed% get_signature("module") %imports% "fake_url"
+    "module1" %signed% get_digest("module") %imports% "fake_url"
   )
   expect_equal(m1, m2)
 

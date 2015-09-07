@@ -4,7 +4,7 @@
 \alias{make}
 \title{Make module}
 \usage{
-make(name)
+make(name = modulr_env$.Last.name)
 }
 \description{
 Make module

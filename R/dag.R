@@ -1,14 +1,15 @@
 # We need to figure out the directed acyclic graph (DAG) of the dependencies.
 .build_dependency_graph <- function(all_dependencies = NULL) {
 
-  assertthat::assert_that(is.null(all_dependencies) || is.character(all_dependencies))
+  assertthat::assert_that(is.null(all_dependencies) ||
+                            is.character(all_dependencies))
 
   dependency <- c()
   module <- c()
 
   for(name in all_dependencies) {
 
-    dependencies <- get("register", pos = modulr_env)[[name]]$dependencies
+    dependencies <- .internals()$register[[name]]$dependencies
 
     if(isTRUE(length(dependencies) > 0)) {
 
@@ -100,3 +101,19 @@
 
 }
 
+.compute_adjacency_matrix <- function(group) {
+
+  #assertthat::assert_that(is.null(group) || is.character(group))
+
+  register <- .internals()$register
+
+  table(
+    Reduce(rbind, Map(function(name) {
+
+      deps <- factor(unlist(register[[name]]$dependencies), levels = group)
+
+      data.frame(from=factor(rep(name, length(deps)), levels = group), to=deps)
+
+    }, group)))
+
+}

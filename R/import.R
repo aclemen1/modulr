@@ -1,10 +1,10 @@
 #' @export
-import_module <- function(name, url, signature = NULL, force = F, ...) {
+import_module <- function(name, url, digest = NULL, force = F, ...) {
 
   assertthat::assert_that(
     .is_regular(name),
     assertthat::is.string(url),
-    is.null(signature) || assertthat::is.string(signature),
+    is.null(digest) || assertthat::is.string(digest),
     assertthat::is.flag(force)
   )
 
@@ -19,8 +19,8 @@ import_module <- function(name, url, signature = NULL, force = F, ...) {
       sprintf(
         "importing [%s] %sfrom %s ...",
         name,
-        ifelse(!is.null(signature),
-               sprintf("with signature %s ", signature),
+        ifelse(!is.null(digest),
+               sprintf("with digest %s ", digest),
                ""),
         url))
 
@@ -56,9 +56,9 @@ import_module <- function(name, url, signature = NULL, force = F, ...) {
            call. = F)
     }
 
-    if(!is.null(signature) && isTRUE(get_signature(name) != signature)) {
+    if(!is.null(digest) && isTRUE(get_digest(name) != digest)) {
       assign("register", register, pos = modulr_env)
-      stop(sprintf("Signature mismatch. Rolling back.", name),
+      stop(sprintf("Digest mismatch. Rolling back.", name),
            call. = F)
     }
 
@@ -77,26 +77,26 @@ import_module <- function(name, url, signature = NULL, force = F, ...) {
     assertthat::is.string(rhs),
     assertthat::is.string(lhs) || (
       is.list(lhs) &
-        setequal(names(lhs), c("name", "signature"))))
+        setequal(names(lhs), c("name", "digest"))))
 
   if(is.list(lhs)) {
     name <- lhs$name
-    signature <- lhs$signature
+    digest <- lhs$digest
   } else {
     name <- lhs
-    signature <- NULL
+    digest <- NULL
   }
 
-  import_module(name = name, signature = signature, url = rhs, force = F)
+  import_module(name = name, digest = digest, url = rhs, force = F)
 
 }
 
 #' @export
-`%signed%` <- function(lhs, rhs) {
+`%digests%` <- function(lhs, rhs) {
 
   assertthat::assert_that(assertthat::is.string(lhs),
                           assertthat::is.string(rhs))
 
-  list(name = lhs, signature = rhs)
+  list(name = lhs, digest = rhs)
 
 }

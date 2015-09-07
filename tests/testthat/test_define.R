@@ -5,14 +5,14 @@ test_that(".hash computes a SHA-1 digest", {
   expect_equal(.hash("modulr"), "f478fe41ce85ad889b473813494b08c88989da19")
 })
 
-test_that("get_signature detects changes", {
+test_that("get_digest detects changes", {
   define(
     "some/module",
     list(dep = "foo/bar"),
     function(dep) {
       return(dep)
     })
-  sig_1 <- get_signature("some/module")
+  sig_1 <- get_digest("some/module")
 
   define(
     "some/module",
@@ -20,7 +20,7 @@ test_that("get_signature detects changes", {
     function(dep) {
       return(dep)
     })
-  sig_2 <- get_signature("some/module")
+  sig_2 <- get_digest("some/module")
 
   define(
     "some/module",
@@ -28,7 +28,7 @@ test_that("get_signature detects changes", {
     function(dep) {
       return(sprintf("%s", dep))
     })
-  sig_3 <- get_signature("some/module")
+  sig_3 <- get_digest("some/module")
 
   define(
     "some/module",
@@ -36,7 +36,7 @@ test_that("get_signature detects changes", {
     function(dep) {
       return(dep)
     })
-  sig_4 <- get_signature("some/module")
+  sig_4 <- get_digest("some/module")
 
   testthat::expect_false(sig_1 == sig_2)
   testthat::expect_false(sig_1 == sig_3)
@@ -68,7 +68,7 @@ test_that("define writes to the register", {
   expect_equal(module$factory, function(dep) {
     return(dep)
   })
-  expect_equal(module$signature, get_signature("some/module"))
+  expect_equal(module$digest, get_digest("some/module"))
   expect_true(is.null(module$instance))
   expect_false(module$instanciated)
   expect_true(module$first_instance)
@@ -106,7 +106,7 @@ test_that("re-define doesn't write to the register when no changes occur", {
   expect_equal(module$factory, function(dep) {
     return(dep)
   })
-  expect_equal(module$signature, get_signature("some/module"))
+  expect_equal(module$digest, get_digest("some/module"))
   expect_true(is.null(module$instance))
   expect_false(module$instanciated)
   expect_true(module$first_instance)
@@ -170,7 +170,7 @@ test_that("re-define writes to the register when changes occur", {
   expect_equal(module$factory, function(dep) {
     return(sprintf("%s", dep))
   })
-  expect_equal(module$signature, get_signature("some/module"))
+  expect_equal(module$digest, get_digest("some/module"))
   expect_true(is.null(module$instance))
   expect_false(module$instanciated)
   expect_false(module$first_instance)

@@ -2,16 +2,10 @@
 #'
 #' @export
 # TODO: write documentation
-make <- function(name) {
+make <- function(name = modulr_env$.Last.name) {
 
   if(exists(".__name__")) {
     stop("Unauthorized call from a module.", call. = F)
-  }
-
-  if(missing(name)) {
-    name <- setdiff(
-      get0(".Last.name", envir = modulr_env, ifnotfound = NULL),
-      RESERVED_NAMES)
   }
 
   .message_meta(sprintf("making [%s] ...", name), {
@@ -69,7 +63,7 @@ make <- function(name) {
             if(!module$instanciated
                | reinstanciated_by_parent
                | (ordered_name == name &
-                    get_signature(ordered_name) != get_signature(name))) {
+                    get_digest(ordered_name) != get_digest(name))) {
 
               .message_meta(sprintf("making [%s] ...", ordered_name), {
 
@@ -137,7 +131,7 @@ make <- function(name) {
 
   }, verbosity = 2)
 
-  .internals()$register[[name]]$instance
+  invisible(.internals()$register[[name]]$instance)
 
 }
 

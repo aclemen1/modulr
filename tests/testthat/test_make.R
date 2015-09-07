@@ -51,7 +51,7 @@ test_that("make writes to the register", {
   expect_equal(module$factory, function() {
     return("foo")
   })
-  expect_equal(module$signature, get_signature("some/module"))
+  expect_equal(module$digest, get_digest("some/module"))
   expect_equal(module$instance, "foo")
   expect_true(module$instanciated)
   expect_false(module$first_instance)
