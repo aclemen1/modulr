@@ -20,7 +20,7 @@ assertthat::on_failure(.is_undefined) <- function(call, env) {
 # Test if a module has a regular name.
 .is_regular <- function(name) {
   assertthat::assert_that(assertthat::is.string(name))
-  !(name %in% RESERVED_NAMES)
+  !(name %in% RESERVED_NAMES) & !grepl("[^a-zA-Z0-9_/-]", name)
 }
 
 assertthat::on_failure(.is_regular) <- function(call, env) {
