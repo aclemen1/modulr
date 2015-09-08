@@ -10,7 +10,7 @@
     unlist(
       Filter(function(x) !is.na(x) & !(x %in% c("modulr")),
              lapply(sys.frames(), function(frame) {
-               get0(".__name__", envir = frame,
+               .get_0(".__name__", envir = frame,
                     ifnotfound = NA, inherits = T)
              }))))
 

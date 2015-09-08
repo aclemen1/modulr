@@ -20,7 +20,7 @@
   makeActiveBinding(
     as.symbol(".Last.name"),
     function() {
-      get0(".Last.name", envir = modulr_env, ifnotfound = NULL)
+      .get_0(".Last.name", envir = modulr_env, ifnotfound = NULL)
     },
     env = as.environment("package:modulr"))
 

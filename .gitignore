@@ -10,3 +10,4 @@ tmp/
 inst/doc
 *.Rds
 vignettes/*.R
+*_SECRET_*

@@ -23,6 +23,11 @@ set_verbosity <- function(value) {
 
 }
 
+# the base::get0 function exsists only since R 3.2
+.get_0 <- function(var, ..., ifnotfound = NULL) {
+  if(exists(var, ...)) get(var, ...) else ifnotfound
+}
+
 .praise <- c(
   "Outstanding",
   "I'm so proud of you",

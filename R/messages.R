@@ -4,12 +4,12 @@
     assertthat::is.string(msg),
     assertthat::is.scalar(verbosity))
 
-  verbosity_level <- get0("verbosity", envir = modulr_env,
+  verbosity_level <- .get_0("verbosity", envir = modulr_env,
                           ifnotfound = +Inf)
 
   verbose <- verbosity <= verbosity_level
 
-  level <- get0(".message_level", envir = modulr_env, ifnotfound = 0)
+  level <- .get_0(".message_level", envir = modulr_env, ifnotfound = 0)
   on.exit(assign(".message_level", level, pos = modulr_env))
 
   if(verbose) {
@@ -68,7 +68,7 @@
                      sprintf(" %s", kwargs$module_name)
                      } else {""})
 
-    level <- get0(".message_level", envir = modulr_env, ifnotfound = 0)
+    level <- .get_0(".message_level", envir = modulr_env, ifnotfound = 0)
 
     if(level > 0) {
       out <- paste0(out, sprintf(
