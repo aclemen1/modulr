@@ -28,6 +28,10 @@ set_verbosity <- function(value) {
   if(exists(var, ...)) get(var, ...) else ifnotfound
 }
 
+.dir_exists <- function(file) {
+  isTRUE(file.info(file)[1, "isdir"])
+}
+
 .praise <- c(
   "Outstanding",
   "I'm so proud of you",

@@ -59,7 +59,7 @@
 
     }
 
-    if(dir.exists(candidate_path)) return(candidate_path)
+    if(.dir_exists(candidate_path)) return(candidate_path)
 
   }
 
