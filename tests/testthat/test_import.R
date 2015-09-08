@@ -124,7 +124,7 @@ test_that("%imports% is a syntactic sugar for `import_module`", {
 
 })
 
-test_that("%signed% %imports% are syntactic sugars for `import_module`", {
+test_that("%digests% %imports% are syntactic sugars for `import_module`", {
   reset()
   define("module", NULL, function() {})
   m1 <- with_mock(
@@ -139,7 +139,7 @@ test_that("%signed% %imports% are syntactic sugars for `import_module`", {
     `httr::GET` = function(...) {},
     `httr::content` = function(...)
     {'define("module1", NULL, function() {})\n"foo"'},
-    "module1" %signed% get_digest("module") %imports% "fake_url"
+    "module1" %digests% get_digest("module") %imports% "fake_url"
   )
   expect_equal(m1, m2)
 
