@@ -193,7 +193,7 @@ make_tests <- function(...) {
   if(!all(unlist(rs))) stop("FAILED.", call. = F)
 
   if(sample(5, 1) == 1) {
-    message("PASSED. ", sample(.praise, 1), ".")
+    message("PASSED. ", sample(PRAISE, 1), ".")
   } else {
     message("PASSED.")
   }

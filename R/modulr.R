@@ -32,7 +32,7 @@ set_verbosity <- function(value) {
   isTRUE(file.info(file)[1, "isdir"])
 }
 
-.praise <- c(
+PRAISE <- c(
   "Outstanding",
   "I'm so proud of you",
   "You're great",

@@ -27,7 +27,6 @@ Imports:
   knitr (>= 1.10.5),
   assertthat,
   digest,
-  stringr,
   httr,
   RUnit,
   networkD3

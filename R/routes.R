@@ -3,7 +3,7 @@
 
   assertthat::assert_that(assertthat::is.string(path))
 
-  paste0(stringr::str_replace(file.path(path), "/+$", ""), "/")
+  paste0(gsub("/+$", "", file.path(path)), "/")
 
 }
 
@@ -13,14 +13,14 @@
 
   assertthat::assert_that(assertthat::is.string(filename))
 
-  filename <- stringr::str_trim(file.path(filename))
+  filename <- gsub("^\\s*|\\s*$", "", file.path(filename))
 
   filename_shifted <- file.path(paste0(filename, .Platform$path.sep))
 
   path <- dirname(filename_shifted) # add "." for "foo/" to be a path
 
-  basename <- stringr::str_replace(basename(filename_shifted),
-                                   sprintf("%s$", .Platform$path.sep), "")
+  basename <- sub(sprintf("%s$", .Platform$path.sep), "",
+                  basename(filename_shifted))
 
   name <- basename(tools::file_path_sans_ext(basename))
 
@@ -84,12 +84,12 @@
 
   candidates <- Map(function(map) {
 
-    start_end_pos <- stringr::str_locate(name, map)
+    reg <- regexpr(map, name)
 
     list(
       map = map,
-      start = start_end_pos[1],
-      end = start_end_pos[2])
+      start = as.integer(reg),
+      end = as.integer(reg) + attr(reg, "match.length") - 1)
 
     }, names(mappings))
 
@@ -114,7 +114,7 @@
 
   matching_map <- candidates[[1]]$map
 
-  stringr::str_replace(name, matching_map, mappings[[matching_map]])
+  sub(matching_map, mappings[[matching_map]], name)
 
 }
 
@@ -141,12 +141,12 @@
 
     path <- .parse_filename(.make_path(namespace))$path
 
-    start_end_pos <- stringr::str_locate(injected_namespace, path)
+    reg <- regexpr(path, injected_namespace)
 
     list(
       namespace = namespace,
-      start = start_end_pos[1],
-      end = start_end_pos[2])
+      start = as.integer(reg),
+      end = as.integer(reg) + attr(reg, "match.length") - 1)
 
     }, names(paths_config$get_all()))
 
@@ -174,10 +174,10 @@
 
     matching_namespace <- candidates[[1]]$namespace
 
-    candidate <- stringr::str_replace(
-      injected_name,
+    candidate <- sub(
       matching_namespace,
-      paths_config$get_all()[[matching_namespace]])
+      paths_config$get_all()[[matching_namespace]],
+      injected_name)
 
   }
 
