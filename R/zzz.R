@@ -1,13 +1,6 @@
 .onLoad <- function(libname, pkgname) {
 
-  assign("register", list(), pos = modulr_env)
-  assign("config", list(modules = list()), pos = modulr_env)
-  assign("verbosity", 2, pos = modulr_env)
-  assign(".Last.name", NULL, pos = modulr_env)
-
-  .define_modulr()
-
-  root_config$set(c("module", "modules", "lib", "libs", "."))
+  reset(all = T, verbose = F)
 
   activate_breadcrumbs()
 

@@ -133,11 +133,24 @@ get_factory <- function(name) {
 #'
 #' @export
 # TODO: write documentation
-reset <- function() {
+reset <- function(all = F, verbose = T) {
 
-  .message_meta("resetting package")
+  assertthat::assert_that(assertthat::is.flag(all),
+                         assertthat::is.flag(verbose))
 
-  .onLoad()
+  if(verbose)
+    .message_meta("Resetting modulr state ... ", verbosity = 2)
+
+  modulr_env$register <- list()
+  modulr_env$config <- list(modules = list())
+  modulr_env$verbosity <- 2
+  modulr_env$.Last.name <- NULL
+  if(all)
+    modulr_env$stash <- list()
+
+  .define_modulr()
+
+  root_config$set(c("module", "modules", "lib", "libs", "."))
 
   invisible()
 
