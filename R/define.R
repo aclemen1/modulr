@@ -44,6 +44,9 @@ get_digest <- function(name) {
 # TODO: write the documentation
 define <- function(name, dependencies, factory) {
 
+  .message_meta(sprintf("entering define() for '%s' ...", name),
+                verbosity = +Inf)
+
   assertthat::assert_that(
     assertthat::is.string(name),
     is.function(factory),
