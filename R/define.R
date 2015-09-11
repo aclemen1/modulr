@@ -66,13 +66,20 @@ define <- function(name, dependencies, factory) {
 
   assertthat::assert_that(
     assertthat::is.string(name),
-    is.function(factory),
+    is.function(factory))
+
+  assertthat::assert_that(
+    is.null(dependencies) || is.list(dependencies),
+    is.function(factory)
+    )
+
+  assertthat::assert_that(
     is.null(dependencies) || (
-      is.list(dependencies) && (
-        setequal(names(dependencies), names(formals(factory))) || (
-          assertthat::are_equal(length(dependencies),
-                                length(formals(factory))) &&
-            is.null(names(dependencies))))))
+      setequal(names(dependencies), names(formals(factory))) || (
+        assertthat::are_equal(length(dependencies),
+                              length(formals(factory))) &&
+          is.null(names(dependencies)))),
+    msg = "dependencies and formals are not matching.")
 
   if(is.null(dependencies)) dependencies <- list()
 
@@ -167,8 +174,9 @@ reset <- function(all = F, verbose = T) {
             call. = F, immediate. = T)
   }
 
-  assertthat::assert_that(assertthat::is.flag(all),
-                         assertthat::is.flag(verbose))
+  assertthat::assert_that(
+    assertthat::is.flag(all),
+    assertthat::is.flag(verbose))
 
   if(verbose)
     .message_meta("Resetting modulr state ... ", verbosity = 2)
@@ -252,10 +260,12 @@ touch <- function(name) {
 #' @export
 `%requires%` = function(lhs, rhs) {
 
+  assertthat::assert_that(.is_regular(lhs))
+
   assertthat::assert_that(
-    assertthat::is.string(lhs),
-    is.list(rhs) || is.null(rhs)
-    )
+    is.list(rhs) || is.null(rhs),
+    msg = "right-hand side of `%requires%` is not a list of dependencies."
+  )
 
   list(name = lhs, dependencies = rhs)
 
@@ -273,9 +283,16 @@ touch <- function(name) {
 
   assertthat::assert_that(
     is.function(rhs),
+    msg = "right-hand side of `%provides%` is not a factory."
+    )
+
+  assertthat::assert_that(
     assertthat::is.string(lhs) || (
-      is.list(lhs) &
-        setequal(names(lhs), c("name", "dependencies"))))
+      is.list(lhs) &&
+        setequal(names(lhs), c("name", "dependencies"))),
+    msg = paste0("left-hand side of `%provides%` ",
+                 "is not a module name or a list of dependencies.")
+  )
 
   if(is.list(lhs)) {
     name <- lhs$name
@@ -295,4 +312,3 @@ touch <- function(name) {
     envir = parent.frame())
 
 }
-

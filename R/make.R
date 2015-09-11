@@ -168,7 +168,7 @@ make_tests <- function(...) {
 
       assertthat::assert_that(
         assertthat::is.flag(lrs) || is.null(lrs),
-        msg = "Test is not returning a boolean or NULL.")
+        msg = "test is not returning a boolean or NULL.")
 
       if(!(is.null(lrs) || lrs))
         stop("Test failed.")
@@ -213,7 +213,8 @@ make_test <- make_tests
   }
 
   assertthat::assert_that(
-    assertthat::is.string(rhs)
+    assertthat::is.string(rhs),
+    msg = "right-hand side of `%<=%` is not a string."
   )
 
   assign(as.character(substitute(lhs)), make(rhs), pos = parent.frame())
@@ -239,7 +240,8 @@ make_test <- make_tests
   }
 
   assertthat::assert_that(
-    assertthat::is.string(rhs)
+    assertthat::is.string(rhs),
+    msg = "right-hand side of `%<<=%` is not a string."
   )
 
   assign(as.character(substitute(lhs)), make(rhs),

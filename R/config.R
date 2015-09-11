@@ -136,8 +136,14 @@ module_option <- function(name) {
 
   assertthat::assert_that(
     .is_regular(lhs),
-    is.list(rhs)
+    msg =
+      "left-hand side of `%has_default_option%` is not a regular module name."
     )
+
+  assertthat::assert_that(
+    is.list(rhs),
+    msg = "right-hand side of `%has_default_option%` is not a list."
+  )
 
   module_option(lhs)$set(rhs, drop = F)
 
@@ -157,7 +163,12 @@ module_option <- function(name) {
 
   assertthat::assert_that(
     .is_regular(lhs),
-    is.list(rhs)
+    msg = "left-hand side of `%has_option%` is not a regular module name."
+  )
+
+  assertthat::assert_that(
+    is.list(rhs),
+    msg = "right-hand side of `%has_option%` is not a list."
   )
 
   module_option(lhs)$set(rhs, drop = T)

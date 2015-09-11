@@ -84,9 +84,14 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
 
   assertthat::assert_that(
     assertthat::is.string(rhs),
+    msg = "right-hand side of `%imports%` is not an URL."
+    )
+
+  assertthat::assert_that(
     assertthat::is.string(lhs) || (
       is.list(lhs) &
-        setequal(names(lhs), c("name", "digest"))))
+        setequal(names(lhs), c("name", "digest"))),
+    msg = "left-hand side of `%imports%` is not a module name or a digest.")
 
   if(is.list(lhs)) {
     name <- lhs$name
@@ -103,8 +108,12 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
 #' @export
 `%digests%` <- function(lhs, rhs) {
 
-  assertthat::assert_that(assertthat::is.string(lhs),
-                          assertthat::is.string(rhs))
+  assertthat::assert_that(
+    assertthat::is.string(lhs),
+    msg = "left-hand side of `%digests%` is not a module name.")
+  assertthat::assert_that(
+    assertthat::is.string(rhs),
+    msg = "right-hand side of `%digests%` is not a digest.")
 
   list(name = lhs, digest = rhs)
 

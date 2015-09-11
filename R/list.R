@@ -14,7 +14,9 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
     missing(regexp) || assertthat::is.string(regexp),
     assertthat::is.flag(all),
     assertthat::is.flag(wide),
-    assertthat::is.flag(full),
+    assertthat::is.flag(full))
+
+  assertthat::assert_that(
     is.character(cols) &&
       all(cols %in% c(
         "name",
@@ -27,7 +29,8 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
         "created",
         "modified",
         "duration",
-        "digest")))
+        "digest")),
+    msg = "an invalid column name is specified.")
 
   register <- .internals()$register
 
