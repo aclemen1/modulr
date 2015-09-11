@@ -4,6 +4,9 @@
 # TODO: write documentation
 load_module <- function(name) {
 
+  .message_meta(sprintf("Entering load_module() for '%s' ...", name),
+                verbosity = +Inf)
+
   if(.is_called_from_within_module()) {
     warning("`%imports%` is called from within a module.",
             call. = F, immediate. = T)

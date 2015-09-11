@@ -7,16 +7,16 @@
 \format{\preformatted{List of 4
  $ unset  :function ()  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 8 12 16 3 12 3 8 16
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x47ecda0> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4c23e28> 
  $ set    :function (..., drop = T)  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 18 10 56 3 10 3 18 56
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x47ecda0> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 18 10 59 3 10 3 18 59
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4c23e28> 
  $ get    :function (key)  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 74 10 81 3 10 3 74 81
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x47ecda0> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 80 10 90 3 10 3 80 90
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4c23e28> 
  $ get_all:function ()  
-  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 58 14 72 3 14 3 58 72
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x47ecda0> 
+  ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 61 14 78 3 14 3 61 78
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x4c23e28> 
 }}
 \usage{
 paths_config

@@ -17,6 +17,9 @@
 
   set <- function(..., drop = T) {
 
+    .message_meta("Entering .config$set() ...",
+                  verbosity = +Inf)
+
     assertthat::assert_that(assertthat::is.flag(drop))
 
     options_list = list(...)
@@ -57,6 +60,9 @@
 
   get_all <- function() {
 
+    .message_meta("Entering .config$get_all() ...",
+                  verbosity = +Inf)
+
     config <- base::get("config", pos = modulr_env)
 
     if(is.na(scope[2])) {
@@ -72,6 +78,9 @@
   }
 
   get <- function(key) {
+
+    .message_meta("Entering .config$get() ...",
+                  verbosity = +Inf)
 
     assertthat::assert_that(is.null(key) || assertthat::is.string(key))
 
@@ -122,6 +131,9 @@ maps_config <-
 #' @export
 # TODO: write documentation
 module_option <- function(name) {
+
+  .message_meta("Entering module_option() ...",
+                verbosity = +Inf)
 
   assertthat::assert_that(.is_regular(name))
 

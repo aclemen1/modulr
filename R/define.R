@@ -11,6 +11,9 @@
 # TODO: write documentation
 get_digest <- function(name, load = F) {
 
+  .message_meta(sprintf("Entering get_digest() for '%s' ...", name),
+                verbosity = +Inf)
+
   assertthat::assert_that(assertthat::is.flag(load))
 
   if(.is_undefined(name) & load) {
@@ -56,13 +59,13 @@ get_digest <- function(name, load = F) {
 # TODO: write the documentation
 define <- function(name, dependencies, factory) {
 
+  .message_meta(sprintf("Entering define() for '%s' ...", name),
+                verbosity = +Inf)
+
   if(.is_called_from_within_module()) {
     warning("define is called from within a module.",
             call. = F, immediate. = T)
   }
-
-  .message_meta(sprintf("entering define() for '%s' ...", name),
-                verbosity = +Inf)
 
   assertthat::assert_that(
     assertthat::is.string(name),
@@ -90,7 +93,7 @@ define <- function(name, dependencies, factory) {
   if(.is_undefined(name)) {
 
     if(.is_regular(name))
-      .message_meta(sprintf("defining [%s] ...", name))
+      .message_meta(sprintf("Defining '%s' ...", name), verbosity = 2)
 
     register[[name]]$name <- name
     register[[name]]$dependencies <- dependencies
@@ -114,7 +117,7 @@ define <- function(name, dependencies, factory) {
       deparse(factory)))
     if(digest != previous_digest) {
 
-      .message_meta(sprintf("re-defining [%s] ...", name))
+      .message_meta(sprintf("Re-defining '%s' ...", name), verbosity = 1)
 
       register[[name]]$dependencies <- dependencies
       register[[name]]$factory <- factory
@@ -145,6 +148,9 @@ define <- function(name, dependencies, factory) {
 # TODO: write documentation
 get_factory <- function(name, load = F) {
 
+  .message_meta(sprintf("Entering get_factory() for '%s' ...", name),
+                verbosity = +Inf)
+
   assertthat::assert_that(assertthat::is.flag(load))
 
   if(.is_undefined(name) & load) {
@@ -168,6 +174,9 @@ get_factory <- function(name, load = F) {
 #' @export
 # TODO: write documentation
 reset <- function(all = F, verbose = T) {
+
+  .message_meta("Entering reset() ...",
+                verbosity = +Inf)
 
   if(.is_called_from_within_module()) {
     warning("reset is called from within a module.",
@@ -203,6 +212,9 @@ reset <- function(all = F, verbose = T) {
 
 undefine <- function(name) {
 
+  .message_meta(sprintf("Entering undefine() for '%s' ...", name),
+                verbosity = +Inf)
+
   if(.is_called_from_within_module()) {
     warning("undefine is called from within a module.",
             call. = F, immediate. = T)
@@ -212,7 +224,7 @@ undefine <- function(name) {
 
   register <- .internals()$register
 
-  .message_meta(sprintf("undefining [%s]", name))
+  .message_meta(sprintf("Undefining '%s' ... ", name), verbosity = 2)
 
   register[[name]] <- NULL
 
@@ -228,6 +240,9 @@ undefine <- function(name) {
 # TODO: write documentation
 touch <- function(name) {
 
+  .message_meta(sprintf("Entering touch() for '%s' ...", name),
+                verbosity = +Inf)
+
   if(.is_called_from_within_module()) {
     warning("touch is called from within a module.",
             call. = F, immediate. = T)
@@ -237,7 +252,7 @@ touch <- function(name) {
 
   register <- .internals()$register
 
-  .message_meta(sprintf("touching [%s]", name))
+  .message_meta(sprintf("Touching '%s' ...", name), verbosity = 2)
 
   register[[name]]$instance <- NULL
   register[[name]]$instanciated <- F

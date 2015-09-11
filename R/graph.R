@@ -4,6 +4,9 @@
 # TODO: write documentation
 graph_dependencies <- function(group, special = T) {
 
+  .message_meta("Entering graph_dependencies() ...",
+                verbosity = +Inf)
+
   if(.is_called_from_within_module()) {
     warning("graph_dependencies is called from within a module.",
             call. = F, immediate. = T)

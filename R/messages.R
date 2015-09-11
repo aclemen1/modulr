@@ -5,7 +5,7 @@
     assertthat::is.scalar(verbosity))
 
   verbosity_level <- .get_0("verbosity", envir = modulr_env,
-                          ifnotfound = +Inf)
+                          ifnotfound = 2)
 
   verbose <- verbosity <= verbosity_level
 

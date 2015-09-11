@@ -10,6 +10,9 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
                            "lines",
                            "modified")) {
 
+  .message_meta("Entering list_modules() ...",
+                verbosity = +Inf)
+
   assertthat::assert_that(
     missing(regexp) || assertthat::is.string(regexp),
     assertthat::is.flag(all),

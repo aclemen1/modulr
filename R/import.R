@@ -1,6 +1,9 @@
 #' @export
 import_module <- function(name, url, digest = NULL, force = F, ...) {
 
+  .message_meta(sprintf("Entering import_module() for '%s' ...", name),
+                verbosity = +Inf)
+
   if(.is_called_from_within_module()) {
     stop("import_module is called from within a module.", call. = F)
   }
@@ -21,12 +24,12 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
 
     .message_meta(
       sprintf(
-        "importing [%s] %sfrom %s ...",
+        "Importing '%s' %sfrom '%s' ...",
         name,
         ifelse(!is.null(digest),
-               sprintf("with digest %s ", digest),
+               sprintf("with digest '%s' ", digest),
                ""),
-        url))
+        url), verbosity = 2)
 
     result <- httr::GET(url, ...)
 
@@ -56,13 +59,13 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
 
     if(.is_undefined(name)) {
       assign("register", register, pos = modulr_env)
-      stop(sprintf("No module named [%s] found. Rolling back.", name),
+      stop(sprintf("module '%s' cannot be found. Rolling back.", name),
            call. = F)
     }
 
     if(!is.null(digest) && isTRUE(get_digest(name) != digest)) {
       assign("register", register, pos = modulr_env)
-      stop(sprintf("Digest mismatch. Rolling back.", name),
+      stop(sprintf("digest is not matching. Rolling back.", name),
            call. = F)
     }
 

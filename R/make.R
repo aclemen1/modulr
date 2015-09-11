@@ -4,14 +4,17 @@
 # TODO: write documentation
 make <- function(name = modulr_env$.Last.name) {
 
+  .message_meta(sprintf("Entering make() for '%s' ...", name),
+                verbosity = +Inf)
+
   if(.is_called_from_within_module()) {
     warning("make is called from within a module.",
             call. = F, immediate. = T)
   }
 
-  .message_meta(sprintf("making [%s] ...", name), {
+  .message_meta(sprintf("Making '%s' ...", name), {
 
-    .message_meta("checking definitions ...", {
+    .message_meta("Checking definitions ...", {
 
       all_dependencies <-
         .define_all_dependent_modules(name)
@@ -66,7 +69,7 @@ make <- function(name = modulr_env$.Last.name) {
                | (ordered_name == name &
                     get_digest(ordered_name) != get_digest(name))) {
 
-              .message_meta(sprintf("making [%s] ...", ordered_name), {
+              .message_meta(sprintf("Making '%s' ...", ordered_name), {
 
                 timestamp <- Sys.time()
 
@@ -124,6 +127,9 @@ make <- function(name = modulr_env$.Last.name) {
 # TODO: write documentation
 make_all <- function(regexp, all = F, error = stop, ...) {
 
+  .message_meta("Entering make_all() ...",
+                verbosity = +Inf)
+
   if(.is_called_from_within_module()) {
     warning("make_all is called from within a module.",
             call. = F, immediate. = T)
@@ -151,6 +157,9 @@ make_all <- function(regexp, all = F, error = stop, ...) {
 #' @export
 # TODO: write documentation
 make_tests <- function(...) {
+
+  .message_meta("Entering make_tests() ...",
+                verbosity = +Inf)
 
   if(.is_called_from_within_module()) {
     warning("make_tests is called from within a module.",
