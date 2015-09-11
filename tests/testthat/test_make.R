@@ -249,7 +249,7 @@ test_that("make calls are prohibited from within a module", {
   define("module", NULL, function() {
     modulr <- make("modulr")
   })
-  expect_error(make(define))
+  expect_error(make("module"))
 })
 
 test_that("make returns an instance", {

@@ -4,7 +4,8 @@
 # TODO: write documentation
 make <- function(name = modulr_env$.Last.name) {
 
-  if(exists(".__name__")) {
+  if(exists(".__name__", inherits = T,
+            mode = "character", envir = parent.env(parent.frame()))) {
     stop("Unauthorized call from a module.", call. = F)
   }
 
@@ -71,7 +72,9 @@ make <- function(name = modulr_env$.Last.name) {
 
                 env = new.env()
 
-                assign(".__name__", ordered_name, pos = env)
+                env$.__name__ <- ordered_name
+
+                args <- list()
 
                 if(length(module$dependencies) > 0) {
 
@@ -84,32 +87,14 @@ make <- function(name = modulr_env$.Last.name) {
                       }
                     )
 
-                  # WORKS:
-                  # module$instance <- evalq(do.call(
-                  #   function() {get("variable", pos = env)},
-                  #   args = list()), envir = env)
-                  #
-                  # DOES NOT WORK:
-                  # f <- function() {get("variable", pos = env)}
-                  # module$instance <-
-                  #   evalq(do.call(f, args = list()), envir = env)
-                  #
-                  # WORKAROUND:
-                  # module$instance <-
-                  #   evalq(do.call(eval(parse(text=deparse(f))),
-                  #   args = list()), envir = env)
-
-                  module$instance <- evalq(do.call(
-                    eval(parse(text=deparse(module$factory))),
-                    args = args), envir = env)
-
-                } else {
-
-                  module$instance <- evalq(do.call(
-                    eval(parse(text=deparse(module$factory))),
-                    args = list()), envir = env)
 
                 }
+
+                environment(module[["factory"]]) <- env
+
+                module$instance <- do.call(
+                  module[["factory"]],
+                  args = args, quote = T, envir = env)
 
                 module$duration <- as.numeric(Sys.time() - timestamp)
                 module$instanciated <- T
