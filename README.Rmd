@@ -22,6 +22,7 @@ Sys.setlocale("LC_TIME", "en_DK.UTF-8")
 ```
 
 [![Build Status](https://travis-ci.org/aclemen1/modulr.svg)](https://travis-ci.org/aclemen1/modulr)
+[![codecov.io](http://codecov.io/github/aclemen1/modulr/coverage.svg?branch=devel)](http://codecov.io/github/aclemen1/modulr?branch=devel)
 
 # modulr — A Dependency Injection (DI) Framework for R
 

@@ -7,7 +7,6 @@ r_github_packages:
   - hadley/assertthat
   - hadley/testthat
   - jimhester/covr
-  - jimhester/lintr
 
 after_success:
   - Rscript -e 'covr::codecov()'
