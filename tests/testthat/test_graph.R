@@ -1,6 +1,8 @@
 context("graph")
 
 test_that("correct Sankey graph is returned for dependent modules", {
+  if (!requireNamespace("networkD3", quietly = TRUE))
+    skip("networkD3 not installed")
   reset()
   define("module_layer1_1", NULL, function() {})
   define("module_layer1_2", NULL, function() {})
@@ -25,6 +27,8 @@ test_that("correct Sankey graph is returned for dependent modules", {
   })
 
 test_that("correct Sankey graph is returned for the whole register", {
+  if (!requireNamespace("networkD3", quietly = TRUE))
+    skip("networkD3 not installed")
   reset()
   define("module_layer1_1", NULL, function() {})
   define("module_layer1_2", NULL, function() {})
@@ -41,6 +45,8 @@ test_that("correct Sankey graph is returned for the whole register", {
 })
 
 test_that("an error message is raised for an undefined module name", {
+  if (!requireNamespace("networkD3", quietly = TRUE))
+    skip("networkD3 not installed")
   reset()
   define("module_layer1_1", NULL, function() {})
 

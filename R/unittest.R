@@ -3,6 +3,12 @@
 #' @export
 # TODO: describe as OBSOLETE and unmaintained, kept for backwards compatibility
 run_tests <- function(module_name) {
+
+  if (!requireNamespace("RUnit", quietly = TRUE)) {
+    stop("RUnit needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
   # TODO: forker https://github.com/cran/RUnit
   # et dans R/runit.r, adapter .sourceTestFile()
   # pour qu'un tangle ait lieu sur les Rmd

@@ -7,6 +7,11 @@ graph_dependencies <- function(group, special = T) {
   .message_meta("Entering graph_dependencies() ...",
                 verbosity = +Inf)
 
+  if (!requireNamespace("networkD3", quietly = TRUE)) {
+    stop("networkD3 is needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
   if(.is_called_from_within_module()) {
     warning("graph_dependencies is called from within a module.",
             call. = F, immediate. = T)
@@ -69,7 +74,7 @@ graph_dependencies <- function(group, special = T) {
 
   }
 
-  message("No dependency to graph.", call. = F)
+  message("No dependency to graph.")
 
   invisible()
 

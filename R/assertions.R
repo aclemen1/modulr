@@ -60,6 +60,6 @@ assertthat::on_failure(.is_defined_regular) <- function(call, env) {
 
 # Test if a call is made from within a module
 .is_called_from_within_module <- function(call, env) {
-  exists(".__name__", inherits = T,
-         mode = "character", envir = parent.frame(2))
+  isTRUE(exists(".__name__", inherits = T,
+         mode = "character", envir = parent.frame(2)))
 }
