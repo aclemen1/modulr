@@ -75,9 +75,9 @@ devtools::install_github("aclemen1/modulr")
 * the latest _bleeding edge_ development version from Github with
 -->
 ``` r
-if (packageVersion("devtools") < 1.8) {
-  install.packages("devtools")
-}
+install.packages("devtools")
+devtools::install_github("hadley/devtools")
+devtools::install_github("hadley/assertthat")
 devtools::install_github("aclemen1/modulr@devel")
 ```
 

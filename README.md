@@ -57,9 +57,9 @@ devtools::install_github("aclemen1/modulr")
 * the latest _bleeding edge_ development version from Github with
 -->
 ``` r
-if (packageVersion("devtools") < 1.8) {
-  install.packages("devtools")
-}
+install.packages("devtools")
+devtools::install_github("hadley/devtools")
+devtools::install_github("hadley/assertthat")
 devtools::install_github("aclemen1/modulr@devel")
 ```
 
@@ -91,7 +91,7 @@ library(modulr)
       stringsAsFactors = F)
     return(students)
   }
-#> [2015-09-06T15:38:02 CEST] defining [data/students] ...
+#> [2015-09-11T21:22:32 CEST] Defining 'data/students' ...
 ```
 
 The anatomy of this module is very simple: "data/student" is its name and the 
@@ -118,7 +118,7 @@ In parallel, let's ask Bob to provide us with a similar module.
       stringsAsFactors = F)
     return(teachers)
   }
-#> [2015-09-06T15:38:02 CEST] defining [data/teachers] ...
+#> [2015-09-11T21:22:32 CEST] Defining 'data/teachers' ...
 ```
 
 Now that we have these two modules at our disposal, let's combine them into 
@@ -135,7 +135,7 @@ another module that returns a (bad) student-teacher ratio.
     ratio <- length(unique(students$id)) / length(unique(teachers$id))
     return(ratio)
   }
-#> [2015-09-06T15:38:02 CEST] defining [bad_stat/student_teacher_ratio] ...
+#> [2015-09-11T21:22:32 CEST] Defining 'bad_stat/student_teacher_ratio' ...
 ```
 
 The `%requires%` operator allows us to specify the modules we rely on for the 
@@ -149,12 +149,12 @@ It is now time to see the DI framework in action.
 
 ```r
 bad_ratio %<=% "bad_stat/student_teacher_ratio"
-#> [2015-09-06T15:38:02 CEST] making [bad_stat/student_teacher_ratio] ...
-#> [2015-09-06T15:38:02 CEST] * checking definitions ...
-#> [2015-09-06T15:38:02 CEST] * found 2 dependencies(s) with 3 modules(s) on 2 layer(s)
-#> [2015-09-06T15:38:02 CEST] ** making [data/students] ...
-#> [2015-09-06T15:38:02 CEST] ** making [data/teachers] ...
-#> [2015-09-06T15:38:02 CEST] ** making [bad_stat/student_teacher_ratio] ...
+#> [2015-09-11T21:22:32 CEST] Making 'bad_stat/student_teacher_ratio' ...
+#> [2015-09-11T21:22:32 CEST] * Checking definitions ...
+#> [2015-09-11T21:22:32 CEST] * found 2 dependencies(s) with 3 modules(s) on 2 layer(s)
+#> [2015-09-11T21:22:32 CEST] ** Making 'data/students' ...
+#> [2015-09-11T21:22:32 CEST] ** Making 'data/teachers' ...
+#> [2015-09-11T21:22:32 CEST] ** Making 'bad_stat/student_teacher_ratio' ...
 ```
 
 We say that the `%<=%` operator **makes** the module given on its 

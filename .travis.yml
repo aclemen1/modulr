@@ -1,6 +1,13 @@
 language: r
 sudo: required
 
-# Be strict when checking our package
-# TODO: change to true
 warnings_are_errors: false
+
+r_github_packages:
+  - hadley/assertthat
+  - hadley/testthat
+  - jimhester/covr
+  - jimhester/lintr
+
+after_success:
+  - Rscript -e 'covr::codecov()'
