@@ -244,12 +244,16 @@ test_that("%=>>% assigns value in parent frame", {
   expect_false(exists("m1_sugar", envir = .GlobalEnv))
 })
 
-test_that("make calls are prohibited from within a module", {
+test_that("make calls are warned from within a module", {
   reset()
   define("module", NULL, function() {
     modulr <- make("modulr")
   })
-  expect_error(make("module"))
+  expect_warning(make("module"))
+  define("module", NULL, function() {
+    modulr %<=% "modulr"
+  })
+  expect_warning(make("module"))
 })
 
 test_that("make returns an instance", {

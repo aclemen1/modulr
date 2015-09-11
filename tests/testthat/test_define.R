@@ -135,10 +135,14 @@ test_that("get_factory returns the body of the module", {
 test_that("get_factory is able to find an undefined module", {
   reset()
 
-  expect_equal(get_factory("module_1"),
-               function() "module_1")
+  expect_error(get_factory("unexisting/module", load = F))
 
-  expect_error(get_factory("unexisting/module"))
+  expect_error(get_factory("unexisting/module", load = T))
+
+  expect_error(get_factory("module_1", load = F))
+
+  expect_equal(get_factory("module_1", load = T),
+               function() "module_1")
 
 })
 

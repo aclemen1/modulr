@@ -4,9 +4,9 @@
 # TODO: write documentation
 make <- function(name = modulr_env$.Last.name) {
 
-  if(exists(".__name__", inherits = T,
-            mode = "character", envir = parent.env(parent.frame()))) {
-    stop("Unauthorized call from a module.", call. = F)
+  if(.is_called_from_within_module()) {
+    warning("make is called from within a module.",
+            call. = F, immediate. = T)
   }
 
   .message_meta(sprintf("making [%s] ...", name), {
@@ -124,6 +124,11 @@ make <- function(name = modulr_env$.Last.name) {
 # TODO: write documentation
 make_all <- function(regexp, all = F, error = stop, ...) {
 
+  if(.is_called_from_within_module()) {
+    warning("make_all is called from within a module.",
+            call. = F, immediate. = T)
+  }
+
   assertthat::assert_that(
     missing(regexp) || assertthat::is.string(regexp),
     assertthat::is.flag(all),
@@ -146,6 +151,11 @@ make_all <- function(regexp, all = F, error = stop, ...) {
 #' @export
 # TODO: write documentation
 make_tests <- function(...) {
+
+  if(.is_called_from_within_module()) {
+    warning("make_tests is called from within a module.",
+            call. = F, immediate. = T)
+  }
 
   module_names <- list_modules("/tests?$", all = F, wide = F)
 
@@ -197,6 +207,11 @@ make_test <- make_tests
 # TODO: write documentation
 `%<=%` <- function(lhs, rhs) {
 
+  if(.is_called_from_within_module()) {
+    warning("make is called from within a module.",
+            call. = F, immediate. = T)
+  }
+
   assertthat::assert_that(
     assertthat::is.string(rhs)
   )
@@ -217,6 +232,11 @@ make_test <- make_tests
 #' @export
 # TODO: write documentation
 `%<<=%` <- function(lhs, rhs) {
+
+  if(.is_called_from_within_module()) {
+    warning("make is called from within a module.",
+            call. = F, immediate. = T)
+  }
 
   assertthat::assert_that(
     assertthat::is.string(rhs)

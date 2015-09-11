@@ -9,7 +9,19 @@
 #' we compute a digest of it with a cryptographic hash.
 #' @export
 # TODO: write documentation
-get_digest <- function(name) {
+get_digest <- function(name, load = F) {
+
+  assertthat::assert_that(assertthat::is.flag(load))
+
+  if(.is_undefined(name) & load) {
+
+    if(.is_called_from_within_module()) {
+      warning("get_factory is called from within a module.",
+              call. = F, immediate. = T)
+    }
+
+    load_module(name)
+  }
 
   assertthat::assert_that(.is_defined(name))
 
@@ -43,6 +55,11 @@ get_digest <- function(name) {
 #' @export
 # TODO: write the documentation
 define <- function(name, dependencies, factory) {
+
+  if(.is_called_from_within_module()) {
+    warning("define is called from within a module.",
+            call. = F, immediate. = T)
+  }
 
   .message_meta(sprintf("entering define() for '%s' ...", name),
                 verbosity = +Inf)
@@ -119,9 +136,19 @@ define <- function(name, dependencies, factory) {
 #'
 #' @export
 # TODO: write documentation
-get_factory <- function(name) {
+get_factory <- function(name, load = F) {
 
-  load_module(name)
+  assertthat::assert_that(assertthat::is.flag(load))
+
+  if(.is_undefined(name) & load) {
+
+    if(.is_called_from_within_module()) {
+      warning("get_factory is called from within a module.",
+              call. = F, immediate. = T)
+    }
+
+    load_module(name)
+  }
 
   assertthat::assert_that(.is_defined(name))
 
@@ -134,6 +161,11 @@ get_factory <- function(name) {
 #' @export
 # TODO: write documentation
 reset <- function(all = F, verbose = T) {
+
+  if(.is_called_from_within_module()) {
+    warning("reset is called from within a module.",
+            call. = F, immediate. = T)
+  }
 
   assertthat::assert_that(assertthat::is.flag(all),
                          assertthat::is.flag(verbose))
@@ -163,6 +195,11 @@ reset <- function(all = F, verbose = T) {
 
 undefine <- function(name) {
 
+  if(.is_called_from_within_module()) {
+    warning("undefine is called from within a module.",
+            call. = F, immediate. = T)
+  }
+
   assertthat::assert_that(.is_defined_regular(name))
 
   register <- .internals()$register
@@ -182,6 +219,11 @@ undefine <- function(name) {
 #' @export
 # TODO: write documentation
 touch <- function(name) {
+
+  if(.is_called_from_within_module()) {
+    warning("touch is called from within a module.",
+            call. = F, immediate. = T)
+  }
 
   assertthat::assert_that(.is_defined_regular(name))
 
@@ -223,6 +265,11 @@ touch <- function(name) {
 #'
 #' @export
 `%provides%` = function(lhs, rhs) {
+
+  if(.is_called_from_within_module()) {
+    warning("`%provides%` is called from within a module.",
+            call. = F, immediate. = T)
+  }
 
   assertthat::assert_that(
     is.function(rhs),

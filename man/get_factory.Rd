@@ -4,7 +4,7 @@
 \alias{get_factory}
 \title{Get module factory.}
 \usage{
-get_factory(name)
+get_factory(name, load = F)
 }
 \description{
 Get module factory.

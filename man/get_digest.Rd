@@ -5,7 +5,7 @@
 \title{In order to know if a module definition has changed,
 we compute a digest of it with a cryptographic hash.}
 \usage{
-get_digest(name)
+get_digest(name, load = F)
 }
 \description{
 In order to know if a module definition has changed,

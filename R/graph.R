@@ -4,6 +4,11 @@
 # TODO: write documentation
 graph_dependencies <- function(group, special = T) {
 
+  if(.is_called_from_within_module()) {
+    warning("graph_dependencies is called from within a module.",
+            call. = F, immediate. = T)
+  }
+
   assertthat::assert_that(
     missing(group) || is.character(group),
     assertthat::is.flag(special)

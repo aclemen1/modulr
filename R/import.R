@@ -1,6 +1,10 @@
 #' @export
 import_module <- function(name, url, digest = NULL, force = F, ...) {
 
+  if(.is_called_from_within_module()) {
+    stop("import_module is called from within a module.", call. = F)
+  }
+
   assertthat::assert_that(
     .is_regular(name),
     assertthat::is.string(url),
@@ -72,6 +76,11 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
 
 #' @export
 `%imports%` <- function(lhs, rhs) {
+
+  if(.is_called_from_within_module()) {
+    warning("`%imports%` is called from within a module.",
+            call. = F, immediate. = T)
+  }
 
   assertthat::assert_that(
     assertthat::is.string(rhs),

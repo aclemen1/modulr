@@ -4,6 +4,11 @@
 # TODO: write documentation
 load_module <- function(name) {
 
+  if(.is_called_from_within_module()) {
+    warning("`%imports%` is called from within a module.",
+            call. = F, immediate. = T)
+  }
+
   if(.is_regular(name)) {
 
     path <- .resolve_path(name)
