@@ -4,9 +4,11 @@ list_modules <- function(regexp, all = TRUE, wide = TRUE, full = FALSE,
                          cols = c(
                            "name",
                            "type",
+                           "weight",
                            "calls",
                            "dependencies",
                            "requisitions",
+                           "size",
                            "lines",
                            "modified")) {
 
@@ -24,9 +26,11 @@ list_modules <- function(regexp, all = TRUE, wide = TRUE, full = FALSE,
       all(cols %in% c(
         "name",
         "type",
+        "weight",
         "calls",
         "dependencies",
         "requisitions",
+        "size",
         "lines",
         "chars",
         "created",
@@ -67,6 +71,18 @@ list_modules <- function(regexp, all = TRUE, wide = TRUE, full = FALSE,
           ifelse(register[[name]]$instanciated,
                  typeof(register[[name]]$instance), NA_character_), flat))
 
+      sizes <-
+        do.call(c, Map(function(name)
+          ifelse(T,
+                 format(object.size(register[[name]]$factory), units = "auto"),
+                 NA_character_), flat))
+
+      weights <-
+        do.call(c, Map(function(name)
+          ifelse(register[[name]]$instanciated,
+                 format(object.size(register[[name]]$instance), units = "auto"),
+                 NA_character_), flat))
+
       deparsed_factories <-
         Map(function(name) deparse(register[[name]]$factory), flat)
 
@@ -87,9 +103,11 @@ list_modules <- function(regexp, all = TRUE, wide = TRUE, full = FALSE,
       data <- data.frame(
         name = flat,
         type = types,
+        weight = weights,
         calls = calls,
         dependencies = deps,
         requisitions = reqs,
+        size = sizes,
         lines = lines,
         chars = chars,
         created = created,
