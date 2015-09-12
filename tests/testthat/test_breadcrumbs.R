@@ -2,6 +2,7 @@ context("breadcrumbs")
 
 test_that("get_breadcrumbs returns null when called from outside a module", {
   expect_null(get_breadcrumbs())
+  expect_null(get_breadcrumbs("foo"))
 })
 
 test_that("get_breadcrumbs returns module name for singletons", {

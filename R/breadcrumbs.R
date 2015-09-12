@@ -43,17 +43,9 @@ activate_breadcrumbs <- function() {
 
   if(!.is_installed_bc(handler)) {
 
-    if(is.null(handler)) {
-      wrapper <- function() {
-        modulr::get_breadcrumbs("installed")
-      }
-
-    } else {
-
-      wrapper <- function() {
-        modulr::get_breadcrumbs("installed")
-        eval(parse(text = deparse(handler)), envir = parent.frame())
-      }
+    wrapper <- function() {
+      modulr::get_breadcrumbs("installed")
+      eval(parse(text = deparse(handler)), envir = parent.frame())
 
     }
 

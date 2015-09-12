@@ -5,7 +5,8 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
                 verbosity = +Inf)
 
   if(.is_called_from_within_module()) {
-    stop("import_module is called from within a module.", call. = FALSE)
+    warning("import_module is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
   }
 
   assertthat::assert_that(

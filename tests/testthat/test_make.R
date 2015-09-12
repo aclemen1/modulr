@@ -249,8 +249,25 @@ test_that("make calls are warned from within a module", {
     modulr <- make("modulr")
   })
   expect_warning(make("module"))
+  reset()
+  define("module", NULL, function() {
+    make_all("foo")
+  })
+  expect_warning(make("module"))
+  reset()
+  define("module", NULL, function() {
+    make_tests()
+  })
+  expect_warning(make("module"))
+  reset()
   define("module", NULL, function() {
     modulr %<=% "modulr"
+  })
+  expect_warning(make("module"))
+  reset()
+  foo <- "bar"
+  define("module", NULL, function() {
+    foo %<<=% "modulr"
   })
   expect_warning(make("module"))
 })

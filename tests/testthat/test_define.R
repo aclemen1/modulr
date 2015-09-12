@@ -43,14 +43,22 @@ test_that("get_digest detects changes", {
   testthat::expect_true(sig_1 == sig_4)
 })
 
+test_that("get_digest calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    get_digest("module_1", load = T)
+  })
+  expect_warning(make("module"))
+})
+
 test_that("define does not re-define special modules", {
+  reset()
   expect_error(define("modulr", list(), function() NULL))
 })
 
 test_that("define writes to the register", {
+  reset()
   timestamp <- Sys.time()
-
-  undefine("some/module")
 
   define(
     "some/module",
@@ -77,7 +85,7 @@ test_that("define writes to the register", {
 })
 
 test_that("re-define doesn't write to the register when no changes occur", {
-  undefine("some/module")
+  reset()
 
   timestamp_1 <- Sys.time()
 
@@ -113,37 +121,6 @@ test_that("re-define doesn't write to the register when no changes occur", {
   expect_less_than(module$timestamp, Sys.time())
   expect_more_than(module$timestamp, timestamp_1)
   expect_less_than(module$timestamp, timestamp_2)
-})
-
-test_that("get_factory returns the body of the module", {
-  undefine("some/module")
-
-  define(
-    "some/module",
-    list(dep = "foo/bar"),
-    function(dep) {
-      return(dep)
-    })
-
-  expect_equal(get_factory("some/module"),
-               function(dep) {
-                 return(dep)
-               })
-
-})
-
-test_that("get_factory is able to find an undefined module", {
-  reset()
-
-  expect_error(get_factory("unexisting/module", load = F))
-
-  expect_error(get_factory("unexisting/module", load = T))
-
-  expect_error(get_factory("module_1", load = F))
-
-  expect_equal(get_factory("module_1", load = T),
-               function() "module_1")
-
 })
 
 test_that("re-define writes to the register when changes occur", {
@@ -182,6 +159,57 @@ test_that("re-define writes to the register when changes occur", {
   expect_more_than(module$timestamp, timestamp)
 })
 
+test_that("define calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    define("other/module", NULL, function() NULL)
+  })
+  expect_warning(make("module"))
+  define("module", NULL, function() {
+    "other/module" %provides% function() NULL
+  })
+  expect_warning(make("module"))
+})
+
+test_that("get_factory returns the body of the module", {
+  reset()
+
+  define(
+    "some/module",
+    list(dep = "foo/bar"),
+    function(dep) {
+      return(dep)
+    })
+
+  expect_equal(get_factory("some/module"),
+               function(dep) {
+                 return(dep)
+               })
+
+})
+
+test_that("get_factory is able to find an undefined module", {
+  reset()
+
+  expect_error(get_factory("unexisting/module", load = F))
+
+  expect_error(get_factory("unexisting/module", load = T))
+
+  expect_error(get_factory("module_1", load = F))
+
+  expect_equal(get_factory("module_1", load = T),
+               function() "module_1")
+
+})
+
+test_that("get_factory calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    get_factory("module_1", load = T)
+  })
+  expect_warning(make("module"))
+})
+
 test_that("reset purges the register", {
   define(
     "some/module",
@@ -206,6 +234,14 @@ test_that("reset(all=T) purges the stashes", {
   expect_false(length(modulr_env$stash) == 0)
   reset(all = T)
   expect_equal(length(modulr_env$stash), 0)
+})
+
+test_that("reset calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    reset()
+  })
+  expect_warning(make("module"))
 })
 
 test_that("undefine removes the module definition from the register", {
@@ -249,6 +285,14 @@ test_that("undefine removes only non special modules", {
 
   expect_error(undefine("modulr"))
 
+})
+
+test_that("undefine calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    undefine("module")
+  })
+  expect_warning(make("module"))
 })
 
 test_that("touch updates the register", {
@@ -296,6 +340,14 @@ test_that("touch updates only non special modules", {
 
   expect_error(touch("modulr"))
 
+})
+
+test_that("touch calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    touch("module")
+  })
+  expect_warning(make("module"))
 })
 
 test_that("define assigns the last regular core module name to .Last.name", {

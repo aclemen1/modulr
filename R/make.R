@@ -201,9 +201,9 @@ make_tests <- function(...) {
   if(!all(unlist(rs))) stop("FAILED.", call. = FALSE)
 
   if(sample(5, 1) == 1) {
-    message("PASSED. ", sample(PRAISE, 1), ".")
+    message("PASSED. ", sample(PRAISE, 1), ".") # nocov
   } else {
-    message("PASSED.")
+    message("PASSED.") # nocov
   }
 
   invisible()

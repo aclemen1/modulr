@@ -1,3 +1,4 @@
+# nocov start
 .onLoad <- function(libname, pkgname) {
 
   reset(all = TRUE, verbose = FALSE)
@@ -20,3 +21,4 @@
 }
 
 # TODO: write documentation for .Last.name
+# nocov end

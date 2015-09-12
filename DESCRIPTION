@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9017
+Version: 0.1.7.9018
 Title: A Dependency Injection (DI) Framework for R
 Description: A Dependency Injection (DI) Framework to break down sequential
   programs into discrete, modular units that are loosely coupled,
@@ -22,18 +22,18 @@ Authors@R: c(
 URL: https://github.com/aclemen1/modulr
 BugReports: https://github.com/aclemen1/modulr/issues
 Depends:
-  R (>= 2.9)
+  R (>= 3.1.0)
 Imports:
   knitr (>= 1.10.5),
   assertthat (>= 0.1.0.99),
-  digest,
-  httr
+  digest (>= 0.6.8),
+  httr (>= 1.0.0)
 Suggests:
-  dplyr,
-  htmltools,
-  lintr,
-  covr,
-  testthat,
-  networkD3
+  dplyr (>= 0.4.2),
+  htmltools (>= 0.2.6),
+  lintr (>= 0.3.1),
+  covr (>= 1.2.3),
+  testthat (>= 0.10.0),
+  networkD3 (>= 0.2.1)
 License: MIT + file LICENSE
 Encoding: UTF-8

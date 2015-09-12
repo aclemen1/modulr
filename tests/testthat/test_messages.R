@@ -47,6 +47,9 @@ test_that(".message_meta increments and decrements level with nested calls", {
 
 test_that(".parse_message_args parse core args and other args", {
   expect_equal(
+    .parse_message_args(),
+    list(core = c()))
+  expect_equal(
     .parse_message_args("core1", "core2"),
     list(core = c("core1", "core2")))
   expect_equal(

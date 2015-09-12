@@ -30,7 +30,7 @@ test_that("correct Sankey graph is returned for the whole register", {
   if (!requireNamespace("networkD3", quietly = TRUE))
     skip("networkD3 not installed")
   reset()
-  define("module_layer1_1", NULL, function() NULL)
+  define("module_layer1_1", list(modulr = "modulr"), function(modulr) NULL)
   define("module_layer1_2", NULL, function() NULL)
   define("module_layer1_3", NULL, function() NULL)
   define("module_layer2_1", list("module_layer1_1", "module_layer1_2"),
@@ -38,10 +38,10 @@ test_that("correct Sankey graph is returned for the whole register", {
   define("module_layer3_1", list("module_layer2_1", "module_layer1_3"),
          function(m1, m2) NULL)
 
-  graph_1 <- graph_dependencies("module_layer3_1")
-  graph_2 <- graph_dependencies()
+  expect_equal(graph_dependencies(), graph_dependencies("module_layer3_1"))
+  expect_equal(graph_dependencies(special = FALSE),
+               graph_dependencies("module_layer3_1", special = FALSE))
 
-  expect_equal(graph_2, graph_1)
 })
 
 test_that("an error message is raised for an undefined module name", {
@@ -51,4 +51,14 @@ test_that("an error message is raised for an undefined module name", {
   define("module_layer1_1", NULL, function() NULL)
 
   expect_error(graph_dependencies("undefined_module"))
+})
+
+test_that("graph_dependencies calls are warned from within a module", {
+  if (!requireNamespace("networkD3", quietly = TRUE))
+    skip("networkD3 not installed")
+  reset()
+  define("module", NULL, function() {
+    graph_dependencies()
+  })
+  expect_warning(make("module"))
 })

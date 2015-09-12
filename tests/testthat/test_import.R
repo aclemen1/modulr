@@ -1,5 +1,22 @@
 context("import")
 
+test_that("import_module imports modules", {
+  reset()
+  with_mock(
+    `httr::GET` = function(...) NULL,
+    `httr::content` = function(...)
+      'define("module", NULL, function() NULL)\n"remote"',
+    expect_equal(import_module("module", "fake_url"), "remote")
+  )
+  reset()
+  with_mock(
+    `httr::GET` = function(...) NULL,
+    `httr::content` = function(...)
+      '```{r}\ndefine("module", NULL, function() NULL)\n"remote"\n```',
+    expect_equal(import_module("module", "fake_url"), "remote")
+  )
+})
+
 test_that("import_module doesn't import defined modules, unless forced", {
   reset()
   define("module1", NULL, function() NULL)
@@ -103,6 +120,19 @@ test_that("import_module fails on modules with errors", {
   )
   expect_equal(list_modules(wide = F), pre_list)
 
+})
+
+test_that("import_module calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    import_module("module_1", "fake_url")
+  })
+  expect_warning(make("module"))
+  reset()
+  define("module", NULL, function() {
+    "module_1" %imports% "fake_url"
+  })
+  expect_warning(make("module"))
 })
 
 test_that("%imports% is a syntactic sugar for `import_module`", {

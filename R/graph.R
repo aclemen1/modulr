@@ -7,10 +7,12 @@ graph_dependencies <- function(group, special = TRUE) {
   .message_meta("Entering graph_dependencies() ...",
                 verbosity = +Inf)
 
+  # nocov start
   if (!requireNamespace("networkD3", quietly = TRUE)) {
     stop("networkD3 is needed for this function to work. Please install it.",
          call. = FALSE)
   }
+  # nocov end
 
   if(.is_called_from_within_module()) {
     warning("graph_dependencies is called from within a module.",
@@ -53,7 +55,8 @@ graph_dependencies <- function(group, special = TRUE) {
     if (!special) {
 
       deps <-
-        deps[, !(deps$from %in% RESERVED_NAMES | deps$to %in% RESERVED_NAMES)]
+        deps[!(deps$module %in% RESERVED_NAMES |
+                   deps$dependency %in% RESERVED_NAMES), ]
 
     }
 

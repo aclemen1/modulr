@@ -41,6 +41,7 @@ test_that("import finds and imports .Rmd files", {
       "```{r}\nlibrary(modulr)\ndefine('%s', NULL, function() NULL)\n```\n",
       name)
   write(module_text, file)
+  on.exit(unlink(file))
 
   root_config$set(path)
   module_file <- load_module(name)
@@ -72,6 +73,7 @@ test_that("import re-imports modified .R files", {
 
   module_text <- sprintf("define('%s', NULL, function() 'changed')", name)
   write(module_text, file)
+  on.exit(unlink(file))
   module_file <- load_module(name)
 
   register <- get("register", pos = modulr_env)
@@ -108,6 +110,7 @@ test_that("import re-imports modified .Rmd files", {
              "NULL, function() 'changed')\n```\n"),
       name)
   write(module_text, file)
+  on.exit(unlink(file))
   module_file <- load_module(name)
 
   register <- get("register", pos = modulr_env)
@@ -117,4 +120,12 @@ test_that("import re-imports modified .Rmd files", {
   expect_less_than(module$timestamp, Sys.time())
   expect_more_than(module$timestamp, timestamp)
 
+})
+
+test_that("load_module calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    load_module("module_1")
+  })
+  expect_warning(make("module"))
 })
