@@ -18,7 +18,7 @@ stash <- function(comment = NA_character_) {
 
   modulr_env$stash[[len_plus_1]] <- list(
     register = modulr_env$register,
-    .Last.name = modulr_env$.Last.name,
+    .Last.name = modulr_env$.Last.name, # Exclude Linting
     config = modulr_env$config,
     verbosity = modulr_env$verbosity,
     timestamp = timestamp,
@@ -50,7 +50,7 @@ unstash <- function(id = length(modulr_env$stash)) {
 
   modulr_env$stash <- modulr_env$stash[-id]
   modulr_env$register <- stash[["register"]]
-  modulr_env$.Last.name <- stash[[".Last.name"]]
+  modulr_env$.Last.name <- stash[[".Last.name"]] # Exclude Linting
   modulr_env$config <- stash[["config"]]
   modulr_env$verbosity <- stash[["verbosity"]]
 
@@ -127,4 +127,3 @@ remove_stash <- function(id, all) {
 
   invisible()
 }
-

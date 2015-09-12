@@ -290,33 +290,33 @@ test_that("touch updates only non special modules", {
 
 test_that("define assigns the last regular core module name to .Last.name", {
   reset()
-  expect_null(.Last.name)
-  define("module_1", NULL, function() {})
-  expect_equal(.Last.name, "module_1")
-  define("module_1/test/a/dependency", NULL, function() {})
-  expect_equal(.Last.name, "module_1")
-  define("module_1/mock/a/dependency", NULL, function() {})
-  expect_equal(.Last.name, "module_1")
+  expect_null(.Last.name) # Exclude Linting
+  define("module_1", NULL, function() NULL)
+  expect_equal(.Last.name, "module_1") # Exclude Linting
+  define("module_1/test/a/dependency", NULL, function() NULL)
+  expect_equal(.Last.name, "module_1") # Exclude Linting
+  define("module_1/mock/a/dependency", NULL, function() NULL)
+  expect_equal(.Last.name, "module_1") # Exclude Linting
 })
 
 test_that("reset resets .Last.name", {
   reset()
-  expect_null(.Last.name)
-  define("module_1", NULL, function() {})
-  expect_equal(.Last.name, "module_1")
+  expect_null(.Last.name) # Exclude Linting
+  define("module_1", NULL, function() NULL)
+  expect_equal(.Last.name, "module_1") # Exclude Linting
   reset()
-  expect_null(.Last.name)
+  expect_null(.Last.name) # Exclude Linting
 })
 
 test_that("touch assigns the last regular module name to .Last.name", {
   reset()
-  define("module_1", NULL, function() {})
-  define("module_2", NULL, function() {})
-  expect_equal(.Last.name, "module_2")
+  define("module_1", NULL, function() NULL)
+  define("module_2", NULL, function() NULL)
+  expect_equal(.Last.name, "module_2") # Exclude Linting
   touch("module_1")
-  expect_equal(.Last.name, "module_1")
-  define("module_1/test/a/dependency", NULL, function() {})
-  expect_equal(.Last.name, "module_1")
+  expect_equal(.Last.name, "module_1") # Exclude Linting
+  define("module_1/test/a/dependency", NULL, function() NULL)
+  expect_equal(.Last.name, "module_1") # Exclude Linting
   touch("module_1/test/a/dependency")
-  expect_equal(.Last.name, "module_1/test/a/dependency")
+  expect_equal(.Last.name, "module_1/test/a/dependency") # Exclude Linting
 })

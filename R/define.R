@@ -136,7 +136,7 @@ define <- function(name, dependencies, factory) {
 
   assign("register", register, pos = modulr_env)
   if(.is_regular_core(name))
-    assign(".Last.name", name, pos = modulr_env)
+    assign(".Last.name", name, pos = modulr_env) # Exclude Linting
 
   invisible(function(...) make(name, ...))
 
@@ -193,7 +193,7 @@ reset <- function(all = F, verbose = T) {
   modulr_env$register <- list()
   modulr_env$config <- list(modules = list())
   modulr_env$verbosity <- 2
-  modulr_env$.Last.name <- NULL
+  modulr_env$.Last.name <- NULL # Exclude Linting
   if(all)
     modulr_env$stash <- list()
 
@@ -262,7 +262,7 @@ touch <- function(name) {
 
   assign("register", register, pos = modulr_env)
   if(.is_regular(name))
-    assign(".Last.name", name, pos = modulr_env)
+    assign(".Last.name", name, pos = modulr_env) # Exclude Linting
 
   module_option(name)$unset()
 
@@ -273,7 +273,7 @@ touch <- function(name) {
 #' Syntactic sugar to require dependencies, to be used in conjunction with \%provides\%.
 #'
 #' @export
-`%requires%` = function(lhs, rhs) {
+`%requires%` <- function(lhs, rhs) {
 
   assertthat::assert_that(.is_regular(lhs))
 
@@ -289,7 +289,7 @@ touch <- function(name) {
 #' Syntactic sugar to provide a factory, can be used in conjunction with \%requires\%.
 #'
 #' @export
-`%provides%` = function(lhs, rhs) {
+`%provides%` <- function(lhs, rhs) {
 
   if(.is_called_from_within_module()) {
     warning("`%provides%` is called from within a module.",

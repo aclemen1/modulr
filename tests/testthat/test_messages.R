@@ -20,13 +20,13 @@ test_that(".message_meta outputs messages according to verbosity", {
 })
 
 test_that(".message_meta evaluates expressions", {
-  expect_equal(.message_meta("hello world", expr = {return("foo")}), "foo")
+  expect_equal(.message_meta("hello world", expr = return("foo")), "foo")
 })
 
 test_that(".message_meta evaluates expressions in the calling env", {
   foo <- "foo"
-  expect_equal(.message_meta("hello world", expr = {return(foo)}), "foo")
-  .message_meta("hello world", expr = {foo <- "bar"})
+  expect_equal(.message_meta("hello world", expr = return(foo)), "foo")
+  .message_meta("hello world", expr = foo <- "bar")
   expect_equal(foo, "bar")
 })
 
@@ -37,9 +37,11 @@ test_that(".message_meta increments and decrements level with nested calls", {
       expect_message(.message_meta("level2"), regexp = "[^*]\\*\\*\\ level2")
       expect_message(.message_meta("level2bis"),
                      regexp = "[^*]\\*\\*\\ level2bis")
-    }), regexp = "[^*]\\*\\ level1")
+    }),
+    regexp = "[^*]\\*\\ level1")
     expect_message(.message_meta("level1bis"), regexp = "[^*]\\*\\ level1bis")
-  }), regexp = "[^*]\\ level0")
+  }),
+  regexp = "[^*]\\ level0")
   expect_message(.message_meta("level0bis"), regexp = "[^*]\\ level0bis" )
 })
 

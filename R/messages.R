@@ -66,7 +66,7 @@
                    format(Sys.time(), format = "%c"),
                    if("module_name" %in% names(kwargs)) {
                      sprintf(" %s", kwargs$module_name)
-                     } else {""})
+                   } else "")
 
     level <- .get_0(".message_level", envir = modulr_env, ifnotfound = 0)
 

@@ -22,7 +22,7 @@
 
     assertthat::assert_that(assertthat::is.flag(drop))
 
-    options_list = list(...)
+    options_list <- list(...)
 
     if(is.null(names(options_list))
        & length(options_list) == 1)
@@ -41,7 +41,7 @@
 
       if(is.null(names(options_list))) {
 
-        if(drop)
+        if (drop)
           config[[scope]] <- options_list
 
       } else {

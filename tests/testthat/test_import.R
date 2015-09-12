@@ -2,17 +2,17 @@ context("import")
 
 test_that("import_module doesn't import defined modules, unless forced", {
   reset()
-  define("module1", NULL, function() {})
+  define("module1", NULL, function() NULL)
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-      {'define("module1", NULL, function() {})\nTRUE'},
+      'define("module1", NULL, function() NULL)\nTRUE',
     expect_null(import_module("module1", "fake_url"))
   )
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-      {'define("module1", NULL, function() {})\nTRUE'},
+      'define("module1", NULL, function() NULL)\nTRUE',
     expect_true(import_module("module1", "fake_url", force = T))
   )
 })
@@ -20,9 +20,9 @@ test_that("import_module doesn't import defined modules, unless forced", {
 test_that("import_module loads local modules if they exist", {
   reset()
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module_1", NULL, function() {})\n"remote"'},
+      'define("module_1", NULL, function() NULL)\n"remote"',
     expect_null(import_module("module_1", "fake_url"))
   )
 })
@@ -39,9 +39,9 @@ test_that("import_module fails on non-existing modules", {
 test_that("import_module fails on existing modules with different name", {
   reset()
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-      {'define("module_not_1", NULL, function() {})\nreturn(TRUE)'},
+      'define("module_not_1", NULL, function() NULL)\nreturn(TRUE)',
     expect_error(import_module("module1", "fake_url")),
     expect_true(import_module("module_not_1", "fake_url"))
   )
@@ -49,9 +49,9 @@ test_that("import_module fails on existing modules with different name", {
   reset()
   pre_list <- list_modules(wide = F)
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module_not_1", NULL, function() {})\nreturn(TRUE)'},
+      'define("module_not_1", NULL, function() NULL)\nreturn(TRUE)',
     expect_error(import_module("module1", "fake_url"))
   )
   expect_equal(list_modules(wide = F), pre_list)
@@ -60,11 +60,11 @@ test_that("import_module fails on existing modules with different name", {
 
 test_that("import_module fails on existing modules with different digest", {
   reset()
-  define("module1_local", NULL, function() {})
+  define("module1_local", NULL, function() NULL)
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module1", NULL, function() {})\nreturn(TRUE)'},
+      'define("module1", NULL, function() NULL)\nreturn(TRUE)',
     expect_error(import_module("module1", "fake_url",
                                digest = "unprobable")),
     expect_true(import_module("module1", "fake_url",
@@ -74,9 +74,9 @@ test_that("import_module fails on existing modules with different digest", {
   reset()
   pre_list <- list_modules(wide = F)
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module1", NULL, function() {})\nreturn(TRUE)'},
+      'define("module1", NULL, function() NULL)\nreturn(TRUE)',
     expect_error(import_module("module1", "fake_url",
                                digest = "unprobable"))
   )
@@ -87,18 +87,18 @@ test_that("import_module fails on existing modules with different digest", {
 test_that("import_module fails on modules with errors", {
   reset()
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module1", NULL, function() {})\nstop()'},
+      'define("module1", NULL, function() NULL)\nstop()',
     expect_error(import_module("module1", "fake_url"))
   )
 
   reset()
   pre_list <- list_modules(wide = F)
   with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module1", NULL, function() {})\nstop()'},
+      'define("module1", NULL, function() NULL)\nstop()',
     expect_error(import_module("module1", "fake_url"))
   )
   expect_equal(list_modules(wide = F), pre_list)
@@ -108,16 +108,16 @@ test_that("import_module fails on modules with errors", {
 test_that("%imports% is a syntactic sugar for `import_module`", {
   reset()
   m1 <- with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module1", NULL, function() {})\n"foo"'},
+      'define("module1", NULL, function() NULL)\n"foo"',
     import_module("module1", "fake_url")
   )
   reset()
   m2 <- with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module1", NULL, function() {})\n"foo"'},
+      'define("module1", NULL, function() NULL)\n"foo"',
     "module1" %imports% "fake_url"
   )
   expect_equal(m1, m2)
@@ -126,19 +126,19 @@ test_that("%imports% is a syntactic sugar for `import_module`", {
 
 test_that("%digests% %imports% are syntactic sugars for `import_module`", {
   reset()
-  define("module", NULL, function() {})
+  define("module", NULL, function() NULL)
   m1 <- with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module1", NULL, function() {})\n"foo"'},
+      'define("module1", NULL, function() NULL)\n"foo"',
     import_module("module1", "fake_url", digest = get_digest("module"))
   )
   reset()
-  define("module", NULL, function() {})
+  define("module", NULL, function() NULL)
   m2 <- with_mock(
-    `httr::GET` = function(...) {},
+    `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
-    {'define("module1", NULL, function() {})\n"foo"'},
+      'define("module1", NULL, function() NULL)\n"foo"',
     "module1" %digests% get_digest("module") %imports% "fake_url"
   )
   expect_equal(m1, m2)

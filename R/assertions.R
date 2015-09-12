@@ -30,7 +30,8 @@ assertthat::on_failure(.is_regular) <- function(call, env) {
 # Test if a module has a regular name which is not intended for testing
 .is_regular_core <- function(name) {
   .is_regular(name) &&
-    !grepl("/tests?$|/tests?/|/mocks?$|/mocks?/", name, ignore.case = T)
+    !grepl("\\/tests?$|\\/tests?\\/|\\/mocks?$|\\/mocks?\\/",
+           name, ignore.case = T)
 }
 
 assertthat::on_failure(.is_regular_core) <- function(call, env) {

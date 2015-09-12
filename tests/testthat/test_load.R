@@ -2,7 +2,7 @@ context("load")
 
 test_that(".is_defined return only T or F", {
   reset()
-  define("bar", NULL, function() {})
+  define("bar", NULL, function() NULL)
   expect_false(.is_defined("foo"))
   expect_true(.is_defined("bar"))
   })
@@ -14,7 +14,7 @@ test_that("import finds and imports .R files", {
   name <- tools::file_path_sans_ext(basename(file))
   path <- dirname(file)
 
-  module_text <- sprintf("define('%s', NULL, function() {})", name)
+  module_text <- sprintf("define('%s', NULL, function() NULL)", name)
   write(module_text, file)
   on.exit(unlink(file))
 
@@ -36,9 +36,11 @@ test_that("import finds and imports .Rmd files", {
   name <- tools::file_path_sans_ext(basename(file))
   path <- dirname(file)
 
-  module_text <- sprintf("```{r}\nlibrary(modulr)\ndefine('%s', NULL, function() {})\n```\n", name)
+  module_text <-
+    sprintf(
+      "```{r}\nlibrary(modulr)\ndefine('%s', NULL, function() NULL)\n```\n",
+      name)
   write(module_text, file)
-  #on.exit(unlink(file))
 
   root_config$set(path)
   module_file <- load_module(name)
@@ -59,7 +61,7 @@ test_that("import re-imports modified .R files", {
   name <- tools::file_path_sans_ext(basename(file))
   path <- dirname(file)
 
-  module_text <- sprintf("define('%s', NULL, function() {})", name)
+  module_text <- sprintf("define('%s', NULL, function() NULL)", name)
   write(module_text, file)
   on.exit(unlink(file))
 
@@ -68,7 +70,7 @@ test_that("import re-imports modified .R files", {
 
   timestamp <- Sys.time()
 
-  module_text <- sprintf("define('%s', NULL, function() {'changed'})", name)
+  module_text <- sprintf("define('%s', NULL, function() 'changed')", name)
   write(module_text, file)
   module_file <- load_module(name)
 
@@ -88,7 +90,10 @@ test_that("import re-imports modified .Rmd files", {
   name <- tools::file_path_sans_ext(basename(file))
   path <- dirname(file)
 
-  module_text <- sprintf("```{r}\nlibrary(modulr)\ndefine('%s', NULL, function() {})\n```\n", name)
+  module_text <-
+    sprintf(
+      "```{r}\nlibrary(modulr)\ndefine('%s', NULL, function() NULL)\n```\n",
+      name)
   write(module_text, file)
   on.exit(unlink(file))
 
@@ -97,7 +102,11 @@ test_that("import re-imports modified .Rmd files", {
 
   timestamp <- Sys.time()
 
-  module_text <- sprintf("```{r}\nlibrary(modulr)\ndefine('%s', NULL, function() {'changed'})\n```\n", name)
+  module_text <-
+    sprintf(
+      paste0("```{r}\nlibrary(modulr)\ndefine('%s', ",
+             "NULL, function() 'changed')\n```\n"),
+      name)
   write(module_text, file)
   module_file <- load_module(name)
 

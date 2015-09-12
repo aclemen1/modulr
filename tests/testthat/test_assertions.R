@@ -48,7 +48,7 @@ test_that(".is_regular_core detects regular core module names", {
 
 test_that(".is_defined_regular detects regular defined modules", {
   reset()
-  define("foo", NULL, function() {})
+  define("foo", NULL, function() NULL)
   expect_true(.is_defined_regular("foo"))
   expect_false(.is_defined_regular("undefined/module"))
   expect_false(.is_defined_regular("modulr"))

@@ -24,7 +24,7 @@ load_module <- function(name) {
 
       } else if(tolower(tools::file_ext(path)) == "rmd") {
 
-        unnamed_chunk_label_opts = knitr::opts_knit$get("unnamed.chunk.label")
+        unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
 
         knitr::opts_knit$set("unnamed.chunk.label" =
                                paste("modulr", name, sep="/"))
@@ -50,11 +50,6 @@ load_module <- function(name) {
 
 }
 
-# # We need to know if a module is already defined.
-# .is_defined <- function(name) {
-#   !is.null(get("register", pos = modulr_env)[[name]])
-# }
-
 # We need to make sure all dependent modules of a given module are defined.
 .define_all_dependent_modules <- function(group) {
 
@@ -79,7 +74,7 @@ load_module <- function(name) {
 
   }
 
-  for(name in group)
+  for (name in group)
     iteration(name)
 
   unlist(visited_dependencies)

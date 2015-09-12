@@ -50,13 +50,13 @@ activate_breadcrumbs <- function() {
 
     if(is.null(handler)) {
       wrapper <- function() {
-        .__breadcrumbs__('installed')
+        .__breadcrumbs__("installed")
       }
 
     } else {
 
       wrapper <- function() {
-        .__breadcrumbs__('installed')
+        .__breadcrumbs__("installed")
         eval(parse(text = deparse(handler)), envir = parent.frame())
       }
 

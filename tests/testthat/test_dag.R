@@ -8,10 +8,10 @@ test_that(".build_dependency_graph can return no dependency", {
 
 test_that(".build_dependency_graph figures out the DAG of dependencies", {
   reset()
-  define("module_1", NULL, function() {})
-  define("module_2", list("module_1"), function(m1) {})
-  define("module_3", list("module_2"), function(m2) {})
-  define("module_4", list("module_1", "module_2"), function(m1, m2) {})
+  define("module_1", NULL, function() NULL)
+  define("module_2", list("module_1"), function(m1) NULL)
+  define("module_3", list("module_2"), function(m2) NULL)
+  define("module_4", list("module_1", "module_2"), function(m1, m2) NULL)
   expect_equal(nrow(.build_dependency_graph("module_1")), 0)
   expect_equal(
     .build_dependency_graph("module_2"),
@@ -42,7 +42,7 @@ test_that(".topological_sort_with_layer is NULL on singletons", {
 
 test_that(".topological_sort_with_layer has two lines on pairs", {
   reset()
-  define("module_1", list("modulr"), function(m) {})
+  define("module_1", list("modulr"), function(m) NULL)
   graph <- .build_dependency_graph(c("module_1", "modulr"))
   expect_equal(
     .topological_sort_with_layer(graph),
@@ -54,8 +54,8 @@ test_that(".topological_sort_with_layer has two lines on pairs", {
 
 test_that(".topological_sort_with_layer can return two layers on triples", {
   reset()
-  define("module_1", list("modulr"), function(m) {})
-  define("module_2", list("modulr"), function(m) {})
+  define("module_1", list("modulr"), function(m) NULL)
+  define("module_2", list("modulr"), function(m) NULL)
   graph <- .build_dependency_graph(c("module_2", "module_1", "modulr"))
   expect_equal(
     .topological_sort_with_layer(graph),
@@ -67,8 +67,8 @@ test_that(".topological_sort_with_layer can return two layers on triples", {
 
 test_that(".topological_sort_with_layer can return three layers on triples", {
   reset()
-  define("module_1", list("modulr"), function(m) {})
-  define("module_2", list("module_1"), function(m) {})
+  define("module_1", list("modulr"), function(m) NULL)
+  define("module_2", list("module_1"), function(m) NULL)
   graph <- .build_dependency_graph(c("module_2", "module_1", "modulr"))
   expect_equal(
     .topological_sort_with_layer(graph),
@@ -78,8 +78,8 @@ test_that(".topological_sort_with_layer can return three layers on triples", {
       stringsAsFactors = F))
 
   reset()
-  define("module_1", list("modulr"), function(m) {})
-  define("module_2", list("module_1", "modulr"), function(m1, m2) {})
+  define("module_1", list("modulr"), function(m) NULL)
+  define("module_2", list("module_1", "modulr"), function(m1, m2) NULL)
   graph <- .build_dependency_graph(c("module_2", "module_1", "modulr"))
   expect_equal(
     .topological_sort_with_layer(graph),
@@ -91,22 +91,12 @@ test_that(".topological_sort_with_layer can return three layers on triples", {
 
 test_that(".topological_sort_by_layers returns vectors for each layer", {
   reset()
-  define("module_1", list("modulr"), function(m) {})
-  define("module_1bis", list("modulr"), function(m) {})
-  define("module_2", list("module_1"), function(m) {})
-  graph <- .build_dependency_graph(c("module_2", "module_1bis", "module_1", "modulr"))
+  define("module_1", list("modulr"), function(m) NULL)
+  define("module_1bis", list("modulr"), function(m) NULL)
+  define("module_2", list("module_1"), function(m) NULL)
+  graph <- .build_dependency_graph(
+    c("module_2", "module_1bis", "module_1", "modulr"))
   expect_equal(
     .topological_sort_by_layers(graph),
     list(`1` = "modulr", `2` = c("module_1", "module_1bis"), `3` = "module_2"))
-})
-
-test_that(".topological_sort returns a vector", {
-  reset()
-  define("module_1", list("modulr"), function(m) {})
-  define("module_1bis", list("modulr"), function(m) {})
-  define("module_2", list("module_1"), function(m) {})
-  graph <- .build_dependency_graph(c("module_2", "module_1bis", "module_1", "modulr"))
-  expect_equal(
-    .topological_sort(graph),
-    c("modulr", "module_1", "module_1bis", "module_2"))
 })

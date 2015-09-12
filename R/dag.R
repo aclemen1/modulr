@@ -7,7 +7,7 @@
   dependency <- c()
   module <- c()
 
-  for(name in all_dependencies) {
+  for (name in all_dependencies) {
 
     dependencies <- .internals()$register[[name]]$dependencies
 
@@ -80,14 +80,15 @@
 .topological_sort_by_layers <- function(graph) {
 
   assertthat::assert_that(
-    is.data.frame(graph)
+    is.data.frame(graph),
+    nrow(graph) == 0 || setequal(names(graph), c("module", "dependency"))
   )
 
   if(nrow(graph) > 0) {
 
     nodes <- .topological_sort_with_layer(graph)
 
-    layers <- with(nodes, split(node, layer))
+    layers <- split(nodes$node, nodes$layer)
 
     return(layers)
 
@@ -95,25 +96,22 @@
 
 }
 
-.topological_sort <- function(graph) {
-
-  .topological_sort_with_layer(graph)$node
-
-}
-
 .compute_adjacency_matrix <- function(group) {
 
-  #assertthat::assert_that(is.null(group) || is.character(group))
+  assertthat::assert_that(is.null(group) || is.character(group))
 
   register <- .internals()$register
 
   table(
+
     Reduce(rbind, Map(function(name) {
 
       deps <- factor(unlist(register[[name]]$dependencies), levels = group)
 
       data.frame(from=factor(rep(name, length(deps)), levels = group), to=deps)
 
-    }, group)))
+    },
+
+    group)))
 
 }

@@ -46,9 +46,11 @@ graph_dependencies <- function(group, special = T) {
                  value = rep(1, length(deps)),
                  stringsAsFactors = F)
 
-    }, universe))
+    },
 
-    if(!special) {
+    universe))
+
+    if (!special) {
 
       deps <-
         deps[, !(deps$from %in% RESERVED_NAMES | deps$to %in% RESERVED_NAMES)]
@@ -59,8 +61,10 @@ graph_dependencies <- function(group, special = T) {
 
       nodes <- .topological_sort_with_layer(deps[, names(deps) != "value"])
 
-      deps$source <- as.integer(factor(deps$module, levels = nodes$node)) - 1
-      deps$target <- as.integer(factor(deps$dependency, levels = nodes$node)) - 1
+      deps$source <-
+        as.integer(factor(deps$module, levels = nodes$node)) - 1
+      deps$target <-
+        as.integer(factor(deps$dependency, levels = nodes$node)) - 1
 
       return(networkD3::sankeyNetwork(
         Links = deps,

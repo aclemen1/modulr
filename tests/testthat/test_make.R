@@ -87,7 +87,8 @@ test_that("make reinstanciates touched dependency, only once", {
 
   make("module_2")
 
-  module_timestamp_2 <- get("register", pos = modulr_env)[["module_2"]]$timestamp
+  module_timestamp_2 <-
+    get("register", pos = modulr_env)[["module_2"]]$timestamp
   expect_equal(module_timestamp_2, module_timestamp)
 })
 
@@ -116,7 +117,6 @@ test_that("make reinstanciates touched dependencies for each child module", {
 test_that("make reinstanciates touched dependencies for chained modules", {
   reset()
 
-  # m_3 <- m_2 <- m_1
   make("module_3")
 
   timestamp <- Sys.time()
@@ -137,7 +137,6 @@ test_that("make reinstanciates touched dependencies for chained modules", {
 test_that("make reinstanciates touched deps for chained modules, scenario 2", {
   reset()
 
-  # m_3 <- m_2 <- m_1
   make("module_3")
 
   timestamp <- Sys.time()
@@ -258,32 +257,32 @@ test_that("make calls are warned from within a module", {
 
 test_that("make returns an instance", {
   reset()
-  define("module", NULL, function() {function() "foo"})
+  define("module", NULL, function() function() "foo")
   expect_equal(make("module")(), "foo")
 })
 
 test_that("make assigns the last regular module name to .Last.name", {
   reset()
-  expect_null(.Last.name)
-  define("module_1", NULL, function() {})
+  expect_null(.Last.name) # Exclude Linting
+  define("module_1", NULL, function() NULL)
   make("module_1")
-  expect_equal(.Last.name, "module_1")
-  define("module_1/test/a/dependency", NULL, function() {})
+  expect_equal(.Last.name, "module_1") # Exclude Linting
+  define("module_1/test/a/dependency", NULL, function() NULL)
   make("module_1/test/a/dependency")
-  expect_equal(.Last.name, "module_1/test/a/dependency")
+  expect_equal(.Last.name, "module_1/test/a/dependency") # Exclude Linting
 })
 
 test_that("make_all makes all regular defined modules and returns results", {
   reset()
-  define("module1", NULL, function() {"m1"})
-  define("module2", NULL, function() {"m2"})
+  define("module1", NULL, function() "m1")
+  define("module2", NULL, function() "m2")
   expect_equal(make_all(), list("module1" = "m1", "module2" = "m2"))
 })
 
 test_that("make_tests makes all tests", {
   reset()
 
-  "test_1" %provides% function() {"hello world"}
+  "test_1" %provides% function() "hello world"
 
   "test_1/mock" %provides% get_factory("test_1")
 
@@ -310,7 +309,7 @@ test_that("make_tests makes all tests", {
 test_that("make_tests fails on error", {
   reset()
 
-  "test_1" %provides% function() {"hello world"}
+  "test_1" %provides% function() "hello world"
 
   "test_1/mock" %provides% get_factory("test_1")
 
@@ -330,7 +329,7 @@ test_that("make_tests fails on error", {
 test_that("make_tests fails on malformed tests", {
   reset()
 
-  "test_1" %provides% function() {"hello world"}
+  "test_1" %provides% function() "hello world"
 
   "test_1/mock" %provides% get_factory("test_1")
 

@@ -2,7 +2,7 @@
 #'
 #' @export
 # TODO: write documentation
-make <- function(name = modulr_env$.Last.name) {
+make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
   .message_meta(sprintf("Entering make() for '%s' ...", name),
                 verbosity = +Inf)
@@ -19,7 +19,8 @@ make <- function(name = modulr_env$.Last.name) {
       all_dependencies <-
         .define_all_dependent_modules(name)
 
-    }, verbosity = 2)
+    },
+    verbosity = 2)
 
     if(.is_regular(name))
       assign(".Last.name", name, pos = modulr_env)
@@ -39,12 +40,10 @@ make <- function(name = modulr_env$.Last.name) {
       sprintf("found %d dependencies(s) with %d modules(s) on %d layer(s)",
               nrow(dependency_graph),
               length(unlist(layered_names)),
-              length(layered_names)),
-      {
+              length(layered_names)
+      ), {
 
         for(layer in names(layered_names)) {
-
-          layer_idx <- as.numeric(layer)
 
           ordered_names <- layered_names[[layer]]
 
@@ -73,7 +72,7 @@ make <- function(name = modulr_env$.Last.name) {
 
                 timestamp <- Sys.time()
 
-                env = new.env()
+                env <- new.env()
 
                 env$.__name__ <- ordered_name
 
@@ -107,7 +106,8 @@ make <- function(name = modulr_env$.Last.name) {
                 register[[ordered_name]] <- module
                 assign("register", register, pos = modulr_env)
 
-              }, verbosity = 1)
+              },
+              verbosity = 1)
 
             }
 
@@ -115,9 +115,11 @@ make <- function(name = modulr_env$.Last.name) {
 
         }
 
-      }, verbosity = 2)
+      },
+      verbosity = 2)
 
-  }, verbosity = 2)
+  },
+  verbosity = 2)
 
   invisible(.internals()$register[[name]]$instance)
 
@@ -143,7 +145,7 @@ make_all <- function(regexp, all = F, error = stop, ...) {
   module_names <- list_modules(regexp, all = all, wide = F)
 
   rs <- list()
-  for(name in module_names) {
+  for (name in module_names) {
 
     rs[[name]] <- tryCatch(make(name, ...),
                            error = error)
@@ -166,10 +168,10 @@ make_tests <- function(...) {
             call. = F, immediate. = T)
   }
 
-  module_names <- list_modules("/tests?$", all = F, wide = F)
+  module_names <- list_modules("\\/tests?$", all = F, wide = F)
 
   rs <- list()
-  for(name in module_names) {
+  for (name in module_names) {
 
     rs[[name]] <- tryCatch({
 
@@ -184,7 +186,9 @@ make_tests <- function(...) {
 
       invisible(T)
 
-    }, error = function(e) {
+    },
+
+    error = function(e) {
 
       message(sprintf("Error: %s", e$message))
 

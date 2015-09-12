@@ -8,17 +8,17 @@ test_that("list_modules can hide special modules", {
 
 test_that("list_modules sorts lexicographically", {
   reset()
-  define("a", NULL, function() {})
-  define("c", NULL, function() {})
-  define("b", NULL, function() {})
+  define("a", NULL, function() NULL)
+  define("c", NULL, function() NULL)
+  define("b", NULL, function() NULL)
   expect_equal(list_modules(all = F, wide = F), c("a", "b", "c"))
 })
 
 test_that("list_modules can filter by regexp", {
   reset()
-  define("hello_world", NULL, function() {})
-  define("hello", NULL, function() {})
-  define("world", NULL, function() {})
+  define("hello_world", NULL, function() NULL)
+  define("hello", NULL, function() NULL)
+  define("world", NULL, function() NULL)
   expect_equal(list_modules("^hello", all = F, wide = F),
                c("hello", "hello_world"))
   expect_equal(list_modules("world$", all = F, wide = F),

@@ -3,7 +3,7 @@
 
   assertthat::assert_that(assertthat::is.string(path))
 
-  paste0(gsub("/+$", "", file.path(path)), "/")
+  paste0(gsub("\\/+$", "", file.path(path)), "/")
 
 }
 
@@ -47,11 +47,11 @@
 
   root <- unique(c(root_config$get_all()[[1]], "."))
 
-  for(root_candidate in root) {
+  for (root_candidate in root) {
 
     candidate_path <- file.path(root_candidate, path)
 
-    for(ext in extensions) {
+    for (ext in extensions) {
 
       path_candidate <- paste0(candidate_path, ext)
 
@@ -82,30 +82,37 @@
 
   if(is.null(mappings)) return(name)
 
-  candidates <- Map(function(map) {
+  candidates <- Map(
+    function(map) {
 
-    reg <- regexpr(map, name)
+      reg <- regexpr(map, name)
 
-    list(
-      map = map,
-      start = as.integer(reg),
-      end = as.integer(reg) + attr(reg, "match.length") - 1)
+      list(
+        map = map,
+        start = as.integer(reg),
+        end = as.integer(reg) + attr(reg, "match.length") - 1)
 
-    }, names(mappings))
+    },
+    names(mappings))
 
   candidates <- Filter(function(candidate) {
     candidate$start == 1
-  }, candidates)
+  },
+  candidates)
 
   if(length(candidates) == 0) return(name)
 
-  maximum_length <- max(unlist(Map(function(candidate) {
-    candidate$end
-  }, candidates)))
+  maximum_length <- max(unlist(Map(
+    function(candidate) {
+      candidate$end
+    },
+    candidates)))
 
-  candidates <- Filter(function(candidate) {
-    candidate$end == maximum_length
-  }, candidates)
+  candidates <- Filter(
+    function(candidate) {
+      candidate$end == maximum_length
+    },
+    candidates)
 
   if(length(candidates) > 1) warning(
     "More than one matching mapping. ",
@@ -126,8 +133,6 @@
     is.null(scope_name) || assertthat::is.string(scope_name),
     assertthat::is.flag(absolute))
 
-  config <- .internals()$config
-
   if(is.null(scope_name)) injected_name <- name else
     injected_name <- .resolve_mapping(name, scope_name)
 
@@ -135,24 +140,26 @@
 
   injected_namespace <- parsed_injected_name$path
 
-  injected_basename <- parsed_injected_name$basename
+  candidates <- Map(
+    function(namespace) {
 
-  candidates <- Map(function(namespace) {
+      path <- .parse_filename(.make_path(namespace))$path
 
-    path <- .parse_filename(.make_path(namespace))$path
+      reg <- regexpr(path, injected_namespace)
 
-    reg <- regexpr(path, injected_namespace)
+      list(
+        namespace = namespace,
+        start = as.integer(reg),
+        end = as.integer(reg) + attr(reg, "match.length") - 1)
 
-    list(
-      namespace = namespace,
-      start = as.integer(reg),
-      end = as.integer(reg) + attr(reg, "match.length") - 1)
+    },
+    names(paths_config$get_all()))
 
-    }, names(paths_config$get_all()))
-
-  candidates <- Filter(function(candidate) {
-    candidate$start == 1
-  }, candidates)
+  candidates <- Filter(
+    function(candidate) {
+      candidate$start == 1
+    },
+    candidates)
 
   if(length(candidates) == 0) {
 
@@ -160,13 +167,17 @@
 
   } else {
 
-    maximum_length <- max(unlist(Map(function(candidate) {
-      candidate$end
-    }, candidates)))
+    maximum_length <- max(unlist(Map(
+      function(candidate) {
+        candidate$end
+      },
+      candidates)))
 
-    candidates <- Filter(function(candidate) {
-      candidate$end == maximum_length
-    }, candidates)
+    candidates <- Filter(
+      function(candidate) {
+        candidate$end == maximum_length
+      },
+      candidates)
 
     if(length(candidates) > 1) warning(
       "More than one matching namespace. ",

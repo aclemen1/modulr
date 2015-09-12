@@ -39,16 +39,16 @@ test_that(".parse_filename returns all the required stuff", {
                  basename = "foo.R",
                  name = "foo",
                  extension = "R"))
-  expect_equal(.parse_filename("/foo"),
+  expect_equal(.parse_filename("/foo"), # Exclude Linting
                list(
-                 filename = "/foo",
+                 filename = "/foo", # Exclude Linting
                  path = "/",
                  basename = "foo",
                  name = "foo",
                  extension = ""))
-  expect_equal(.parse_filename("/foo.R"),
+  expect_equal(.parse_filename("/foo.R"), # Exclude Linting
                list(
-                 filename = "/foo.R",
+                 filename = "/foo.R", # Exclude Linting
                  path = "/",
                  basename = "foo.R",
                  name = "foo",

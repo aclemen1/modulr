@@ -39,7 +39,7 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
 
     if(grepl("```\\s*\\{\\s*[rR]", script)) {
       # Rmd import
-      unnamed_chunk_label_opts = knitr::opts_knit$get("unnamed.chunk.label")
+      unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
       knitr::opts_knit$set("unnamed.chunk.label" =
                              paste("modulr", name, sep="/"))
       script <- knitr::knit(text = script,
