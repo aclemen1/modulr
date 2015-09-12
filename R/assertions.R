@@ -1,7 +1,7 @@
 # Test if a module is already defined.
 .is_defined <- function(name) {
   assertthat::assert_that(assertthat::is.string(name))
-  name %in% names(.internals()$register)
+  name %in% names(modulr_env$register)
 }
 
 assertthat::on_failure(.is_defined) <- function(call, env) {
@@ -31,7 +31,7 @@ assertthat::on_failure(.is_regular) <- function(call, env) {
 .is_regular_core <- function(name) {
   .is_regular(name) &&
     !grepl("\\/tests?$|\\/tests?\\/|\\/mocks?$|\\/mocks?\\/",
-           name, ignore.case = T)
+           name, ignore.case = TRUE)
 }
 
 assertthat::on_failure(.is_regular_core) <- function(call, env) {
@@ -61,6 +61,6 @@ assertthat::on_failure(.is_defined_regular) <- function(call, env) {
 
 # Test if a call is made from within a module
 .is_called_from_within_module <- function(call, env) {
-  isTRUE(exists(".__name__", inherits = T,
+  isTRUE(exists(".__name__", inherits = TRUE,
          mode = "character", envir = parent.frame(2)))
 }

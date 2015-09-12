@@ -26,7 +26,7 @@
 
     out <- paste0(out, msg)
 
-    message(out, appendLF = T)
+    message(out, appendLF = TRUE)
 
   }
 
@@ -48,7 +48,7 @@
     return(list(core = unlist(kwargs)))
   }
 
-  core <- unlist(kwargs[nchar(names(kwargs)) == 0], use.names = F)
+  core <- unlist(kwargs[nchar(names(kwargs)) == 0], use.names = FALSE)
 
   others <- kwargs[nchar(names(kwargs)) != 0]
 
@@ -77,7 +77,7 @@
 
     out <- paste0(out, paste0(kwargs$core, collapse = ""))
 
-    kwargs$fun(out, appendLF = T)
+    kwargs$fun(out, appendLF = TRUE)
 
   }
 
@@ -87,7 +87,8 @@
   .message(..., fun = function(...) message(...))
 
 .message_warn <- function(...)
-  .message(..., fun = function(...) warning(..., immediate. = T, call. = F))
+  .message(..., fun = function(...) warning(..., immediate. = TRUE,
+                                            call. = FALSE))
 
 .message_stop <- function(...)
-  .message(..., fun = function(...) stop(..., call. = F))
+  .message(..., fun = function(...) stop(..., call. = FALSE))

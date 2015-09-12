@@ -1,7 +1,7 @@
 context("internals")
 
-test_that(".internals returns a list of internals", {
-  internals <- .internals()
+test_that("get_internals() returns a list of internals", {
+  internals <- get_internals()
   expect_true(length(
     setdiff(names(internals),
             c("env", "register", "config", "verbosity"))) == 0)
@@ -11,18 +11,18 @@ test_that(".internals returns a list of internals", {
   expect_true(is.numeric(internals$verbosity))
 })
 
-test_that(".internals$env returns the modulr env", {
-  expect_equal(.internals()$env, modulr_env)
+test_that("get_internals()$env returns the modulr env", {
+  expect_equal(get_internals()$env, modulr_env)
   })
 
-test_that(".internals$register returns the register", {
-  expect_equal(.internals()$register, modulr_env$register)
+test_that("get_internals()$register returns the register", {
+  expect_equal(get_internals()$register, modulr_env$register)
 })
 
-test_that(".internals$config returns the configurations", {
-  expect_equal(.internals()$config, modulr_env$config)
+test_that("get_internals()$config returns the configurations", {
+  expect_equal(get_internals()$config, modulr_env$config)
 })
 
-test_that(".internals$verbosity returns the verbosity level", {
-  expect_equal(.internals()$verbosity, modulr_env$verbosity)
+test_that("get_internals()$verbosity returns the verbosity level", {
+  expect_equal(get_internals()$verbosity, modulr_env$verbosity)
 })

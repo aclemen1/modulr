@@ -117,7 +117,7 @@
   if(length(candidates) > 1) warning(
     "More than one matching mapping. ",
     "Considering only the first occurence.",
-    call. = F, immediate. = T)
+    call. = FALSE, immediate. = TRUE)
 
   matching_map <- candidates[[1]]$map
 
@@ -126,7 +126,7 @@
 }
 
 # From a module name, we want to infer its (absolute) path.
-.resolve_path <- function(name, scope_name = NULL, absolute = T, ...) {
+.resolve_path <- function(name, scope_name = NULL, absolute = TRUE, ...) {
 
   assertthat::assert_that(
     assertthat::is.string(name),

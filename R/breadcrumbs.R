@@ -2,7 +2,7 @@
 #'
 #' @export
 # TODO: write documentation
-.__breadcrumbs__ <- function(void, verbose = T) {
+get_breadcrumbs <- function(void, verbose = TRUE) {
 
   assertthat::assert_that(assertthat::is.flag(verbose))
 
@@ -11,7 +11,7 @@
       Filter(function(x) !is.na(x) & !(x %in% c("modulr")),
              lapply(sys.frames(), function(frame) {
                .get_0(".__name__", envir = frame,
-                    ifnotfound = NA, inherits = T)
+                    ifnotfound = NA, inherits = TRUE)
              }))))
 
   if(length(bc) & verbose)
@@ -28,15 +28,10 @@
 
   if(is.null(handler)) return(F)
 
-  any(grepl("\\.\\_\\_breadcrumbs\\_\\_\\(\"installed\"\\)", format(handler)))
+  any(grepl("modulr\\:\\:get\\_breadcrumbs\\(\"installed\"\\)",
+            format(handler)))
 
 }
-
-#' Get and show breadcrumbs
-#'
-#' @export
-# TODO: write documentation
-breadcrumbs <- .__breadcrumbs__
 
 #' Activate breadcrumbs
 #'
@@ -50,13 +45,13 @@ activate_breadcrumbs <- function() {
 
     if(is.null(handler)) {
       wrapper <- function() {
-        .__breadcrumbs__("installed")
+        modulr::get_breadcrumbs("installed")
       }
 
     } else {
 
       wrapper <- function() {
-        .__breadcrumbs__("installed")
+        modulr::get_breadcrumbs("installed")
         eval(parse(text = deparse(handler)), envir = parent.frame())
       }
 

@@ -1,6 +1,6 @@
 #' @export
 # TODO: write documentation
-list_modules <- function(regexp, all = T, wide = T, full = F,
+list_modules <- function(regexp, all = TRUE, wide = TRUE, full = FALSE,
                          cols = c(
                            "name",
                            "type",
@@ -35,7 +35,7 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
         "digest")),
     msg = "an invalid column name is specified.")
 
-  register <- .internals()$register
+  register <- modulr_env$register
 
   flat <- names(register)
 
@@ -43,7 +43,7 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
     flat <- setdiff(flat, RESERVED_NAMES)
 
   if(!missing(regexp))
-    flat <- grep(paste0(regexp), flat, value = T)
+    flat <- grep(paste0(regexp), flat, value = TRUE)
 
   if(assertthat::not_empty(flat)) {
 
@@ -96,7 +96,7 @@ list_modules <- function(regexp, all = T, wide = T, full = F,
         modified = modified,
         duration = durations,
         digest = digests,
-        stringsAsFactors = F,
+        stringsAsFactors = FALSE,
         row.names = NULL)
 
       data <- data[order(data$name), ]

@@ -198,6 +198,16 @@ test_that("reset purges the register", {
 
   })
 
+test_that("reset(all=T) purges the stashes", {
+  reset(all = T)
+  expect_equal(length(modulr_env$stash), 0)
+  stash()
+  reset(all = F)
+  expect_false(length(modulr_env$stash) == 0)
+  reset(all = T)
+  expect_equal(length(modulr_env$stash), 0)
+})
+
 test_that("undefine removes the module definition from the register", {
   define(
     "some/module",

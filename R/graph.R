@@ -2,7 +2,7 @@
 #'
 #' @export
 # TODO: write documentation
-graph_dependencies <- function(group, special = T) {
+graph_dependencies <- function(group, special = TRUE) {
 
   .message_meta("Entering graph_dependencies() ...",
                 verbosity = +Inf)
@@ -14,7 +14,7 @@ graph_dependencies <- function(group, special = T) {
 
   if(.is_called_from_within_module()) {
     warning("graph_dependencies is called from within a module.",
-            call. = F, immediate. = T)
+            call. = FALSE, immediate. = TRUE)
   }
 
   assertthat::assert_that(
@@ -22,13 +22,13 @@ graph_dependencies <- function(group, special = T) {
     assertthat::is.flag(special)
   )
 
-  universe <- .internals()$register
+  universe <- modulr_env$register
 
   if(!missing(group)) {
 
     sub <- .define_all_dependent_modules(group)
 
-    register <- .internals()$register
+    register <- modulr_env$register
 
     universe <- register[names(register) %in% sub]
 
@@ -44,7 +44,7 @@ graph_dependencies <- function(group, special = T) {
       data.frame(module=deps, dependency=rep(module$name, length(deps)),
                  # MAYBE: adapt values for nicer output
                  value = rep(1, length(deps)),
-                 stringsAsFactors = F)
+                 stringsAsFactors = FALSE)
 
     },
 

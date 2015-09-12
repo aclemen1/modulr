@@ -15,7 +15,7 @@
 
   }
 
-  set <- function(..., drop = T) {
+  set <- function(..., drop = TRUE) {
 
     .message_meta("Entering .config$set() ...",
                   verbosity = +Inf)
@@ -157,7 +157,7 @@ module_option <- function(name) {
     msg = "right-hand side of `%has_default_option%` is not a list."
   )
 
-  module_option(lhs)$set(rhs, drop = F)
+  module_option(lhs)$set(rhs, drop = FALSE)
 
 }
 
@@ -183,7 +183,7 @@ module_option <- function(name) {
     msg = "right-hand side of `%has_option%` is not a list."
   )
 
-  module_option(lhs)$set(rhs, drop = T)
+  module_option(lhs)$set(rhs, drop = TRUE)
 
 }
 

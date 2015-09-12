@@ -1,11 +1,11 @@
 #' @export
-import_module <- function(name, url, digest = NULL, force = F, ...) {
+import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
 
   .message_meta(sprintf("Entering import_module() for '%s' ...", name),
                 verbosity = +Inf)
 
   if(.is_called_from_within_module()) {
-    stop("import_module is called from within a module.", call. = F)
+    stop("import_module is called from within a module.", call. = FALSE)
   }
 
   assertthat::assert_that(
@@ -15,7 +15,7 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
     assertthat::is.flag(force)
   )
 
-  try(load_module(name), silent = T)
+  try(load_module(name), silent = TRUE)
 
   if(force && .is_defined(name))
     undefine(name)
@@ -35,7 +35,7 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
 
     script <- httr::content(result, as = "text")
 
-    register <- .internals()$register
+    register <- modulr_env$register
 
     if(grepl("```\\s*\\{\\s*[rR]", script)) {
       # Rmd import
@@ -43,7 +43,7 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
       knitr::opts_knit$set("unnamed.chunk.label" =
                              paste("modulr", name, sep="/"))
       script <- knitr::knit(text = script,
-                            tangle = T, quiet = T)
+                            tangle = TRUE, quiet = TRUE)
       knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
     }
 
@@ -60,13 +60,13 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
     if(.is_undefined(name)) {
       assign("register", register, pos = modulr_env)
       stop(sprintf("module '%s' cannot be found. Rolling back.", name),
-           call. = F)
+           call. = FALSE)
     }
 
     if(!is.null(digest) && isTRUE(get_digest(name) != digest)) {
       assign("register", register, pos = modulr_env)
       stop(sprintf("digest is not matching. Rolling back.", name),
-           call. = F)
+           call. = FALSE)
     }
 
     return(invisible(ev))
@@ -82,7 +82,7 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
 
   if(.is_called_from_within_module()) {
     warning("`%imports%` is called from within a module.",
-            call. = F, immediate. = T)
+            call. = FALSE, immediate. = TRUE)
   }
 
   assertthat::assert_that(
@@ -104,7 +104,7 @@ import_module <- function(name, url, digest = NULL, force = F, ...) {
     digest <- NULL
   }
 
-  import_module(name = name, digest = digest, url = rhs, force = F)
+  import_module(name = name, digest = digest, url = rhs, force = FALSE)
 
 }
 

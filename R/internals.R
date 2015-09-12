@@ -1,7 +1,7 @@
 #' Get internals
 #'
 #' @export
-.internals <- function() {
+get_internals <- function() {
 
   list(
     env = modulr_env,

@@ -4,7 +4,7 @@
 \alias{reset}
 \title{Remove all module definitions.}
 \usage{
-reset(all = F, verbose = T)
+reset(all = FALSE, verbose = TRUE)
 }
 \description{
 Remove all module definitions.

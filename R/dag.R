@@ -9,7 +9,7 @@
 
   for (name in all_dependencies) {
 
-    dependencies <- .internals()$register[[name]]$dependencies
+    dependencies <- modulr_env$register[[name]]$dependencies
 
     if(isTRUE(length(dependencies) > 0)) {
 
@@ -26,7 +26,7 @@
   data.frame(
     module = module,
     dependency = dependency,
-    stringsAsFactors = F
+    stringsAsFactors = FALSE
   )
 
 }
@@ -41,7 +41,7 @@
 
   if(nrow(graph) > 0) {
 
-    node <- unique(unlist(graph, use.names = F))
+    node <- unique(unlist(graph, use.names = FALSE))
     node_length <- length(node)
 
     nodes <-
@@ -49,12 +49,12 @@
         node = node,
         dependency = node,
         deps_idx = 1,
-        stringsAsFactors = F)
+        stringsAsFactors = FALSE)
 
     while(!all(is.na(nodes$dependency))) {
 
       names(nodes)[names(nodes) == "dependency"] <- "module"
-      nodes <- merge(nodes, graph, by = "module", all.x = T)
+      nodes <- merge(nodes, graph, by = "module", all.x = TRUE)
       nodes <- nodes[, names(nodes) != "module"]
       nodes <- transform(
         nodes,
@@ -62,7 +62,7 @@
           is.na(nodes$dependency), nodes$deps_idx, nodes$deps_idx + 1))
 
       if(max(nodes$deps_idx) > node_length)
-        stop("Cycle detected.", call. = F)
+        stop("Cycle detected.", call. = FALSE)
 
     }
 
@@ -100,7 +100,7 @@
 
   assertthat::assert_that(is.null(group) || is.character(group))
 
-  register <- .internals()$register
+  register <- modulr_env$register
 
   table(
 

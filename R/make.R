@@ -9,7 +9,7 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
   if(.is_called_from_within_module()) {
     warning("make is called from within a module.",
-            call. = F, immediate. = T)
+            call. = FALSE, immediate. = TRUE)
   }
 
   .message_meta(sprintf("Making '%s' ...", name), {
@@ -25,7 +25,7 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
     if(.is_regular(name))
       assign(".Last.name", name, pos = modulr_env)
 
-    register <- .internals()$register
+    register <- modulr_env$register
 
     register[[name]]$calls <- register[[name]]$calls + 1
     assign("register", register, pos = modulr_env)
@@ -53,7 +53,7 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
             assertthat::assert_that(.is_defined(ordered_name))
 
-            register <- .internals()$register
+            register <- modulr_env$register
 
             module <- register[[ordered_name]]
 
@@ -96,7 +96,7 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
                 module$instance <- do.call(
                   module[["factory"]],
-                  args = args, quote = T, envir = env)
+                  args = args, quote = TRUE, envir = env)
 
                 module$duration <- as.numeric(Sys.time() - timestamp)
                 module$instanciated <- T
@@ -121,20 +121,20 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
   },
   verbosity = 2)
 
-  invisible(.internals()$register[[name]]$instance)
+  invisible(modulr_env$register[[name]]$instance)
 
 }
 
 #' @export
 # TODO: write documentation
-make_all <- function(regexp, all = F, error = stop, ...) {
+make_all <- function(regexp, all = FALSE, error = stop, ...) {
 
   .message_meta("Entering make_all() ...",
                 verbosity = +Inf)
 
   if(.is_called_from_within_module()) {
     warning("make_all is called from within a module.",
-            call. = F, immediate. = T)
+            call. = FALSE, immediate. = TRUE)
   }
 
   assertthat::assert_that(
@@ -142,7 +142,7 @@ make_all <- function(regexp, all = F, error = stop, ...) {
     assertthat::is.flag(all),
     is.function(error))
 
-  module_names <- list_modules(regexp, all = all, wide = F)
+  module_names <- list_modules(regexp, all = all, wide = FALSE)
 
   rs <- list()
   for (name in module_names) {
@@ -165,10 +165,10 @@ make_tests <- function(...) {
 
   if(.is_called_from_within_module()) {
     warning("make_tests is called from within a module.",
-            call. = F, immediate. = T)
+            call. = FALSE, immediate. = TRUE)
   }
 
-  module_names <- list_modules("\\/tests?$", all = F, wide = F)
+  module_names <- list_modules("\\/tests?$", all = FALSE, wide = FALSE)
 
   rs <- list()
   for (name in module_names) {
@@ -198,7 +198,7 @@ make_tests <- function(...) {
 
   }
 
-  if(!all(unlist(rs))) stop("FAILED.", call. = F)
+  if(!all(unlist(rs))) stop("FAILED.", call. = FALSE)
 
   if(sample(5, 1) == 1) {
     message("PASSED. ", sample(PRAISE, 1), ".")
@@ -222,7 +222,7 @@ make_test <- make_tests
 
   if(.is_called_from_within_module()) {
     warning("make is called from within a module.",
-            call. = F, immediate. = T)
+            call. = FALSE, immediate. = TRUE)
   }
 
   assertthat::assert_that(
@@ -249,7 +249,7 @@ make_test <- make_tests
 
   if(.is_called_from_within_module()) {
     warning("make is called from within a module.",
-            call. = F, immediate. = T)
+            call. = FALSE, immediate. = TRUE)
   }
 
   assertthat::assert_that(
@@ -258,7 +258,7 @@ make_test <- make_tests
   )
 
   assign(as.character(substitute(lhs)), make(rhs),
-         pos = parent.frame(), inherits = T)
+         pos = parent.frame(), inherits = TRUE)
 
 }
 

@@ -9,7 +9,7 @@ load_module <- function(name) {
 
   if(.is_called_from_within_module()) {
     warning("`%imports%` is called from within a module.",
-            call. = F, immediate. = T)
+            call. = FALSE, immediate. = TRUE)
   }
 
   if(.is_regular(name)) {
@@ -32,9 +32,9 @@ load_module <- function(name) {
         tmp_file <- tempfile(fileext = ".R")
         source(knitr::knit(path,
                            output = tmp_file,
-                           tangle = T, quiet = T))
+                           tangle = TRUE, quiet = TRUE))
 
-        try(unlink(tmp_file), silent = T)
+        try(unlink(tmp_file), silent = TRUE)
 
         knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
 

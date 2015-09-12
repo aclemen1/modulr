@@ -33,7 +33,6 @@ stash <- function(comment = NA_character_) {
 # TODO: test that
 # TODO: write documentation
 unstash <- function(id = length(modulr_env$stash)) {
-
   .message_meta("Entering unstash() ...",
                 verbosity = +Inf)
 
@@ -43,7 +42,7 @@ unstash <- function(id = length(modulr_env$stash)) {
   assertthat::assert_that(assertthat::is.count(id))
   assertthat::assert_that(id <= len, msg = "id is out of bounds.")
 
-  stash <- modulr_env$stash[[len]]
+  stash <- modulr_env$stash[[id]]
 
   .message_meta(sprintf("Unstashing modulr state, stash #%s ...", id),
                 verbosity = 2)

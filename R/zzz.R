@@ -1,6 +1,6 @@
 .onLoad <- function(libname, pkgname) {
 
-  reset(all = T, verbose = F)
+  reset(all = TRUE, verbose = FALSE)
 
   activate_breadcrumbs()
 
