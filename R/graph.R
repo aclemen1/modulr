@@ -2,7 +2,7 @@
 #'
 #' @export
 # TODO: write documentation
-graph_dependencies <- function(group, special = TRUE) {
+graph_dependencies <- function(group, reserved = TRUE) {
 
   .message_meta("Entering graph_dependencies() ...",
                 verbosity = +Inf)
@@ -21,7 +21,7 @@ graph_dependencies <- function(group, special = TRUE) {
 
   assertthat::assert_that(
     missing(group) || is.character(group),
-    assertthat::is.flag(special)
+    assertthat::is.flag(reserved)
   )
 
   universe <- modulr_env$register
@@ -52,7 +52,7 @@ graph_dependencies <- function(group, special = TRUE) {
 
     universe))
 
-    if (!special) {
+    if (!reserved) {
 
       deps <-
         deps[!(deps$module %in% RESERVED_NAMES |

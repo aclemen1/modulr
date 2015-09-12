@@ -17,14 +17,24 @@ assertthat::on_failure(.is_undefined) <- function(call, env) {
   paste0(deparse(eval(call$name, envir = env)), " is defined.")
 }
 
+.is_conform <- function(name) {
+  assertthat::assert_that(assertthat::is.string(name))
+  !grepl("[^a-zA-Z0-9_/-]", name)
+}
+
+assertthat::on_failure(.is_conform) <- function(call, env) {
+  paste0(deparse(eval(call$name, envir = env)),
+         " contains reserved characters.")
+}
+
 # Test if a module has a regular name.
 .is_regular <- function(name) {
   assertthat::assert_that(assertthat::is.string(name))
-  !(name %in% RESERVED_NAMES) & !grepl("[^a-zA-Z0-9_/-]", name)
+  !(name %in% RESERVED_NAMES) & .is_conform(name)
 }
 
 assertthat::on_failure(.is_regular) <- function(call, env) {
-  paste0(deparse(eval(call$name, envir = env)), " is special.")
+  paste0(deparse(eval(call$name, envir = env)), " is reserved.")
 }
 
 # Test if a module has a regular name which is not intended for testing
@@ -36,16 +46,16 @@ assertthat::on_failure(.is_regular) <- function(call, env) {
 
 assertthat::on_failure(.is_regular_core) <- function(call, env) {
   paste0(deparse(eval(call$name, envir = env)),
-         " is special or intended for testing purposes.")
+         " is reserved or intended for testing purposes.")
 }
 
-# Test if a module name is special.
-.is_special <- function(name) {
-  !.is_regular(name)
+# Test if a module name is reserved.
+.is_reserved <- function(name) {
+  name %in% RESERVED_NAMES
 }
 
-assertthat::on_failure(.is_special) <- function(call, env) {
-  paste0(deparse(eval(call$name, envir = env)), " is regular.")
+assertthat::on_failure(.is_reserved) <- function(call, env) {
+  paste0(deparse(eval(call$name, envir = env)), " is not reserved.")
 }
 
 # Test if a module is defined and has a regular name.
@@ -56,7 +66,7 @@ assertthat::on_failure(.is_special) <- function(call, env) {
 assertthat::on_failure(.is_defined_regular) <- function(call, env) {
   paste0(
     deparse(eval(call$name, envir = env)),
-    " is undefined and/or special.")
+    " is undefined and/or reserved.")
 }
 
 # Test if a call is made from within a module

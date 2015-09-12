@@ -1,3 +1,5 @@
+RESERVED_NAMES <- c("modulr")
+
 # TODO: write documentation
 
 .define_modulr <- function() {

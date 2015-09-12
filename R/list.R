@@ -1,6 +1,6 @@
 #' @export
 # TODO: write documentation
-list_modules <- function(regexp, all = TRUE, wide = TRUE, full = FALSE,
+list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
                          cols = c(
                            "name",
                            "type",
@@ -17,7 +17,7 @@ list_modules <- function(regexp, all = TRUE, wide = TRUE, full = FALSE,
 
   assertthat::assert_that(
     missing(regexp) || assertthat::is.string(regexp),
-    assertthat::is.flag(all),
+    assertthat::is.flag(reserved),
     assertthat::is.flag(wide),
     assertthat::is.flag(full))
 
@@ -43,7 +43,7 @@ list_modules <- function(regexp, all = TRUE, wide = TRUE, full = FALSE,
 
   flat <- names(register)
 
-  if(!all)
+  if(!reserved)
     flat <- setdiff(flat, RESERVED_NAMES)
 
   if(!missing(regexp))

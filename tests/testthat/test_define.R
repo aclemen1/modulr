@@ -51,7 +51,7 @@ test_that("get_digest calls are warned from within a module", {
   expect_warning(make("module"))
 })
 
-test_that("define does not re-define special modules", {
+test_that("define does not re-define reserved modules", {
   reset()
   expect_error(define("modulr", list(), function() NULL))
 })
@@ -280,7 +280,7 @@ test_that("undefine removes only registered modules", {
 
 })
 
-test_that("undefine removes only non special modules", {
+test_that("undefine removes only non reserved modules", {
   reset()
 
   expect_error(undefine("modulr"))
@@ -335,7 +335,7 @@ test_that("touch updates only registered modules", {
 
 })
 
-test_that("touch updates only non special modules", {
+test_that("touch updates only non reserved modules", {
   reset()
 
   expect_error(touch("modulr"))

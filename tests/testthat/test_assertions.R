@@ -12,10 +12,17 @@ test_that(".is_undefined detects undefined modules", {
   expect_true(.is_undefined("undefined/module"))
 })
 
-test_that(".is_special detects special module names", {
+test_that(".is_conform detects conform module names", {
   reset()
-  expect_true(.is_special("modulr"))
-  expect_false(.is_special("foo"))
+  expect_true(.is_conform("modulr"))
+  expect_true(.is_conform("foo"))
+  expect_false(.is_conform(".foo"))
+})
+
+test_that(".is_reserved detects reserved module names", {
+  reset()
+  expect_true(.is_reserved("modulr"))
+  expect_false(.is_reserved("foo"))
 })
 
 test_that(".is_regular detects regular module names", {

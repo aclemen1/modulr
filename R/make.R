@@ -127,7 +127,7 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
 #' @export
 # TODO: write documentation
-make_all <- function(regexp, all = FALSE, error = stop, ...) {
+make_all <- function(regexp, reserved = FALSE, error = stop, ...) {
 
   .message_meta("Entering make_all() ...",
                 verbosity = +Inf)
@@ -139,10 +139,10 @@ make_all <- function(regexp, all = FALSE, error = stop, ...) {
 
   assertthat::assert_that(
     missing(regexp) || assertthat::is.string(regexp),
-    assertthat::is.flag(all),
+    assertthat::is.flag(reserved),
     is.function(error))
 
-  module_names <- list_modules(regexp, all = all, wide = FALSE)
+  module_names <- list_modules(regexp, reserved = reserved, wide = FALSE)
 
   rs <- list()
   for (name in module_names) {
@@ -168,7 +168,7 @@ make_tests <- function(...) {
             call. = FALSE, immediate. = TRUE)
   }
 
-  module_names <- list_modules("\\/tests?$", all = FALSE, wide = FALSE)
+  module_names <- list_modules("\\/tests?$", reserved = FALSE, wide = FALSE)
 
   rs <- list()
   for (name in module_names) {

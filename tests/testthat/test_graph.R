@@ -39,8 +39,8 @@ test_that("correct Sankey graph is returned for the whole register", {
          function(m1, m2) NULL)
 
   expect_equal(graph_dependencies(), graph_dependencies("module_layer3_1"))
-  expect_equal(graph_dependencies(special = FALSE),
-               graph_dependencies("module_layer3_1", special = FALSE))
+  expect_equal(graph_dependencies(reserved = FALSE),
+               graph_dependencies("module_layer3_1", reserved = FALSE))
 
 })
 

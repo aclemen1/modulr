@@ -72,6 +72,10 @@ define <- function(name, dependencies, factory) {
     is.function(factory))
 
   assertthat::assert_that(
+    .is_regular(name) | .is_reserved(name),
+    msg = "module name is not regular nor reserved.")
+
+  assertthat::assert_that(
     is.null(dependencies) || is.list(dependencies),
     is.function(factory)
     )

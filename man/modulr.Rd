@@ -2,14 +2,14 @@
 % Please edit documentation in R/modulr.R
 \docType{package}
 \name{modulr}
-\alias{RESERVED_NAMES}
 \alias{modulr}
 \alias{modulr-package}
+\alias{modulr_env}
 \title{modulr -- Module Pattern and DI in R}
-\format{\preformatted{ chr "modulr"
+\format{\preformatted{<environment: 0x34cc708> 
 }}
 \usage{
-RESERVED_NAMES
+modulr_env
 }
 \description{
 modulr is a Module Pattern and Dependency Injection implementation in R.

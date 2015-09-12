@@ -1,4 +1,4 @@
-context("special")
+context("reserved")
 
 test_that("$get_module_name returns the module name", {
   reset()
