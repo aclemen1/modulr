@@ -65,7 +65,8 @@ test_that("define writes to the register", {
     list(dep = "foo/bar"),
     function(dep) {
       return(dep)
-    })
+    },
+    compress = NULL)
 
   register <- get("register", pos = modulr_env)
   module <- register[["some/module"]]
@@ -84,6 +85,36 @@ test_that("define writes to the register", {
   expect_more_than(module$timestamp, timestamp)
 })
 
+test_that("define can compress the factory", {
+  reset()
+  timestamp <- Sys.time()
+
+  define(
+    "some/module",
+    list(dep = "foo/bar"),
+    function(dep) {
+      return(dep)
+    },
+    compress = "gzip")
+
+  register <- get("register", pos = modulr_env)
+  module <- register[["some/module"]]
+
+  expect_equal(module$name, "some/module")
+  expect_equal(module$name, "some/module")
+  expect_equal(module$dependencies, list(dep = "foo/bar"))
+  expect_equal(module$factory, .compress(function(dep) {
+    return(dep)
+  },
+  type = "gzip"))
+  expect_equal(module$digest, get_digest("some/module"))
+  expect_true(is.null(module$instance))
+  expect_false(module$instanciated)
+  expect_true(module$first_instance)
+  expect_less_than(module$timestamp, Sys.time())
+  expect_more_than(module$timestamp, timestamp)
+})
+
 test_that("re-define doesn't write to the register when no changes occur", {
   reset()
 
@@ -94,7 +125,8 @@ test_that("re-define doesn't write to the register when no changes occur", {
     list(dep = "foo/bar"),
     function(dep) {
       return(dep)
-    })
+    },
+    compress = NULL)
 
   timestamp_2 <- Sys.time()
 
@@ -103,7 +135,8 @@ test_that("re-define doesn't write to the register when no changes occur", {
     list(dep = "foo/bar"),
     function(dep) {
       return(dep)
-    })
+    },
+    compress = NULL)
 
   register <- get("register", pos = modulr_env)
   module <- register[["some/module"]]
@@ -131,7 +164,8 @@ test_that("re-define writes to the register when changes occur", {
     list(dep = "foo/bar"),
     function(dep) {
       return(dep)
-    })
+    },
+    compress = NULL)
 
   timestamp <- Sys.time()
 
@@ -140,7 +174,8 @@ test_that("re-define writes to the register when changes occur", {
     list(dep = "foo/bar"),
     function(dep) {
       return(sprintf("%s", dep))
-    })
+    },
+    compress = NULL)
 
   register <- get("register", pos = modulr_env)
   module <- register[["some/module"]]
@@ -171,6 +206,37 @@ test_that("define calls are warned from within a module", {
   expect_warning(make("module"))
 })
 
+test_that("define with compression change re-defines module", {
+  reset()
+
+  define(
+    "some/module",
+    list(dep = "foo/bar"),
+    function(dep) {
+      return(dep)
+    },
+    compress = NULL)
+
+  expect_equal(get_factory("some/module"),
+               function(dep) {
+                 return(dep)
+               })
+
+  timestamp <- modulr_env$register[[c("some/module", "timestamp")]]
+
+  define(
+    "some/module",
+    list(dep = "foo/bar"),
+    function(dep) {
+      return(dep)
+    },
+    compress = "gzip")
+
+  expect_true(modulr_env$register[[c("some/module", "timestamp")]] > timestamp)
+
+
+})
+
 test_that("get_factory returns the body of the module", {
   reset()
 
@@ -179,14 +245,30 @@ test_that("get_factory returns the body of the module", {
     list(dep = "foo/bar"),
     function(dep) {
       return(dep)
-    })
+    },
+    compress = NULL)
 
   expect_equal(get_factory("some/module"),
                function(dep) {
                  return(dep)
                })
 
-})
+  reset()
+
+  define(
+    "some/module",
+    list(dep = "foo/bar"),
+    function(dep) {
+      return(dep)
+    },
+    compress = "gzip")
+
+  expect_equal(get_factory("some/module"),
+               function(dep) {
+                 return(dep)
+               })
+
+  })
 
 test_that("get_factory is able to find an undefined module", {
   reset()

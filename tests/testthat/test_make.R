@@ -37,7 +37,8 @@ test_that("make writes to the register", {
     list(),
     function() {
       return("foo")
-    })
+    },
+    compress = NULL)
 
   timestamp <- Sys.time()
 

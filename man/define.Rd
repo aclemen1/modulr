@@ -4,7 +4,7 @@
 \alias{define}
 \title{Define a module.}
 \usage{
-define(name, dependencies, factory)
+define(name, dependencies, factory, compress = "gzip")
 }
 \arguments{
 \item{name}{the module name, given as a character string.}

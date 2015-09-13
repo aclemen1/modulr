@@ -76,14 +76,15 @@ list_modules <-
       sizes <-
         do.call(c, Map(function(name)
           (if(formatted) function(x) format(x, units = "auto") else identity)(
-            object.size(modulr_env$register[[c(name, "factory")]])), flat))
+            utils::object.size(
+              modulr_env$register[[c(name, "factory")]])), flat))
 
       weights <-
         do.call(c, Map(function(name)
           ifelse(
             modulr_env$register[[c(name, "instanciated")]],
             (if(formatted) function(x) format(x, units = "auto") else identity)(
-              object.size(modulr_env$register[[c(name, "instance")]])),
+              utils::object.size(modulr_env$register[[c(name, "instance")]])),
             NA_character_), flat))
 
       deparsed_factories <-

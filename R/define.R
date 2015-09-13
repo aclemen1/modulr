@@ -28,9 +28,14 @@ get_digest <- function(name, load = FALSE) {
 
   assertthat::assert_that(.is_defined(name))
 
+  factory <- modulr_env$register[[c(name, "factory")]]
+  if(!is.null(modulr_env$register[[c(name, "compressed")]]))
+    factory <- .decompress(
+      factory, modulr_env$register[[c(name, "compressed")]])
+
   .hash(c(
     deparse(modulr_env$register[[c(name, "dependencies")]]),
-    deparse(modulr_env$register[[c(name, "factory")]])))
+    deparse(factory)))
 
 }
 
@@ -53,7 +58,7 @@ get_digest <- function(name, load = FALSE) {
 #' m2()
 #' @export
 # TODO: write the documentation
-define <- function(name, dependencies, factory) {
+define <- function(name, dependencies, factory, compress = "gzip") {
 
   .message_meta(sprintf("Entering define() for '%s' ...", name),
                 verbosity = +Inf)
@@ -62,6 +67,13 @@ define <- function(name, dependencies, factory) {
     warning("define is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
+
+  assertthat::assert_that(
+    is.null(compress) ||
+      compress %in% c("gzip", c("gzip", "bzip2", "xz")),
+    msg = paste0("compress can take the following values: ",
+                 "NULL, \"gzip\", \"bzip2\" or \"xz\".")
+    )
 
   assertthat::assert_that(
     assertthat::is.string(name),
@@ -88,25 +100,50 @@ define <- function(name, dependencies, factory) {
 
   timestamp <- Sys.time()
 
+  store <- function(factory) {
+    if(!is.null(compress)) {
+      if(.is_regular(name))
+        .message_meta(sprintf("Compressing definition factory ... "),
+                      verbosity = 2)
+      pack <- .compress(factory, type = compress)
+      factory_size <- utils::object.size(factory)
+      pack_size <- utils::object.size(pack)
+      if(.is_regular(name))
+        .message_meta(
+          sprintf(
+            "Compression factor: %.0fx (%s instead of %s)",
+            factory_size / pack_size,
+            format(pack_size, units = "auto"),
+            format(factory_size, units = "auto")),
+          verbosity = 2)
+      pack
+    } else factory
+  }
+
   if(.is_undefined(name)) {
 
-    if(.is_regular(name))
-      .message_meta(sprintf("Defining '%s' ...", name), verbosity = 2)
+    .message_meta(
+      sprintf("Defining '%s' ...", name), {
+        modulr_env$register[[name]] <- list()
+        modulr_env$register[[c(name, "name")]] <- name
+        modulr_env$register[[c(name, "dependencies")]] <- dependencies
+        modulr_env$register[[c(name, "compressed")]] <- compress
+        modulr_env$register[[c(name, "factory")]] <- store(factory)
+        modulr_env$register[[c(name, "digest")]] <- .hash(c(
+          deparse(dependencies),
+          deparse(factory)))
+        modulr_env$register[[c(name, "instance")]] <- NULL
+        modulr_env$register[[c(name, "instanciated")]] <- F
+        modulr_env$register[[c(name, "calls")]] <- 0
+        modulr_env$register[[c(name, "duration")]] <- NA_integer_
+        modulr_env$register[[c(name, "first_instance")]] <- T
+        modulr_env$register[[c(name, "timestamp")]] <- timestamp
+        modulr_env$register[[c(name, "created")]] <- timestamp
 
-    modulr_env$register[[name]] <- list()
-    modulr_env$register[[c(name, "name")]] <- name
-    modulr_env$register[[c(name, "dependencies")]] <- dependencies
-    modulr_env$register[[c(name, "factory")]] <- factory
-    modulr_env$register[[c(name, "digest")]] <- .hash(c(
-      deparse(dependencies),
-      deparse(factory)))
-    modulr_env$register[[c(name, "instance")]] <- NULL
-    modulr_env$register[[c(name, "instanciated")]] <- F
-    modulr_env$register[[c(name, "calls")]] <- 0
-    modulr_env$register[[c(name, "duration")]] <- NA_integer_
-    modulr_env$register[[c(name, "first_instance")]] <- T
-    modulr_env$register[[c(name, "timestamp")]] <- timestamp
-    modulr_env$register[[c(name, "created")]] <- timestamp
+    },
+    verbosity = ifelse(.is_regular(name), 2, 3))
+
+
 
   } else if(.is_regular(name)) {
 
@@ -114,19 +151,24 @@ define <- function(name, dependencies, factory) {
     digest <- .hash(c(
       deparse(dependencies),
       deparse(factory)))
-    if(digest != previous_digest) {
+    if(digest != previous_digest ||
+         ifelse(is.null(compress), "", compress) !=
+         ifelse(is.null(modulr_env$register[[c(name, "compressed")]]),
+                "", modulr_env$register[[c(name, "compressed")]])) {
 
-      .message_meta(sprintf("Re-defining '%s' ...", name), verbosity = 1)
-
-      modulr_env$register[[c(name, "dependencies")]] <- dependencies
-      modulr_env$register[[c(name, "factory")]] <- factory
-      modulr_env$register[[c(name, "digest")]] <- digest
-      modulr_env$register[[c(name, "instance")]] <- NULL
-      modulr_env$register[[c(name, "instanciated")]] <- F
-      modulr_env$register[[c(name, "calls")]] <- 0
-      modulr_env$register[[c(name, "duration")]] <- NA_integer_
-      modulr_env$register[[c(name, "first_instance")]] <- F
-      modulr_env$register[[c(name, "timestamp")]] <- timestamp
+      .message_meta(sprintf("Re-defining '%s' ...", name), {
+        modulr_env$register[[c(name, "dependencies")]] <- dependencies
+        modulr_env$register[[c(name, "compressed")]] <- compress
+        modulr_env$register[[c(name, "factory")]] <- store(factory)
+        modulr_env$register[[c(name, "digest")]] <- digest
+        modulr_env$register[[c(name, "instance")]] <- NULL
+        modulr_env$register[[c(name, "instanciated")]] <- F
+        modulr_env$register[[c(name, "calls")]] <- 0
+        modulr_env$register[[c(name, "duration")]] <- NA_integer_
+        modulr_env$register[[c(name, "first_instance")]] <- F
+        modulr_env$register[[c(name, "timestamp")]] <- timestamp
+      },
+      verbosity = 1)
 
     }
   } else {
@@ -163,7 +205,13 @@ get_factory <- function(name, load = FALSE) {
 
   assertthat::assert_that(.is_defined(name))
 
-  modulr_env$register[[c(name, "factory")]]
+  factory <-
+    modulr_env$register[[c(name, "factory")]]
+  if(!is.null(modulr_env$register[[c(name, "compressed")]]))
+    factory <- .decompress(
+      factory, type = modulr_env$register[[c(name, "compressed")]])
+
+  factory
 
 }
 

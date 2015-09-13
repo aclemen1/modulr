@@ -81,20 +81,28 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
                       modulr_env$register[[
                         c(ordered_name, "dependencies")]],
                       function(name) {
-                        modulr_env$register[[
-                          c(.resolve_mapping(name, ordered_name), "instance")]]
+                        modulr_env$register[[c(
+                          .resolve_mapping(name, ordered_name), "instance")]]
                       }
                     )
 
                 }
 
-                environment(modulr_env$register[[
-                  c(ordered_name, "factory")]]) <- env
+                factory <- modulr_env$register[[c(ordered_name, "factory")]]
+                if(!is.null(modulr_env$register[[
+                  c(ordered_name, "compressed")]])) {
+                  .message_meta("Decompressing factory ...", verbosity = 3)
+                  factory <- .decompress(factory, type = modulr_env$register[[
+                    c(ordered_name, "compressed")]])
+                }
 
-                modulr_env$register[[c(ordered_name, "instance")]] <-
-                  do.call(
-                    modulr_env$register[[c(ordered_name, "factory")]],
-                    args = args, quote = TRUE, envir = env)
+                environment(factory) <- env
+
+                instance <- do.call(
+                  factory,
+                  args = args, quote = TRUE, envir = env)
+
+                modulr_env$register[[c(ordered_name, "instance")]] <- instance
 
                 modulr_env$register[[c(ordered_name, "duration")]] <-
                   as.numeric(Sys.time() - timestamp)
@@ -120,7 +128,9 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
   },
   verbosity = 2)
 
-  invisible(modulr_env$register[[c(name, "instance")]])
+  instance <- modulr_env$register[[c(name, "instance")]]
+
+  invisible(instance)
 
 }
 
