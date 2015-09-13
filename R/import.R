@@ -37,6 +37,18 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
     script <- httr::content(result, as = "text")
 
     register <- modulr_env$register
+    .Last.name <- modulr_env$.Last.name # Exclude Linting
+    config <- modulr_env$config
+    verbosity <- modulr_env$verbosity
+    stash <- modulr_env$stash
+
+    rollback <- function() {
+      modulr_env$register <- register
+      modulr_env$.Last.name <- .Last.name # Exclude Linting
+      modulr_env$config <- config
+      modulr_env$verbosity <- verbosity
+      modulr_env$stash <- stash
+    }
 
     if(grepl("```\\s*\\{\\s*[rR]", script)) {
       # Rmd import
@@ -53,19 +65,19 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
                  envir = parent.frame())
       },
       error = function(e) {
-        assign("register", register, pos = modulr_env)
+        rollback()
         e$message <- sprintf("%s. Rolling back.", e$message)
         stop(e)
       })
 
     if(.is_undefined(name)) {
-      assign("register", register, pos = modulr_env)
+      rollback()
       stop(sprintf("module '%s' cannot be found. Rolling back.", name),
            call. = FALSE)
     }
 
     if(!is.null(digest) && isTRUE(get_digest(name) != digest)) {
-      assign("register", register, pos = modulr_env)
+      rollback()
       stop(sprintf("digest is not matching. Rolling back.", name),
            call. = FALSE)
     }
@@ -98,8 +110,8 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
     msg = "left-hand side of `%imports%` is not a module name or a digest.")
 
   if(is.list(lhs)) {
-    name <- lhs$name
-    digest <- lhs$digest
+    name <- lhs[["name"]]
+    digest <- lhs[["digest"]]
   } else {
     name <- lhs
     digest <- NULL

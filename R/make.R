@@ -23,12 +23,10 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
     verbosity = 2)
 
     if(.is_regular(name))
-      assign(".Last.name", name, pos = modulr_env)
+      modulr_env$.Last.name <- name # Exclude Linting
 
-    register <- modulr_env$register
-
-    register[[name]]$calls <- register[[name]]$calls + 1
-    assign("register", register, pos = modulr_env)
+    modulr_env$register[[c(name, "calls")]] <-
+      modulr_env$register[[c(name, "calls")]] + 1
 
     dependency_graph <- .build_dependency_graph(all_dependencies)
 
@@ -53,17 +51,14 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
             assertthat::assert_that(.is_defined(ordered_name))
 
-            register <- modulr_env$register
-
-            module <- register[[ordered_name]]
-
             reinstanciated_by_parent <- any(unlist(lapply(
-              module$dependencies,
+              modulr_env$register[[c(ordered_name, "dependencies")]],
               function(name) {
-                register[[name]]$timestamp >= module$timestamp
+                modulr_env$register[[c(name, "timestamp")]] >=
+                  modulr_env$register[[c(ordered_name, "timestamp")]]
               })))
 
-            if(!module$instanciated
+            if(!modulr_env$register[[c(ordered_name, "instanciated")]]
                | reinstanciated_by_parent
                | (ordered_name == name &
                     get_digest(ordered_name) != get_digest(name))) {
@@ -78,33 +73,37 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
                 args <- list()
 
-                if(length(module$dependencies) > 0) {
+                if(length(modulr_env$register[[
+                  c(ordered_name, "dependencies")]]) > 0) {
 
                   args <-
                     lapply(
-                      module$dependencies,
+                      modulr_env$register[[
+                        c(ordered_name, "dependencies")]],
                       function(name) {
-                        register[[
-                          .resolve_mapping(name, ordered_name)]]$instance
+                        modulr_env$register[[
+                          c(.resolve_mapping(name, ordered_name), "instance")]]
                       }
                     )
 
-
                 }
 
-                environment(module[["factory"]]) <- env
+                environment(modulr_env$register[[
+                  c(ordered_name, "factory")]]) <- env
 
-                module$instance <- do.call(
-                  module[["factory"]],
-                  args = args, quote = TRUE, envir = env)
+                modulr_env$register[[c(ordered_name, "instance")]] <-
+                  do.call(
+                    modulr_env$register[[c(ordered_name, "factory")]],
+                    args = args, quote = TRUE, envir = env)
 
-                module$duration <- as.numeric(Sys.time() - timestamp)
-                module$instanciated <- T
-                module$first_instance <- F
-                module$timestamp <- Sys.time()
-
-                register[[ordered_name]] <- module
-                assign("register", register, pos = modulr_env)
+                modulr_env$register[[c(ordered_name, "duration")]] <-
+                  as.numeric(Sys.time() - timestamp)
+                modulr_env$register[[c(ordered_name, "instanciated")]] <-
+                  TRUE
+                modulr_env$register[[c(ordered_name, "first_instance")]] <-
+                  FALSE
+                modulr_env$register[[c(ordered_name, "timestamp")]] <-
+                  Sys.time()
 
               },
               verbosity = 1)
@@ -121,7 +120,7 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
   },
   verbosity = 2)
 
-  invisible(modulr_env$register[[name]]$instance)
+  invisible(modulr_env$register[[c(name, "instance")]])
 
 }
 

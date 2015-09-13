@@ -236,12 +236,12 @@ test_that("reset(all=T) purges the stashes", {
   expect_equal(length(modulr_env$stash), 0)
 })
 
-test_that("reset calls are warned from within a module", {
+test_that("reset calls generate an error from within a module", {
   reset()
   define("module", NULL, function() {
     reset()
   })
-  expect_warning(make("module"))
+  expect_error(make("module"))
 })
 
 test_that("undefine removes the module definition from the register", {
@@ -289,10 +289,15 @@ test_that("undefine removes only non reserved modules", {
 
 test_that("undefine calls are warned from within a module", {
   reset()
+  define("module_ex", NULL, function() NULL)
+  define("module", NULL, function() {
+    undefine("module_ex")
+  })
+  expect_warning(make("module"))
   define("module", NULL, function() {
     undefine("module")
   })
-  expect_warning(make("module"))
+  expect_error(make("module"))
 })
 
 test_that("touch updates the register", {

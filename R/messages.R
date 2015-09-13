@@ -10,7 +10,7 @@
   verbose <- verbosity <= verbosity_level
 
   level <- .get_0(".message_level", envir = modulr_env, ifnotfound = 0)
-  on.exit(assign(".message_level", level, pos = modulr_env))
+  on.exit(modulr_env$.message_level <- level)
 
   if(verbose) {
 
@@ -30,7 +30,7 @@
 
   }
 
-  if(verbose) assign(".message_level", level + 1, pos = modulr_env)
+  if (verbose) modulr_env$.message_level <- level + 1
 
   if(!is.null(expr)) eval(expr)
 
@@ -60,12 +60,12 @@
 
   kwargs <- .parse_message_args(...)
 
-  if(length(kwargs$core)) {
+  if(length(kwargs[["core"]])) {
 
     out <- sprintf("[%s%s] ",
                    format(Sys.time(), format = "%c"),
                    if("module_name" %in% names(kwargs)) {
-                     sprintf(" %s", kwargs$module_name)
+                     sprintf(" %s", kwargs[["module_name"]])
                    } else "")
 
     level <- .get_0(".message_level", envir = modulr_env, ifnotfound = 0)
@@ -75,9 +75,9 @@
         "%s ", paste(rep("*", level), collapse="")))
     }
 
-    out <- paste0(out, paste0(kwargs$core, collapse = ""))
+    out <- paste0(out, paste0(kwargs[["core"]], collapse = ""))
 
-    kwargs$fun(out, appendLF = TRUE)
+    kwargs[["fun"]](out, appendLF = TRUE) # Exclude Linting
 
   }
 

@@ -68,7 +68,7 @@ load_module <- function(name) {
       visited_dependencies <<- c(visited_dependencies, name)
 
       Map(function(dependency) iteration(dependency, name),
-          get("register", pos = modulr_env)[[name]]$dependencies)
+          modulr_env$register[[c(name, "dependencies")]])
 
     }
 

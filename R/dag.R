@@ -9,7 +9,9 @@
 
   for (name in all_dependencies) {
 
-    dependencies <- modulr_env$register[[name]]$dependencies
+    assertthat::assert_that(.is_defined(name))
+
+    dependencies <- modulr_env$register[[c(name, "dependencies")]]
 
     if(isTRUE(length(dependencies) > 0)) {
 
@@ -100,13 +102,12 @@
 
   assertthat::assert_that(is.null(group) || is.character(group))
 
-  register <- modulr_env$register
-
   table(
 
     Reduce(rbind, Map(function(name) {
 
-      deps <- factor(unlist(register[[name]]$dependencies), levels = group)
+      deps <- factor(unlist(modulr_env$register[[c(name, "dependencies")]]),
+                     levels = group)
 
       data.frame(from=factor(rep(name, length(deps)), levels = group), to=deps)
 

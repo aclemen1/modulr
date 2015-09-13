@@ -96,7 +96,7 @@
     names(mappings))
 
   candidates <- Filter(function(candidate) {
-    candidate$start == 1
+    candidate[["start"]] == 1
   },
   candidates)
 
@@ -104,13 +104,13 @@
 
   maximum_length <- max(unlist(Map(
     function(candidate) {
-      candidate$end
+      candidate[["end"]]
     },
     candidates)))
 
   candidates <- Filter(
     function(candidate) {
-      candidate$end == maximum_length
+      candidate[["end"]] == maximum_length
     },
     candidates)
 
@@ -119,7 +119,7 @@
     "Considering only the first occurence.",
     call. = FALSE, immediate. = TRUE)
 
-  matching_map <- candidates[[1]]$map
+  matching_map <- candidates[[1]][["map"]]
 
   sub(matching_map, mappings[[matching_map]], name)
 
@@ -157,7 +157,7 @@
 
   candidates <- Filter(
     function(candidate) {
-      candidate$start == 1
+      candidate[["start"]] == 1
     },
     candidates)
 
@@ -169,13 +169,13 @@
 
     maximum_length <- max(unlist(Map(
       function(candidate) {
-        candidate$end
+        candidate[["end"]]
       },
       candidates)))
 
     candidates <- Filter(
       function(candidate) {
-        candidate$end == maximum_length
+        candidate[["end"]] == maximum_length
       },
       candidates)
 

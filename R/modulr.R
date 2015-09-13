@@ -20,7 +20,7 @@ set_verbosity <- function(value) {
 
   assertthat::assert_that(assertthat::is.scalar(value))
 
-  assign("verbosity", value, pos = modulr_env)
+  modulr_env$verbosity <- value
 
 }
 

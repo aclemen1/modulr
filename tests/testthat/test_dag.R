@@ -3,11 +3,10 @@ context("dag")
 test_that(".build_dependency_graph can return no dependency", {
   reset()
   expect_equal(nrow(.build_dependency_graph()), 0)
-  expect_equal(nrow(.build_dependency_graph("undefined/module")), 0)
+  expect_error(.build_dependency_graph("undefined/module"))
 })
 
 test_that(".build_dependency_graph figures out the DAG of dependencies", {
-  reset()
   define("module_1", NULL, function() NULL)
   define("module_2", list("module_1"), function(m1) NULL)
   define("module_3", list("module_2"), function(m2) NULL)

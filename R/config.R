@@ -7,11 +7,7 @@
 
   unset <- function() {
 
-    config <- base::get("config", pos = modulr_env)
-
-    config[[scope]] <- NULL
-
-    assign("config", config, pos = modulr_env)
+    modulr_env$config[[scope]] <- NULL
 
   }
 
@@ -31,30 +27,26 @@
 
     if(length(options_list) == 0) return(invisible())
 
-    config <- base::get("config", pos = modulr_env)
+    if(is.null(modulr_env$config[[scope]])) {
 
-    if(is.null(config[[scope]])) {
-
-      config[[scope]] <- options_list
+      modulr_env$config[[scope]] <- options_list
 
     } else {
 
       if(is.null(names(options_list))) {
 
         if (drop)
-          config[[scope]] <- options_list
+          modulr_env$config[[scope]] <- options_list
 
       } else {
 
         for(key in names(options_list))
-          if(is.null(config[[scope]][[key]]) | isTRUE(drop))
-            config[[scope]][[key]] <- options_list[[key]]
+          if(is.null(modulr_env$config[[c(scope, key)]]) | isTRUE(drop))
+            modulr_env$config[[c(scope, key)]] <- options_list[[key]]
 
       }
 
     }
-
-    assign("config", config, pos = modulr_env)
 
   }
 
@@ -63,15 +55,13 @@
     .message_meta("Entering .config$get_all() ...",
                   verbosity = +Inf)
 
-    config <- base::get("config", pos = modulr_env)
-
     if(is.na(scope[2])) {
 
-      config[[scope[1]]]
+      modulr_env$config[[scope[1]]]
 
     } else {
 
-      config[[scope[1]]][[scope[2]]]
+      modulr_env$config[[scope[1:2]]]
 
     }
 

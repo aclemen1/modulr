@@ -28,13 +28,9 @@ get_digest <- function(name, load = FALSE) {
 
   assertthat::assert_that(.is_defined(name))
 
-  register <- modulr_env$register
-
-  module <- register[[name]]
-
   .hash(c(
-    deparse(module$dependencies),
-    deparse(module$factory)))
+    deparse(modulr_env$register[[c(name, "dependencies")]]),
+    deparse(modulr_env$register[[c(name, "factory")]])))
 
 }
 
@@ -92,30 +88,29 @@ define <- function(name, dependencies, factory) {
 
   timestamp <- Sys.time()
 
-  register <- modulr_env$register
-
   if(.is_undefined(name)) {
 
     if(.is_regular(name))
       .message_meta(sprintf("Defining '%s' ...", name), verbosity = 2)
 
-    register[[name]]$name <- name
-    register[[name]]$dependencies <- dependencies
-    register[[name]]$factory <- factory
-    register[[name]]$digest <- .hash(c(
+    modulr_env$register[[name]] <- list()
+    modulr_env$register[[c(name, "name")]] <- name
+    modulr_env$register[[c(name, "dependencies")]] <- dependencies
+    modulr_env$register[[c(name, "factory")]] <- factory
+    modulr_env$register[[c(name, "digest")]] <- .hash(c(
       deparse(dependencies),
       deparse(factory)))
-    register[[name]]$instance <- NULL
-    register[[name]]$instanciated <- F
-    register[[name]]$calls <- 0
-    register[[name]]$duration <- NA_integer_
-    register[[name]]$first_instance <- T
-    register[[name]]$timestamp <- timestamp
-    register[[name]]$created <- timestamp
+    modulr_env$register[[c(name, "instance")]] <- NULL
+    modulr_env$register[[c(name, "instanciated")]] <- F
+    modulr_env$register[[c(name, "calls")]] <- 0
+    modulr_env$register[[c(name, "duration")]] <- NA_integer_
+    modulr_env$register[[c(name, "first_instance")]] <- T
+    modulr_env$register[[c(name, "timestamp")]] <- timestamp
+    modulr_env$register[[c(name, "created")]] <- timestamp
 
   } else if(.is_regular(name)) {
 
-    previous_digest <- register[[name]]$digest
+    previous_digest <- modulr_env$register[[c(name, "digest")]]
     digest <- .hash(c(
       deparse(dependencies),
       deparse(factory)))
@@ -123,24 +118,23 @@ define <- function(name, dependencies, factory) {
 
       .message_meta(sprintf("Re-defining '%s' ...", name), verbosity = 1)
 
-      register[[name]]$dependencies <- dependencies
-      register[[name]]$factory <- factory
-      register[[name]]$digest <- digest
-      register[[name]]$instance <- NULL
-      register[[name]]$instanciated <- F
-      register[[name]]$calls <- 0
-      register[[name]]$duration <- NA_integer_
-      register[[name]]$first_instance <- F
-      register[[name]]$timestamp <- timestamp
+      modulr_env$register[[c(name, "dependencies")]] <- dependencies
+      modulr_env$register[[c(name, "factory")]] <- factory
+      modulr_env$register[[c(name, "digest")]] <- digest
+      modulr_env$register[[c(name, "instance")]] <- NULL
+      modulr_env$register[[c(name, "instanciated")]] <- F
+      modulr_env$register[[c(name, "calls")]] <- 0
+      modulr_env$register[[c(name, "duration")]] <- NA_integer_
+      modulr_env$register[[c(name, "first_instance")]] <- F
+      modulr_env$register[[c(name, "timestamp")]] <- timestamp
 
     }
   } else {
     assertthat::assert_that(.is_regular(name))
   }
 
-  assign("register", register, pos = modulr_env)
   if(.is_regular_core(name))
-    assign(".Last.name", name, pos = modulr_env) # Exclude Linting
+    modulr_env$.Last.name <- name # Exclude Linting
 
   invisible(function(...) make(name, ...))
 
@@ -169,7 +163,7 @@ get_factory <- function(name, load = FALSE) {
 
   assertthat::assert_that(.is_defined(name))
 
-  modulr_env$register[[name]]$factory
+  modulr_env$register[[c(name, "factory")]]
 
 }
 
@@ -226,13 +220,9 @@ undefine <- function(name) {
 
   assertthat::assert_that(.is_defined_regular(name))
 
-  register <- modulr_env$register
-
   .message_meta(sprintf("Undefining '%s' ... ", name), verbosity = 2)
 
-  register[[name]] <- NULL
-
-  assign("register", register, pos = modulr_env)
+  modulr_env$register[[name]] <- NULL
 
   invisible()
 
@@ -254,19 +244,16 @@ touch <- function(name) {
 
   assertthat::assert_that(.is_defined_regular(name))
 
-  register <- modulr_env$register
-
   .message_meta(sprintf("Touching '%s' ...", name), verbosity = 2)
 
-  register[[name]]$instance <- NULL
-  register[[name]]$instanciated <- F
-  register[[name]]$calls <- 0
-  register[[name]]$duration <- NA_integer_
-  register[[name]]$timestamp <- Sys.time()
+  modulr_env$register[[c(name, "instance")]] <- NULL
+  modulr_env$register[[c(name, "instanciated")]] <- F
+  modulr_env$register[[c(name, "calls")]] <- 0
+  modulr_env$register[[c(name, "duration")]] <- NA_integer_
+  modulr_env$register[[c(name, "timestamp")]] <- Sys.time()
 
-  assign("register", register, pos = modulr_env)
   if(.is_regular(name))
-    assign(".Last.name", name, pos = modulr_env) # Exclude Linting
+    modulr_env$.Last.name <- name # Exclude Linting
 
   module_option(name)$unset()
 
@@ -314,8 +301,8 @@ touch <- function(name) {
   )
 
   if(is.list(lhs)) {
-    name <- lhs$name
-    dependencies <- lhs$dependencies
+    name <- lhs[["name"]]
+    dependencies <- lhs[["dependencies"]]
   } else {
     name <- as.character(lhs)
     dependencies <- list()

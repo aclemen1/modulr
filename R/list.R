@@ -39,9 +39,7 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
         "digest")),
     msg = "an invalid column name is specified.")
 
-  register <- modulr_env$register
-
-  flat <- names(register)
+  flat <- names(modulr_env$register)
 
   if(!reserved)
     flat <- setdiff(flat, RESERVED_NAMES)
@@ -59,32 +57,40 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
 
       modified <-
         format(
-          do.call(c, Map(function(name) register[[name]]$timestamp, flat)),
+          do.call(c, Map(function(name)
+            modulr_env$register[[c(name, "timestamp")]], flat)),
           "%c")
 
       created <-
         format(
-          do.call(c, Map(function(name) register[[name]]$created, flat)), "%c")
+          do.call(c, Map(function(name)
+            modulr_env$register[[c(name, "created")]], flat)), "%c")
 
       types <-
         do.call(c, Map(function(name)
-          ifelse(register[[name]]$instanciated,
-                 typeof(register[[name]]$instance), NA_character_), flat))
+          ifelse(modulr_env$register[[c(name, "instanciated")]],
+                 typeof(modulr_env$register[[c(name, "instance")]]),
+                 NA_character_), flat))
 
       sizes <-
         do.call(c, Map(function(name)
           ifelse(T,
-                 format(object.size(register[[name]]$factory), units = "auto"),
+                 format(object.size(
+                   modulr_env$register[[c(name, "factory")]]),
+                   units = "auto"),
                  NA_character_), flat))
 
       weights <-
         do.call(c, Map(function(name)
-          ifelse(register[[name]]$instanciated,
-                 format(object.size(register[[name]]$instance), units = "auto"),
+          ifelse(modulr_env$register[[c(name, "instanciated")]],
+                 format(object.size(
+                   modulr_env$register[[c(name, "instance")]]),
+                   units = "auto"),
                  NA_character_), flat))
 
       deparsed_factories <-
-        Map(function(name) deparse(register[[name]]$factory), flat)
+        Map(function(name)
+          deparse(modulr_env$register[[c(name, "factory")]]), flat)
 
       lines <- vapply(deparsed_factories, length, FUN.VALUE = 0)
 
@@ -92,13 +98,15 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
                       FUN.VALUE = 0)
 
       durations <-
-        do.call(c, Map(function(name) register[[name]]$duration, flat))
+        do.call(c, Map(function(name)
+          modulr_env$register[[c(name, "duration")]], flat))
 
       adj <- .compute_adjacency_matrix(flat)
       deps <- diag(adj %*% t(adj))
       reqs <- diag(t(adj) %*% adj)
 
-      calls <- do.call(c, Map(function(name) register[[name]]$calls, flat))
+      calls <- do.call(c, Map(function(name)
+        modulr_env$register[[c(name, "calls")]], flat))
 
       data <- data.frame(
         name = flat,

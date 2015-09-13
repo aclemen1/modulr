@@ -72,11 +72,11 @@ list_stashes <- function() {
 
   timestamps <-
     format(
-      do.call(c, Map(function(stash) stash$timestamp, modulr_env$stash)),
+      do.call(c, Map(function(stash) stash[["timestamp"]], modulr_env$stash)),
       "%c")
 
   comments <-
-    do.call(c, Map(function(stash) stash$comment, modulr_env$stash))
+    do.call(c, Map(function(stash) stash[["comment"]], modulr_env$stash))
 
   ids <- seq_along(timestamps)
 

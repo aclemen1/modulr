@@ -2,6 +2,7 @@ context("make")
 
 test_that("mappings are resolved", {
   reset()
+
   maps_config$set(
     "some/old_module" = list(
       "foo/bar" = "foo/bar_V2"
