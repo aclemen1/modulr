@@ -1,16 +1,17 @@
 #' @export
 # TODO: write documentation
-list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
-                         cols = c(
-                           "name",
-                           "type",
-                           "weight",
-                           "calls",
-                           "dependencies",
-                           "requisitions",
-                           "size",
-                           "lines",
-                           "modified")) {
+list_modules <-
+  function(regexp, reserved = TRUE, wide = TRUE, full = FALSE, formatted = TRUE,
+           cols = c(
+             "name",
+             "type",
+             "weight",
+             "calls",
+             "dependencies",
+             "childs",
+             "size",
+             "lines",
+             "modified")) {
 
   .message_meta("Entering list_modules() ...",
                 verbosity = +Inf)
@@ -19,7 +20,8 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
     missing(regexp) || assertthat::is.string(regexp),
     assertthat::is.flag(reserved),
     assertthat::is.flag(wide),
-    assertthat::is.flag(full))
+    assertthat::is.flag(full),
+    assertthat::is.flag(formatted))
 
   assertthat::assert_that(
     is.character(cols) &&
@@ -29,7 +31,7 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
         "weight",
         "calls",
         "dependencies",
-        "requisitions",
+        "childs",
         "size",
         "lines",
         "chars",
@@ -56,15 +58,14 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
       digests <- vapply(flat, get_digest, FUN.VALUE = "")
 
       modified <-
-        format(
+        (if(formatted) function(x) format(x, format = "%c") else identity)(
           do.call(c, Map(function(name)
-            modulr_env$register[[c(name, "timestamp")]], flat)),
-          "%c")
+            modulr_env$register[[c(name, "timestamp")]], flat)))
 
       created <-
-        format(
+        (if(formatted) function(x) format(x, format = "%c") else identity)(
           do.call(c, Map(function(name)
-            modulr_env$register[[c(name, "created")]], flat)), "%c")
+            modulr_env$register[[c(name, "created")]], flat)))
 
       types <-
         do.call(c, Map(function(name)
@@ -74,19 +75,16 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
 
       sizes <-
         do.call(c, Map(function(name)
-          ifelse(T,
-                 format(object.size(
-                   modulr_env$register[[c(name, "factory")]]),
-                   units = "auto"),
-                 NA_character_), flat))
+          (if(formatted) function(x) format(x, units = "auto") else identity)(
+            object.size(modulr_env$register[[c(name, "factory")]])), flat))
 
       weights <-
         do.call(c, Map(function(name)
-          ifelse(modulr_env$register[[c(name, "instanciated")]],
-                 format(object.size(
-                   modulr_env$register[[c(name, "instance")]]),
-                   units = "auto"),
-                 NA_character_), flat))
+          ifelse(
+            modulr_env$register[[c(name, "instanciated")]],
+            (if(formatted) function(x) format(x, units = "auto") else identity)(
+              object.size(modulr_env$register[[c(name, "instance")]])),
+            NA_character_), flat))
 
       deparsed_factories <-
         Map(function(name)
@@ -103,7 +101,7 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
 
       adj <- .compute_adjacency_matrix(flat)
       deps <- diag(adj %*% t(adj))
-      reqs <- diag(t(adj) %*% adj)
+      childs <- diag(t(adj) %*% adj)
 
       calls <- do.call(c, Map(function(name)
         modulr_env$register[[c(name, "calls")]], flat))
@@ -114,7 +112,7 @@ list_modules <- function(regexp, reserved = TRUE, wide = TRUE, full = FALSE,
         weight = weights,
         calls = calls,
         dependencies = deps,
-        requisitions = reqs,
+        childs = childs,
         size = sizes,
         lines = lines,
         chars = chars,

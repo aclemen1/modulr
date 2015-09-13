@@ -81,7 +81,7 @@ list_stashes <- function() {
   ids <- seq_along(timestamps)
 
   data.frame(id = ids, timestamp = timestamps, comment = comments,
-             stringsAsFactors = F)
+             stringsAsFactors = FALSE)
 
 }
 
