@@ -28,14 +28,9 @@ get_digest <- function(name, load = FALSE) {
 
   assertthat::assert_that(.is_defined(name))
 
-  factory <- modulr_env$register[[c(name, "factory")]]
-  if(!is.null(modulr_env$register[[c(name, "compressed")]]))
-    factory <- .decompress(
-      factory, modulr_env$register[[c(name, "compressed")]])
-
   .hash(c(
     deparse(modulr_env$register[[c(name, "dependencies")]]),
-    deparse(factory)))
+    deparse(modulr_env$register[[c(name, "factory")]])))
 
 }
 
@@ -58,7 +53,7 @@ get_digest <- function(name, load = FALSE) {
 #' m2()
 #' @export
 # TODO: write the documentation
-define <- function(name, dependencies, factory, compress = "gzip") {
+define <- function(name, dependencies, factory) {
 
   .message_meta(sprintf("Entering define() for '%s' ...", name),
                 verbosity = +Inf)
@@ -67,13 +62,6 @@ define <- function(name, dependencies, factory, compress = "gzip") {
     warning("define is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
-
-  assertthat::assert_that(
-    is.null(compress) ||
-      compress %in% c("gzip", c("gzip", "bzip2", "xz")),
-    msg = paste0("compress can take the following values: ",
-                 "NULL, \"gzip\", \"bzip2\" or \"xz\".")
-    )
 
   assertthat::assert_that(
     assertthat::is.string(name),
@@ -100,26 +88,6 @@ define <- function(name, dependencies, factory, compress = "gzip") {
 
   timestamp <- Sys.time()
 
-  store <- function(factory) {
-    if(!is.null(compress)) {
-      if(.is_regular(name))
-        .message_meta(sprintf("Compressing definition factory ... "),
-                      verbosity = 2)
-      pack <- .compress(factory, type = compress)
-      factory_size <- utils::object.size(factory)
-      pack_size <- utils::object.size(pack)
-      if(.is_regular(name))
-        .message_meta(
-          sprintf(
-            "Compression factor: %.0fx (%s instead of %s)",
-            factory_size / pack_size,
-            format(pack_size, units = "auto"),
-            format(factory_size, units = "auto")),
-          verbosity = 2)
-      pack
-    } else factory
-  }
-
   if(.is_undefined(name)) {
 
     .message_meta(
@@ -127,8 +95,7 @@ define <- function(name, dependencies, factory, compress = "gzip") {
         modulr_env$register[[name]] <- list()
         modulr_env$register[[c(name, "name")]] <- name
         modulr_env$register[[c(name, "dependencies")]] <- dependencies
-        modulr_env$register[[c(name, "compressed")]] <- compress
-        modulr_env$register[[c(name, "factory")]] <- store(factory)
+        modulr_env$register[[c(name, "factory")]] <- factory
         modulr_env$register[[c(name, "digest")]] <- .hash(c(
           deparse(dependencies),
           deparse(factory)))
@@ -151,15 +118,10 @@ define <- function(name, dependencies, factory, compress = "gzip") {
     digest <- .hash(c(
       deparse(dependencies),
       deparse(factory)))
-    if(digest != previous_digest ||
-         ifelse(is.null(compress), "", compress) !=
-         ifelse(is.null(modulr_env$register[[c(name, "compressed")]]),
-                "", modulr_env$register[[c(name, "compressed")]])) {
-
+    if(digest != previous_digest) {
       .message_meta(sprintf("Re-defining '%s' ...", name), {
         modulr_env$register[[c(name, "dependencies")]] <- dependencies
-        modulr_env$register[[c(name, "compressed")]] <- compress
-        modulr_env$register[[c(name, "factory")]] <- store(factory)
+        modulr_env$register[[c(name, "factory")]] <- factory
         modulr_env$register[[c(name, "digest")]] <- digest
         modulr_env$register[[c(name, "instance")]] <- NULL
         modulr_env$register[[c(name, "instanciated")]] <- F
@@ -205,13 +167,7 @@ get_factory <- function(name, load = FALSE) {
 
   assertthat::assert_that(.is_defined(name))
 
-  factory <-
-    modulr_env$register[[c(name, "factory")]]
-  if(!is.null(modulr_env$register[[c(name, "compressed")]]))
-    factory <- .decompress(
-      factory, type = modulr_env$register[[c(name, "compressed")]])
-
-  factory
+  modulr_env$register[[c(name, "factory")]]
 
 }
 

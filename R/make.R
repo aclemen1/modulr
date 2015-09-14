@@ -89,12 +89,6 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
                 }
 
                 factory <- modulr_env$register[[c(ordered_name, "factory")]]
-                if(!is.null(modulr_env$register[[
-                  c(ordered_name, "compressed")]])) {
-                  .message_meta("Decompressing factory ...", verbosity = 3)
-                  factory <- .decompress(factory, type = modulr_env$register[[
-                    c(ordered_name, "compressed")]])
-                }
 
                 environment(factory) <- env
 
