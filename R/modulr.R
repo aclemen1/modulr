@@ -11,6 +11,14 @@
 
 modulr_env <- new.env(parent = emptyenv())
 
+if(packageVersion("assertthat") >= package_version("0.1.0.99")) {
+  assert_that <- assertthat::assert_that
+} else {
+  assert_that <- function(..., msg) {
+    do.call(assertthat::assert_that, list(...), envir = parent.frame())
+  }
+}
+
 #' @export
 # TODO: write documentation
 set_verbosity <- function(value) {

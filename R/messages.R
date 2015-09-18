@@ -1,6 +1,6 @@
 .message_meta <- function(msg, expr = NULL, verbosity = 0) {
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(msg),
     assertthat::is.scalar(verbosity))
 

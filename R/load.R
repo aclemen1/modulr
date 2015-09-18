@@ -42,7 +42,7 @@ load_module <- function(name) {
 
     }
 
-    assertthat::assert_that(.is_defined(name))
+    assert_that(.is_defined(name))
 
     return(path)
 
@@ -53,7 +53,7 @@ load_module <- function(name) {
 # We need to make sure all dependent modules of a given module are defined.
 .define_all_dependent_modules <- function(group) {
 
-  assertthat::assert_that(is.character(group))
+  assert_that(is.character(group))
 
   visited_dependencies <- list()
 

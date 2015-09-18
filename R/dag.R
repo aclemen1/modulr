@@ -1,7 +1,7 @@
 # We need to figure out the directed acyclic graph (DAG) of the dependencies.
 .build_dependency_graph <- function(all_dependencies = NULL) {
 
-  assertthat::assert_that(is.null(all_dependencies) ||
+  assert_that(is.null(all_dependencies) ||
                             is.character(all_dependencies))
 
   dependency <- c()
@@ -9,7 +9,7 @@
 
   for (name in all_dependencies) {
 
-    assertthat::assert_that(.is_defined(name))
+    assert_that(.is_defined(name))
 
     dependencies <- modulr_env$register[[c(name, "dependencies")]]
 
@@ -36,7 +36,7 @@
 # A topological sort, grouped by independent modules into layers.
 .topological_sort_with_layer <- function(graph) {
 
-  assertthat::assert_that(
+  assert_that(
     is.data.frame(graph),
     nrow(graph) == 0 || setequal(names(graph), c("module", "dependency"))
   )
@@ -81,7 +81,7 @@
 
 .topological_sort_by_layers <- function(graph) {
 
-  assertthat::assert_that(
+  assert_that(
     is.data.frame(graph),
     nrow(graph) == 0 || setequal(names(graph), c("module", "dependency"))
   )
@@ -100,7 +100,7 @@
 
 .compute_adjacency_matrix <- function(group) {
 
-  assertthat::assert_that(is.null(group) || is.character(group))
+  assert_that(is.null(group) || is.character(group))
 
   table(
 

@@ -9,7 +9,7 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
             call. = FALSE, immediate. = TRUE)
   }
 
-  assertthat::assert_that(
+  assert_that(
     .is_regular(name),
     assertthat::is.string(url),
     is.null(digest) || assertthat::is.string(digest),
@@ -98,12 +98,12 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
             call. = FALSE, immediate. = TRUE)
   }
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(rhs),
     msg = "right-hand side of `%imports%` is not an URL."
     )
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(lhs) || (
       is.list(lhs) &
         setequal(names(lhs), c("name", "digest"))),
@@ -124,10 +124,10 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
 #' @export
 `%digests%` <- function(lhs, rhs) {
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(lhs),
     msg = "left-hand side of `%digests%` is not a module name.")
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(rhs),
     msg = "right-hand side of `%digests%` is not a digest.")
 

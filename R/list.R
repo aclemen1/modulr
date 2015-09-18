@@ -16,14 +16,14 @@ list_modules <-
   .message_meta("Entering list_modules() ...",
                 verbosity = +Inf)
 
-  assertthat::assert_that(
+  assert_that(
     missing(regexp) || assertthat::is.string(regexp),
     assertthat::is.flag(reserved),
     assertthat::is.flag(wide),
     assertthat::is.flag(full),
     assertthat::is.flag(formatted))
 
-  assertthat::assert_that(
+  assert_that(
     is.character(cols) &&
       all(cols %in% c(
         "name",

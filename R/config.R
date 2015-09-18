@@ -1,7 +1,9 @@
+#' @include modulr.R
+
 # A helper function to set, get and unset values in configuration scopes.
 .config <- function(scope) {
 
-  assertthat::assert_that(missing(scope) || is.character(scope))
+  assert_that(missing(scope) || is.character(scope))
 
   if(missing(scope)) return(NULL)
 
@@ -16,7 +18,7 @@
     .message_meta("Entering .config$set() ...",
                   verbosity = +Inf)
 
-    assertthat::assert_that(assertthat::is.flag(drop))
+    assert_that(assertthat::is.flag(drop))
 
     options_list <- list(...)
 
@@ -72,7 +74,7 @@
     .message_meta("Entering .config$get() ...",
                   verbosity = +Inf)
 
-    assertthat::assert_that(is.null(key) || assertthat::is.string(key))
+    assert_that(is.null(key) || assertthat::is.string(key))
 
     if(!is.null(key))
       get_all()[[key]]
@@ -125,7 +127,7 @@ module_option <- function(name) {
   .message_meta("Entering module_option() ...",
                 verbosity = +Inf)
 
-  assertthat::assert_that(.is_regular(name))
+  assert_that(.is_regular(name))
 
   .config(c("modules", name))
 
@@ -136,13 +138,13 @@ module_option <- function(name) {
 #' @export
 `%has_default_option%` <- function(lhs, rhs) {
 
-  assertthat::assert_that(
+  assert_that(
     .is_regular(lhs),
     msg =
       "left-hand side of `%has_default_option%` is not a regular module name."
     )
 
-  assertthat::assert_that(
+  assert_that(
     is.list(rhs),
     msg = "right-hand side of `%has_default_option%` is not a list."
   )
@@ -163,12 +165,12 @@ module_option <- function(name) {
 #' @export
 `%has_option%` <- function(lhs, rhs) {
 
-  assertthat::assert_that(
+  assert_that(
     .is_regular(lhs),
     msg = "left-hand side of `%has_option%` is not a regular module name."
   )
 
-  assertthat::assert_that(
+  assert_that(
     is.list(rhs),
     msg = "right-hand side of `%has_option%` is not a list."
   )

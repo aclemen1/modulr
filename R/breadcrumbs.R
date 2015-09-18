@@ -4,7 +4,7 @@
 # TODO: write documentation
 get_breadcrumbs <- function(void, verbose = TRUE) {
 
-  assertthat::assert_that(assertthat::is.flag(verbose))
+  assert_that(assertthat::is.flag(verbose))
 
   bc <- unique(
     unlist(
@@ -24,7 +24,7 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
 
 .is_installed_bc <- function(handler = getOption("error")) {
 
-  assertthat::assert_that(is.language(handler) || is.null(handler))
+  assert_that(is.language(handler) || is.null(handler))
 
   if(is.null(handler)) return(F)
 

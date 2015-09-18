@@ -1,6 +1,6 @@
 # Test if a module is already defined.
 .is_defined <- function(name) {
-  assertthat::assert_that(assertthat::is.string(name))
+  assert_that(assertthat::is.string(name))
   name %in% names(modulr_env$register)
 }
 
@@ -18,7 +18,7 @@ assertthat::on_failure(.is_undefined) <- function(call, env) {
 }
 
 .is_conform <- function(name) {
-  assertthat::assert_that(assertthat::is.string(name))
+  assert_that(assertthat::is.string(name))
   !grepl("[^a-zA-Z0-9_/-]", name)
 }
 
@@ -29,7 +29,7 @@ assertthat::on_failure(.is_conform) <- function(call, env) {
 
 # Test if a module has a regular name.
 .is_regular <- function(name) {
-  assertthat::assert_that(assertthat::is.string(name))
+  assert_that(assertthat::is.string(name))
   !(name %in% RESERVED_NAMES) & .is_conform(name)
 }
 

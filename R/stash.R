@@ -6,7 +6,7 @@ stash <- function(comment = NA_character_) {
   .message_meta("Entering stash() ...",
                 verbosity = +Inf)
 
-  assertthat::assert_that(is.na(comment) || assertthat::is.string(comment),
+  assert_that(is.na(comment) || assertthat::is.string(comment),
                           msg = "comment is not a string.")
 
   timestamp <- Sys.time()
@@ -38,9 +38,9 @@ unstash <- function(id = length(modulr_env$stash)) {
 
   len <- length(modulr_env$stash)
 
-  assertthat::assert_that(len > 0, msg = "nothing to unstash.")
-  assertthat::assert_that(assertthat::is.count(id))
-  assertthat::assert_that(id <= len, msg = "id is out of bounds.")
+  assert_that(len > 0, msg = "nothing to unstash.")
+  assert_that(assertthat::is.count(id))
+  assert_that(id <= len, msg = "id is out of bounds.")
 
   stash <- modulr_env$stash[[id]]
 
@@ -93,16 +93,16 @@ remove_stash <- function(id, all) {
   .message_meta("Entering remove_stash() ...",
                 verbosity = +Inf)
 
-  assertthat::assert_that(
+  assert_that(
     (missing(id) & !missing(all)) | (!missing(id) & missing(all)),
     msg = "call is ambiguous (two arguments passed)."
   )
 
   if(!missing(all)) {
 
-    assertthat::assert_that(
+    assert_that(
       assertthat::is.flag(all))
-    assertthat::assert_that(all, msg = "all is not TRUE.")
+    assert_that(all, msg = "all is not TRUE.")
 
     .message_meta("Removing all stashes ...", verbosity = 2)
     modulr_env$stash <- list()
@@ -111,9 +111,9 @@ remove_stash <- function(id, all) {
 
   if(!missing(id)) {
 
-    assertthat::assert_that(
+    assert_that(
       assertthat::is.count(id))
-    assertthat::assert_that(
+    assert_that(
       id <= length(modulr_env$stash),
       msg = "id is out of bounds.")
 

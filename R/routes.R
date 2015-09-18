@@ -1,7 +1,7 @@
 # Paths should end with exactly one trailing slash
 .make_path <- function(path) {
 
-  assertthat::assert_that(assertthat::is.string(path))
+  assert_that(assertthat::is.string(path))
 
   paste0(gsub("\\/+$", "", file.path(path)), "/")
 
@@ -11,7 +11,7 @@
 # path, basename, name (as a module) and extension
 .parse_filename <- function(filename) {
 
-  assertthat::assert_that(assertthat::is.string(filename))
+  assert_that(assertthat::is.string(filename))
 
   filename <- gsub("^\\s*|\\s*$", "", file.path(filename))
 
@@ -41,7 +41,7 @@
 .find_absolute_path <- function(path,
                                 extensions = c(".R", ".r", ".Rmd", ".rmd")) {
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(path),
     is.character(extensions))
 
@@ -74,7 +74,7 @@
 # "foo/bar_V1" for "some/old_module" only. See tests for more examples.
 .resolve_mapping <- function(name, scope_name = NULL) {
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(name),
     is.null(scope_name) || assertthat::is.string(scope_name))
 
@@ -128,7 +128,7 @@
 # From a module name, we want to infer its (absolute) path.
 .resolve_path <- function(name, scope_name = NULL, absolute = TRUE, ...) {
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(name),
     is.null(scope_name) || assertthat::is.string(scope_name),
     assertthat::is.flag(absolute))

@@ -1,10 +1,10 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9021
+Version: 0.1.7.9022
 Title: A Dependency Injection (DI) Framework for R
 Description: A Dependency Injection (DI) Framework to break down sequential
-  programs into discrete, modular units that are loosely coupled,
-  simple to develop, test, reuse, and share in a wide range of situations.
+    programs into discrete, modular units that are loosely coupled,
+    simple to develop, test, reuse, and share in a wide range of situations.
 Authors@R: c(
   person(
     given = "Alain", family = "Clément-Pavon",
@@ -22,18 +22,39 @@ Authors@R: c(
 URL: https://github.com/aclemen1/modulr
 BugReports: https://github.com/aclemen1/modulr/issues
 Depends:
-  R (>= 3.1.0)
+    R (>= 3.0.2)
 Imports:
-  knitr (>= 1.10.5),
-  assertthat (>= 0.1.0.99),
-  digest (>= 0.6.8),
-  httr (>= 1.0.0)
+    knitr (>= 1.11),
+    assertthat,
+    digest,
+    httr
 Suggests:
-  dplyr (>= 0.4.2),
-  htmltools (>= 0.2.6),
-  lintr (>= 0.3.1),
-  covr (>= 1.2.3),
-  testthat (>= 0.10.0),
-  networkD3 (>= 0.2.1)
+    dplyr,
+    htmltools,
+    lintr,
+    covr,
+    assertthat (>= 0.1.0.99),
+    testthat,
+    networkD3,
+    gistr
 License: MIT + file LICENSE
 Encoding: UTF-8
+Collate:
+    'assertions.R'
+    'breadcrumbs.R'
+    'modulr.R'
+    'config.R'
+    'dag.R'
+    'define.R'
+    'gears.R'
+    'graph.R'
+    'import.R'
+    'internals.R'
+    'list.R'
+    'load.R'
+    'make.R'
+    'messages.R'
+    'reserved.R'
+    'routes.R'
+    'stash.R'
+    'zzz.R'

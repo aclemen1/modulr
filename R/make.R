@@ -49,7 +49,7 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
             ordered_name <- ordered_names[ordered_name_idx]
 
-            assertthat::assert_that(.is_defined(ordered_name))
+            assert_that(.is_defined(ordered_name))
 
             reinstanciated_by_parent <- any(unlist(lapply(
               modulr_env$register[[c(ordered_name, "dependencies")]],
@@ -140,7 +140,7 @@ make_all <- function(regexp, reserved = FALSE, error = stop, ...) {
             call. = FALSE, immediate. = TRUE)
   }
 
-  assertthat::assert_that(
+  assert_that(
     missing(regexp) || assertthat::is.string(regexp),
     assertthat::is.flag(reserved),
     is.function(error))
@@ -180,7 +180,7 @@ make_tests <- function(...) {
 
       lrs <- make(name, ...)
 
-      assertthat::assert_that(
+      assert_that(
         assertthat::is.flag(lrs) || is.null(lrs),
         msg = "test is not returning a boolean or NULL.")
 
@@ -228,7 +228,7 @@ make_test <- make_tests
             call. = FALSE, immediate. = TRUE)
   }
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(rhs),
     msg = "right-hand side of `%<=%` is not a string."
   )
@@ -255,7 +255,7 @@ make_test <- make_tests
             call. = FALSE, immediate. = TRUE)
   }
 
-  assertthat::assert_that(
+  assert_that(
     assertthat::is.string(rhs),
     msg = "right-hand side of `%<<=%` is not a string."
   )

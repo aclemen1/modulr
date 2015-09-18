@@ -19,7 +19,7 @@ graph_dependencies <- function(group, reserved = TRUE) {
             call. = FALSE, immediate. = TRUE)
   }
 
-  assertthat::assert_that(
+  assert_that(
     missing(group) || is.character(group),
     assertthat::is.flag(reserved)
   )
