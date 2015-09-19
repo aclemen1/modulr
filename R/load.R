@@ -22,7 +22,7 @@ load_module <- function(name) {
 
         source(path)
 
-      } else if(tolower(tools::file_ext(path)) == "rmd") {
+      } else if(tolower(tools::file_ext(path)) %in% c("rmd", "rnw")) {
 
         unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
 

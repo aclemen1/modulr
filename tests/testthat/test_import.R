@@ -15,7 +15,13 @@ test_that("import_module imports modules", {
       '```{r}\ndefine("module", NULL, function() NULL)\n"remote"\n```',
     expect_equal(import_module("module", "fake_url"), "remote")
   )
-})
+  reset()
+  with_mock(
+    `httr::GET` = function(...) NULL,
+    `httr::content` = function(...)
+      '<<>>=\ndefine("module", NULL, function() NULL)\n"remote"\n@',
+    expect_equal(import_module("module", "fake_url"), "remote")
+  )})
 
 test_that("import_module doesn't import defined modules, unless forced", {
   reset()

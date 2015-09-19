@@ -1,0 +1,38 @@
+\documentclass{article}
+\usepackage[sc]{mathpazo}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{url}
+\usepackage[unicode=true,pdfusetitle,
+            bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+            breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+{hyperref}
+\hypersetup{
+  pdfstartview={XYZ null null 1}}
+\begin{document}
+<<setup, include=FALSE, cache=FALSE>>=
+  library(knitr)
+  library(modulr)
+# set global chunk options
+@
+
+
+\title{A Minimal Demo of Modulr Gear in LaTeX}
+
+
+\author{Alain Cl\'ement-Pavon}
+
+\maketitle
+This is a minimal example of gear written with LaTeX and persisted in an Rnw file.
+
+<<definition>>=
+"module_Rnw" %provides%
+  function() {
+    "Hello World!"
+  }
+@
+
+\end{document}

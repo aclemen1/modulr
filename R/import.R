@@ -50,7 +50,8 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
       modulr_env$stash <- stash
     }
 
-    if(grepl("```\\s*\\{\\s*[rR]", script)) {
+    if(grepl("```\\s*\\{\\s*[rR]", script) ||
+         grepl("<<[^>]*>>=[^@]*@", script)) {
       # Rmd import
       unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
       knitr::opts_knit$set("unnamed.chunk.label" =

@@ -87,10 +87,10 @@ get_digest <- function(name, load = FALSE) {
 #' \code{/home/user} and a file name \code{readme.txt}, a module name
 #' \code{vendor/tool/swissknife} is similarily composed of a namespace
 #' \code{vendor/tool} and a local name \code{swissknife}. For modulr to find
-#' this module, it is sufficient to store its definition in an R or R Markdown
-#' file named \code{swissknife.R[md]} (R files have precedence over Rmd's),
-#' laid out on disk in the \code{vendor/tool} path, relative to the modulr
-#' root directory (see \code{\link{root_config}}).
+#' this module, it is sufficient to store its definition in an R, R Markdown or
+#' R Sweave file named \code{swissknife.R[md|nw]} (R files have precedence over
+#' Rmd's and Rnw's), laid out on disk in the \code{vendor/tool} path, relative
+#' to the modulr root directory (see \code{\link{root_config}}).
 #'
 #' \itemize{
 #' \item \code{vendor/}
@@ -119,7 +119,7 @@ get_digest <- function(name, load = FALSE) {
 #' level} by mapping a specific namespace to a dedicated path, relative to the
 #' root directory. For instance, \code{paths_config$set("vendor" =
 #' "third_parties/vendor")} will map the \code{vendor/great_module} to
-#' the \code{third_parties/vendor/great_module.R[md]} path, relative to the
+#' the \code{third_parties/vendor/great_module.R[md|nw]} path, relative to the
 #' root directory.
 #' \itemize{
 #' \item \code{third_parties}
@@ -210,6 +210,7 @@ define <- function(name, dependencies, factory) {
 
     .message_meta(
       sprintf("Defining '%s' ...", name), {
+
         modulr_env$register[[name]] <- list()
         modulr_env$register[[c(name, "name")]] <- name
         modulr_env$register[[c(name, "dependencies")]] <- dependencies
@@ -238,6 +239,7 @@ define <- function(name, dependencies, factory) {
       deparse(factory)))
     if(digest != previous_digest) {
       .message_meta(sprintf("Re-defining '%s' ...", name), {
+
         modulr_env$register[[c(name, "dependencies")]] <- dependencies
         modulr_env$register[[c(name, "factory")]] <- factory
         modulr_env$register[[c(name, "digest")]] <- digest
@@ -247,6 +249,7 @@ define <- function(name, dependencies, factory) {
         modulr_env$register[[c(name, "duration")]] <- NA_integer_
         modulr_env$register[[c(name, "first_instance")]] <- F
         modulr_env$register[[c(name, "timestamp")]] <- timestamp
+
       },
       verbosity = 1)
 

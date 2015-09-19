@@ -39,7 +39,9 @@
 # If several root paths are present, the first occurrence of an absolute path
 # matching an existing file (with extension) or directory is returned.
 .find_absolute_path <- function(path,
-                                extensions = c(".R", ".r", ".Rmd", ".rmd")) {
+                                extensions = c(".R", ".r",
+                                               ".Rmd", ".rmd",
+                                               ".Rnw", ".rnw")) {
 
   assert_that(
     assertthat::is.string(path),

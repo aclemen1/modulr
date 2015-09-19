@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9022
+Version: 0.1.7.9023
 Title: A Dependency Injection (DI) Framework for R
 Description: A Dependency Injection (DI) Framework to break down sequential
     programs into discrete, modular units that are loosely coupled,
@@ -33,7 +33,6 @@ Suggests:
     htmltools,
     lintr,
     covr,
-    assertthat (>= 0.1.0.99),
     testthat,
     networkD3,
     gistr

@@ -55,6 +55,31 @@ test_that("import finds and imports .Rmd files", {
 
 })
 
+test_that("import finds and imports .Rnw files", {
+  reset()
+  file <- tempfile("modulr_test", fileext = ".Rnw")
+  name <- tools::file_path_sans_ext(basename(file))
+  path <- dirname(file)
+
+  module_text <-
+    sprintf(
+      "<<>>=\nlibrary(modulr)\ndefine('%s', NULL, function() NULL)\n@\n",
+      name)
+  write(module_text, file)
+  on.exit(unlink(file))
+
+  root_config$set(path)
+  module_file <- load_module(name)
+
+  expect_equal(module_file, file)
+
+  register <- get("register", pos = modulr_env)
+  module <- register[[name]]
+
+  expect_equal(module$name, name)
+
+})
+
 test_that("import re-imports modified .R files", {
   reset()
 
@@ -108,6 +133,43 @@ test_that("import re-imports modified .Rmd files", {
     sprintf(
       paste0("```{r}\nlibrary(modulr)\ndefine('%s', ",
              "NULL, function() 'changed')\n```\n"),
+      name)
+  write(module_text, file)
+  on.exit(unlink(file))
+  module_file <- load_module(name)
+
+  register <- get("register", pos = modulr_env)
+  module <- register[[name]]
+
+  expect_false(module$first_instance)
+  expect_less_than(module$timestamp, Sys.time())
+  expect_more_than(module$timestamp, timestamp)
+
+})
+
+test_that("import re-imports modified .Rnw files", {
+  reset()
+
+  file <- tempfile("modulr_test", fileext = ".Rnw")
+  name <- tools::file_path_sans_ext(basename(file))
+  path <- dirname(file)
+
+  module_text <-
+    sprintf(
+      "<<>>=\nlibrary(modulr)\ndefine('%s', NULL, function() NULL)\n@\n",
+      name)
+  write(module_text, file)
+  on.exit(unlink(file))
+
+  root_config$set(path)
+  module_file <- load_module(name)
+
+  timestamp <- Sys.time()
+
+  module_text <-
+    sprintf(
+      paste0("<<>>=\nlibrary(modulr)\ndefine('%s', ",
+             "NULL, function() 'changed')\n@\n"),
       name)
   write(module_text, file)
   on.exit(unlink(file))

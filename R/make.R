@@ -124,7 +124,7 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
   instance <- modulr_env$register[[c(name, "instance")]]
 
-  invisible(instance)
+  instance
 
 }
 
