@@ -38,11 +38,18 @@ test_that(".module_to_string returns a string", {
   expect_equal(length(.module_to_string("module")), 1)
 })
 
-test_that(".module_to_string loads modules", {
+test_that(".import_to_string shows name, digest and url", {
   reset()
-  expect_is(.module_to_string("module_1", load = TRUE), "character")
-  reset()
-  expect_error(.module_to_string("module_1", load = FALSE))
+  with_mock(
+    `httr::GET` = function(...) NULL,
+    `httr::content` = function(...)
+      'define("foo", NULL, function() NULL)\n',
+    import_module("foo", "fake_url"),
+    tmp <- .import_to_string("foo"),
+    expect_match(tmp, "^\"foo\""),
+    expect_match(tmp, sprintf("%%digests%%.*\"%s\"", get_digest("foo"))),
+    expect_match(tmp, "%imports%.*\"fake_url\"")
+  )
 })
 
 test_that(".module_to_string shows name", {
@@ -102,6 +109,17 @@ test_that("prepare_gear shows installation section", {
   reset()
   define("module", NULL, function(other) NULL)
   expect_match(prepare_gear("module"), "## Installation")
+})
+
+test_that("prepare_gear shows imports section", {
+  with_mock(
+    `httr::GET` = function(...) NULL,
+    `httr::content` = function(...)
+      'define("foo", NULL, function() NULL)\n',
+    import_module("foo", "fake_url"),
+    define("module", list(foo = "foo"), function(foo) NULL),
+    expect_match(prepare_gear("module"), "```\\{r imports\\}")
+  )
 })
 
 test_that("prepare_gear shows definition section", {

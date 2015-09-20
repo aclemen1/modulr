@@ -6,7 +6,7 @@
 \alias{modulr-package}
 \alias{modulr_env}
 \title{modulr -- Module Pattern and DI in R}
-\format{\preformatted{<environment: 0x444c5c0> 
+\format{\preformatted{<environment: 0x465a7f0> 
 }}
 \usage{
 modulr_env

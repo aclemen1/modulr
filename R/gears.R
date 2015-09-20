@@ -8,20 +8,20 @@
   paste(s, collapse = "\n")
 }
 
-.module_to_string <- function(name, base = NULL, load = T) {
+.module_to_string <- function(name, base = NULL) {
 
   assert_that(
-    .is_regular(name),
-    is.null(base) || .is_regular(base),
-    assertthat::is.flag(load))
+    .is_defined_regular(name),
+    is.null(base) || .is_defined_regular(base))
 
-  factory <- get_factory(name, load = load)
+  factory <- get_factory(name, load = FALSE)
   if(!is.null(base) &&
-       identical(factory, get_factory(base, load = load))) {
+       identical(factory, get_factory(base))) {
     factory_string <- sprintf("get_factory(\"%s\")", base)
   } else {
     factory_string <- .function_to_string(factory)
   }
+
   dependencies <- modulr_env$register[[name]]$dependencies
   if(isTRUE(length(dependencies) > 0)) {
     if(length(dependencies) == 1) {
@@ -51,8 +51,28 @@
   module
 }
 
+.import_to_string <- function(name) {
+
+  assert_that(.is_defined(name))
+
+  url <- modulr_env$register[[c(name, "url")]]
+
+  if(!is.null(url)) {
+    sprintf(
+      paste(
+        "\"%s\" %%digests%%",
+        "  \"%s\" %%imports%%",
+        "  \"%s\"",
+        "", sep = "\n"),
+      name,
+      modulr_env$register[[c(name, "digest")]],
+      url)
+  }
+
+}
+
 #' @export
-prepare_gear <- function(name, url = NULL, load = T) {
+prepare_gear <- function(name, url = NULL, load = TRUE) {
 
   .message_meta("Entering prepare_gear() ...",
                 verbosity = +Inf)
@@ -67,17 +87,25 @@ prepare_gear <- function(name, url = NULL, load = T) {
     is.null(url) || assertthat::is.string(url),
     assertthat::is.flag(load))
 
-  module <- .module_to_string(name, load = load)
+  if(load) load_module(name)
+
+  assert_that(.is_defined_regular(name))
+
+  imports <- lapply(
+    setdiff(.define_all_dependent_modules(name), name),
+    .import_to_string)
+
+  module <- .module_to_string(name)
 
   mocks <-
     vapply(list_modules(regexp = sprintf("^%s/mock", name), wide = F),
-           .module_to_string, load = load, base = name, FUN.VALUE = "")
+           .module_to_string, base = name, FUN.VALUE = "")
   tests <-
     vapply(list_modules(regexp = sprintf("^%s/test", name), wide = F),
-           .module_to_string, load = load, FUN.VALUE = "")
+           .module_to_string, FUN.VALUE = "")
   examples <-
     vapply(list_modules(regexp = sprintf("^%s/example", name), wide = F),
-           .module_to_string, load = load, FUN.VALUE = "")
+           .module_to_string, FUN.VALUE = "")
 
   gear <- paste(
     sprintf("# `%s` (gear)", name),
@@ -95,6 +123,10 @@ prepare_gear <- function(name, url = NULL, load = T) {
       sprintf("```"), sep = "\n"),
     paste(
       sprintf("## Definition"),
+      if(length(imports) > 0) paste(
+        sprintf("```{r imports}"),
+        sprintf("%s", paste(imports, collapse = "\n")),
+        sprintf("```"), sep = "\n"),
       sprintf("```{r definition}"),
       sprintf("%s", module),
       sprintf("```"), sep = "\n"),

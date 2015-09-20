@@ -83,6 +83,8 @@ import_module <- function(name, url, digest = NULL, force = FALSE, ...) {
            call. = FALSE)
     }
 
+    modulr_env$register[[c(name, "url")]] <- url
+
     return(invisible(ev))
 
   }
