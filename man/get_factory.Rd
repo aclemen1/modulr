@@ -2,11 +2,62 @@
 % Please edit documentation in R/define.R
 \name{get_factory}
 \alias{get_factory}
-\title{Get module factory.}
+\title{Get the Factory of a Module.}
 \usage{
 get_factory(name, load = FALSE)
 }
+\arguments{
+\item{name}{A string (character vector of lenght one).
+
+  A module name can contain letters, figures and some special characters,
+  namely \code{_}, \code{-}, and \code{/}. The latter is a namespace
+  separator.
+
+  Names containing \code{/mock/}, \code{/mocks/}, \code{/test/},
+  \code{/tests/}, \code{/example/}, or \code{/examples/} have a special
+  meaning related to code testing and examples.
+
+  The name "modulr" corresponds to a special module and is therefore
+  reserved.}
+
+\item{load}{A flag. Should an undefined module be implicitely loaded?}
+}
+\value{
+A function identical to the factory function of the module.
+}
 \description{
-Get module factory.
+Get the factory function of a module.
+}
+\details{
+For testing purposes, it is often useful for mocks to be able to refer to
+ the factory of a module.
+}
+\section{Warning}{
+
+ It is considered a very bad practice to define, touch, undefine, load, make,
+ reset, or perform any other operation from within a module definition that
+ may alterate the internal state of modulr.
+}
+\examples{
+reset()
+define("foo", NULL, function() "foo")
+define("bar", list(foo = "foo"), function(foo) paste0(foo, "bar"))
+define("foo/mock", NULL, function() "foooooo")
+define("bar/mock", list(foo = "foo/mock"), get_factory("bar"))
+make("bar/mock")
+
+reset()
+tmp_dir <- tempfile("modulr_")
+dir.create(tmp_dir)
+tmp_file <- file.path(tmp_dir, "foo.R")
+cat('define("foo", NULL, function() "Hello World!")', file = tmp_file)
+root_config$set(tmp_dir)
+\dontrun{get_factory("foo", load = FALSE)}
+get_factory("foo", load = TRUE)
+unlink(tmp_dir)
+}
+\seealso{
+\code{\link{define}}, \code{\link{make}}, \code{\link{reset}},
+  and \code{link{root_config}}.
 }
 

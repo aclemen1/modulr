@@ -1,7 +1,7 @@
 # nocov start
 .onLoad <- function(libname, pkgname) {
 
-  reset(all = TRUE, verbose = FALSE)
+  reset(all = TRUE, .verbose = FALSE)
 
   activate_breadcrumbs()
 

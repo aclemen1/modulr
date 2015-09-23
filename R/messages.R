@@ -1,7 +1,7 @@
 .message_meta <- function(msg, expr = NULL, verbosity = 0) {
 
   assert_that(
-    assertthat::is.string(msg),
+    assertthat::is.string(msg) || is.null(msg),
     assertthat::is.scalar(verbosity))
 
   verbosity_level <- .get_0("verbosity", envir = modulr_env,
@@ -12,7 +12,7 @@
   level <- .get_0(".message_level", envir = modulr_env, ifnotfound = 0)
   on.exit(modulr_env$.message_level <- level)
 
-  if(verbose) {
+  if(verbose && !is.null(msg)) {
 
     out <- sprintf(
       "[%s] ",
@@ -30,7 +30,7 @@
 
   }
 
-  if (verbose) modulr_env$.message_level <- level + 1
+  if (verbose && !is.null(msg)) modulr_env$.message_level <- level + 1
 
   if(!is.null(expr)) eval(expr)
 

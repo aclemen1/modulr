@@ -5,10 +5,46 @@
 
 }
 
-#' In order to know if a module definition has changed,
-#' we compute a digest of it with a cryptographic hash.
+#' Get the Digest of a Module.
+#'
+#' Get the digest (a SHA-256 hash of the dependencies and factory) of a module.
+#'
+#' @inheritParams define
+#' @param load A flag. Should an undefined module be implicitely loaded?
+#'
+#' @return A string containing the digest of the module.
+#'
+#' @details
+#'
+#'  A digest is useful for comparing two modules. For instance, in order to know
+#'  if a module definition has changed, a digest of the newly presented module
+#'  is computed and compared to the existing one. When a module is imported from
+#'  an URL, it is also possible to specify a digest. The imported module is then
+#'  rejected if its digest differs from the expected value.
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{define}} and \code{\link{root_config}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() NULL)
+#' get_digest("foo")
+#'
+#' reset()
+#' tmp_dir <- tempfile("modulr_")
+#' dir.create(tmp_dir)
+#' tmp_file <- file.path(tmp_dir, "foo.R")
+#' cat('define("foo", NULL, function() NULL)', file = tmp_file)
+#' root_config$set(tmp_dir)
+#' \dontrun{get_digest("foo", load = FALSE)}
+#' get_digest("foo", load = TRUE)
+#' unlink(tmp_dir)
+#'
 #' @export
-# TODO: write documentation
 get_digest <- function(name, load = FALSE) {
 
   .message_meta(sprintf("Entering get_digest() for '%s' ...", name),
@@ -64,15 +100,14 @@ get_digest <- function(name, load = FALSE) {
 #' @details
 #'
 #' The definition of a module can be done explicitly in the console, implicitly
-#' from a file which is persistent on a disk, or remotely at a given URL via the
-#' HTTP(S) protocol (\emph{modulr gears}). These three ways of defining modules
-#' have their specificities.
+#' from a file on a disk, or remotely at a given URL via the HTTP(S) protocol.
+#' These three ways of defining modules have their specificities.
 #'
 #' \describe{
-#' \item{Explicit Method}{
+#' \item{Explicit Definition}{
 #' This is the most direct method to define or redefine a module. This is also
 #' the most volatile since the lifespan of the module is limited to the R
-#' session only. When a new module is defined, the internal state of the package
+#' session. When a new module is defined, the internal state of the package
 #' is modified to record its name, dependencies and factory. Some other useful
 #' metadata are also recorded, like timestamps, various flags and counters, and
 #' a digest. When an existing module is redefined, the internal state is updated
@@ -81,7 +116,7 @@ get_digest <- function(name, load = FALSE) {
 #' the factory which is postponed to a subsequent \code{\link{make}} call.
 #' }
 #'
-#' \item{Implicit Method}{ This is the natural
+#' \item{Implicit Definition}{ This is the natural
 #' method to choose when a module is intended to be reused. In such a case, the
 #' definition takes place in a dedicated file, which name is closely related to
 #' the module's name.
@@ -118,7 +153,7 @@ get_digest <- function(name, load = FALSE) {
 #' directories \code{"./module"}, \code{"./modules"}, \code{"./lib"},
 #' \code{"./libs"}, and \code{"."}.
 #'
-#' \item The \code{\link{paths_config}} accessor acts at a \emph{namespace
+#' \item The \code{\link{paths_config}} accessor acts at the \emph{namespace
 #' level}, by mapping a specific namespace to a dedicated path, relative to the
 #' root directory. For instance, \code{paths_config$set("vendor" =
 #' "third_parties/vendor")} will map the \code{vendor/great_module} to the
@@ -137,9 +172,9 @@ get_digest <- function(name, load = FALSE) {
 #' }
 #' }
 #' }
-#' \item The \code{\link{maps_config}} accessor acts at a \emph{module level},
-#' by substituting specific dependencies within the scope of a given module
-#' only. This is especially useful in a situation where a dependency has been
+#' \item The \code{\link{maps_config}} accessor acts at the \emph{module level},
+#' by substituting specific dependencies within the scope of a given module.
+#' This is especially useful in a situation where a dependency has been
 #' replaced by a newer version, but a module still needs to rely on the previous
 #' one. For instance, \code{maps_config$set("foo/bar" =
 #' list("vendor/great_module" = "vendor/old_great_module"))} tells modulr that
@@ -177,16 +212,64 @@ get_digest <- function(name, load = FALSE) {
 #' testing module.
 #'
 #' }
-#' \item{Remote Method and \emph{modulr gears}}{
-#' This is the method used to share modules via the HTTP(S) protocol. The module
-#' is thus served at a given URL and has to be imported in order to be defined.
-#' Public and private Gists, files on Github, and any HTTP server can be used to
-#' share so called \emph{modulr gears}, or more succinctly \emph{gears}.
+#' \item{Remote Definition}{
+#' This is the method used to share a module via the HTTP(S) protocol. The
+#' module is thus served at a given URL and has to be imported (see
+#' \code{\link{import_module}}) in order to be defined and used. Like files, it
+#' is possible to store several related definitions at one URL. Public and
+#' private Gists, files on Github, and any HTTP server can be used to share so
+#' called \emph{modulr gears}.
 #' }
 #' }
 #'
+#' @section Syntactic Sugars:
+#'  \preformatted{name \%provides\% factory}
+#'  \preformatted{name \%requires\% dependencies \%provides\% factory}
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{.Last.name}}, \code{\link{graph_dependencies}},
+#'   \code{\link{import_module}}, \code{\link{make}},
+#'   \code{\link{maps_config}}, \code{\link{paths_config}}, \code{\link{reset}},
+#'   \code{\link{touch}}, and \code{\link{undefine}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() "Hello")
+#' bar <- define("bar", list(foo = "foo"), function(foo) paste(foo, "World!"))
+#' bar()
+#' define("foo", NULL, function() "Again, Hello")
+#' bar()
+#'
+#' reset()
+#' "foo" %provides% function() "Hello"
+#' "bar" %requires%
+#'   list(foo = "foo") %provides%
+#'   function(foo) paste(foo, "World!")
+#' make()
+#' "foo" %provides% function() "Again, Hello"
+#' make("bar")
+#'
+#' reset()
+#' define("A", list(b = "B"), function(b) NULL)
+#' define("B", list(a = "A"), function(a) NULL)
+#' \dontrun{make()}
+#'
+#' reset()
+#' define("A", NULL, function() NULL)
+#' define("B", NULL, function() NULL)
+#' define("C", list(a = "A"), function(a) NULL)
+#' define("D", list(a = "A", b = "B"), function(a, b) NULL)
+#' define("E", list(d = "D"), function(d) NULL)
+#' define("F", list(c = "C", d = "D", e = "E"), function(c, d, e) NULL)
+#' graph_dependencies()
+#' make()
+#'
+#' @aliases %requires% %provides%
 #' @export
-# TODO: write the documentation
 define <- function(name, dependencies, factory) {
 
   .message_meta(sprintf("Entering define() for '%s' ...", name),
@@ -283,10 +366,47 @@ define <- function(name, dependencies, factory) {
 
 }
 
-#' Get module factory.
+#' Get the Factory of a Module.
+#'
+#' Get the factory function of a module.
+#'
+#' @inheritParams define
+#' @param load A flag. Should an undefined module be implicitely loaded?
+#'
+#' @return A function identical to the factory function of the module.
+#'
+#' @details
+#'
+#'  For testing purposes, it is often useful for mocks to be able to refer to
+#'  the factory of a module.
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{define}}, \code{\link{make}}, \code{\link{reset}},
+#'   and \code{link{root_config}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() "foo")
+#' define("bar", list(foo = "foo"), function(foo) paste0(foo, "bar"))
+#' define("foo/mock", NULL, function() "foooooo")
+#' define("bar/mock", list(foo = "foo/mock"), get_factory("bar"))
+#' make("bar/mock")
+#'
+#' reset()
+#' tmp_dir <- tempfile("modulr_")
+#' dir.create(tmp_dir)
+#' tmp_file <- file.path(tmp_dir, "foo.R")
+#' cat('define("foo", NULL, function() "Hello World!")', file = tmp_file)
+#' root_config$set(tmp_dir)
+#' \dontrun{get_factory("foo", load = FALSE)}
+#' get_factory("foo", load = TRUE)
+#' unlink(tmp_dir)
 #'
 #' @export
-# TODO: write documentation
 get_factory <- function(name, load = FALSE) {
 
   .message_meta(sprintf("Entering get_factory() for '%s' ...", name),
@@ -310,11 +430,48 @@ get_factory <- function(name, load = FALSE) {
 
 }
 
-#' Remove all module definitions.
+#' Reset the Modulr Internal State.
+#'
+#' Reset the modulr internal state.
+#'
+#' @param all A flag. Should stashes be also dropped?
+#' @param .verbose A flag. For internal use only. Should be verbose?
+#'
+#' @details
+#'
+#'  Reset the modulr internal state: definitions and configurations are dropped,
+#'  verbosity is set to default (see \code{\link{set_verbosity}}), .Last.name is
+#'  set to NULL (see \code{\link{.Last.name}}), and root directory is set to
+#'  default (see \code{\link{root_config}}). After a reset, the special module
+#'  \code{modulr} is automatically defined. If \code{all} is set to \code{TRUE},
+#'  stashes are also dropped (see \code{\link{stash}}).
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{.Last.name}}, \code{\link{define}},
+#'   \code{\link{list_modules}}, \code{\link{list_stashes}},
+#'   \code{\link{reset}}, \code{\link{root_config}},
+#'   \code{\link{set_verbosity}}, and \code{\link{stash}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() NULL)
+#' root_config$set("./foobar")
+#' stash(comment = "foo stash")
+#' set_verbosity(+Inf)
+#' reset()
+#' list_modules()
+#' list_stashes()
+#' root_config$get_all()
+#' .Last.name
+#' reset(all = T)
+#' list_stashes()
 #'
 #' @export
-# TODO: write documentation
-reset <- function(all = FALSE, verbose = TRUE) {
+reset <- function(all = FALSE, .verbose = TRUE) {
 
   .message_meta("Entering reset() ...",
                 verbosity = +Inf)
@@ -326,9 +483,9 @@ reset <- function(all = FALSE, verbose = TRUE) {
 
   assert_that(
     assertthat::is.flag(all),
-    assertthat::is.flag(verbose))
+    assertthat::is.flag(.verbose))
 
-  if(verbose)
+  if(.verbose)
     .message_meta("Resetting modulr state ... ", verbosity = 2)
 
   modulr_env$register <- list()
@@ -346,11 +503,28 @@ reset <- function(all = FALSE, verbose = TRUE) {
 
 }
 
-#' Undefine module.
+#' Undefine a Module.
+#'
+#' Undefine a module by dropping it definition from the modulr internal state.
+#'
+#' @inheritParams define
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{define}}, \code{\link{list_modules}},
+#'   and \code{\link{reset}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() "foo")
+#' list_modules()
+#' undefine("foo")
+#' list_modules()
 #'
 #' @export
-# TODO: write documentation
-
 undefine <- function(name) {
 
   .message_meta(sprintf("Entering undefine() for '%s' ...", name),
@@ -371,59 +545,22 @@ undefine <- function(name) {
 
 }
 
-#' Touch module.
-#'
 #' @export
-# TODO: write documentation
-touch <- function(name) {
+`%requires%` <- function(name, dependencies) {
 
-  .message_meta(sprintf("Entering touch() for '%s' ...", name),
-                verbosity = +Inf)
-
-  if(.is_called_from_within_module()) {
-    warning("touch is called from within a module.",
-            call. = FALSE, immediate. = TRUE)
-  }
-
-  assert_that(.is_defined_regular(name))
-
-  .message_meta(sprintf("Touching '%s' ...", name), verbosity = 2)
-
-  modulr_env$register[[c(name, "instance")]] <- NULL
-  modulr_env$register[[c(name, "instanciated")]] <- F
-  modulr_env$register[[c(name, "calls")]] <- 0
-  modulr_env$register[[c(name, "duration")]] <- NA_integer_
-  modulr_env$register[[c(name, "timestamp")]] <- Sys.time()
-
-  if(.is_regular(name))
-    modulr_env$.Last.name <- name # Exclude Linting
-
-  module_option(name)$unset()
-
-  invisible()
-
-}
-
-#' Syntactic sugar to require dependencies, to be used in conjunction with \%provides\%.
-#'
-#' @export
-`%requires%` <- function(lhs, rhs) {
-
-  assert_that(.is_regular(lhs))
+  assert_that(.is_regular(name))
 
   assert_that(
-    is.list(rhs) || is.null(rhs),
+    is.list(dependencies) || is.null(dependencies),
     msg = "right-hand side of `%requires%` is not a list of dependencies."
   )
 
-  list(name = lhs, dependencies = rhs)
+  list(name = name, dependencies = dependencies)
 
 }
 
-#' Syntactic sugar to provide a factory, can be used in conjunction with \%requires\%.
-#'
 #' @export
-`%provides%` <- function(lhs, rhs) {
+`%provides%` <- function(lhs, factory) {
 
   if(.is_called_from_within_module()) {
     warning("`%provides%` is called from within a module.",
@@ -431,7 +568,7 @@ touch <- function(name) {
   }
 
   assert_that(
-    is.function(rhs),
+    is.function(factory),
     msg = "right-hand side of `%provides%` is not a factory."
     )
 
@@ -450,7 +587,6 @@ touch <- function(name) {
     name <- as.character(lhs)
     dependencies <- list()
   }
-  factory <- rhs
 
   do.call(
     define,

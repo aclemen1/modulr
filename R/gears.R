@@ -91,9 +91,9 @@ prepare_gear <- function(name, url = NULL, load = TRUE) {
 
   assert_that(.is_defined_regular(name))
 
-  imports <- lapply(
+  imports <- Filter(function(x) !is.null(x), lapply(
     setdiff(.define_all_dependent_modules(name), name),
-    .import_to_string)
+    .import_to_string))
 
   module <- .module_to_string(name)
 
@@ -186,6 +186,10 @@ publish_gear <- function(name, load = TRUE, browse = TRUE) {
     assertthat::is.flag(load),
     assertthat::is.flag(browse))
 
+  if(load) load_module(name)
+
+  assert_that(.is_defined_regular(name))
+
   auth <- gistr::gist_auth()
 
   rates <- gistr::rate_limit()
@@ -227,8 +231,7 @@ publish_gear <- function(name, load = TRUE, browse = TRUE) {
 
   gear_url <- sub("(?:raw/)[^/]*", "raw", g[["files"]][[1]][["raw_url"]])
 
-  gear_string <- prepare_gear(name, url = gear_url,
-                              load = load)
+  gear_string <- prepare_gear(name, url = gear_url)
 
   tmp_dir <- tempfile("modulr_")
   dir.create(tmp_dir)

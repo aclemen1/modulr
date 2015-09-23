@@ -33,8 +33,7 @@
 
 }
 
-# A topological sort, grouped by independent modules into layers.
-.topological_sort_with_layer <- function(graph) {
+.topological_sort <- function(graph) {
 
   assert_that(
     is.data.frame(graph),
@@ -42,58 +41,7 @@
   )
 
   if(nrow(graph) > 0) {
-
-    node <- unique(unlist(graph, use.names = FALSE))
-    node_length <- length(node)
-
-    nodes <-
-      data.frame(
-        node = node,
-        dependency = node,
-        deps_idx = 1,
-        stringsAsFactors = FALSE)
-
-    while(!all(is.na(nodes$dependency))) {
-
-      names(nodes)[names(nodes) == "dependency"] <- "module"
-      nodes <- merge(nodes, graph, by = "module", all.x = TRUE)
-      nodes <- nodes[, names(nodes) != "module"]
-      nodes <- transform(
-        nodes,
-        deps_idx = ifelse(
-          is.na(nodes$dependency), nodes$deps_idx, nodes$deps_idx + 1))
-
-      if(max(nodes$deps_idx) > node_length)
-        stop("Cycle detected.", call. = FALSE)
-
-    }
-
-    nodes <- aggregate(deps_idx ~ node, data = nodes, max)
-    names(nodes)[names(nodes) == "deps_idx"] <- "layer"
-    nodes <- nodes[order(nodes$layer),]
-    row.names(nodes) <- seq_len(nrow(nodes))
-
-    return(nodes)
-
-  }
-
-}
-
-.topological_sort_by_layers <- function(graph) {
-
-  assert_that(
-    is.data.frame(graph),
-    nrow(graph) == 0 || setequal(names(graph), c("module", "dependency"))
-  )
-
-  if(nrow(graph) > 0) {
-
-    nodes <- .topological_sort_with_layer(graph)
-
-    layers <- split(nodes$node, nodes$layer)
-
-    return(layers)
-
+    pooh::tsort(graph$dependency, graph$module)
   }
 
 }

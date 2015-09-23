@@ -2,11 +2,42 @@
 % Please edit documentation in R/define.R
 \name{undefine}
 \alias{undefine}
-\title{Undefine module.}
+\title{Undefine a Module.}
 \usage{
 undefine(name)
 }
+\arguments{
+\item{name}{A string (character vector of lenght one).
+
+  A module name can contain letters, figures and some special characters,
+  namely \code{_}, \code{-}, and \code{/}. The latter is a namespace
+  separator.
+
+  Names containing \code{/mock/}, \code{/mocks/}, \code{/test/},
+  \code{/tests/}, \code{/example/}, or \code{/examples/} have a special
+  meaning related to code testing and examples.
+
+  The name "modulr" corresponds to a special module and is therefore
+  reserved.}
+}
 \description{
-Undefine module.
+Undefine a module by dropping it definition from the modulr internal state.
+}
+\section{Warning}{
+
+ It is considered a very bad practice to define, touch, undefine, load, make,
+ reset, or perform any other operation from within a module definition that
+ may alterate the internal state of modulr.
+}
+\examples{
+reset()
+define("foo", NULL, function() "foo")
+list_modules()
+undefine("foo")
+list_modules()
+}
+\seealso{
+\code{\link{define}}, \code{\link{list_modules}},
+  and \code{\link{reset}}.
 }
 

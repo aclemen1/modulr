@@ -2,11 +2,50 @@
 % Please edit documentation in R/define.R
 \name{reset}
 \alias{reset}
-\title{Remove all module definitions.}
+\title{Reset the Modulr Internal State.}
 \usage{
-reset(all = FALSE, verbose = TRUE)
+reset(all = FALSE, .verbose = TRUE)
+}
+\arguments{
+\item{all}{A flag. Should stashes be also dropped?}
+
+\item{.verbose}{A flag. For internal use only. Should be verbose?}
 }
 \description{
-Remove all module definitions.
+Reset the modulr internal state.
+}
+\details{
+Reset the modulr internal state: definitions and configurations are dropped,
+ verbosity is set to default (see \code{\link{set_verbosity}}), .Last.name is
+ set to NULL (see \code{\link{.Last.name}}), and root directory is set to
+ default (see \code{\link{root_config}}). After a reset, the special module
+ \code{modulr} is automatically defined. If \code{all} is set to \code{TRUE},
+ stashes are also dropped (see \code{\link{stash}}).
+}
+\section{Warning}{
+
+ It is considered a very bad practice to define, touch, undefine, load, make,
+ reset, or perform any other operation from within a module definition that
+ may alterate the internal state of modulr.
+}
+\examples{
+reset()
+define("foo", NULL, function() NULL)
+root_config$set("./foobar")
+stash(comment = "foo stash")
+set_verbosity(+Inf)
+reset()
+list_modules()
+list_stashes()
+root_config$get_all()
+.Last.name
+reset(all = T)
+list_stashes()
+}
+\seealso{
+\code{\link{.Last.name}}, \code{\link{define}},
+  \code{\link{list_modules}}, \code{\link{list_stashes}},
+  \code{\link{reset}}, \code{\link{root_config}},
+  \code{\link{set_verbosity}}, and \code{\link{stash}}.
 }
 

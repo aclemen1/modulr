@@ -11,6 +11,8 @@
 
 modulr_env <- new.env(parent = emptyenv())
 
+globalVariables(c(".Last.name"))
+
 if(packageVersion("assertthat") >= package_version("0.1.0.99")) {
   assert_that <- assertthat::assert_that
 } else {

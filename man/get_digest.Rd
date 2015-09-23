@@ -2,13 +2,61 @@
 % Please edit documentation in R/define.R
 \name{get_digest}
 \alias{get_digest}
-\title{In order to know if a module definition has changed,
-we compute a digest of it with a cryptographic hash.}
+\title{Get the Digest of a Module.}
 \usage{
 get_digest(name, load = FALSE)
 }
+\arguments{
+\item{name}{A string (character vector of lenght one).
+
+  A module name can contain letters, figures and some special characters,
+  namely \code{_}, \code{-}, and \code{/}. The latter is a namespace
+  separator.
+
+  Names containing \code{/mock/}, \code{/mocks/}, \code{/test/},
+  \code{/tests/}, \code{/example/}, or \code{/examples/} have a special
+  meaning related to code testing and examples.
+
+  The name "modulr" corresponds to a special module and is therefore
+  reserved.}
+
+\item{load}{A flag. Should an undefined module be implicitely loaded?}
+}
+\value{
+A string containing the digest of the module.
+}
 \description{
-In order to know if a module definition has changed,
-we compute a digest of it with a cryptographic hash.
+Get the digest (a SHA-256 hash of the dependencies and factory) of a module.
+}
+\details{
+A digest is useful for comparing two modules. For instance, in order to know
+ if a module definition has changed, a digest of the newly presented module
+ is computed and compared to the existing one. When a module is imported from
+ an URL, it is also possible to specify a digest. The imported module is then
+ rejected if its digest differs from the expected value.
+}
+\section{Warning}{
+
+ It is considered a very bad practice to define, touch, undefine, load, make,
+ reset, or perform any other operation from within a module definition that
+ may alterate the internal state of modulr.
+}
+\examples{
+reset()
+define("foo", NULL, function() NULL)
+get_digest("foo")
+
+reset()
+tmp_dir <- tempfile("modulr_")
+dir.create(tmp_dir)
+tmp_file <- file.path(tmp_dir, "foo.R")
+cat('define("foo", NULL, function() NULL)', file = tmp_file)
+root_config$set(tmp_dir)
+\dontrun{get_digest("foo", load = FALSE)}
+get_digest("foo", load = TRUE)
+unlink(tmp_dir)
+}
+\seealso{
+\code{\link{define}} and \code{\link{root_config}}.
 }
 

@@ -7,7 +7,7 @@ test_that(".is_defined return only T or F", {
   expect_true(.is_defined("bar"))
   })
 
-test_that("import finds and imports .R files", {
+test_that("load_module finds and loads .R files", {
   reset()
 
   file <- tempfile("modulr_test", fileext = ".R")
@@ -30,7 +30,7 @@ test_that("import finds and imports .R files", {
 
   })
 
-test_that("import finds and imports .Rmd files", {
+test_that("load_module finds and loads .Rmd files", {
   reset()
   file <- tempfile("modulr_test", fileext = ".Rmd")
   name <- tools::file_path_sans_ext(basename(file))
@@ -55,7 +55,7 @@ test_that("import finds and imports .Rmd files", {
 
 })
 
-test_that("import finds and imports .Rnw files", {
+test_that("load_module finds and loads .Rnw files", {
   reset()
   file <- tempfile("modulr_test", fileext = ".Rnw")
   name <- tools::file_path_sans_ext(basename(file))
@@ -80,7 +80,7 @@ test_that("import finds and imports .Rnw files", {
 
 })
 
-test_that("import re-imports modified .R files", {
+test_that("load_module re-loads modified .R files", {
   reset()
 
   file <- tempfile("modulr_test", fileext = ".R")
@@ -110,7 +110,7 @@ test_that("import re-imports modified .R files", {
 
 })
 
-test_that("import re-imports modified .Rmd files", {
+test_that("load_module re-loads modified .Rmd files", {
   reset()
 
   file <- tempfile("modulr_test", fileext = ".Rmd")
@@ -147,7 +147,7 @@ test_that("import re-imports modified .Rmd files", {
 
 })
 
-test_that("import re-imports modified .Rnw files", {
+test_that("load_module re-loads modified .Rnw files", {
   reset()
 
   file <- tempfile("modulr_test", fileext = ".Rnw")
@@ -190,4 +190,29 @@ test_that("load_module calls are warned from within a module", {
     load_module("module_1")
   })
   expect_warning(make("module"))
+})
+
+test_that(".define_all_dependent_modules doesn't fall into cycles", {
+  reset()
+
+  file_1 <- tempfile("modulr_test", fileext = ".R")
+  name_1 <- tools::file_path_sans_ext(basename(file_1))
+
+  file_2 <- tempfile("modulr_test", fileext = ".R")
+  name_2 <- tools::file_path_sans_ext(basename(file_2))
+
+  module_1_text <- sprintf("define('%s', list(m2 = '%s'), function(m2) NULL)",
+                           name_1, name_2)
+  write(module_1_text, file_1)
+  on.exit(unlink(file_1))
+
+  module_2_text <- sprintf("define('%s', list(m1 = '%s'), function(m1) NULL)",
+                           name_2, name_1)
+  write(module_2_text, file_2)
+  on.exit(unlink(file_2), add = T)
+
+  root_config$set(tempdir())
+
+  expect_equal(length(.define_all_dependent_modules(name_1)), 2)
+
 })

@@ -1,11 +1,122 @@
-#' Make module
+#' Make a Module.
 #'
+#' Make or remake a module.
+#'
+#' @inheritParams define
+#'
+#' @return The object resulting of the evaluation of the factory function of the
+#'   module.
+#'
+#' @details
+#'
+#' A call to the \code{make} function triggers a series of actions, which are
+#' actually the core purposes of the modulr package.
+#' \enumerate{
+#' \item All dependencies are visited, recursively. This process is based on the
+#' explicit and implicit rules of name resolution, as explained in
+#' \code{\link{define}}. In particular, the configurations set by
+#' \code{\link{root_config}}, \code{\link{paths_config}}, and
+#' \code{\link{maps_config}} are taken into account and every modules for which
+#' changes are detected are automatically redefined.
+#' \item Along the lines of this recursive process, an internal representation
+#' of the dependencies and the relations between them is constructed. This
+#' provides a directed graph, which vertices represent the modules to be
+#' evaluated, and edges represent constraints on evaluations that must be
+#' performed before others.
+#' \item If no cycle among dependencies is detected, the graph is then a
+#' Directed Acyclic Graph (DAG), and a so called topological sorting can be
+#' performed on it to compute a well ordered sequence of evaluations.
+#' \item Each module factory is then evaluated in the order, or re-evaluated if
+#' outdated, with all its dependencies passed as arguments. A module is
+#' considered outdated when it has been explicitly \code{\link{touch}}ed or if
+#' one of its dependencies has been redefined or is itself outdated. The result
+#' of the evaluation of every module factory is stored in the modulr internal
+#' state, so that it can be reused when appropriate, without re-evaluation.
+#' }
+#'
+#' The expressions \code{variable \%<=\% name} and \code{name \%=>\% variable}
+#' (respectively \code{variable \%<<=\% name} and \code{name \%=>>\% variable})
+#' are just \emph{syntactic sugars} for the expression
+#' \code{variable <- make(name)} (respectively \code{variable <<- make(name)}).
+#'
+#' The \code{make_all} function applies a \code{make} call to each defined module.
+#'
+#' @section Syntactic Sugars:
+#'  \preformatted{variable \%<=\% name}
+#'  \preformatted{name \%=>\% variable}
+#'  \preformatted{variable \%<<=\% name}
+#'  \preformatted{name \%=>>\% variable}
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{.Last.name}}, \code{\link{graph_dependencies}},
+#'   \code{\link{import_module}}, \code{\link{make}},
+#'   \code{\link{maps_config}}, \code{\link{paths_config}}, \code{\link{reset}},
+#'   and \code{\link{touch}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() format(Sys.time(), "%H:%M:%OS6"))
+#' foo <- make("foo")
+#' foo
+#' foo
+#'
+#' reset()
+#' define("foo", NULL, function() function() format(Sys.time(), "%H:%M:%OS6"))
+#' foo %<=% "foo"
+#' foo()
+#' foo()
+#'
+#' reset()
+#' define("A", NULL, function() "(A)")
+#' define("B", NULL, function() "(B)")
+#' define("C", list(a = "A"), function(a) paste0("(", a, "C)"))
+#' define("D", list(a = "A", b = "B"), function(a, b) paste0("(", a, b, "D)"))
+#' define("E", list(d = "D"), function(d) paste0("(", d, "E)"))
+#' define("F", list(c = "C", d = "D", e = "E"),
+#'   function(c, d, e) paste0("(", c, d, e, "F)"))
+#' make()
+#' define("B", NULL, function() "(B')")
+#' make("F")
+#' graph_dependencies()
+#'
+#' reset()
+#' tmp_dir <- tempfile("modulr_")
+#' dir.create(tmp_dir)
+#' tmp_file <- file.path(tmp_dir, "foo.R")
+#' cat('define("foo", NULL, function() "Hello World!")', file = tmp_file)
+#' root_config$set(tmp_dir)
+#' set_verbosity(1L)
+#' make("foo")
+#' make("foo")
+#' touch("foo")
+#' make("foo")
+#' unlink(tmp_dir)
+#'
+#' \dontrun{
+#' reset()
+#' # https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3
+#' "modulr/vault" %imports%
+#'   paste0("https://gist.githubusercontent.com/aclemen1/",
+#'     "3fcc508cb40ddac6c1e3/raw/modulr-vault.Rmd")
+#' list_modules()
+#' make_tests()
+#' make("modulr/vault/example")
+#' touch("modulr/vault")
+#' make_all()
+#' }
+#'
+#' @aliases %<=% %=>% %<<=% %=>>%
 #' @export
-# TODO: write documentation
-make <- function(name = modulr_env$.Last.name) { # Exclude Linting
+make <- function(name = .Last.name) { # Exclude Linting
 
   .message_meta(sprintf("Entering make() for '%s' ...", name),
                 verbosity = +Inf)
+
+  assert_that(.is_conform(name))
 
   if(.is_called_from_within_module()) {
     warning("make is called from within a module.",
@@ -30,106 +141,121 @@ make <- function(name = modulr_env$.Last.name) { # Exclude Linting
 
     dependency_graph <- .build_dependency_graph(all_dependencies)
 
-    layered_names <- .topological_sort_by_layers(dependency_graph)
+    if(nrow(dependency_graph) > 0) {
+      .message_meta(sprintf(
+        "Sorting %d modules with %d dependencies(s) ...",
+        length(unique(unlist(dependency_graph))),
+        nrow(dependency_graph)),{
 
-    if(is.null(layered_names)) layered_names <- list(`1` = name)
+          ordered_names <- .topological_sort(dependency_graph)
+
+        })
+    } else {
+      ordered_names <- name
+    }
 
     .message_meta(
-      sprintf("found %d dependencies(s) with %d modules(s) on %d layer(s)",
-              nrow(dependency_graph),
-              length(unlist(layered_names)),
-              length(layered_names)
-      ), {
+      if(nrow(dependency_graph) > 0)
+        sprintf(
+          "Making dependencies(s) and module in the order ...",
+          nrow(dependency_graph),
+          length(ordered_names)), {
 
-        for(layer in names(layered_names)) {
+        for(ordered_name_idx in c(1:length(ordered_names))) {
 
-          ordered_names <- layered_names[[layer]]
+          ordered_name <- ordered_names[ordered_name_idx]
 
-          for(ordered_name_idx in c(1:length(ordered_names))) {
+          assert_that(.is_defined(ordered_name))
 
-            ordered_name <- ordered_names[ordered_name_idx]
+          reinstanciated_by_parent <- any(unlist(lapply(
+            modulr_env$register[[c(ordered_name, "dependencies")]],
+            function(name) {
+              modulr_env$register[[c(name, "timestamp")]] >=
+                modulr_env$register[[c(ordered_name, "timestamp")]]
+            })))
 
-            assert_that(.is_defined(ordered_name))
+          if(!modulr_env$register[[c(ordered_name, "instanciated")]]
+             | reinstanciated_by_parent
+             | (ordered_name == name &
+                  get_digest(ordered_name) != get_digest(name))) {
 
-            reinstanciated_by_parent <- any(unlist(lapply(
-              modulr_env$register[[c(ordered_name, "dependencies")]],
-              function(name) {
-                modulr_env$register[[c(name, "timestamp")]] >=
-                  modulr_env$register[[c(ordered_name, "timestamp")]]
-              })))
+            .message_meta(
+              if(ordered_name_idx != length(ordered_names))
+                sprintf("Making dependency #%d/%d: '%s' ...",
+                        ordered_name_idx, length(ordered_names),
+                        ordered_name)
+              else
+                sprintf("Making module #%d/%d: '%s' ...",
+                        ordered_name_idx, length(ordered_names),
+                        ordered_name), {
 
-            if(!modulr_env$register[[c(ordered_name, "instanciated")]]
-               | reinstanciated_by_parent
-               | (ordered_name == name &
-                    get_digest(ordered_name) != get_digest(name))) {
+              timestamp <- Sys.time()
 
-              .message_meta(sprintf("Making '%s' ...", ordered_name), {
+              env <- new.env()
 
-                timestamp <- Sys.time()
+              env$.__name__ <- ordered_name
 
-                env <- new.env()
+              args <- list()
 
-                env$.__name__ <- ordered_name
+              if(length(modulr_env$register[[
+                c(ordered_name, "dependencies")]]) > 0) {
 
-                args <- list()
+                args <-
+                  lapply(
+                    modulr_env$register[[
+                      c(ordered_name, "dependencies")]],
+                    function(name) {
+                      modulr_env$register[[c(
+                        .resolve_mapping(name, ordered_name), "instance")]]
+                    }
+                  )
 
-                if(length(modulr_env$register[[
-                  c(ordered_name, "dependencies")]]) > 0) {
+              }
 
-                  args <-
-                    lapply(
-                      modulr_env$register[[
-                        c(ordered_name, "dependencies")]],
-                      function(name) {
-                        modulr_env$register[[c(
-                          .resolve_mapping(name, ordered_name), "instance")]]
-                      }
-                    )
+              factory <- modulr_env$register[[c(ordered_name, "factory")]]
 
-                }
+              environment(factory) <- env
 
-                factory <- modulr_env$register[[c(ordered_name, "factory")]]
+              instance <- do.call(
+                factory,
+                args = args, quote = TRUE, envir = env)
 
-                environment(factory) <- env
+              modulr_env$register[[c(ordered_name, "instance")]] <- instance
 
-                instance <- do.call(
-                  factory,
-                  args = args, quote = TRUE, envir = env)
+              modulr_env$register[[c(ordered_name, "duration")]] <-
+                as.numeric(Sys.time() - timestamp)
+              modulr_env$register[[c(ordered_name, "instanciated")]] <-
+                TRUE
+              modulr_env$register[[c(ordered_name, "first_instance")]] <-
+                FALSE
+              modulr_env$register[[c(ordered_name, "timestamp")]] <-
+                Sys.time()
 
-                modulr_env$register[[c(ordered_name, "instance")]] <- instance
-
-                modulr_env$register[[c(ordered_name, "duration")]] <-
-                  as.numeric(Sys.time() - timestamp)
-                modulr_env$register[[c(ordered_name, "instanciated")]] <-
-                  TRUE
-                modulr_env$register[[c(ordered_name, "first_instance")]] <-
-                  FALSE
-                modulr_env$register[[c(ordered_name, "timestamp")]] <-
-                  Sys.time()
-
-              },
-              verbosity = 1)
-
-            }
+            },
+            verbosity = 1)
 
           }
 
         }
 
-      },
-      verbosity = 2)
+      })
 
-  },
-  verbosity = 2)
+    instance <- modulr_env$register[[c(name, "instance")]]
 
-  instance <- modulr_env$register[[c(name, "instance")]]
+    instance
 
-  instance
+  })
 
 }
 
+#' @rdname make
+#' @param regexp A regular expression. If not missing, the regular expression
+#'  is used to filter the names of the modules to be made.
+#' @param reserved A flag. Should special modules with a reserved name be
+#'   considered?
+#' @param error A function. This function is triggered on error.
+#' @param ... Arguments passed to \code{make}.
 #' @export
-# TODO: write documentation
 make_all <- function(regexp, reserved = FALSE, error = stop, ...) {
 
   .message_meta("Entering make_all() ...",
@@ -159,8 +285,9 @@ make_all <- function(regexp, reserved = FALSE, error = stop, ...) {
 
 }
 
+#' @rdname make
+#' @inheritParams make_all
 #' @export
-# TODO: write documentation
 make_tests <- function(...) {
 
   .message_meta("Entering make_tests() ...",
@@ -214,14 +341,7 @@ make_tests <- function(...) {
 }
 
 #' @export
-# TODO: write documentation
-make_test <- make_tests
-
-#' Syntactic sugar to make a module.
-#'
-#' @export
-# TODO: write documentation
-`%<=%` <- function(lhs, rhs) {
+`%<=%` <- function(variable, name) {
 
   if(.is_called_from_within_module()) {
     warning("make is called from within a module.",
@@ -229,26 +349,20 @@ make_test <- make_tests
   }
 
   assert_that(
-    assertthat::is.string(rhs),
+    assertthat::is.string(name),
     msg = "right-hand side of `%<=%` is not a string."
   )
 
-  assign(as.character(substitute(lhs)), make(rhs), pos = parent.frame())
+  assign(as.character(substitute(variable)), make(name), pos = parent.frame())
 
 }
 
-#' Syntactic sugar to make a module.
-#'
 #' @export
-# TODO: write documentation
-`%=>%` <- function(lhs, rhs) eval(substitute(`%<=%`(rhs, lhs)),
-                                  envir = parent.frame())
+`%=>%` <- function(name, variable) eval(substitute(`%<=%`(variable, name)),
+                                        envir = parent.frame())
 
-#' Syntactic sugar to make a module and assign it in an enclosing frame.
-#'
 #' @export
-# TODO: write documentation
-`%<<=%` <- function(lhs, rhs) {
+`%<<=%` <- function(variable, name) {
 
   if(.is_called_from_within_module()) {
     warning("make is called from within a module.",
@@ -256,18 +370,48 @@ make_test <- make_tests
   }
 
   assert_that(
-    assertthat::is.string(rhs),
+    assertthat::is.string(name),
     msg = "right-hand side of `%<<=%` is not a string."
   )
 
-  assign(as.character(substitute(lhs)), make(rhs),
+  assign(as.character(substitute(variable)), make(name),
          pos = parent.frame(), inherits = TRUE)
 
 }
 
-#' Syntactic sugar to make a module and assign it in an enclosing frame.
+#' @export
+`%=>>%` <- function(name, variable) eval(substitute(`%<<=%`(variable, name)),
+                                         envir = parent.frame())
+
+#' Touch module.
 #'
 #' @export
 # TODO: write documentation
-`%=>>%` <- function(lhs, rhs) eval(substitute(`%<<=%`(rhs, lhs)),
-                                   envir = parent.frame())
+touch <- function(name) {
+
+  .message_meta(sprintf("Entering touch() for '%s' ...", name),
+                verbosity = +Inf)
+
+  if(.is_called_from_within_module()) {
+    warning("touch is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  assert_that(.is_defined_regular(name))
+
+  .message_meta(sprintf("Touching '%s' ...", name), verbosity = 2)
+
+  modulr_env$register[[c(name, "instance")]] <- NULL
+  modulr_env$register[[c(name, "instanciated")]] <- F
+  modulr_env$register[[c(name, "calls")]] <- 0
+  modulr_env$register[[c(name, "duration")]] <- NA_integer_
+  modulr_env$register[[c(name, "timestamp")]] <- Sys.time()
+
+  if(.is_regular(name))
+    modulr_env$.Last.name <- name # Exclude Linting
+
+  module_option(name)$unset()
+
+  invisible()
+
+}
