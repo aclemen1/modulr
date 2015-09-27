@@ -38,15 +38,18 @@ assertthat::on_failure(.is_regular) <- function(call, env) {
 }
 
 # Test if a module has a regular name which is not intended for testing
+# or special purposes
 .is_regular_core <- function(name) {
   .is_regular(name) &&
-    !grepl("\\/tests?$|\\/tests?\\/|\\/mocks?$|\\/mocks?\\/",
+    !grepl(paste0("\\/tests?$|\\/tests?\\/|",
+                  "\\/mocks?$|\\/mocks?\\/|",
+                  "\\/examples?$|\\/examples?\\/"),
            name, ignore.case = TRUE)
 }
 
 assertthat::on_failure(.is_regular_core) <- function(call, env) {
   paste0(deparse(eval(call$name, envir = env)),
-         " is reserved or intended for testing purposes.")
+         " is reserved or intended for testing or special purposes.")
 }
 
 # Test if a module name is reserved.

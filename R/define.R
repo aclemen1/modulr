@@ -42,19 +42,19 @@
 #' root_config$set(tmp_dir)
 #' \dontrun{get_digest("foo", load = FALSE)}
 #' get_digest("foo", load = TRUE)
-#' unlink(tmp_dir)
+#' unlink(tmp_dir, recursive = TRUE)
 #'
 #' @export
-get_digest <- function(name, load = FALSE) {
+get_digest <- function(name = .Last.name, load = FALSE) {
 
   .message_meta(sprintf("Entering get_digest() for '%s' ...", name),
                 verbosity = +Inf)
 
   assert_that(assertthat::is.flag(load))
 
-  if(.is_undefined(name) & load) {
+  if (.is_undefined(name) & load) {
 
-    if(.is_called_from_within_module()) {
+    if (.is_called_from_within_module()) {
       warning("get_factory is called from within a module.",
               call. = FALSE, immediate. = TRUE)
     }
@@ -275,7 +275,7 @@ define <- function(name, dependencies, factory) {
   .message_meta(sprintf("Entering define() for '%s' ...", name),
                 verbosity = +Inf)
 
-  if(.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
     warning("define is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
@@ -301,14 +301,14 @@ define <- function(name, dependencies, factory) {
           is.null(names(dependencies)))),
     msg = "dependencies and formals are not matching.")
 
-  if(is.null(dependencies)) dependencies <- list()
+  if (is.null(dependencies)) dependencies <- list()
 
   timestamp <- Sys.time()
 
-  if(.is_undefined(name)) {
+  if (.is_undefined(name)) {
 
     .message_meta(
-      sprintf("Defining '%s' ...", name), {
+      sprintf("Defining '%s'", name), {
 
         modulr_env$register[[name]] <- list()
         modulr_env$register[[c(name, "name")]] <- name
@@ -327,18 +327,18 @@ define <- function(name, dependencies, factory) {
         modulr_env$register[[c(name, "created")]] <- timestamp
 
     },
-    verbosity = ifelse(.is_regular(name), 2, 3))
+    ok = TRUE, verbosity = ifelse(.is_regular(name), 2, 3))
 
 
 
-  } else if(.is_regular(name)) {
+  } else if (.is_regular(name)) {
 
     previous_digest <- modulr_env$register[[c(name, "digest")]]
     digest <- .hash(c(
       deparse(dependencies),
       deparse(factory)))
-    if(digest != previous_digest) {
-      .message_meta(sprintf("Re-defining '%s' ...", name), {
+    if (digest != previous_digest) {
+      .message_meta(sprintf("Re-defining '%s'", name), {
 
         modulr_env$register[[c(name, "dependencies")]] <- dependencies
         modulr_env$register[[c(name, "factory")]] <- factory
@@ -352,15 +352,15 @@ define <- function(name, dependencies, factory) {
         modulr_env$register[[c(name, "timestamp")]] <- timestamp
 
       },
-      verbosity = 1)
+      ok = TRUE, verbosity = 1)
 
     }
   } else {
     assert_that(.is_regular(name))
   }
 
-  if(.is_regular_core(name))
-    modulr_env$.Last.name <- name # Exclude Linting
+  if (.is_regular_core(name))
+    modulr_env$.Last.name <- name
 
   invisible(function(...) make(name, ...))
 
@@ -404,19 +404,19 @@ define <- function(name, dependencies, factory) {
 #' root_config$set(tmp_dir)
 #' \dontrun{get_factory("foo", load = FALSE)}
 #' get_factory("foo", load = TRUE)
-#' unlink(tmp_dir)
+#' unlink(tmp_dir, recursive = TRUE)
 #'
 #' @export
-get_factory <- function(name, load = FALSE) {
+get_factory <- function(name = .Last.name, load = FALSE) {
 
   .message_meta(sprintf("Entering get_factory() for '%s' ...", name),
                 verbosity = +Inf)
 
   assert_that(assertthat::is.flag(load))
 
-  if(.is_undefined(name) & load) {
+  if (.is_undefined(name) & load) {
 
-    if(.is_called_from_within_module()) {
+    if (.is_called_from_within_module()) {
       warning("get_factory is called from within a module.",
               call. = FALSE, immediate. = TRUE)
     }
@@ -476,7 +476,7 @@ reset <- function(all = FALSE, .verbose = TRUE) {
   .message_meta("Entering reset() ...",
                 verbosity = +Inf)
 
-  if(.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
     warning("reset is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
@@ -485,19 +485,22 @@ reset <- function(all = FALSE, .verbose = TRUE) {
     assertthat::is.flag(all),
     assertthat::is.flag(.verbose))
 
-  if(.verbose)
-    .message_meta("Resetting modulr state ... ", verbosity = 2)
+  .message_meta(
+    if (.verbose) "Resetting modulr state", {
 
-  modulr_env$register <- list()
-  modulr_env$config <- list(modules = list())
-  modulr_env$verbosity <- 2
-  modulr_env$.Last.name <- NULL # Exclude Linting
-  if(all)
-    modulr_env$stash <- list()
+      modulr_env$register <- list()
+      modulr_env$config <- list(modules = list())
+      modulr_env$verbosity <- 2
+      modulr_env$.Last.name <- NULL
+      if (all)
+        modulr_env$stash <- list()
 
-  .define_modulr()
+      .define_modulr()
 
-  root_config$set(c("module", "modules", "lib", "libs", "."))
+      root_config$set(c("module", "modules", "lib", "libs", "."))
+
+    },
+    ok = TRUE, verbosity = 2)
 
   invisible()
 
@@ -525,21 +528,24 @@ reset <- function(all = FALSE, .verbose = TRUE) {
 #' list_modules()
 #'
 #' @export
-undefine <- function(name) {
+undefine <- function(name = .Last.name) {
 
   .message_meta(sprintf("Entering undefine() for '%s' ...", name),
                 verbosity = +Inf)
 
-  if(.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
     warning("undefine is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
 
   assert_that(.is_defined_regular(name))
 
-  .message_meta(sprintf("Undefining '%s' ... ", name), verbosity = 2)
+  .message_meta(sprintf("Undefining '%s'", name), {
 
-  modulr_env$register[[name]] <- NULL
+    modulr_env$register[[name]] <- NULL
+
+  },
+  ok = TRUE, verbosity = 2)
 
   invisible()
 
@@ -562,7 +568,7 @@ undefine <- function(name) {
 #' @export
 `%provides%` <- function(lhs, factory) {
 
-  if(.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
     warning("`%provides%` is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
@@ -580,7 +586,7 @@ undefine <- function(name) {
                  "is not a module name or a list of dependencies.")
   )
 
-  if(is.list(lhs)) {
+  if (is.list(lhs)) {
     name <- lhs[["name"]]
     dependencies <- lhs[["dependencies"]]
   } else {

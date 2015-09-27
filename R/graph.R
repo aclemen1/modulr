@@ -14,7 +14,7 @@ graph_dependencies <- function(group, reserved = TRUE) {
   }
   # nocov end
 
-  if(.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
     warning("graph_dependencies is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
@@ -26,7 +26,7 @@ graph_dependencies <- function(group, reserved = TRUE) {
 
   universe <- modulr_env$register
 
-  if(!missing(group)) {
+  if (!missing(group)) {
 
     sub <- .define_all_dependent_modules(group)
 
@@ -36,7 +36,7 @@ graph_dependencies <- function(group, reserved = TRUE) {
 
   }
 
-  if(length(universe) > 0) {
+  if (length(universe) > 0) {
 
     deps <- Reduce(rbind, Map(function(module) {
 
@@ -60,7 +60,7 @@ graph_dependencies <- function(group, reserved = TRUE) {
 
     }
 
-    if(isTRUE(nrow(deps) > 0)) {
+    if (isTRUE(nrow(deps) > 0)) {
 
       nodes <- unique(unlist(deps[, names(deps) != "value"]))
 

@@ -12,9 +12,9 @@
 \usage{
 make(name = .Last.name)
 
-make_all(regexp, reserved = FALSE, error = stop, ...)
+make_all(regexp, reserved = FALSE, error = stop)
 
-make_tests(...)
+make_tests()
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -37,8 +37,6 @@ is used to filter the names of the modules to be made.}
 considered?}
 
 \item{error}{A function. This function is triggered on error.}
-
-\item{...}{Arguments passed to \code{make}.}
 }
 \value{
 The object resulting of the evaluation of the factory function of the
@@ -51,12 +49,12 @@ Make or remake a module.
 A call to the \code{make} function triggers a series of actions, which are
 actually the core purposes of the modulr package.
 \enumerate{
-\item All dependencies are visited, recursively. This process is based on the
-explicit and implicit rules of name resolution, as explained in
+\item All dependencies are visited and defined, recursively. This process is
+based on the explicit and implicit rules of name resolution, as explained in
 \code{\link{define}}. In particular, the configurations set by
 \code{\link{root_config}}, \code{\link{paths_config}}, and
-\code{\link{maps_config}} are taken into account and every modules for which
-changes are detected are automatically redefined.
+\code{\link{maps_config}} are taken into account and every module for which
+changes are detected is automatically redefined.
 \item Along the lines of this recursive process, an internal representation
 of the dependencies and the relations between them is constructed. This
 provides a directed graph, which vertices represent the modules to be
@@ -73,12 +71,10 @@ of the evaluation of every module factory is stored in the modulr internal
 state, so that it can be reused when appropriate, without re-evaluation.
 }
 
-The expressions \code{variable \%<=\% name} and \code{name \%=>\% variable}
-(respectively \code{variable \%<<=\% name} and \code{name \%=>>\% variable})
-are just \emph{syntactic sugars} for the expression
-\code{variable <- make(name)} (respectively \code{variable <<- make(name)}).
-
-The \code{make_all} function applies a \code{make} call to each defined module.
+The \code{make_all} function applies \code{make} to each defined module.
+If a \code{regexp} is specified, this applies only to modules which name
+satisfies the regular expression. Similarily, the \code{make_tests} function
+applies to each module which name contains \code{/test/} or \code{/tests/}.
 }
 \section{Syntactic Sugars}{
 
@@ -86,6 +82,11 @@ The \code{make_all} function applies a \code{make} call to each defined module.
  \preformatted{name \%=>\% variable}
  \preformatted{variable \%<<=\% name}
  \preformatted{name \%=>>\% variable}
+
+The expressions \code{variable \%<=\% name} and \code{name \%=>\% variable}
+(respectively \code{variable \%<<=\% name} and \code{name \%=>>\% variable})
+are just \emph{syntactic sugars} for the expression
+\code{variable <- make(name)} (respectively \code{variable <<- make(name)}).
 }
 
 \section{Warning}{
@@ -131,7 +132,7 @@ make("foo")
 make("foo")
 touch("foo")
 make("foo")
-unlink(tmp_dir)
+unlink(tmp_dir, recursive = TRUE)
 
 \dontrun{
 reset()
@@ -143,8 +144,7 @@ list_modules()
 make_tests()
 make("modulr/vault/example")
 touch("modulr/vault")
-make_all()
-}
+make_all()}
 }
 \seealso{
 \code{\link{.Last.name}}, \code{\link{graph_dependencies}},

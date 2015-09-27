@@ -14,7 +14,7 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
                     ifnotfound = NA, inherits = TRUE)
              }))))
 
-  if(length(bc) & verbose)
+  if (length(bc) & verbose)
     message(sprintf("modulr breadcrumbs: %s",
                     paste(sprintf("[%s]", bc), collapse = " > ")))
 
@@ -26,7 +26,7 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
 
   assert_that(is.language(handler) || is.null(handler))
 
-  if(is.null(handler)) return(F)
+  if (is.null(handler)) return(F)
 
   any(grepl("modulr\\:\\:get\\_breadcrumbs\\(\"installed\"\\)",
             format(handler)))
@@ -41,7 +41,7 @@ activate_breadcrumbs <- function() {
 
   handler <- getOption("error")
 
-  if(!.is_installed_bc(handler)) {
+  if (!.is_installed_bc(handler)) {
 
     wrapper <- function() {
       modulr::get_breadcrumbs("installed")

@@ -3,7 +3,7 @@
   assert_that(is.function(fun))
 
   s <- capture.output(fun)
-  if(grepl("<[^<]*>", s[length(s)]))
+  if (grepl("<[^<]*>", s[length(s)]))
     s <- s[-length(s)]
   paste(s, collapse = "\n")
 }
@@ -15,7 +15,7 @@
     is.null(base) || .is_defined_regular(base))
 
   factory <- get_factory(name, load = FALSE)
-  if(!is.null(base) &&
+  if (!is.null(base) &&
        identical(factory, get_factory(base))) {
     factory_string <- sprintf("get_factory(\"%s\")", base)
   } else {
@@ -23,8 +23,8 @@
   }
 
   dependencies <- modulr_env$register[[name]]$dependencies
-  if(isTRUE(length(dependencies) > 0)) {
-    if(length(dependencies) == 1) {
+  if (isTRUE(length(dependencies) > 0)) {
+    if (length(dependencies) == 1) {
       deps <-
         sprintf("list(%s = \"%s\")",
                 names(dependencies),
@@ -57,7 +57,7 @@
 
   url <- modulr_env$register[[c(name, "url")]]
 
-  if(!is.null(url)) {
+  if (!is.null(url)) {
     sprintf(
       paste(
         "\"%s\" %%digests%%",
@@ -72,12 +72,12 @@
 }
 
 #' @export
-prepare_gear <- function(name, url = NULL, load = TRUE) {
+prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
 
   .message_meta("Entering prepare_gear() ...",
                 verbosity = +Inf)
 
-  if(.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
     warning("prepare_gear is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
@@ -87,7 +87,7 @@ prepare_gear <- function(name, url = NULL, load = TRUE) {
     is.null(url) || assertthat::is.string(url),
     assertthat::is.flag(load))
 
-  if(load) load_module(name)
+  if (load) load_module(name)
 
   assert_that(.is_defined_regular(name))
 
@@ -123,20 +123,20 @@ prepare_gear <- function(name, url = NULL, load = TRUE) {
       sprintf("```"), sep = "\n"),
     paste(
       sprintf("## Definition"),
-      if(length(imports) > 0) paste(
+      if (length(imports) > 0) paste(
         sprintf("```{r imports}"),
         sprintf("%s", paste(imports, collapse = "\n")),
         sprintf("```"), sep = "\n"),
       sprintf("```{r definition}"),
       sprintf("%s", module),
       sprintf("```"), sep = "\n"),
-    if(length(tests) + length(mocks) > 0) paste(
+    if (length(tests) + length(mocks) > 0) paste(
       sprintf("## Tests"),
-      if(length(mocks) > 0) paste(
+      if (length(mocks) > 0) paste(
         sprintf("```{r mocks}"),
         sprintf("%s", paste(mocks, collapse = "\n")),
         sprintf("```"), sep = "\n"),
-      if(length(tests) > 0) paste(
+      if (length(tests) > 0) paste(
         sprintf("```{r tests}"),
         sprintf("%s", paste(tests, collapse = "\n")),
         sprintf("```"),
@@ -144,7 +144,7 @@ prepare_gear <- function(name, url = NULL, load = TRUE) {
       sprintf("# Not run"),
       sprintf("make_all(regexp = \"%s/test\")", name),
       sprintf("```"), sep = "\n"),
-    if(length(examples) > 0) paste(
+    if (length(examples) > 0) paste(
       sprintf("## Examples"),
       sprintf("```{r examples}"),
       sprintf("%s", paste(examples, collapse = "\n")),
@@ -164,7 +164,7 @@ prepare_gear <- function(name, url = NULL, load = TRUE) {
 }
 
 #' @export
-publish_gear <- function(name, load = TRUE, browse = TRUE) {
+publish_gear <- function(name = .Last.name, load = TRUE, browse = TRUE) {
 
   .message_meta("Entering publish_gear() ...",
                 verbosity = +Inf)
@@ -176,7 +176,7 @@ publish_gear <- function(name, load = TRUE, browse = TRUE) {
   }
   # nocov end
 
-  if(.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
     warning("publish_gear is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
@@ -186,7 +186,7 @@ publish_gear <- function(name, load = TRUE, browse = TRUE) {
     assertthat::is.flag(load),
     assertthat::is.flag(browse))
 
-  if(load) load_module(name)
+  if (load) load_module(name)
 
   assert_that(.is_defined_regular(name))
 
@@ -214,7 +214,7 @@ publish_gear <- function(name, load = TRUE, browse = TRUE) {
   # nocov end
 
   # nocov start
-  if(!is.null(auth)) Sys.sleep(3)
+  if (!is.null(auth)) Sys.sleep(3)
   # nocov end
 
   rates <- gistr::rate_limit()
@@ -235,7 +235,7 @@ publish_gear <- function(name, load = TRUE, browse = TRUE) {
 
   tmp_dir <- tempfile("modulr_")
   dir.create(tmp_dir)
-  on.exit(unlink(tmp_dir))
+  on.exit(unlink(tmp_dir, recursive = TRUE))
 
   tmp_filename <- file.path(tmp_dir, filename)
 
@@ -243,7 +243,7 @@ publish_gear <- function(name, load = TRUE, browse = TRUE) {
 
   g <- gistr::update(gistr::update_files(g, tmp_filename))
 
-  if(browse) gistr::browse(g)
+  if (browse) gistr::browse(g)
 
   return(g)
 

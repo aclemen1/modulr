@@ -6,16 +6,17 @@
 \alias{modulr-package}
 \alias{modulr_env}
 \title{modulr -- Module Pattern and DI in R}
-\format{\preformatted{<environment: 0x45e7aa0> 
+\format{\preformatted{<environment: 0x3900f30> 
 }}
 \usage{
 modulr_env
 }
 \description{
 modulr is a Module Pattern and Dependency Injection implementation in R.
-Module Pattern and DI allows you to encapsulate pieces of code into useful singleton units,
-namely modules that register their capabilities, export values and rely on other modules as dependencies.
-modulr is widely inspired from RequireJS and AngularJS for Javascript.
+Module Pattern and DI allows you to encapsulate pieces of code into useful
+singleton units, namely modules that register their capabilities, export
+values and rely on other modules as dependencies. modulr is widely inspired
+from RequireJS and AngularJS for Javascript.
 }
 \author{
 Alain Clément-Pavon <\email{alain.clement-pavon@unil.ch}>

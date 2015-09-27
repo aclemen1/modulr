@@ -13,17 +13,18 @@ stash <- function(comment = NA_character_) {
 
   len_plus_1 <- length(modulr_env$stash) + 1
 
-  .message_meta(sprintf("Stashing modulr state, stash #%s ...",
-                        len_plus_1), verbosity = 2)
-
-  modulr_env$stash[[len_plus_1]] <- list(
-    register = modulr_env$register,
-    .Last.name = modulr_env$.Last.name, # Exclude Linting
-    config = modulr_env$config,
-    verbosity = modulr_env$verbosity,
-    timestamp = timestamp,
-    comment = comment
-  )
+  .message_meta(
+    sprintf("Stashing modulr state, stash #%s", len_plus_1), {
+      modulr_env$stash[[len_plus_1]] <- list(
+        register = modulr_env$register,
+        .Last.name = modulr_env$.Last.name,
+        config = modulr_env$config,
+        verbosity = modulr_env$verbosity,
+        timestamp = timestamp,
+        comment = comment
+      )
+    },
+    ok = TRUE, verbosity = 2)
 
   invisible()
 
@@ -44,14 +45,17 @@ unstash <- function(id = length(modulr_env$stash)) {
 
   stash <- modulr_env$stash[[id]]
 
-  .message_meta(sprintf("Unstashing modulr state, stash #%s ...", id),
-                verbosity = 2)
+  .message_meta(
+    sprintf("Unstashing modulr state, stash #%s", id), {
 
-  modulr_env$stash <- modulr_env$stash[-id]
-  modulr_env$register <- stash[["register"]]
-  modulr_env$.Last.name <- stash[[".Last.name"]] # Exclude Linting
-  modulr_env$config <- stash[["config"]]
-  modulr_env$verbosity <- stash[["verbosity"]]
+      modulr_env$stash <- modulr_env$stash[-id]
+      modulr_env$register <- stash[["register"]]
+      modulr_env$.Last.name <- stash[[".Last.name"]]
+      modulr_env$config <- stash[["config"]]
+      modulr_env$verbosity <- stash[["verbosity"]]
+
+    },
+    ok = TRUE, verbosity = 2)
 
   invisible()
 
@@ -65,7 +69,7 @@ list_stashes <- function() {
   .message_meta("Entering list_stashes() ...",
                 verbosity = +Inf)
 
-  if(length(modulr_env$stash) == 0) {
+  if (length(modulr_env$stash) == 0) {
     message("No stash found.")
     return(invisible())
   }
@@ -98,18 +102,22 @@ remove_stash <- function(id, all) {
     msg = "call is ambiguous (two arguments passed)."
   )
 
-  if(!missing(all)) {
+  if (!missing(all)) {
 
     assert_that(
       assertthat::is.flag(all))
     assert_that(all, msg = "all is not TRUE.")
 
-    .message_meta("Removing all stashes ...", verbosity = 2)
-    modulr_env$stash <- list()
+    .message_meta("Removing all stashes", {
+
+      modulr_env$stash <- list()
+
+    },
+    ok = TRUE, verbosity = 2)
 
   }
 
-  if(!missing(id)) {
+  if (!missing(id)) {
 
     assert_that(
       assertthat::is.count(id))
@@ -117,12 +125,16 @@ remove_stash <- function(id, all) {
       id <= length(modulr_env$stash),
       msg = "id is out of bounds.")
 
-    .message_meta(sprintf("Removing stash #%s ...",
-                          id), verbosity = 2)
+    .message_meta(
+      sprintf("Removing stash #%s", id), {
 
-    modulr_env$stash[[id]] <- NULL
+        modulr_env$stash[[id]] <- NULL
+
+      },
+      ok = TRUE, verbosity = 2)
 
   }
 
   invisible()
+
 }

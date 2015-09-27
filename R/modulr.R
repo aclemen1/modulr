@@ -1,9 +1,10 @@
 #' modulr -- Module Pattern and DI in R
 #'
 #' modulr is a Module Pattern and Dependency Injection implementation in R.
-#' Module Pattern and DI allows you to encapsulate pieces of code into useful singleton units,
-#' namely modules that register their capabilities, export values and rely on other modules as dependencies.
-#' modulr is widely inspired from RequireJS and AngularJS for Javascript.
+#' Module Pattern and DI allows you to encapsulate pieces of code into useful
+#' singleton units, namely modules that register their capabilities, export
+#' values and rely on other modules as dependencies. modulr is widely inspired
+#' from RequireJS and AngularJS for Javascript.
 #'
 #' @docType package
 #' @name modulr
@@ -11,9 +12,35 @@
 
 modulr_env <- new.env(parent = emptyenv())
 
+#' @name .Last.name
+#' @aliases .Last.name
+#' @rdname last_name
+#' @title Name of Last Used Module.
+#' @description The name of the last used module.
+#' @usage .Last.name
+#' @details
+#' A module is considered used last if it has just been:
+#' \itemize{
+#'  \item defined or imported with a name without special meaning and not
+#'    reserved (see \code{\link{define}}),
+#'  \item made or touched with a non-reserved name.
+#' }
+#' Other actions on modules do not alter the value of \code{.Last.name}.
+#' @section Warning:
+#' Do not assign to \code{.Last.name} in the workspace, because this will always
+#' mask the object of the same name in package:modulr.
+#' @return The name of the last used module.
+#' @seealso \code{\link{define}}.
+#' @examples
+#' define("foo", NULL, function() NULL)
+#' .Last.name
+#' define("bar/test", NULL, function() NULL)
+#' .Last.name
+#' make("bar/test")
+#' .Last.name
 globalVariables(c(".Last.name"))
 
-if(packageVersion("assertthat") >= package_version("0.1.0.99")) {
+if (packageVersion("assertthat") >= package_version("0.1.0.99")) {
   assert_that <- assertthat::assert_that
 } else {
   assert_that <- function(..., msg) {
@@ -36,7 +63,7 @@ set_verbosity <- function(value) {
 
 # the base::get0 function exsists only since R 3.2
 .get_0 <- function(var, ..., ifnotfound = NULL) {
-  if(exists(var, ...)) get(var, ...) else ifnotfound
+  if (exists(var, ...)) get(var, ...) else ifnotfound
 }
 
 .dir_exists <- function(file) {

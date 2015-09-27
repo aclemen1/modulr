@@ -2,11 +2,61 @@
 % Please edit documentation in R/make.R
 \name{touch}
 \alias{touch}
-\title{Touch module.}
+\title{Touch a Module.}
 \usage{
-touch(name)
+touch(name = .Last.name)
+}
+\arguments{
+\item{name}{A string (character vector of lenght one).
+
+  A module name can contain letters, figures and some special characters,
+  namely \code{_}, \code{-}, and \code{/}. The latter is a namespace
+  separator.
+
+  Names containing \code{/mock/}, \code{/mocks/}, \code{/test/},
+  \code{/tests/}, \code{/example/}, or \code{/examples/} have a special
+  meaning related to code testing and examples.
+
+  The name "modulr" corresponds to a special module and is therefore
+  reserved.}
 }
 \description{
-Touch module.
+Touch a module by marking it as outdated and by resetting its default
+configuration, if appropriate.
+}
+\details{
+See \code{\link{make}} and \code{\link{module_option}}.
+}
+\section{Warning}{
+
+ It is considered a very bad practice to define, touch, undefine, load, make,
+ reset, or perform any other operation from within a module definition that
+ may alterate the internal state of modulr.
+}
+\examples{
+reset()
+define("foo", NULL, function() format(Sys.time(), "\%H:\%M:\%OS6"))
+make()
+make()
+touch()
+make()
+
+reset()
+define("A", NULL, function() "(A)")
+define("B", NULL, function() "(B)")
+define("C", list(a = "A"), function(a) paste0("(", a, "C)"))
+define("D", list(a = "A", b = "B"), function(a, b) paste0("(", a, b, "D)"))
+define("E", list(d = "D"), function(d) paste0("(", d, "E)"))
+define("F", list(c = "C", d = "D", e = "E"),
+  function(c, d, e) paste0("(", c, d, e, "F)"))
+make()
+touch("B")
+make("F")
+graph_dependencies()
+}
+\seealso{
+\code{\link{.Last.name}}, \code{\link{graph_dependencies}},
+  \code{\link{make}}, \code{\link{module_option}},
+  and \code{\link{reset}}.
 }
 

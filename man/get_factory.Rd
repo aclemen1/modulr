@@ -4,7 +4,7 @@
 \alias{get_factory}
 \title{Get the Factory of a Module.}
 \usage{
-get_factory(name, load = FALSE)
+get_factory(name = .Last.name, load = FALSE)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -54,7 +54,7 @@ cat('define("foo", NULL, function() "Hello World!")', file = tmp_file)
 root_config$set(tmp_dir)
 \dontrun{get_factory("foo", load = FALSE)}
 get_factory("foo", load = TRUE)
-unlink(tmp_dir)
+unlink(tmp_dir, recursive = TRUE)
 }
 \seealso{
 \code{\link{define}}, \code{\link{make}}, \code{\link{reset}},

@@ -13,7 +13,7 @@
 
     dependencies <- modulr_env$register[[c(name, "dependencies")]]
 
-    if(isTRUE(length(dependencies) > 0)) {
+    if (isTRUE(length(dependencies) > 0)) {
 
       array <- rbind(unlist(lapply(dependencies, .resolve_mapping, name)),
                      name, deparse.level = 0)
@@ -40,7 +40,7 @@
     nrow(graph) == 0 || setequal(names(graph), c("module", "dependency"))
   )
 
-  if(nrow(graph) > 0) {
+  if (nrow(graph) > 0) {
     pooh::tsort(graph$dependency, graph$module)
   }
 

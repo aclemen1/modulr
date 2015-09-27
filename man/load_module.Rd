@@ -2,11 +2,59 @@
 % Please edit documentation in R/load.R
 \name{load_module}
 \alias{load_module}
-\title{load_module module.}
+\title{Load a Module.}
 \usage{
-load_module(name)
+load_module(name = .Last.name)
+}
+\arguments{
+\item{name}{A string (character vector of lenght one).
+
+  A module name can contain letters, figures and some special characters,
+  namely \code{_}, \code{-}, and \code{/}. The latter is a namespace
+  separator.
+
+  Names containing \code{/mock/}, \code{/mocks/}, \code{/test/},
+  \code{/tests/}, \code{/example/}, or \code{/examples/} have a special
+  meaning related to code testing and examples.
+
+  The name "modulr" corresponds to a special module and is therefore
+  reserved.}
+}
+\value{
+The absolute file name of the loaded module.
 }
 \description{
-load_module module.
+Load or reload a module which is defined in an R, R Markdown or R Sweave
+file stored on disk.
+}
+\details{
+As described in \code{\link{define}} under \emph{Implicit Definition}, the
+module name is resolved into a file location by applying the rules accessed
+by \code{\link{root_config}}, \code{\link{paths_config}}, and
+\code{\link{maps_config}}. R Markdown and R Sweave files are accordingly
+tangled into R code, which is in turn evaluated.
+}
+\section{Warning}{
+
+ It is considered a very bad practice to define, touch, undefine, load, make,
+ reset, or perform any other operation from within a module definition that
+ may alterate the internal state of modulr.
+}
+\examples{
+reset()
+tmp_dir <- tempfile("modulr_")
+dir.create(tmp_dir)
+tmp_file <- file.path(tmp_dir, "foo.R")
+cat('define("foo", NULL, function() "Hello World!")', file = tmp_file)
+root_config$set(tmp_dir)
+load_module("foo")
+make()
+unlink(tmp_dir, recursive = TRUE)
+load_module("foo")
+}
+\seealso{
+\code{\link{.Last.name}}, \code{\link{make}},
+  \code{\link{maps_config}}, \code{\link{paths_config}}, and
+  \code{\link{reset}}.
 }
 

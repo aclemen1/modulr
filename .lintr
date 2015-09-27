@@ -1,5 +1,6 @@
 linters: with_defaults(
   line_length_linter(80),
+  multiple_dots_linter = NULL,
   NULL
   )
 exclude: "# Exclude Linting"

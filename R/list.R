@@ -43,27 +43,27 @@ list_modules <-
 
   flat <- names(modulr_env$register)
 
-  if(!reserved)
+  if (!reserved)
     flat <- setdiff(flat, RESERVED_NAMES)
 
-  if(!missing(regexp))
+  if (!missing(regexp))
     flat <- grep(paste0(regexp), flat, value = TRUE)
 
-  if(assertthat::not_empty(flat)) {
+  if (assertthat::not_empty(flat)) {
 
     flat <- flat[ordered(flat)]
 
-    if(wide) {
+    if (wide) {
 
       digests <- vapply(flat, get_digest, FUN.VALUE = "")
 
       modified <-
-        (if(formatted) function(x) format(x, format = "%c") else identity)(
+        (if (formatted) function(x) format(x, format = "%c") else identity)(
           do.call(c, Map(function(name)
             modulr_env$register[[c(name, "timestamp")]], flat)))
 
       created <-
-        (if(formatted) function(x) format(x, format = "%c") else identity)(
+        (if (formatted) function(x) format(x, format = "%c") else identity)(
           do.call(c, Map(function(name)
             modulr_env$register[[c(name, "created")]], flat)))
 
@@ -75,7 +75,7 @@ list_modules <-
 
       sizes <-
         do.call(c, Map(function(name)
-          (if(formatted) function(x) format(x, units = "auto") else identity)(
+          (if (formatted) function(x) format(x, units = "auto") else identity)(
             utils::object.size(
               modulr_env$register[[c(name, "factory")]])), flat))
 
@@ -83,8 +83,8 @@ list_modules <-
         do.call(c, Map(function(name)
           ifelse(
             modulr_env$register[[c(name, "instanciated")]],
-            (if(formatted) function(x) format(x, units = "auto") else identity)(
-              utils::object.size(modulr_env$register[[c(name, "instance")]])),
+            (if (formatted) function(x) format(x, units = "auto") else identity)
+            (utils::object.size(modulr_env$register[[c(name, "instance")]])),
             NA_character_), flat))
 
       deparsed_factories <-
@@ -128,7 +128,7 @@ list_modules <-
 
       row.names(data) <- seq_len(nrow(data))
 
-      if(full) return(data)
+      if (full) return(data)
 
       return(data[unique(c("name", cols))])
 

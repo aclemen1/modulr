@@ -4,7 +4,7 @@
 \alias{get_digest}
 \title{Get the Digest of a Module.}
 \usage{
-get_digest(name, load = FALSE)
+get_digest(name = .Last.name, load = FALSE)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -54,7 +54,7 @@ cat('define("foo", NULL, function() NULL)', file = tmp_file)
 root_config$set(tmp_dir)
 \dontrun{get_digest("foo", load = FALSE)}
 get_digest("foo", load = TRUE)
-unlink(tmp_dir)
+unlink(tmp_dir, recursive = TRUE)
 }
 \seealso{
 \code{\link{define}} and \code{\link{root_config}}.

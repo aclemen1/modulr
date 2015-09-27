@@ -29,7 +29,7 @@ RESERVED_NAMES <- c("modulr")
       get_dirname = function() {
         name <- get(".__name__", pos = parent.frame())
         file <- .resolve_path(name)
-        if(is.null(file)) return(NULL)
+        if (is.null(file)) return(NULL)
         dirname(file)
       },
 

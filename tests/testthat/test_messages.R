@@ -1,9 +1,13 @@
 context("messages")
 
-test_that(".message_meta outputs messages", {
+test_that(".message_meta outputs non-NULL messages", {
   set_verbosity(+Inf)
-  expect_message(.message_meta("hello world"), regexp = "hello world")
-  })
+  expect_message(.message_meta("hello world", ok = F), regexp = "hello world")
+  expect_message(.message_meta("hello world", ok = T), regexp = "hello world")
+  expect_message(.message_meta("hello world", ok = T), regexp = "OK")
+  expect_null(.message_meta(NULL, ok = F))
+  expect_null(.message_meta(NULL, ok = T))
+})
 
 test_that(".message_meta outputs messages according to verbosity", {
   set_verbosity(+Inf)

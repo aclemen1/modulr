@@ -5,7 +5,7 @@
 
   assert_that(missing(scope) || is.character(scope))
 
-  if(missing(scope)) return(NULL)
+  if (missing(scope)) return(NULL)
 
   unset <- function() {
 
@@ -22,28 +22,28 @@
 
     options_list <- list(...)
 
-    if(is.null(names(options_list))
+    if (is.null(names(options_list))
        & length(options_list) == 1)
-      if(is.list(options_list[[1]]))
+      if (is.list(options_list[[1]]))
         options_list <- options_list[[1]]
 
-    if(length(options_list) == 0) return(invisible())
+    if (length(options_list) == 0) return(invisible())
 
-    if(is.null(modulr_env$config[[scope]])) {
+    if (is.null(modulr_env$config[[scope]])) {
 
       modulr_env$config[[scope]] <- options_list
 
     } else {
 
-      if(is.null(names(options_list))) {
+      if (is.null(names(options_list))) {
 
         if (drop)
           modulr_env$config[[scope]] <- options_list
 
       } else {
 
-        for(key in names(options_list))
-          if(is.null(modulr_env$config[[c(scope, key)]]) | isTRUE(drop))
+        for (key in names(options_list))
+          if (is.null(modulr_env$config[[c(scope, key)]]) | isTRUE(drop))
             modulr_env$config[[c(scope, key)]] <- options_list[[key]]
 
       }
@@ -57,7 +57,7 @@
     .message_meta("Entering .config$get_all() ...",
                   verbosity = +Inf)
 
-    if(is.na(scope[2])) {
+    if (is.na(scope[2])) {
 
       modulr_env$config[[scope[1]]]
 
@@ -76,7 +76,7 @@
 
     assert_that(is.null(key) || assertthat::is.string(key))
 
-    if(!is.null(key))
+    if (!is.null(key))
       get_all()[[key]]
 
   }
@@ -122,7 +122,7 @@ maps_config <-
 #'
 #' @export
 # TODO: write documentation
-module_option <- function(name) {
+module_option <- function(name = .Last.name) {
 
   .message_meta("Entering module_option() ...",
                 verbosity = +Inf)

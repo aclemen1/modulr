@@ -53,11 +53,23 @@ test_that("make writes to the register", {
     return("foo")
   })
   expect_equal(module$digest, get_digest("some/module"))
-  expect_equal(module$instance, "foo")
+  expect_equal(module$instance$value, "foo")
   expect_true(module$instanciated)
   expect_false(module$first_instance)
   expect_less_than(module$timestamp, Sys.time())
   expect_more_than(module$timestamp, timestamp)
+})
+
+test_that("make handles invisibility correctly", {
+  reset()
+
+  define("foo", NULL, function() invisible("phantom"))
+  define("bar", NULL, function() "incarned")
+
+  expect_false(withVisible(make("foo"))$visible)
+  expect_equal(make("foo"), "phantom")
+  expect_true(withVisible(make("bar"))$visible)
+  expect_equal(make("bar"), "incarned")
 })
 
 test_that("make instanciates dependencies", {

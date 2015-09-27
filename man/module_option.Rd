@@ -4,7 +4,7 @@
 \alias{module_option}
 \title{Module options.}
 \usage{
-module_option(name)
+module_option(name = .Last.name)
 }
 \description{
 Module options.

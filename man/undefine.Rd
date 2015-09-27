@@ -4,7 +4,7 @@
 \alias{undefine}
 \title{Undefine a Module.}
 \usage{
-undefine(name)
+undefine(name = .Last.name)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).

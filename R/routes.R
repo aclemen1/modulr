@@ -57,11 +57,11 @@
 
       path_candidate <- paste0(candidate_path, ext)
 
-      if(file.exists(path_candidate)) return(path_candidate)
+      if (file.exists(path_candidate)) return(path_candidate)
 
     }
 
-    if(.dir_exists(candidate_path)) return(candidate_path)
+    if (.dir_exists(candidate_path)) return(candidate_path)
 
   }
 
@@ -82,7 +82,7 @@
 
   mappings <- maps_config$get(scope_name)
 
-  if(is.null(mappings)) return(name)
+  if (is.null(mappings)) return(name)
 
   candidates <- Map(
     function(map) {
@@ -102,7 +102,7 @@
   },
   candidates)
 
-  if(length(candidates) == 0) return(name)
+  if (length(candidates) == 0) return(name)
 
   maximum_length <- max(unlist(Map(
     function(candidate) {
@@ -116,7 +116,7 @@
     },
     candidates)
 
-  if(length(candidates) > 1) warning(
+  if (length(candidates) > 1) warning(
     "More than one matching mapping. ",
     "Considering only the first occurence.",
     call. = FALSE, immediate. = TRUE)
@@ -135,7 +135,7 @@
     is.null(scope_name) || assertthat::is.string(scope_name),
     assertthat::is.flag(absolute))
 
-  if(is.null(scope_name)) injected_name <- name else
+  if (is.null(scope_name)) injected_name <- name else
     injected_name <- .resolve_mapping(name, scope_name)
 
   parsed_injected_name <- .parse_filename(injected_name)
@@ -163,7 +163,7 @@
     },
     candidates)
 
-  if(length(candidates) == 0) {
+  if (length(candidates) == 0) {
 
     candidate <- injected_name
 
@@ -181,7 +181,7 @@
       },
       candidates)
 
-    if(length(candidates) > 1) warning(
+    if (length(candidates) > 1) warning(
       "More than one matching namespace. ",
       "Considering only the first occurence.")
 
@@ -194,7 +194,7 @@
 
   }
 
-  if(absolute)
+  if (absolute)
     return(.find_absolute_path(candidate, ...))
 
   candidate
