@@ -41,7 +41,47 @@
   )
 
   if (nrow(graph) > 0) {
+
     pooh::tsort(graph$dependency, graph$module)
+
+  }
+
+}
+
+.topological_sort_by_layers <- function(graph) {
+
+  assert_that(
+    is.data.frame(graph),
+    nrow(graph) == 0 || setequal(names(graph), c("module", "dependency"))
+  )
+
+  if (nrow(graph) > 0) {
+
+    ordered_names <- .topological_sort(graph)
+
+    deps <-
+      sapply(
+        ordered_names,
+        function(x)
+          unlist(modulr_env$register[[c(x, "dependencies")]],
+                 use.names = FALSE))
+
+    layers <- list()
+
+    while(length(deps) > 0) {
+
+      idx <- sapply(
+        1:length(deps),
+        function(n) any(deps[[n]] %in% names(deps)[1:n]))
+
+      layers[[length(layers) + 1]] <- names(deps)[!idx]
+
+      deps <- deps[idx]
+
+    }
+
+    return(layers)
+
   }
 
 }

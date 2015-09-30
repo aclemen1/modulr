@@ -16,7 +16,7 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
 
   if (length(bc) & verbose)
     message(sprintf("modulr breadcrumbs: %s",
-                    paste(sprintf("[%s]", bc), collapse = " > ")))
+                    paste(sprintf("'%s'", bc), collapse = " > ")))
 
   invisible(bc)
 

@@ -150,7 +150,8 @@ make <- function(name = .Last.name) {
 
     if (nrow(dependency_graph) == 0) {
       deps_count <- 0
-      ordered_names <- name
+      layers <- list(name)
+      layers_count <- 1
     } else {
       deps_count <- length(unique(unlist(dependency_graph))) - 1
       .message_meta(
@@ -160,91 +161,112 @@ make <- function(name = .Last.name) {
             deps_count,
             nrow(dependency_graph)), {
 
-          ordered_names <- .topological_sort(dependency_graph)
+              layers <- .topological_sort_by_layers(dependency_graph)
 
-        },
-        ok = TRUE, verbosity = 2)
+              layers_count <- length(layers)
+
+              if(deps_count > 1 && layers_count > 1)
+                message(sprintf("%d layers, ", layers_count - 1),
+                        appendLF = FALSE)
+
+            },
+        ok = T, verbosity = 2)
     }
 
     .message_meta(
       if (deps_count > 1)
         "Evaluating only new or outdated dependencies ...", {
 
-        for (ordered_name_idx in c(1:length(ordered_names))) {
+          nodes <- unlist(layers, use.names = FALSE)
+          nodes_count <- length(nodes)
+          eval_counter <- 0
 
-          ordered_name <- ordered_names[ordered_name_idx]
+          for(layer_idx in c(1:layers_count)) {
 
-          assert_that(.is_defined(ordered_name))
+            ordered_names <- layers[[layer_idx]]
 
-          reinstanciated_by_parent <- any(unlist(lapply(
-            modulr_env$register[[c(ordered_name, "dependencies")]],
-            function(name) {
-              modulr_env$register[[c(name, "timestamp")]] >=
-                modulr_env$register[[c(ordered_name, "timestamp")]]
-            })))
+            for (ordered_name_idx in c(1:length(ordered_names))) {
 
-          if (!modulr_env$register[[c(ordered_name, "instanciated")]]
-             | reinstanciated_by_parent
-             | (ordered_name == name &
-                  get_digest(ordered_name) != get_digest(name))) {
+              eval_counter <- eval_counter + 1
 
-            .message_meta(
-              if (ordered_name_idx != length(ordered_names))
-                sprintf("Making dependency #%d/%d: '%s' ...",
-                        ordered_name_idx, length(ordered_names) - 1,
-                        ordered_name), {
+              ordered_name <- ordered_names[ordered_name_idx]
 
-              timestamp <- Sys.time()
+              assert_that(.is_defined(ordered_name))
 
-              env <- new.env()
+              reinstanciated_by_parent <- any(unlist(lapply(
+                modulr_env$register[[c(ordered_name, "dependencies")]],
+                function(name) {
+                  modulr_env$register[[c(name, "timestamp")]] >=
+                    modulr_env$register[[c(ordered_name, "timestamp")]]
+                })))
 
-              env$.__name__ <- ordered_name
+              if (!modulr_env$register[[c(ordered_name, "instanciated")]]
+                  | reinstanciated_by_parent
+                  | (ordered_name == name &
+                       get_digest(ordered_name) != get_digest(name))) {
 
-              args <- list()
+                .message_meta(
+                  if (eval_counter != nodes_count)
+                    sprintf("Evaluating #%d/%d (%d/%d): '%s' ...",
+                            eval_counter, nodes_count - 1,
+                            layer_idx, layers_count - 1,
+                            ordered_name), {
 
-              if (length(modulr_env$register[[
-                c(ordered_name, "dependencies")]]) > 0) {
+                              timestamp <- Sys.time()
 
-                args <-
-                  lapply(
-                    modulr_env$register[[
-                      c(ordered_name, "dependencies")]],
-                    function(name) {
-                      modulr_env$register[[c(
-                        .resolve_mapping(name, ordered_name),
-                        "instance", "value")]]
-                    }
-                  )
+                              env <- new.env()
+
+                              env$.__name__ <- ordered_name
+
+                              args <- list()
+
+                              if (length(modulr_env$register[[
+                                c(ordered_name, "dependencies")]]) > 0) {
+
+                                args <-
+                                  lapply(
+                                    modulr_env$register[[
+                                      c(ordered_name, "dependencies")]],
+                                    function(name) {
+                                      modulr_env$register[[c(
+                                        .resolve_mapping(name, ordered_name),
+                                        "instance", "value")]]
+                                    }
+                                  )
+
+                              }
+
+                              factory <-
+                                modulr_env$register[[
+                                  c(ordered_name, "factory")]]
+
+                              environment(factory) <- env
+
+                              instance <- withVisible(do.call(
+                                factory,
+                                args = args, quote = TRUE, envir = env))
+
+                              modulr_env$register[[
+                                c(ordered_name, "instance")]] <- instance
+                              modulr_env$register[[
+                                c(ordered_name, "duration")]] <-
+                                as.numeric(Sys.time() - timestamp)
+                              modulr_env$register[[
+                                c(ordered_name, "instanciated")]] <- TRUE
+                              modulr_env$register[[
+                                c(ordered_name, "first_instance")]] <- FALSE
+                              modulr_env$register[[
+                                c(ordered_name, "timestamp")]] <- Sys.time()
+
+                            },
+                  verbosity = 1)
 
               }
 
-              factory <- modulr_env$register[[c(ordered_name, "factory")]]
-
-              environment(factory) <- env
-
-              instance <- withVisible(do.call(
-                factory,
-                args = args, quote = TRUE, envir = env))
-
-              modulr_env$register[[c(ordered_name, "instance")]] <- instance
-
-              modulr_env$register[[c(ordered_name, "duration")]] <-
-                as.numeric(Sys.time() - timestamp)
-              modulr_env$register[[c(ordered_name, "instanciated")]] <-
-                TRUE
-              modulr_env$register[[c(ordered_name, "first_instance")]] <-
-                FALSE
-              modulr_env$register[[c(ordered_name, "timestamp")]] <-
-                Sys.time()
-
-            },
-            verbosity = 1)
-
+            }
           }
 
-        }
-
-      })
+        })
 
     instance <- modulr_env$register[[c(name, "instance")]]
 

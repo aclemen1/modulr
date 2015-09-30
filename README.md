@@ -92,7 +92,7 @@ library(modulr)
       stringsAsFactors = F)
     return(students)
   }
-#> [2015-09-11T19:52:35 UTC] Defining 'data/students' ...
+#> [2015-09-27T14:28:39 CEST] Defining 'data/students' ... OK
 ```
 
 The anatomy of this module is very simple: "data/student" is its name and the 
@@ -119,7 +119,7 @@ In parallel, let's ask Bob to provide us with a similar module.
       stringsAsFactors = F)
     return(teachers)
   }
-#> [2015-09-11T19:52:35 UTC] Defining 'data/teachers' ...
+#> [2015-09-27T14:28:39 CEST] Defining 'data/teachers' ... OK
 ```
 
 Now that we have these two modules at our disposal, let's combine them into 
@@ -136,7 +136,7 @@ another module that returns a (bad) student-teacher ratio.
     ratio <- length(unique(students$id)) / length(unique(teachers$id))
     return(ratio)
   }
-#> [2015-09-11T19:52:35 UTC] Defining 'bad_stat/student_teacher_ratio' ...
+#> [2015-09-27T14:28:39 CEST] Defining 'bad_stat/student_teacher_ratio' ... OK
 ```
 
 The `%requires%` operator allows us to specify the modules we rely on for the 
@@ -150,12 +150,14 @@ It is now time to see the DI framework in action.
 
 ```r
 bad_ratio %<=% "bad_stat/student_teacher_ratio"
-#> [2015-09-11T19:52:35 UTC] Making 'bad_stat/student_teacher_ratio' ...
-#> [2015-09-11T19:52:35 UTC] * Checking definitions ...
-#> [2015-09-11T19:52:35 UTC] * found 2 dependencies(s) with 3 modules(s) on 2 layer(s)
-#> [2015-09-11T19:52:35 UTC] ** Making 'data/students' ...
-#> [2015-09-11T19:52:35 UTC] ** Making 'data/teachers' ...
-#> [2015-09-11T19:52:35 UTC] ** Making 'bad_stat/student_teacher_ratio' ...
+#> [2015-09-27T14:28:39 CEST] Making 'bad_stat/student_teacher_ratio' ...
+#> [2015-09-27T14:28:39 CEST] * Visiting and defining dependencies ...
+#> [2015-09-27T14:28:39 CEST] * Constructing dependency graph ... OK
+#> [2015-09-27T14:28:39 CEST] * Sorting 2 dependencies with 2 relations ... OK
+#> [2015-09-27T14:28:39 CEST] * Evaluating only new or outdated dependencies ...
+#> [2015-09-27T14:28:39 CEST] ** Making dependency #1/2: 'data/teachers' ...
+#> [2015-09-27T14:28:39 CEST] ** Making dependency #2/2: 'data/students' ...
+#> [2015-09-27T14:28:39 CEST] DONE ('bad_stat/student_teacher_ratio')
 ```
 
 We say that the `%<=%` operator **makes** the module given on its 
