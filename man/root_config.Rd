@@ -7,16 +7,16 @@
 \format{\preformatted{List of 4
  $ unset  :function ()  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 10 12 14 3 12 3 10 14
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x39efe08> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x39a9380> 
  $ set    :function (..., drop = TRUE)  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 16 10 53 3 10 3 16 53
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x39efe08> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x39a9380> 
  $ get    :function (key)  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 72 10 82 3 10 3 72 82
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x39efe08> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x39a9380> 
  $ get_all:function ()  
   ..- attr(*, "srcref")=Class 'srcref'  atomic [1:8] 55 14 70 3 14 3 55 70
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x39efe08> 
+  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x39a9380> 
 }}
 \usage{
 root_config

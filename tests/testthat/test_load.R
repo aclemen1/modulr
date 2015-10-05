@@ -216,3 +216,37 @@ test_that(".define_all_dependent_modules doesn't fall into cycles", {
   expect_equal(length(.define_all_dependent_modules(name_1)), 2)
 
 })
+
+test_that("load_all_modules finds and loads files in dir", {
+  reset()
+
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE))
+
+  expect_null(load_all_modules(tmp_dir))
+
+  tmp_file <- file.path(tmp_dir, "foo.R")
+  cat('define("foo", NULL, function() print("Hello World!"))', file = tmp_file)
+  tmp_file <- file.path(tmp_dir, "bar.R")
+  cat('define("bar", NULL, function() print("hELLO wORLD?"))', file = tmp_file)
+  load_all_modules(tmp_dir)
+
+  register <- get("register", pos = modulr_env)
+
+  expect_true(all(c("foo", "bar") %in% names(register)))
+
+})
+
+test_that("load_all_modules calls are warned from within a module", {
+  reset()
+
+  define("module", NULL, function() {
+    tmp_dir <- tempfile("modulr_")
+    dir.create(tmp_dir)
+    on.exit(unlink(tmp_dir, recursive = TRUE))
+    load_all_modules(tmp_dir)
+  })
+
+  expect_warning(make("module"))
+})

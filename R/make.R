@@ -34,10 +34,12 @@
 #' state, so that it can be reused when appropriate, without re-evaluation.
 #' }
 #'
-#' The \code{make_all} function applies \code{make} to each defined module.
-#' If a \code{regexp} is specified, this applies only to modules which name
-#' satisfies the regular expression. Similarily, the \code{make_tests} function
-#' applies to each module which name contains \code{/test/} or \code{/tests/}.
+#' The \code{make_all} function applies \code{make} to each defined module. If a
+#' \code{regexp} is specified, this applies only to modules which name satisfies
+#' the regular expression. Similarily, the \code{make_tests} function applies to
+#' each module which name contains \code{/test/} or \code{/tests/}. It is also
+#' possible to run tests on all modules defined in a named directory with
+#' \code{make_all_tests}.
 #'
 #' @section Syntactic Sugars:
 #'  \preformatted{variable \%<=\% name}
@@ -376,11 +378,29 @@ make_tests <- function() {
 
 }
 
+#' @rdname make
+#' @param ... Further arguments to be passed to \code{\link{load_all_modules}}.
+#' @export
+make_all_tests <- function(...) {
+
+  .message_meta("Entering make_all_tests() ...",
+                verbosity = +Inf)
+
+  if (.is_called_from_within_module()) {
+    warning("make_all_tests is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  load_all_modules(...)
+
+  make_tests()
+}
+
 #' @export
 `%<=%` <- function(variable, name) {
 
   if (.is_called_from_within_module()) {
-    warning("make is called from within a module.",
+    warning("`%<=%` or `%=>%` is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
 
@@ -401,7 +421,7 @@ make_tests <- function() {
 `%<<=%` <- function(variable, name) {
 
   if (.is_called_from_within_module()) {
-    warning("make is called from within a module.",
+    warning("`%<<=%` or `%=>>%` is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
 

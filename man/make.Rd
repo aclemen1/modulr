@@ -7,6 +7,7 @@
 \alias{\%=>\%}
 \alias{make}
 \alias{make_all}
+\alias{make_all_tests}
 \alias{make_tests}
 \title{Make a Module.}
 \usage{
@@ -15,6 +16,8 @@ make(name = .Last.name)
 make_all(regexp, reserved = FALSE, error = stop)
 
 make_tests()
+
+make_all_tests(...)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -37,6 +40,8 @@ is used to filter the names of the modules to be made.}
 considered?}
 
 \item{error}{A function. This function is triggered on error.}
+
+\item{...}{Further arguments to be passed to \code{\link{load_all_modules}}.}
 }
 \value{
 The object resulting of the evaluation of the factory function of the
@@ -71,10 +76,12 @@ of the evaluation of every module factory is stored in the modulr internal
 state, so that it can be reused when appropriate, without re-evaluation.
 }
 
-The \code{make_all} function applies \code{make} to each defined module.
-If a \code{regexp} is specified, this applies only to modules which name
-satisfies the regular expression. Similarily, the \code{make_tests} function
-applies to each module which name contains \code{/test/} or \code{/tests/}.
+The \code{make_all} function applies \code{make} to each defined module. If a
+\code{regexp} is specified, this applies only to modules which name satisfies
+the regular expression. Similarily, the \code{make_tests} function applies to
+each module which name contains \code{/test/} or \code{/tests/}. It is also
+possible to run tests on all modules defined in a named directory with
+\code{make_all_tests}.
 }
 \section{Syntactic Sugars}{
 

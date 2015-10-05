@@ -274,6 +274,14 @@ test_that("make calls are warned from within a module", {
   expect_warning(make("module"))
   reset()
   define("module", NULL, function() {
+    tmp_dir <- tempfile("modulr_")
+    dir.create(tmp_dir)
+    on.exit(unlink(tmp_dir, recursive = TRUE))
+    make_all_tests(tmp_dir)
+  })
+  expect_warning(make("module"))
+  reset()
+  define("module", NULL, function() {
     modulr %<=% "modulr"
   })
   expect_warning(make("module"))
