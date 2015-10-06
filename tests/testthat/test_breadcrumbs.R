@@ -57,12 +57,15 @@ test_that("activate_breadcrumbs installs and preserves error handler", {
   expect_true(.is_installed_bc())
 
   foo <- NULL
-  options(error = function() assign("foo", "bar", envir = parent.frame()))
+  options(error = function() {
+    assign("foo", "bar", envir = parent.frame())
+    stop()
+  })
   expect_false(.is_installed_bc())
 
   activate_breadcrumbs()
   expect_true(.is_installed_bc())
 
-  eval(getOption("error"))
+  try(eval(getOption("error")), silent = T)
   expect_equal(foo, "bar")
 })

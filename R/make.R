@@ -177,7 +177,7 @@ make <- function(name = .Last.name) {
 
     .message_meta(
       if (deps_count > 1)
-        "Evaluating only new or outdated dependencies ...", {
+        "Evaluating new or outdated dependencies ...", {
 
           nodes <- unlist(layers, use.names = FALSE)
           nodes_count <- length(nodes)

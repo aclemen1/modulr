@@ -39,7 +39,7 @@ list_modules()
 list_stashes()
 root_config$get_all()
 .Last.name
-reset(all = T)
+reset(all = TRUE)
 list_stashes()
 }
 \seealso{

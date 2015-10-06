@@ -14,7 +14,7 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
                     ifnotfound = NA, inherits = TRUE)
              }))))
 
-  if (length(bc) & verbose)
+  if (length(bc) > 0 && verbose)
     message(sprintf("modulr breadcrumbs: %s",
                     paste(sprintf("'%s'", bc), collapse = " > ")))
 
@@ -46,7 +46,7 @@ activate_breadcrumbs <- function() {
     wrapper <- function() {
       modulr::get_breadcrumbs("installed")
       eval(parse(text = deparse(handler)), envir = parent.frame())
-
+      if(!interactive()) stop(call. = FALSE)
     }
 
     options(error = wrapper)
