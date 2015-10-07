@@ -24,12 +24,12 @@ Sys.setlocale("LC_TIME", "en_DK.UTF-8")
 
 [![Build status](https://travis-ci.org/aclemen1/modulr.svg)](https://travis-ci.org/aclemen1/modulr)
 [![Coverage status](https://codecov.io/github/aclemen1/modulr/coverage.svg?branch=devel)](http://codecov.io/github/aclemen1/modulr?branch=devel)
-[![GitHub issues](https://img.shields.io/github/issues/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/issues)
 [![Pending pull-requests](https://githubbadges.herokuapp.com/aclemen1/modulr/pulls.svg?style=flat)](https://github.com/aclemen1/modulr/pulls)
-[![GitHub stars](https://img.shields.io/github/stars/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/network)
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet?text=modulr%20-%20%20A%20Dependency%20Injection%20Framework%20for%20R)
+[![GitHub issues](http://img.shields.io/github/issues-raw/aclemen1/modulr.svg)](http://waffle.io/aclemen1/modulr)
+[![GitHub stars](http://img.shields.io/github/stars/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/stargazers)
+[![GitHub forks](http://img.shields.io/github/forks/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/network)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org/license.html)
+[![Twitter](http://img.shields.io/twitter/url/https/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet?text=modulr%20-%20%20A%20Dependency%20Injection%20Framework%20for%20R)
 
 # modulr — A Dependency Injection (DI) Framework for R
 

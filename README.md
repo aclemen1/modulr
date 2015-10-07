@@ -5,12 +5,12 @@
 
 [![Build status](https://travis-ci.org/aclemen1/modulr.svg)](https://travis-ci.org/aclemen1/modulr)
 [![Coverage status](https://codecov.io/github/aclemen1/modulr/coverage.svg?branch=devel)](http://codecov.io/github/aclemen1/modulr?branch=devel)
-[![GitHub issues](https://img.shields.io/github/issues/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/issues)
 [![Pending pull-requests](https://githubbadges.herokuapp.com/aclemen1/modulr/pulls.svg?style=flat)](https://github.com/aclemen1/modulr/pulls)
-[![GitHub stars](https://img.shields.io/github/stars/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/network)
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet?text=modulr%20-%20%20A%20Dependency%20Injection%20Framework%20for%20R)
+[![GitHub issues](http://img.shields.io/github/issues-raw/aclemen1/modulr.svg)](http://waffle.io/aclemen1/modulr)
+[![GitHub stars](http://img.shields.io/github/stars/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/stargazers)
+[![GitHub forks](http://img.shields.io/github/forks/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/network)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org/license.html)
+[![Twitter](http://img.shields.io/twitter/url/https/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet?text=modulr%20-%20%20A%20Dependency%20Injection%20Framework%20for%20R)
 
 # modulr — A Dependency Injection (DI) Framework for R
 
@@ -98,7 +98,7 @@ library(modulr)
       stringsAsFactors = F)
     return(students)
   }
-#> [2015-10-07T23:51:40 CEST] Defining 'data/students' ... OK
+#> [2015-10-08T17:45:58 UTC] Defining 'data/students' ... OK
 ```
 
 The anatomy of this module is very simple: "data/student" is its name and the 
@@ -125,7 +125,7 @@ In parallel, let's ask Bob to provide us with a similar module.
       stringsAsFactors = F)
     return(teachers)
   }
-#> [2015-10-07T23:51:40 CEST] Defining 'data/teachers' ... OK
+#> [2015-10-08T17:45:58 UTC] Defining 'data/teachers' ... OK
 ```
 
 Now that we have these two modules at our disposal, let's combine them into 
@@ -142,7 +142,7 @@ another module that returns a (bad) student-teacher ratio.
     ratio <- length(unique(students$id)) / length(unique(teachers$id))
     return(ratio)
   }
-#> [2015-10-07T23:51:40 CEST] Defining 'bad_stat/student_teacher_ratio' ... OK
+#> [2015-10-08T17:45:58 UTC] Defining 'bad_stat/student_teacher_ratio' ... OK
 ```
 
 The `%requires%` operator allows us to specify the modules we rely on for the 
@@ -156,14 +156,14 @@ It is now time to see the DI framework in action.
 
 ```r
 bad_ratio %<=% "bad_stat/student_teacher_ratio"
-#> [2015-10-07T23:51:40 CEST] Making 'bad_stat/student_teacher_ratio' ...
-#> [2015-10-07T23:51:40 CEST] * Visiting and defining dependencies ...
-#> [2015-10-07T23:51:40 CEST] * Constructing dependency graph ... OK
-#> [2015-10-07T23:51:40 CEST] * Sorting 2 dependencies with 2 relations ... 1 layers, OK
-#> [2015-10-07T23:51:40 CEST] * Evaluating new or outdated dependencies ...
-#> [2015-10-07T23:51:40 CEST] ** Evaluating #1/2 (1/1): 'data/teachers' ...
-#> [2015-10-07T23:51:40 CEST] ** Evaluating #2/2 (1/1): 'data/students' ...
-#> [2015-10-07T23:51:40 CEST] DONE ('bad_stat/student_teacher_ratio')
+#> [2015-10-08T17:45:58 UTC] Making 'bad_stat/student_teacher_ratio' ...
+#> [2015-10-08T17:45:58 UTC] * Visiting and defining dependencies ...
+#> [2015-10-08T17:45:58 UTC] * Constructing dependency graph ... OK
+#> [2015-10-08T17:45:58 UTC] * Sorting 2 dependencies with 2 relations ... 1 layers, OK
+#> [2015-10-08T17:45:58 UTC] * Evaluating new or outdated dependencies ...
+#> [2015-10-08T17:45:58 UTC] ** Evaluating #1/2 (1/1): 'data/teachers' ...
+#> [2015-10-08T17:45:58 UTC] ** Evaluating #2/2 (1/1): 'data/students' ...
+#> [2015-10-08T17:45:58 UTC] DONE ('bad_stat/student_teacher_ratio')
 ```
 
 We say that the `%<=%` operator **makes** the module given on its 
