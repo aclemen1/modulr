@@ -11,3 +11,5 @@ inst/doc
 *.Rds
 vignettes/*.R
 *_SECRET_*
+README.html
+README_files

@@ -9,6 +9,7 @@ man-roxygen
 ^README\.Rmd$
 ^README-.*\.png$
 ^README\.html$
+^README_files/
 ^lib/
 tmp/
 data/

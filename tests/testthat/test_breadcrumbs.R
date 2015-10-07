@@ -68,4 +68,5 @@ test_that("activate_breadcrumbs installs and preserves error handler", {
 
   try(eval(getOption("error")), silent = T)
   expect_equal(foo, "bar")
+
 })
