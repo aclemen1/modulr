@@ -5,7 +5,12 @@
 
     if (tolower(tools::file_ext(path)) == "r") {
 
-      source(path)
+      if(interactive() && requireNamespace("rstudioapi", quietly = TRUE) &&
+           rstudioapi::isAvailable()) {
+        local(do.call("debugSource", args = list(path, echo = FALSE))) # nocov
+      } else {
+        source(path, local = TRUE, echo = FALSE, keep.source = TRUE)
+      }
 
     } else if (tolower(tools::file_ext(path)) %in% c("rmd", "rnw")) {
 
@@ -18,7 +23,8 @@
 
       source(knitr::knit(path,
                          output = tmp_file,
-                         tangle = TRUE, quiet = TRUE))
+                         tangle = TRUE, quiet = TRUE),
+             local = TRUE, echo = FALSE, keep.source = TRUE)
 
       try(unlink(tmp_file), silent = TRUE)
 

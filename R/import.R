@@ -149,7 +149,7 @@ import_module <- function(name, url, digest = NULL,
 
     if (!is.null(digest) && isTRUE(get_digest(name) != digest)) {
       rollback()
-      stop(sprintf("digest is not matching. Rolling back.", name),
+      stop(sprintf("digests do not match. Rolling back.", name),
            call. = FALSE)
     }
 

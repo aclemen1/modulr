@@ -1,7 +1,65 @@
+#' List Defined Modules.
+#'
+#' List defined modules.
+#'
+#' @inheritParams make
+#' @param wide A flag. Should the function return a data frame instead of a
+#'   characted vector?
+#' @param full A flag. Should all columns be included in the data frame?
+#' @param formatted A flag. Should columns with units be string formatted?
+#' @param cols A character vector. Details returned in the columns of the data
+#'   frame.
+#'
+#' @return A character vector or a data frame containing module informations.
+#'
+#' @details
+#'
+#' For each module, the following details can be returned in the columns of the
+#' data frame:
+#' \describe{
+#' \item{\code{name}}{name.}
+#' \item{\code{type}}{type of the object returned.}
+#' \item{\code{weight}}{memory size of the object.}
+#' \item{\code{calls}}{number of explicit make calls.}
+#' \item{\code{dependencies}}{number of direct dependencies (parents).}
+#' \item{\code{childs}}{number of modules requiring the module (childs).}
+#' \item{\code{size}}{memory size occupied by the definition.}
+#' \item{\code{lines}}{number of lines of the factory.}
+#' \item{\code{chars}}{number of characters of the factory.}
+#' \item{\code{duration}}{duration of the evaluation.}
+#' \item{\code{modified}}{timestamp of last modification.}
+#' \item{\code{created}}{timestamp of creation.}
+#' \item{\code{digest}}{digest (cf. \code{\link{get_digest}}).}
+#' }
+#'
+#' @seealso \code{\link{define}}, \code{\link{make}},
+#'   \code{\link{reset}}, and \code{\link{touch}}.
+#'
+#' @examples
+#' reset()
+#' list_modules()
+#' define("foo", NULL, function() Sys.sleep(1))
+#' list_modules()
+#' list_modules(reserved = TRUE)
+#' list_modules(reserved = TRUE, wide = FALSE)
+#' invisible(make("foo"))
+#' list_modules(reserved = TRUE, full = TRUE)
+#' list_modules(
+#'   reserved = TRUE,
+#'   formatted = FALSE,
+#'   cols = c("weight", "size", "modified", "created"))
+#' define("bar", NULL, function() Sys.sleep(1))
+#' define("foobar", list(f = "foo", b = "bar"), function(f, b) NULL)
+#' invisible(make("foobar"))
+#' Sys.sleep(1)
+#' touch("foo")
+#' list_modules(".oo.*", cols = c("weight", "size", "modified", "created"))
+#'
+#' @aliases lsmod
 #' @export
-# TODO: write documentation
 list_modules <-
-  function(regexp, reserved = TRUE, wide = TRUE, full = FALSE, formatted = TRUE,
+  function(regexp,
+           reserved = FALSE, wide = TRUE, full = FALSE, formatted = TRUE,
            cols = c(
              "name",
              "type",
@@ -140,6 +198,6 @@ list_modules <-
 
 }
 
+#' @rdname list_modules
 #' @export
-# TODO: write documentation
 lsmod <- list_modules
