@@ -371,7 +371,7 @@ define <- function(name, dependencies, factory) {
 #' Get the factory function of a module.
 #'
 #' @inheritParams define
-#' @param load A flag. Should an undefined module be implicitely loaded?
+#' @inheritParams get_digest
 #'
 #' @return A function identical to the factory function of the module.
 #'

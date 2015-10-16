@@ -2,11 +2,34 @@
 % Please edit documentation in R/graph.R
 \name{graph_dependencies}
 \alias{graph_dependencies}
-\title{Dependency graph}
+\title{Graph Dependencies.}
 \usage{
 graph_dependencies(group, reserved = TRUE)
 }
+\arguments{
+\item{group}{A character vector of module names (cf. \code{\link{define}}) to
+  include as a subset of the graph nodes.}
+
+\item{reserved}{A flag. Should special modules with a reserved name be
+considered?}
+}
 \description{
-Dependency graph
+Graph the directed acyclic graph (DAG) of modules and dependencies.
+}
+\examples{
+reset()
+define("foo", NULL, function() NULL)
+define("bar", list(m = "modulr"), function(m) NULL)
+define("foobar", list(f = "foo", b = "bar"), function(f, b) NULL)
+define("foobuzz", list(f = "foo", b = "buzz"), function(f, b) NULL)
+define("fizz", list(f1 = "foobar", f2 = "foobuz"), function(f1, f2) NULL)
+wait <- function() invisible(readline(prompt="Press [enter] to continue"))
+graph_dependencies("foobar", reserved = FALSE); wait()
+graph_dependencies("foobar"); wait()
+graph_dependencies(reserved = FALSE); wait()
+graph_dependencies()
+}
+\seealso{
+\code{\link{define}} and \code{\link{reset}}.
 }
 

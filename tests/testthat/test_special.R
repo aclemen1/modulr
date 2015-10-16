@@ -1,4 +1,4 @@
-context("reserved")
+context("special")
 
 test_that("$get_module_name returns the module name", {
   reset()
@@ -9,7 +9,7 @@ test_that("$get_module_name returns the module name", {
 
 test_that("$get_module_options returns the module options", {
   reset()
-  module_option("my/great/module")$set(list(opt1 = "value1", opt2 = "value2"))
+  module_options("my/great/module")$set(list(opt1 = "value1", opt2 = "value2"))
   define("my/great/module", list(modulr = "modulr"),
          function(modulr) modulr$get_module_options())
   expect_equal(make("my/great/module"), list(opt1 = "value1", opt2 = "value2"))

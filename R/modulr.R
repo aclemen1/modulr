@@ -1,14 +1,24 @@
-#' modulr -- Module Pattern and DI in R
+#' modulr -- A Dependency Injection Framework for R
 #'
-#' modulr is a Module Pattern and Dependency Injection implementation in R.
-#' Module Pattern and DI allows you to encapsulate pieces of code into useful
-#' singleton units, namely modules that register their capabilities, export
-#' values and rely on other modules as dependencies. modulr is widely inspired
-#' from RequireJS and AngularJS for Javascript.
+#' @description
+#' This package contains a Dependency Injection framework for R. It allows to
+#' organize programs into discrete, modular, and loosely coupled units. By
+#' nature, such modules are easy to develop, debug, test, reuse, share and
+#' maintain in a wide range of common situations. This package may also allow
+#' for higher compliance with best practices in software engineering, provably
+#' within small- to mid-sized teams of developers and R users.
+#'
+#' @details
+#' To learn more about modulr, start with the vignettes and use
+#' \code{browseVignettes(package = "modulr")}.
+#'
+#' For a complete list of functions,
+#' use \code{library(help = "modulr")}.
 #'
 #' @docType package
 #' @name modulr
 #' @author Alain Clément-Pavon <\email{alain.clement-pavon@@unil.ch}>
+NULL
 
 modulr_env <- new.env(parent = emptyenv())
 
@@ -48,16 +58,74 @@ if (packageVersion("assertthat") >= package_version("0.1.0.99")) {
   }
 }
 
+#' Set and Get Verbosity Level.
+#'
+#' Set and get the global verbosity level.
+#'
+#' @param level A scalar (integer vector of length one),
+#'  possibly \code{-Inf} or \code{+Inf}.
+#'
+#' @details
+#'
+#' Messages are generated, accordingly to the following levels:
+#'
+#' \describe{
+#' \item{Level 0.}{None.}
+#' \item{Level 1.}{Operations modifying the internal state.}
+#' \item{Level 2 (default).}{All operations.}
+#' \item{Level \code{+Inf}.}{Debugging informations.}
+#' }
+#'
+#' @seealso \code{\link{define}}, \code{\link{make}}, \code{\link{reset}}, and
+#'   \code{\link{touch}}.
+#'
+#' @examples
+#' reset()
+#' set_verbosity(+Inf)
+#' define("foo", NULL, function() "Hello World")
+#' define("bar", list(f = "foo"), function(f) sprintf("*%s*", f))
+#' make()
+#' touch("foo")
+#' make("bar")
+#'
+#' reset()
+#' set_verbosity(2)
+#' define("foo", NULL, function() "Hello World")
+#' define("bar", list(f = "foo"), function(f) sprintf("*%s*", f))
+#' make()
+#' touch("foo")
+#' make("bar")
+#'
+#' reset()
+#' set_verbosity(1)
+#' define("foo", NULL, function() "Hello World")
+#' define("bar", list(f = "foo"), function(f) sprintf("*%s*", f))
+#' make()
+#' touch("foo")
+#' make("bar")
+#'
+#' reset()
+#' set_verbosity(0)
+#' define("foo", NULL, function() "Hello World")
+#' define("bar", list(f = "foo"), function(f) sprintf("*%s*", f))
+#' make()
+#' touch("foo")
+#' make("bar")
+#'
 #' @export
-# TODO: write documentation
-set_verbosity <- function(value) {
+set_verbosity <- function(level = 2) {
 
-  .message_meta("Entering set_verbosity() ...",
-                verbosity = +Inf)
+  assertthat::assert_that(assertthat::is.scalar(level))
 
-  assertthat::assert_that(assertthat::is.scalar(value))
+  modulr_env$verbosity <- level
 
-  modulr_env$verbosity <- value
+}
+
+#' @rdname set_verbosity
+#' @export
+get_verbosity <- function() {
+
+  modulr_env$verbosity
 
 }
 

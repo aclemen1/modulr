@@ -1,6 +1,40 @@
+#' Stash and Unstash Modules. List and Remove Stashes.
+#'
+#' Stash and unstash all modules and internal state. List and remove stashes.
+#'
+#' @param comment A string (character vector of length one).
+#'
+#' @details
+#'
+#' \code{stash} allows to stash all modules and the internal state of modulr.
+#' Each stash is pushed on a stack and can be commented for later reference.
+#' \code{unstash} pops a stash from the stack and restores the state
+#' accordingly. \code{list_stashes} lists the stack, showing ids, timestamps and
+#' comments for each stash. \code{remove_stash} removes one or all stashes from
+#' the stack.
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{define}}, \code{\link{list_modules}}, and
+#'   \code{\link{reset}}.
+#'
+#' @examples
+#' reset()
+#' remove_stash(all = TRUE)
+#' define("foo", NULL, function() NULL)
+#' stash("'foo' only")
+#' list_stashes()
+#' define("bar", NULL, function() NULL)
+#' stash("'foo' and 'bar'")
+#' list_stashes()
+#' list_modules()
+#' unstash(1L)
+#' list_modules()
+#'
 #' @export
-# TODO: test that
-# TODO: write documentation
 stash <- function(comment = NA_character_) {
 
   .message_meta("Entering stash() ...",
@@ -30,9 +64,9 @@ stash <- function(comment = NA_character_) {
 
 }
 
+#' @rdname stash
+#' @param id A scalar (integer vector of length one).
 #' @export
-# TODO: test that
-# TODO: write documentation
 unstash <- function(id = length(modulr_env$stash)) {
   .message_meta("Entering unstash() ...",
                 verbosity = +Inf)
@@ -61,9 +95,8 @@ unstash <- function(id = length(modulr_env$stash)) {
 
 }
 
+#' @rdname stash
 #' @export
-# TODO: test that
-# TODO: write documentation
 list_stashes <- function() {
 
   .message_meta("Entering list_stashes() ...",
@@ -89,9 +122,10 @@ list_stashes <- function() {
 
 }
 
+#' @rdname stash
+#' @inheritParams unstash
+#' @param all A flag. Should all stashes be removed?
 #' @export
-# TODO: test that
-# TODO: write documentation
 remove_stash <- function(id, all) {
 
   .message_meta("Entering remove_stash() ...",

@@ -2,11 +2,43 @@
 % Please edit documentation in R/breadcrumbs.R
 \name{get_breadcrumbs}
 \alias{get_breadcrumbs}
-\title{Get and show breadcrumbs}
+\title{Get Breadcrumbs.}
 \usage{
 get_breadcrumbs(void, verbose = TRUE)
 }
+\arguments{
+\item{void}{Any object. Not used.}
+
+\item{verbose}{A flag. Should a message be outputted?}
+}
+\value{
+An ordered character vector containing the names of the nested
+  modules.
+}
 \description{
-Get and show breadcrumbs
+Get breadcrumbs and output a message.
+}
+\details{
+Breadcrumbs allow to keep track of locations within modules. This is
+particularily useful to circumvent an error occurring in a chain of nested
+dependent modules, for instance. See \code{\link{reactivate_breadcrumbs}}.
+}
+\examples{
+reset()
+define("foo", NULL, function() function() get_breadcrumbs())
+define("bar", list(foo = "foo"), function(foo) function() foo())
+define("foobar", list(bar = "bar"), function(bar) (bar()))
+make()
+
+reset()
+reactivate_breadcrumbs()
+define("foo", NULL, function() function() stop("error in 'foo'"))
+define("bar", list(foo = "foo"), function(foo) function() foo())
+define("foobar", list(bar = "bar"), function(bar) bar())
+\dontrun{make()}
+}
+\seealso{
+\code{\link{reactivate_breadcrumbs}}, \code{\link{define}},
+\code{\link{make}}, and \code{\link{reset}}.
 }
 

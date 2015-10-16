@@ -91,59 +91,59 @@ test_that("get_configs returns the whole configuration state", {
 test_that("%has_default_option% sets default module option", {
   reset()
   `%has_default_option%`("module", list(c1 = "v1", c2 = "v2"))
-  expect_equal(module_option("module")$get_all(), list(c1 = "v1", c2 = "v2"))
+  expect_equal(module_options("module")$get_all(), list(c1 = "v1", c2 = "v2"))
   })
 
 test_that("%has_default_option% sets only unset module options", {
   reset()
   `%has_default_option%`("module", list(c1 = "v1", c2 = "v2"))
-  expect_equal(module_option("module")$get_all(), list(c1 = "v1", c2 = "v2"))
+  expect_equal(module_options("module")$get_all(), list(c1 = "v1", c2 = "v2"))
   `%has_default_option%`("module", list(c1 = "v1", c2 = "v2bis", c3 = "v3"))
-  expect_equal(module_option("module")$get_all(),
+  expect_equal(module_options("module")$get_all(),
                list(c1 = "v1", c2 = "v2", c3 = "v3"))
 })
 
 test_that("%has_option% sets module option", {
   reset()
   `%has_option%`("module", list(c1 = "v1", c2 = "v2"))
-  expect_equal(module_option("module")$get_all(), list(c1 = "v1", c2 = "v2"))
+  expect_equal(module_options("module")$get_all(), list(c1 = "v1", c2 = "v2"))
 })
 
 test_that("%has_option% sets already set module options", {
   reset()
   `%has_option%`("module", list(c1 = "v1", c2 = "v2"))
-  expect_equal(module_option("module")$get_all(), list(c1 = "v1", c2 = "v2"))
+  expect_equal(module_options("module")$get_all(), list(c1 = "v1", c2 = "v2"))
   `%has_option%`("module", list(c1 = "v1", c2 = "v2bis", c3 = "v3"))
-  expect_equal(module_option("module")$get_all(),
+  expect_equal(module_options("module")$get_all(),
                list(c1 = "v1", c2 = "v2bis", c3 = "v3"))
 })
 
 test_that("%has_default_options% sets default module option", {
   reset()
   `%has_default_options%`("module", list(c1 = "v1", c2 = "v2"))
-  expect_equal(module_option("module")$get_all(), list(c1 = "v1", c2 = "v2"))
+  expect_equal(module_options("module")$get_all(), list(c1 = "v1", c2 = "v2"))
 })
 
 test_that("%has_default_options% sets only unset module options", {
   reset()
   `%has_default_options%`("module", list(c1 = "v1", c2 = "v2"))
-  expect_equal(module_option("module")$get_all(), list(c1 = "v1", c2 = "v2"))
+  expect_equal(module_options("module")$get_all(), list(c1 = "v1", c2 = "v2"))
   `%has_default_options%`("module", list(c1 = "v1", c2 = "v2bis", c3 = "v3"))
-  expect_equal(module_option("module")$get_all(),
+  expect_equal(module_options("module")$get_all(),
                list(c1 = "v1", c2 = "v2", c3 = "v3"))
 })
 
 test_that("%has_options% sets module option", {
   reset()
   `%has_options%`("module", list(c1 = "v1", c2 = "v2"))
-  expect_equal(module_option("module")$get_all(), list(c1 = "v1", c2 = "v2"))
+  expect_equal(module_options("module")$get_all(), list(c1 = "v1", c2 = "v2"))
 })
 
 test_that("%has_options% sets already set module options", {
   reset()
   `%has_options%`("module", list(c1 = "v1", c2 = "v2"))
-  expect_equal(module_option("module")$get_all(), list(c1 = "v1", c2 = "v2"))
+  expect_equal(module_options("module")$get_all(), list(c1 = "v1", c2 = "v2"))
   `%has_options%`("module", list(c1 = "v1", c2 = "v2bis", c3 = "v3"))
-  expect_equal(module_option("module")$get_all(),
+  expect_equal(module_options("module")$get_all(),
                list(c1 = "v1", c2 = "v2bis", c3 = "v3"))
 })

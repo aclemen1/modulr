@@ -1,7 +1,27 @@
-#' Dependency graph
+#' Graph Dependencies.
+#'
+#' Graph the directed acyclic graph (DAG) of modules and dependencies.
+#'
+#' @inheritParams make
+#' @param group A character vector of module names (cf. \code{\link{define}}) to
+#'   include as a subset of the graph nodes.
+#'
+#' @seealso \code{\link{define}} and \code{\link{reset}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() NULL)
+#' define("bar", list(m = "modulr"), function(m) NULL)
+#' define("foobar", list(f = "foo", b = "bar"), function(f, b) NULL)
+#' define("foobuzz", list(f = "foo", b = "buzz"), function(f, b) NULL)
+#' define("fizz", list(f1 = "foobar", f2 = "foobuz"), function(f1, f2) NULL)
+#' wait <- function() invisible(readline(prompt="Press [enter] to continue"))
+#' graph_dependencies("foobar", reserved = FALSE); wait()
+#' graph_dependencies("foobar"); wait()
+#' graph_dependencies(reserved = FALSE); wait()
+#' graph_dependencies()
 #'
 #' @export
-# TODO: write documentation
 graph_dependencies <- function(group, reserved = TRUE) {
 
   .message_meta("Entering graph_dependencies() ...",

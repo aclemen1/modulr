@@ -1,7 +1,36 @@
-#' Get and show breadcrumbs
+#' Get Breadcrumbs.
 #'
+#' Get breadcrumbs and output a message.
+#'
+#' @param void Any object. Not used.
+#' @param verbose A flag. Should a message be outputted?
+#'
+#' @return An ordered character vector containing the names of the nested
+#'   modules.
+#'
+#' @details
+#'
+#' Breadcrumbs allow to keep track of locations within modules. This is
+#' particularily useful to circumvent an error occurring in a chain of nested
+#' dependent modules, for instance. See \code{\link{reactivate_breadcrumbs}}.
+#'
+#' @seealso \code{\link{reactivate_breadcrumbs}}, \code{\link{define}},
+#' \code{\link{make}}, and \code{\link{reset}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() function() get_breadcrumbs())
+#' define("bar", list(foo = "foo"), function(foo) function() foo())
+#' define("foobar", list(bar = "bar"), function(bar) (bar()))
+#' make()
+#'
+#' reset()
+#' reactivate_breadcrumbs()
+#' define("foo", NULL, function() function() stop("error in 'foo'"))
+#' define("bar", list(foo = "foo"), function(foo) function() foo())
+#' define("foobar", list(bar = "bar"), function(bar) bar())
+#' \dontrun{make()}
 #' @export
-# TODO: write documentation
 get_breadcrumbs <- function(void, verbose = TRUE) {
 
   assert_that(assertthat::is.flag(verbose))
@@ -33,11 +62,31 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
 
 }
 
-#' Activate breadcrumbs
+#' Re-Activate Breadcrumbs.
+#'
+#' Re-activate breadcrumbs messages on error.
+#'
+#' @details
+#'
+#' Breadcrumbs messages are activated by default when the modulr package is
+#' loaded. This is done by binding a wrapper function to the
+#' \code{\link[=options]{error}} option. The function wraps any other previously
+#' binded function and the \code{\link{get_breadcrumbs}} function together.
+#' Since IDEs like RStudio are likely to reset this option during the lifetime
+#' of an R session, \code{reactivate_breadcrumbs} can be useful to re-install
+#' the wrapper function.
+#'
+#' @examples
+#' reset()
+#' options(error = browser)
+#' reactivate_breadcrumbs()
+#' define("foo", NULL, function() function() stop("error in 'foo'"))
+#' define("bar", list(foo = "foo"), function(foo) function() foo())
+#' define("foobar", list(bar = "bar"), function(bar) bar())
+#' \dontrun{make()}
 #'
 #' @export
-# TODO: write documentation
-activate_breadcrumbs <- function() {
+reactivate_breadcrumbs <- function() {
 
   handler <- getOption("error")
 

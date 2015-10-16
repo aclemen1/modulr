@@ -179,6 +179,7 @@ make <- function(name = .Last.name) {
       if (deps_count > 1)
         "Evaluating new or outdated dependencies ...", {
 
+          digest <- get_digest(name)
           nodes <- unlist(layers, use.names = FALSE)
           nodes_count <- length(nodes)
           eval_counter <- 0
@@ -205,7 +206,7 @@ make <- function(name = .Last.name) {
               if (!modulr_env$register[[c(ordered_name, "instanciated")]]
                   | reinstanciated_by_parent
                   | (ordered_name == name &
-                       get_digest(ordered_name) != get_digest(name))) {
+                       get_digest(ordered_name) != digest)) {
 
                 .message_meta(
                   if (eval_counter != nodes_count)
@@ -448,7 +449,7 @@ make_all_tests <- function(...) {
 #'
 #' @details
 #'
-#' See \code{\link{make}} and \code{\link{module_option}}.
+#' See \code{\link{make}} and \code{\link{module_options}}.
 #'
 #' @section Warning:
 #'  It is considered a very bad practice to define, touch, undefine, load, make,
@@ -456,7 +457,7 @@ make_all_tests <- function(...) {
 #'  may alterate the internal state of modulr.
 #'
 #' @seealso \code{\link{.Last.name}}, \code{\link{graph_dependencies}},
-#'   \code{\link{make}}, \code{\link{module_option}},
+#'   \code{\link{make}}, \code{\link{module_options}},
 #'   and \code{\link{reset}}.
 #'
 #' @examples
@@ -502,7 +503,7 @@ touch <- function(name = .Last.name) {
     if (.is_regular(name))
       modulr_env$.Last.name <- name
 
-    module_option(name)$unset()
+    module_options(name)$unset() # Deprecated, kept for backward compatibility.
 
   },
   ok = TRUE, verbosity = 2)

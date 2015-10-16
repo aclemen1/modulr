@@ -2,11 +2,18 @@
 % Please edit documentation in R/config.R
 \name{get_configs}
 \alias{get_configs}
-\title{All configurations.}
+\title{Get Configurations.}
 \usage{
 get_configs()
 }
 \description{
-All configurations.
+Get all configurations.
+}
+\examples{
+reset()
+get_configs()
+}
+\seealso{
+\code{\link{config}} and \code{\link{reset}}.
 }
 

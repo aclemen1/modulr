@@ -3,7 +3,7 @@
 
   reset(all = TRUE, .verbose = FALSE)
 
-  activate_breadcrumbs()
+  reactivate_breadcrumbs()
 
   invisible()
 

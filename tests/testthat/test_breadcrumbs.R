@@ -46,14 +46,14 @@ test_that(".is_installed_bc detects breadcrumbs in error handler", {
   expect_true(.is_installed_bc())
 })
 
-test_that("activate_breadcrumbs installs and preserves error handler", {
+test_that("reactivate_breadcrumbs installs and preserves error handler", {
   error_bak <- getOption("error")
   on.exit(options(error = error_bak))
 
   options(error = NULL)
   expect_false(.is_installed_bc())
 
-  activate_breadcrumbs()
+  reactivate_breadcrumbs()
   expect_true(.is_installed_bc())
 
   foo <- NULL
@@ -63,7 +63,7 @@ test_that("activate_breadcrumbs installs and preserves error handler", {
   })
   expect_false(.is_installed_bc())
 
-  activate_breadcrumbs()
+  reactivate_breadcrumbs()
   expect_true(.is_installed_bc())
 
   try(eval(getOption("error")), silent = T)

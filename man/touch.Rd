@@ -25,7 +25,7 @@ Touch a module by marking it as outdated and by resetting its default
 configuration, if appropriate.
 }
 \details{
-See \code{\link{make}} and \code{\link{module_option}}.
+See \code{\link{make}} and \code{\link{module_options}}.
 }
 \section{Warning}{
 
@@ -56,7 +56,7 @@ graph_dependencies()
 }
 \seealso{
 \code{\link{.Last.name}}, \code{\link{graph_dependencies}},
-  \code{\link{make}}, \code{\link{module_option}},
+  \code{\link{make}}, \code{\link{module_options}},
   and \code{\link{reset}}.
 }
 

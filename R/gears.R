@@ -60,9 +60,12 @@
   if (!is.null(url)) {
     sprintf(
       paste(
-        "\"%s\" %%digests%%",
-        "  \"%s\" %%imports%%",
-        "  \"%s\"",
+        "\"%1$s\" %%imports%%",
+        "  \"%3$s\"",
+        "",
+        "# \"%1$s\" %%digests%%",
+        "#   \"%2$s\" %%imports%%",
+        "#   \"%3$s\"",
         "", sep = "\n"),
       name,
       modulr_env$register[[c(name, "digest")]],
@@ -71,6 +74,33 @@
 
 }
 
+#' Prepare Modulr Gear.
+#'
+#' Prepare a module (including mocks, tests and examples) for publication as a
+#' Modulr Gear.
+#'
+#' @inheritParams define
+#' @inheritParams import_module
+#' @inheritParams get_digest
+#'
+#' @details
+#'
+#' A Modulr Gear is an R Markdown script containing a module and its special
+#' modules definitions, like mocks, tests, and examples, for instance.
+#' \code{prepare_gear} prepares such a Modulr Gear. If an \code{url} is given,
+#' the script will be completed accordingly (see example).
+#'
+#' @return A string (character vector of length one) containing a Modulr Gear R
+#'   Markdown script.
+#'
+#' @seealso \code{\link{define}}, \code{\link{gist_gear}}, and
+#'   \code{\link{reset}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() NULL)
+#' cat(prepare_gear("foo", url = "https://example.org/gears/foo"), sep = "\n")
+#'
 #' @export
 prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
 
@@ -117,9 +147,18 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
       sprintf("```"),
       sprintf("```r"),
       sprintf("# Not run"),
-      sprintf("\"%s\" %%digests%%", name),
-      sprintf("  \"%s\" %%imports%%", modulr_env$register[[c(name, "digest")]]),
-      sprintf("  \"%s\"", ifelse(is.null(url), "<URL>", url)),
+      sprintf(
+        paste(
+          "\"%1$s\" %%imports%%",
+          "  \"%3$s\"",
+          "",
+          "# \"%1$s\" %%digests%%",
+          "#   \"%2$s\" %%imports%%",
+          "#   \"%3$s\"",
+          sep = "\n"),
+        name,
+        modulr_env$register[[c(name, "digest")]],
+        ifelse(is.null(url), "<URL>", url)),
       sprintf("```"), sep = "\n"),
     paste(
       sprintf("## Definition"),
@@ -154,17 +193,38 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
       sprintf("make_all(regexp = \"%s/example\")", name),
       sprintf("```"), sep = "\n"),
     sprintf("---"),
-    sprintf(paste0("_Gear published with the R package ",
-                   "[_modulr_](https://github.com/aclemen1/modulr) ",
-                   "on %s._"), Sys.time()),
+    sprintf(paste0("_Gear prepared with the R package ",
+                   "[_modulr_](https://github.com/aclemen1/modulr) (v%s) ",
+                   "on %s._"), packageVersion("modulr"), Sys.time()),
     sep = "\n")
 
   gear
 
 }
 
+#' Prepare and Publish a Modulr Gear as a Gist on Github.
+#'
+#' Prepare and publish a Modulr Gear as a Gist on Github.
+#'
+#' @inheritParams define
+#' @inheritParams get_digest
+#' @param browse A flag. Should the created gist be opened in the default
+#'   browser?
+#'
+#' @seealso \code{\link{define}}, \code{\link{prepare_gear}}, and
+#'   \code{\link{reset}}.
+#'
+#' @examples
+#' \dontrun{
+#' library(gistr)
+#' reset()
+#' define("foo", NULL, function() NULL)
+#' Sys.setenv("GITHUB_PAT" = "your Personal Access Token here")
+#' gist_auth(reauth = TRUE)
+#' gist_gear("foo")}
+#'
 #' @export
-publish_gear <- function(name = .Last.name, load = TRUE, browse = TRUE) {
+gist_gear <- function(name = .Last.name, load = TRUE, browse = TRUE) {
 
   .message_meta("Entering publish_gear() ...",
                 verbosity = +Inf)
@@ -229,7 +289,7 @@ publish_gear <- function(name = .Last.name, load = TRUE, browse = TRUE) {
       format(as.POSIXct(rates[[c("rate", "reset")]] / 1e6,
                         origin = Sys.time()), format = "%c")))
 
-  gear_url <- sub("(?:raw/)[^/]*", "raw", g[["files"]][[1]][["raw_url"]])
+  gear_url <- gsub("(?:raw/)[^/]*", "raw", g[["files"]][[1]][["raw_url"]])
 
   gear_string <- prepare_gear(name, url = gear_url)
 

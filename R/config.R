@@ -1,6 +1,5 @@
 #' @include modulr.R
 
-# A helper function to set, get and unset values in configuration scopes.
 .config <- function(scope) {
 
   assert_that(missing(scope) || is.character(scope))
@@ -15,8 +14,8 @@
 
   set <- function(..., drop = TRUE) {
 
-    .message_meta("Entering .config$set() ...",
-                  verbosity = +Inf)
+#     .message_meta("Entering .config$set() ...",
+#                   verbosity = +Inf)
 
     assert_that(assertthat::is.flag(drop))
 
@@ -54,8 +53,8 @@
 
   get_all <- function() {
 
-    .message_meta("Entering .config$get_all() ...",
-                  verbosity = +Inf)
+#     .message_meta("Entering .config$get_all() ...",
+#                   verbosity = +Inf)
 
     if (is.na(scope[2])) {
 
@@ -71,8 +70,8 @@
 
   get <- function(key) {
 
-    .message_meta("Entering .config$get() ...",
-                  verbosity = +Inf)
+#     .message_meta("Entering .config$get() ...",
+#                   verbosity = +Inf)
 
     assert_that(is.null(key) || assertthat::is.string(key))
 
@@ -90,42 +89,95 @@
 
 }
 
-#' All configurations.
-#'
-#' @export
-# TODO: write documentation
-get_configs <- function() get("config", pos = modulr_env)
+#' @title Configurations.
+#' @description Getters and setters for various configurations.
+#' @format A list of getters and setters for a configuration.
+#'  \preformatted{
+#'  unset()
+#'  set(..., drop = TRUE)
+#'  get(key)
+#'  get_all()
+#'  }
+#' @section Arguments:
+#' \describe{
+#' \item{\code{...}}{A (named) list of options.}
+#' \item{\code{key}}{A string (character vector of length one).}
+#' \item{\code{drop}}{A flag. Should previous options be dropped and replaced?}
+#' }
+#' @seealso \code{\link{define}}, \code{\link{get_configs}}, and \code{\link{reset}}.
+#' @examples
+#' reset()
+#' root_config$get_all()
+#' root_config$unset()
+#' root_config$get_all()
+#' root_config$set(c("my_modules"))
+#' root_config$get_all()
+#' root_config$set(c("my_great_modules"), drop = FALSE)
+#' root_config$get_all()
+#' @name config
+#' @aliases get get_all unset set
+NULL
 
-#' Root configuration.
-#'
+#' @rdname config
+#' @usage root_config
 #' @export
-# TODO: write documentation
 root_config <-
   .config(".__root__")
 
-#' Paths configuration.
-#'
+#' @rdname config
+#' @usage paths_config
 #' @export
-# TODO: write documentation
 paths_config <-
   .config(".__paths__")
 
-
-#' Maps configuration.
-#'
+#' @rdname config
+#' @usage maps_config
 #' @export
-# TODO: write documentation
 maps_config <-
   .config(".__maps__")
 
-#' Module options.
+#' Get Configurations.
 #'
+#' Get all configurations.
+#'
+#' @examples
+#' reset()
+#' get_configs()
+#'
+#' @seealso \code{\link{config}} and \code{\link{reset}}.
 #' @export
-# TODO: write documentation
-module_option <- function(name = .Last.name) {
+get_configs <- function() get("config", pos = modulr_env)
 
-  .message_meta("Entering module_option() ...",
-                verbosity = +Inf)
+#' Module Options.
+#'
+#' Getters and setters for module options.
+#' \bold{Deprecated and kept for backward compatibility.}
+#'
+#' @inheritParams define
+#'
+#' @return A list of getters and setters. See \code{\link{config}}.
+#'
+#' @section Syntactic Sugars:
+#'  \code{name \%has_default_option\% options} and
+#'  \code{name \%has_default_options\% options} for
+#'    \code{module_options(name)$set(options, drop = FALSE)}.
+#'
+#'  \code{name \%has_option\% options} and
+#'  \code{name \%has_options\% options} for
+#'    \code{module_options(name)$set(options, drop = TRUE)}.
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @section Warning:
+#' Deprecated and kept for backward compatibility.
+#'
+#' @aliases %has_default_option% %has_default_options% %has_option%
+#'   %has_options%
+#' @export
+module_options <- function(name = .Last.name) {
 
   assert_that(.is_regular(name))
 
@@ -133,54 +185,54 @@ module_option <- function(name = .Last.name) {
 
 }
 
-#' Syntactic sugar for setting default module options.
-#'
+#' @rdname module_options
+#' @inheritParams define
+#' @param options A (named) list of options.
 #' @export
-`%has_default_option%` <- function(lhs, rhs) {
+`%has_default_option%` <- function(name, options) {
 
   assert_that(
-    .is_regular(lhs),
+    .is_regular(name),
     msg =
       "left-hand side of `%has_default_option%` is not a regular module name."
-    )
+  )
 
   assert_that(
-    is.list(rhs),
+    is.list(options),
     msg = "right-hand side of `%has_default_option%` is not a list."
   )
 
-  module_option(lhs)$set(rhs, drop = FALSE)
+  module_options(name)$set(options, drop = FALSE)
 
 }
 
-#' Syntactic sugar for setting default module options.
-#'
+#' @rdname module_options
 #' @export
 `%has_default_options%` <-
-  function(lhs, rhs) eval(substitute(`%has_default_option%`(lhs, rhs)),
-                          envir = parent.frame())
+  function(name, options)
+    eval(substitute(`%has_default_option%`(name, options)),
+         envir = parent.frame())
 
-#' Syntactic sugar for setting module options.
-#'
+#' @rdname module_options
 #' @export
-`%has_option%` <- function(lhs, rhs) {
+`%has_option%` <- function(name, options) {
 
   assert_that(
-    .is_regular(lhs),
+    .is_regular(name),
     msg = "left-hand side of `%has_option%` is not a regular module name."
   )
 
   assert_that(
-    is.list(rhs),
+    is.list(options),
     msg = "right-hand side of `%has_option%` is not a list."
   )
 
-  module_option(lhs)$set(rhs, drop = TRUE)
+  module_options(name)$set(options, drop = TRUE)
 
 }
 
-#' Syntactic sugar for setting module options.
-#'
+#' @rdname module_options
 #' @export
-`%has_options%` <- function(lhs, rhs) eval(substitute(`%has_option%`(lhs, rhs)),
-                                  envir = parent.frame())
+`%has_options%` <- function(name, options)
+  eval(substitute(`%has_option%`(name, options)),
+       envir = parent.frame())

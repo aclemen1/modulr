@@ -170,7 +170,7 @@ test_that("prepare_gear shows example section", {
   expect_match(prepare_gear("module"), "```\\{r examples\\}")
 })
 
-test_that("publish_gear calls are warned from within a module", {
+test_that("gist_gear calls are warned from within a module", {
   reset()
   with_mock(
     `base::dir.create` = function(...) NULL,
@@ -186,13 +186,13 @@ test_that("publish_gear calls are warned from within a module", {
     `gistr::browse` = function(...) NULL,
     define("outer_module", NULL, function() NULL),
     define("module", NULL, function() {
-      publish_gear("outer_module")
+      gist_gear("outer_module")
     }),
     expect_warning(make("module"))
   )
 })
 
-test_that("publish_gear loads modules", {
+test_that("gist_gear loads modules", {
   reset()
   with_mock(
     `base::dir.create` = function(...) NULL,
@@ -207,12 +207,12 @@ test_that("publish_gear loads modules", {
     `gistr::update` = function(...)
       list(files = list(list(raw_url = "fake_url"))),
     `gistr::browse` = function(...) NULL,
-    expect_error(publish_gear("module_1", load = FALSE)),
-    expect_is(publish_gear("module_1", load = TRUE), "list")
+    expect_error(gist_gear("module_1", load = FALSE)),
+    expect_is(gist_gear("module_1", load = TRUE), "list")
   )
 })
 
-test_that("publish_gear tests rate limits", {
+test_that("gist_gear tests rate limits", {
   reset()
   with_mock(
     `base::dir.create` = function(...) NULL,
@@ -228,7 +228,7 @@ test_that("publish_gear tests rate limits", {
       list(files = list(list(raw_url = "fake_url"))),
     `gistr::browse` = function(...) NULL,
     define("module", NULL, function() NULL),
-    expect_is(publish_gear("module"), "list")
+    expect_is(gist_gear("module"), "list")
   )
   reset()
   with_mock(
@@ -245,7 +245,7 @@ test_that("publish_gear tests rate limits", {
       list(files = list(list(raw_url = "fake_url"))),
     `gistr::browse` = function(...) NULL,
     define("module", NULL, function() NULL),
-    expect_error(publish_gear("module"))
+    expect_error(gist_gear("module"))
   )
   reset()
   remaining <- function() 2
@@ -265,7 +265,7 @@ test_that("publish_gear tests rate limits", {
       list(files = list(list(raw_url = "fake_url"))),
     `gistr::browse` = function(...) NULL,
     define("module", NULL, function() NULL),
-    expect_is(publish_gear("module"), "list")
+    expect_is(gist_gear("module"), "list")
   )
   reset()
   remaining <- function() 2
@@ -285,11 +285,11 @@ test_that("publish_gear tests rate limits", {
       list(files = list(list(raw_url = "fake_url"))),
     `gistr::browse` = function(...) NULL,
     define("module", NULL, function() NULL),
-    expect_error(publish_gear("module"), regexp = "dangling")
+    expect_error(gist_gear("module"), regexp = "dangling")
   )
 })
 
-test_that("publish_gear publishes a gist", {
+test_that("gist_gear publishes a gist", {
   reset()
   with_mock(
     `gistr::gist_auth` = function(...) NULL,
@@ -307,6 +307,6 @@ test_that("publish_gear publishes a gist", {
     `gistr::update` = identity,
     `gistr::browse` = function(...) NULL,
     define("module", NULL, function() NULL),
-    expect_match(publish_gear("module"), "# `module`")
+    expect_match(gist_gear("module"), "# `module`")
   )
 })

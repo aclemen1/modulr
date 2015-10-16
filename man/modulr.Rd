@@ -4,22 +4,23 @@
 \name{modulr}
 \alias{modulr}
 \alias{modulr-package}
-\alias{modulr_env}
-\title{modulr -- Module Pattern and DI in R}
-\format{\preformatted{<environment: 0x3066ae0> 
-}}
-\usage{
-modulr_env
-}
+\title{modulr -- A Dependency Injection Framework for R}
 \description{
-modulr is a Module Pattern and Dependency Injection implementation in R.
-Module Pattern and DI allows you to encapsulate pieces of code into useful
-singleton units, namely modules that register their capabilities, export
-values and rely on other modules as dependencies. modulr is widely inspired
-from RequireJS and AngularJS for Javascript.
+This package contains a Dependency Injection framework for R. It allows to
+organize programs into discrete, modular, and loosely coupled units. By
+nature, such modules are easy to develop, debug, test, reuse, share and
+maintain in a wide range of common situations. This package may also allow
+for higher compliance with best practices in software engineering, provably
+within small- to mid-sized teams of developers and R users.
+}
+\details{
+To learn more about modulr, start with the vignettes and use
+\code{browseVignettes(package = "modulr")}.
+
+For a complete list of functions,
+use \code{library(help = "modulr")}.
 }
 \author{
 Alain Clément-Pavon <\email{alain.clement-pavon@unil.ch}>
 }
-\keyword{datasets}
 
