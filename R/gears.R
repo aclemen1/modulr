@@ -128,17 +128,17 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
   module <- .module_to_string(name)
 
   mocks <-
-    vapply(list_modules(regexp = sprintf("^%s/mock", name), wide = F),
+    vapply(list_modules(regexp = sprintf("^%s/.*mocks?$", name), wide = F),
            .module_to_string, base = name, FUN.VALUE = "")
   tests <-
-    vapply(list_modules(regexp = sprintf("^%s/test", name), wide = F),
+    vapply(list_modules(regexp = sprintf("^%s/.*tests?$", name), wide = F),
            .module_to_string, FUN.VALUE = "")
   examples <-
-    vapply(list_modules(regexp = sprintf("^%s/example", name), wide = F),
+    vapply(list_modules(regexp = sprintf("^%s/.*examples?$", name), wide = F),
            .module_to_string, FUN.VALUE = "")
 
   gear <- paste(
-    sprintf("# `%s` (gear)", name),
+    sprintf("# `%s` (Modulr Gear)", name),
     sprintf(""),
     paste(
       sprintf("## Installation"),
@@ -170,12 +170,14 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
       sprintf("%s", module),
       sprintf("```"), sep = "\n"),
     if (length(tests) + length(mocks) > 0) paste(
-      sprintf("## Tests"),
+      sprintf("## Testing"),
       if (length(mocks) > 0) paste(
+        sprintf("### Mocks"),
         sprintf("```{r mocks}"),
         sprintf("%s", paste(mocks, collapse = "\n")),
         sprintf("```"), sep = "\n"),
       if (length(tests) > 0) paste(
+        sprintf("### Tests"),
         sprintf("```{r tests}"),
         sprintf("%s", paste(tests, collapse = "\n")),
         sprintf("```"),
