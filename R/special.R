@@ -70,6 +70,47 @@ NULL
 
   define("modulr", list(), function() {
 
+    # Begin Exclude Linting
+
+    #' # `modulr`
+    #'
+    #' Access module metadata and helper functions.
+    #'
+    #' The purpose of this special module is to give access to metadata and
+    #' useful helper functions related to the module into which it is injected.
+    #'
+    #' ## Methods
+    #'
+    #' ### `get_module_name()`
+    #'
+    #' Returns a string (character vector of lenght one) containing the module
+    #' name.
+    #'
+    #' ### `get_module_options()`
+    #'
+    #' Returns a list containing the module options. Deprecated and kept for
+    #' backward compatibility.
+    #'
+    #' ### `get_filename()`
+    #'
+    #' Returns a string (character vector of lenght one) containing the module
+    #' filename.
+    #'
+    #' ### `get_dirname()`
+    #'
+    #' Returns a string (character vector of lenght one) containing the module
+    #' dirname.
+    #'
+    #' ### `message_info(...)`, `message_warn(...)`, `message_stop(...)`
+    #'
+    #' Outputs an informative, warning, or critical and stopping message,
+    #' prefixed with a timestamp and the module name. Such messages are
+    #' particularily useful in modules involved in long chains of dependencies
+    #' and workflows.
+    #'
+
+    # End Exclude Linting
+
     list(
 
       # returns module name

@@ -94,6 +94,7 @@ test_that("import_module fails on existing modules with different name", {
 
 test_that("import_module fails on existing modules with different digest", {
   reset()
+
   define("module1_local", NULL, function() NULL)
   with_mock(
     `httr::GET` = function(...) NULL,

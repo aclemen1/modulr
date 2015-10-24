@@ -85,20 +85,26 @@
 #'
 #' @details
 #'
-#' A Modulr Gear is an R Markdown script containing a module and its special
-#' modules definitions, like mocks, tests, and examples, for instance.
-#' \code{prepare_gear} prepares such a Modulr Gear. If an \code{url} is given,
-#' the script will be completed accordingly (see example).
+#' A Modulr Gear is an R Markdown script containing a module, its
+#' \link{docstring} info, and its special modules definitions, like mocks,
+#' tests, and examples, for instance. \code{prepare_gear} prepares such a Modulr
+#' Gear. If an \code{url} is given, the script will be completed accordingly
+#' (see example).
 #'
 #' @return A string (character vector of length one) containing a Modulr Gear R
 #'   Markdown script.
 #'
-#' @seealso \code{\link{define}}, \code{\link{gist_gear}}, and
-#'   \code{\link{reset}}.
+#' @seealso \code{\link{define}}, \code{\link{gist_gear}}, \code{\link{info}},
+#'   and \code{\link{reset}}.
 #'
 #' @examples
 #' reset()
-#' define("foo", NULL, function() NULL)
+#' define("foo", NULL, function() {
+#'  #' # A `foo` module
+#'  #'
+#'  #' Description goes here.
+#'  NULL
+#' })
 #' cat(prepare_gear("foo", url = "https://example.org/gears/foo"), sep = "\n")
 #'
 #' @export
@@ -127,6 +133,8 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
 
   module <- .module_to_string(name)
 
+  capture.output(docstring <- info(name))
+
   mocks <-
     vapply(list_modules(regexp = sprintf("^%s/.*mocks?$", name), wide = F),
            .module_to_string, base = name, FUN.VALUE = "")
@@ -138,8 +146,11 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
            .module_to_string, FUN.VALUE = "")
 
   gear <- paste(
-    sprintf("# `%s` (Modulr Gear)", name),
-    sprintf(""),
+    if(isTRUE(nchar(docstring) > 0)) {
+      format(docstring)
+    } else {
+      sprintf("# `%s` (Modulr Gear)", name)
+    },
     paste(
       sprintf("## Installation"),
       sprintf("```{r}"),

@@ -5,6 +5,17 @@ test_that(".hash computes a SHA-1 digest", {
   expect_equal(.hash("modulr"), "f478fe41ce85ad889b473813494b08c88989da19")
 })
 
+test_that(".digest computes a module digest", {
+  dependencies <- list(foo = "foo")
+  factory <- function(foo) {
+    # Hello World
+    NULL
+  }
+  expect_equal(
+    .digest(dependencies, factory),
+    "536c8d1cabcc167884f75e11a6fb82f918025ea8")
+})
+
 test_that("get_digest detects changes", {
   define(
     "some/module",

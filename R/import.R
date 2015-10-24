@@ -123,17 +123,21 @@ import_module <- function(name, url, digest = NULL,
     if (grepl("```\\s*\\{\\s*[rR]", script) ||
          grepl("<<[^>]*>>=[^@]*@", script)) {
       # Rmd import
+
       unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
+
       knitr::opts_knit$set("unnamed.chunk.label" =
                              paste("modulr", name, sep="/"))
+
       script <- knitr::knit(text = script,
                             tangle = TRUE, quiet = TRUE)
+
       knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
+
     }
 
     tryCatch({
-      ev <- eval(parse(text = script),
-                 envir = parent.frame())
+      ev <- local(eval(parse(text = script, keep.source = TRUE)))
       },
       error = function(e) {
         rollback()

@@ -19,14 +19,10 @@
       knitr::opts_knit$set("unnamed.chunk.label" =
                              paste("modulr", name, sep="/"))
 
-      tmp_file <- tempfile(fileext = ".R")
+      script <- knitr::knit(text = readChar(path, file.info(path)$size),
+                            tangle = TRUE, quiet = TRUE)
 
-      source(knitr::knit(path,
-                         output = tmp_file,
-                         tangle = TRUE, quiet = TRUE),
-             local = TRUE, echo = FALSE, keep.source = TRUE)
-
-      try(unlink(tmp_file), silent = TRUE)
+      local(eval(parse(text = script, keep.source = TRUE)))
 
       knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
 

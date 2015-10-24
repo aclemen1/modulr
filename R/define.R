@@ -5,6 +5,14 @@
 
 }
 
+# Compute the digets of a module
+.digest <- function(dependencies, factory) {
+  .hash(c(
+    deparse(dependencies),
+    deparse(factory, control = "useSource")
+  ))
+}
+
 #' Get the Digest of a Module.
 #'
 #' Get the digest (a SHA-256 hash of the dependencies and factory) of a module.
@@ -64,9 +72,10 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 
   assert_that(.is_defined(name))
 
-  .hash(c(
-    deparse(modulr_env$register[[c(name, "dependencies")]]),
-    deparse(modulr_env$register[[c(name, "factory")]])))
+  .digest(
+    modulr_env$register[[c(name, "dependencies")]],
+    modulr_env$register[[c(name, "factory")]]
+  )
 
 }
 
@@ -310,33 +319,26 @@ define <- function(name, dependencies, factory) {
     .message_meta(
       sprintf("Defining '%s'", name), {
 
-        modulr_env$register[[name]] <- list()
-        modulr_env$register[[c(name, "name")]] <- name
-        modulr_env$register[[c(name, "dependencies")]] <- dependencies
-        modulr_env$register[[c(name, "factory")]] <- factory
-        modulr_env$register[[c(name, "digest")]] <- .hash(c(
-          deparse(dependencies),
-          deparse(factory)))
-        modulr_env$register[[c(name, "instance")]] <- NULL
-        modulr_env$register[[c(name, "instanciated")]] <- F
-        modulr_env$register[[c(name, "calls")]] <- 0
-        modulr_env$register[[c(name, "duration")]] <- NA_integer_
-        modulr_env$register[[c(name, "first_instance")]] <- T
-        modulr_env$register[[c(name, "url")]] <- NULL
-        modulr_env$register[[c(name, "timestamp")]] <- timestamp
-        modulr_env$register[[c(name, "created")]] <- timestamp
+        modulr_env$register[[name]] <- list(
+          "name" = name,
+          "dependencies" = dependencies,
+          "factory" = factory,
+          "digest" = .digest(dependencies, factory),
+          "instanciated" = F,
+          "calls" = 0,
+          "duration" = NA_integer_,
+          "first_instance" = T,
+          "timestamp" = timestamp,
+          "created" = timestamp
+          )
 
     },
     ok = TRUE, verbosity = ifelse(.is_regular(name), 2, 3))
 
-
-
   } else if (.is_regular(name)) {
 
     previous_digest <- modulr_env$register[[c(name, "digest")]]
-    digest <- .hash(c(
-      deparse(dependencies),
-      deparse(factory)))
+    digest <- .digest(dependencies, factory)
     if (digest != previous_digest) {
       .message_meta(sprintf("Re-defining '%s'", name), {
 
@@ -414,7 +416,7 @@ get_factory <- function(name = .Last.name, load = FALSE) {
 
   assert_that(assertthat::is.flag(load))
 
-  if (.is_undefined(name) & load) {
+  if (.is_undefined(name) && load) {
 
     if (.is_called_from_within_module()) {
       warning("get_factory is called from within a module.",

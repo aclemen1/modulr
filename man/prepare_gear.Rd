@@ -34,18 +34,24 @@ Prepare a module (including mocks, tests and examples) for publication as a
 Modulr Gear.
 }
 \details{
-A Modulr Gear is an R Markdown script containing a module and its special
-modules definitions, like mocks, tests, and examples, for instance.
-\code{prepare_gear} prepares such a Modulr Gear. If an \code{url} is given,
-the script will be completed accordingly (see example).
+A Modulr Gear is an R Markdown script containing a module, its
+\link{docstring} info, and its special modules definitions, like mocks,
+tests, and examples, for instance. \code{prepare_gear} prepares such a Modulr
+Gear. If an \code{url} is given, the script will be completed accordingly
+(see example).
 }
 \examples{
 reset()
-define("foo", NULL, function() NULL)
+define("foo", NULL, function() {
+ #' # A `foo` module
+ #'
+ #' Description goes here.
+ NULL
+})
 cat(prepare_gear("foo", url = "https://example.org/gears/foo"), sep = "\\n")
 }
 \seealso{
-\code{\link{define}}, \code{\link{gist_gear}}, and
-  \code{\link{reset}}.
+\code{\link{define}}, \code{\link{gist_gear}}, \code{\link{info}},
+  and \code{\link{reset}}.
 }
 

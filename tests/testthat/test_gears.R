@@ -122,6 +122,14 @@ test_that("prepare_gear shows imports section", {
   )
 })
 
+test_that("prepare_gear shows docstring info", {
+  reset()
+  define("module", NULL, function(other) {
+    #' docstring
+  })
+  expect_match(prepare_gear("module"), "docstring")
+})
+
 test_that("prepare_gear shows definition section", {
   reset()
   define("module", NULL, function(other) NULL)
