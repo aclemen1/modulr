@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9047
+Version: 0.1.7.9048
 Date: 2015-10-24
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
@@ -39,7 +39,9 @@ Suggests:
     covr,
     testthat,
     networkD3,
-    gistr
+    gistr,
+    rmarkdown,
+    knitr
 License: MIT + file LICENSE
 Encoding: UTF-8
 Collate:
@@ -62,9 +64,4 @@ Collate:
     'stash.R'
     'zzz.R'
 NeedsCompilation: no
-Packaged: 2015-10-16 22:40:23 UTC; aclemen1
-Author: Alain Clément-Pavon [aut, cre, cph],
-    Raphaël Conradin [ctb],
-    Jean-Moïse Rochat [ctb],
-    Anne-Laure Aeby [ctb]
-Maintainer: Alain Clément-Pavon <alain.clement-pavon@unil.ch>
+VignetteBuilder: knitr

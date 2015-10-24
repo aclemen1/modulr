@@ -1,0 +1,12 @@
+---
+title: "Modulr Quickstart Guide"
+author: "Alain Clément-Pavon"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Modulr Quickstart Guide}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+The goal of this document is to get you up and running with modulr.
