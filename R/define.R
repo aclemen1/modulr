@@ -414,6 +414,7 @@ define <- function(name, dependencies, provider) {
 #' get_provider("foo", load = TRUE)
 #' unlink(tmp_dir, recursive = TRUE)
 #'
+#' @aliases get_factory
 #' @export
 get_provider <- function(name = .Last.name, load = FALSE) {
 
@@ -437,6 +438,14 @@ get_provider <- function(name = .Last.name, load = FALSE) {
   modulr_env$register[[c(name, "provider")]]
 
 }
+
+#' @export
+# nocov start
+get_factory <- function(...) {
+  .Deprecated("get_provider")
+  eval(substitute(get_provider(...)), envir = parent.frame(1L))
+}
+# nocov end
 
 #' Reset the Modulr Internal State.
 #'

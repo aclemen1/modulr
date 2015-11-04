@@ -313,7 +313,8 @@ make <- function(name = .Last.name, ...) {
   .message_meta(sprintf("DONE ('%s')", name), {
 
     if(!missing(...) && is.function(instance[["value"]])) {
-      return(instance[["value"]](...)) # Exclude Linting
+      return(eval(substitute(instance[["value"]](...)), # Exclude Linting
+                  envir = parent.frame(1L)))
     } else {
       return(
         ifelse(instance[["visible"]], identity, invisible)(instance[["value"]])
