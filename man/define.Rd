@@ -6,7 +6,7 @@
 \alias{define}
 \title{Define a Module.}
 \usage{
-define(name, dependencies, factory)
+define(name, dependencies, provider)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -26,15 +26,15 @@ define(name, dependencies, factory)
 
   Elements of the list of dependencies designate modules by their name.}
 
-\item{factory}{A function.
+\item{provider}{A function.
 
-  The formals of the factory must coincide with the list of dependencies.}
+  If any, formals must coincide with the list of dependencies.}
 }
 \value{
 A wrapper function around a make call for the defined module.
 }
 \description{
-Define or redefine a module by name, dependencies, and factory.
+Define or redefine a module by name, dependencies, and provider.
 }
 \details{
 The definition of a module can be done explicitly in the console, implicitly
@@ -46,12 +46,12 @@ These three ways of defining modules have their specificities.
 This is the most direct method to define or redefine a module. This is also
 the most volatile since the lifespan of the module is limited to the R
 session. When a new module is defined, the internal state of the package
-is modified to record its name, dependencies and factory. Some other useful
+is modified to record its name, dependencies and provider. Some other useful
 metadata are also recorded, like timestamps, various flags and counters, and
 a digest. When an existing module is redefined, the internal state is updated
 accordingly, unless no change is detected by digests comparison. No other
 side-effect occurs during the definition process, notably the evaluation of
-the factory which is postponed to a subsequent \code{\link{make}} call.
+the provider which is postponed to a subsequent \code{\link{make}} call.
 }
 
 \item{Implicit Definition}{ This is the natural
@@ -162,8 +162,8 @@ called \emph{modulr gears}.
 }
 \section{Syntactic Sugars}{
 
- \preformatted{name \%provides\% factory}
- \preformatted{name \%requires\% dependencies \%provides\% factory}
+ \preformatted{name \%provides\% provider}
+ \preformatted{name \%requires\% dependencies \%provides\% provider}
 }
 
 \section{Warning}{

@@ -47,8 +47,8 @@ data frame:
 \item{\code{dependencies}}{number of direct dependencies (parents).}
 \item{\code{childs}}{number of modules requiring the module (childs).}
 \item{\code{size}}{memory size occupied by the definition.}
-\item{\code{lines}}{number of lines of the factory.}
-\item{\code{chars}}{number of characters of the factory.}
+\item{\code{lines}}{number of lines of the provider.}
+\item{\code{chars}}{number of characters of the provider.}
 \item{\code{duration}}{duration of the evaluation.}
 \item{\code{modified}}{timestamp of last modification.}
 \item{\code{created}}{timestamp of creation.}

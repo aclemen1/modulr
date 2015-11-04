@@ -7,13 +7,31 @@ test_that(".hash computes a SHA-1 digest", {
 
 test_that(".digest computes a module digest", {
   dependencies <- list(foo = "foo")
-  factory <- function(foo) {
+
+  provider <- function(foo) {
     # Hello World
     NULL
   }
   expect_equal(
-    .digest(dependencies, factory),
+    .digest(dependencies, provider),
     "536c8d1cabcc167884f75e11a6fb82f918025ea8")
+
+  # without formals, it's safer if the digest reflects the change
+  provider <- function() {
+    # Hello World
+    NULL
+  }
+  expect_equal(
+    .digest(dependencies, provider),
+    "a3389ff336408acc1b653190134e35578e5548c3")
+
+  provider <- function(foo) {
+    # HELLO WORLD
+    NULL
+  }
+  expect_equal(
+    .digest(dependencies, provider),
+    "8a819ba8310f9bd5b00e161b44271af2dcb6c794")
 })
 
 test_that("get_digest detects changes", {
@@ -54,6 +72,21 @@ test_that("get_digest detects changes", {
   testthat::expect_true(sig_1 == sig_4)
 })
 
+test_that("get_digest detects comments", {
+  define("foo", NULL, function() {
+    # comment
+    NULL
+  })
+  sig_1 <- get_digest("foo")
+
+  define("bar", NULL, function() {
+    NULL
+  })
+  sig_2 <- get_digest("bar")
+
+  expect_false(sig_1 == sig_2)
+})
+
 test_that("get_digest calls are warned from within a module", {
   reset()
   define("module", NULL, function() {
@@ -84,7 +117,7 @@ test_that("define writes to the register", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$factory, function(dep) {
+  expect_equal(module$provider, function(dep) {
     return(dep)
   })
   expect_equal(module$digest, get_digest("some/module"))
@@ -123,7 +156,7 @@ test_that("re-define doesn't write to the register when no changes occur", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$factory, function(dep) {
+  expect_equal(module$provider, function(dep) {
     return(dep)
   })
   expect_equal(module$digest, get_digest("some/module"))
@@ -160,7 +193,7 @@ test_that("re-define writes to the register when changes occur", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$factory, function(dep) {
+  expect_equal(module$provider, function(dep) {
     return(sprintf("%s", dep))
   })
   expect_equal(module$digest, get_digest("some/module"))
@@ -184,7 +217,55 @@ test_that("define calls are warned from within a module", {
   expect_warning(make("module"))
 })
 
-test_that("get_factory returns the body of the module", {
+test_that("define accepts provider without formals", {
+  reset()
+
+  define("foo", NULL, function() "foo")
+  define("foobar", list(foo = "foo"), function() paste0(foo, "bar"))
+
+  expect_equal(make("foobar"), "foobar")
+})
+
+test_that("define requires named dependencies if provider has no formals", {
+  reset()
+
+  expect_error(define("foobar", list("foo"), function() paste0(foo, "bar")))
+  expect_error(define("foobar", list(foo = "foo", bad),
+                      function() paste0(foo, "bar")))
+
+})
+
+test_that("define doesn't require named dependencies if provider has formals", {
+  reset()
+
+  define("foo", NULL, function() "foo")
+  define("foobar", list("foo"), function(foo) paste0(foo, "bar"))
+
+  expect_equal(make("foobar"), "foobar")
+
+})
+
+test_that("define requires dependencies and provider to coincide", {
+  reset()
+
+  expect_silent(suppressMessages(define("foobar", list(foo = "foo"),
+                       function(foo) paste0(foo, "bar"))))
+
+  expect_error(define("foobar", list(foo = "foo"),
+                      function(bad) paste0(foo, "bar")))
+
+  expect_error(define("foobar", list(bad = "foo"),
+                      function(foo) paste0(foo, "bar")))
+
+  expect_error(define("foobar", list(foo = "foo", bad = "bad"),
+                      function(foo) paste0(foo, "bar")))
+
+  expect_error(define("foobar", list(foo = "foo"),
+                      function(foo, bad) paste0(foo, "bar")))
+
+})
+
+test_that("get_provider returns the body of the module", {
   reset()
 
   define(
@@ -194,7 +275,7 @@ test_that("get_factory returns the body of the module", {
       return(dep)
     })
 
-  expect_equal(get_factory("some/module"),
+  expect_equal(get_provider("some/module"),
                function(dep) {
                  return(dep)
                })
@@ -208,31 +289,50 @@ test_that("get_factory returns the body of the module", {
       return(dep)
     })
 
-  expect_equal(get_factory("some/module"),
+  expect_equal(get_provider("some/module"),
                function(dep) {
                  return(dep)
                })
 
-  })
+})
 
-test_that("get_factory is able to find an undefined module", {
+test_that("get_provider returns comments", {
   reset()
 
-  expect_error(get_factory("unexisting/module", load = F))
+  define(
+    "foo",
+    NULL,
+    function() {
+      # comment
+      NULL
+    })
 
-  expect_error(get_factory("unexisting/module", load = T))
+  expect_match(
+    paste(deparse(get_provider("foo"), control = "useSource"),
+          collapse = "\n"),
+    "# comment"
+  )
 
-  expect_error(get_factory("module_1", load = F))
+})
 
-  expect_equal(get_factory("module_1", load = T),
+test_that("get_provider is able to find an undefined module", {
+  reset()
+
+  expect_error(get_provider("unexisting/module", load = F))
+
+  expect_error(get_provider("unexisting/module", load = T))
+
+  expect_error(get_provider("module_1", load = F))
+
+  expect_equal(get_provider("module_1", load = T),
                function() "module_1")
 
 })
 
-test_that("get_factory calls are warned from within a module", {
+test_that("get_provider calls are warned from within a module", {
   reset()
   define("module", NULL, function() {
-    get_factory("module_1", load = T)
+    get_provider("module_1", load = T)
   })
   expect_warning(make("module"))
 })

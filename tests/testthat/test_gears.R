@@ -66,14 +66,25 @@ test_that(".module_to_string shows dependencies", {
   expect_match(.module_to_string("module"), "%provides%")
   expect_match(.module_to_string("module"), "%requires%")
   reset()
+  define("module", list("other_module"), function(other) NULL)
+  expect_match(.module_to_string("module"), "list\\(\"other_module")
+  expect_match(.module_to_string("module"), "%provides%")
+  expect_match(.module_to_string("module"), "%requires%")
+  reset()
   define("module", list(o1 = "o_mod_1", o2 = "o_mod_2"), function(o1, o2) NULL)
   expect_match(.module_to_string("module"), "o1 = \"o_mod_1")
   expect_match(.module_to_string("module"), "o2 = \"o_mod_2")
   expect_match(.module_to_string("module"), "%provides%")
   expect_match(.module_to_string("module"), "%requires%")
+  reset()
+  define("module", list("o_mod_1", "o_mod_2"), function(o1, o2) NULL)
+  expect_match(.module_to_string("module"), "\"o_mod_1")
+  expect_match(.module_to_string("module"), "\"o_mod_2")
+  expect_match(.module_to_string("module"), "%provides%")
+  expect_match(.module_to_string("module"), "%requires%")
 })
 
-test_that(".module_to_string shows factory", {
+test_that(".module_to_string shows provider", {
   reset()
   define("module", list(other = "other_module"), function(other) "foobar")
   expect_match(.module_to_string("module"), "function\\(other")
@@ -84,9 +95,9 @@ test_that(".module_to_string shows factory", {
 test_that(".module_to_string detects identical factories for mocks", {
   reset()
   define("module", NULL, function() "foobar")
-  define("module/mock", NULL, get_factory("module"))
+  define("module/mock", NULL, get_provider("module"))
   expect_match(.module_to_string("module/mock", base = "module"),
-               "get_factory\\(\"module\"")
+               "get_provider\\(\"module\"")
 })
 
 test_that("prepare_gear calls are warned from within a module", {
@@ -107,7 +118,7 @@ test_that("prepare_gear loads modules", {
 
 test_that("prepare_gear shows installation section", {
   reset()
-  define("module", NULL, function(other) NULL)
+  define("module", NULL, function() NULL)
   expect_match(prepare_gear("module"), "## Installation")
 })
 
@@ -124,7 +135,7 @@ test_that("prepare_gear shows imports section", {
 
 test_that("prepare_gear shows docstring info", {
   reset()
-  define("module", NULL, function(other) {
+  define("module", NULL, function() {
     #' docstring
   })
   expect_match(prepare_gear("module"), "docstring")
@@ -132,37 +143,37 @@ test_that("prepare_gear shows docstring info", {
 
 test_that("prepare_gear shows definition section", {
   reset()
-  define("module", NULL, function(other) NULL)
+  define("module", NULL, function() NULL)
   expect_match(prepare_gear("module"), "## Definition")
 })
 
 test_that("prepare_gear shows tests section", {
   reset()
-  define("module/mock", NULL, function(other) NULL)
+  define("module/mock", NULL, function() NULL)
   expect_match(prepare_gear("module/mock"), "## Definition")
 
   reset()
-  define("module/test", NULL, function(other) NULL)
+  define("module/test", NULL, function() NULL)
   expect_match(prepare_gear("module/test"), "## Definition")
 
   reset()
-  define("module", NULL, function(other) NULL)
-  define("module/mock", NULL, function(other) NULL)
+  define("module", NULL, function() NULL)
+  define("module/mock", NULL, function() NULL)
   expect_match(prepare_gear("module"), "## Testing")
   expect_match(prepare_gear("module"), "### Mocks")
   expect_match(prepare_gear("module"), "```\\{r mocks\\}")
 
   reset()
-  define("module", NULL, function(other) NULL)
-  define("module/test", NULL, function(other) NULL)
+  define("module", NULL, function() NULL)
+  define("module/test", NULL, function() NULL)
   expect_match(prepare_gear("module"), "## Testing")
   expect_match(prepare_gear("module"), "### Tests")
   expect_match(prepare_gear("module"), "```\\{r tests\\}")
 
   reset()
-  define("module", NULL, function(other) NULL)
-  define("module/mock", NULL, function(other) NULL)
-  define("module/test", NULL, function(other) NULL)
+  define("module", NULL, function() NULL)
+  define("module/mock", NULL, function() NULL)
+  define("module/test", NULL, function() NULL)
   expect_match(prepare_gear("module"), "## Testing")
   expect_match(prepare_gear("module"), "### Mocks")
   expect_match(prepare_gear("module"), "```\\{r mocks\\}")
@@ -172,12 +183,12 @@ test_that("prepare_gear shows tests section", {
 
 test_that("prepare_gear shows example section", {
   reset()
-  define("module/example", NULL, function(other) NULL)
+  define("module/example", NULL, function() NULL)
   expect_match(prepare_gear("module/example"), "## Definition")
 
   reset()
-  define("module", NULL, function(other) NULL)
-  define("module/example", NULL, function(other) NULL)
+  define("module", NULL, function() NULL)
+  define("module/example", NULL, function() NULL)
   expect_match(prepare_gear("module"), "## Examples")
   expect_match(prepare_gear("module"), "```\\{r examples\\}")
 })

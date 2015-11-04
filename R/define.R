@@ -6,16 +6,18 @@
 }
 
 # Compute the digets of a module
-.digest <- function(dependencies, factory) {
+.digest <- function(dependencies, provider) {
+
   .hash(c(
     deparse(dependencies),
-    deparse(factory, control = "useSource")
+    deparse(provider, control = "useSource")
   ))
+
 }
 
 #' Get the Digest of a Module.
 #'
-#' Get the digest (a SHA-256 hash of the dependencies and factory) of a module.
+#' Get the digest (a SHA-256 hash of the dependencies and provider) of a module.
 #'
 #' @inheritParams define
 #' @param load A flag. Should an undefined module be implicitely loaded?
@@ -63,7 +65,7 @@ get_digest <- function(name = .Last.name, load = FALSE) {
   if (.is_undefined(name) & load) {
 
     if (.is_called_from_within_module()) {
-      warning("get_factory is called from within a module.",
+      warning("get_provider is called from within a module.",
               call. = FALSE, immediate. = TRUE)
     }
 
@@ -74,14 +76,14 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 
   .digest(
     modulr_env$register[[c(name, "dependencies")]],
-    modulr_env$register[[c(name, "factory")]]
+    modulr_env$register[[c(name, "provider")]]
   )
 
 }
 
 #' Define a Module.
 #'
-#' Define or redefine a module by name, dependencies, and factory.
+#' Define or redefine a module by name, dependencies, and provider.
 #'
 #' @param name A string (character vector of lenght one).
 #'
@@ -100,9 +102,9 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 #'
 #'   Elements of the list of dependencies designate modules by their name.
 #'
-#' @param factory A function.
+#' @param provider A function.
 #'
-#'   The formals of the factory must coincide with the list of dependencies.
+#'   If any, formals must coincide with the list of dependencies.
 #'
 #' @return A wrapper function around a make call for the defined module.
 #'
@@ -117,12 +119,12 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 #' This is the most direct method to define or redefine a module. This is also
 #' the most volatile since the lifespan of the module is limited to the R
 #' session. When a new module is defined, the internal state of the package
-#' is modified to record its name, dependencies and factory. Some other useful
+#' is modified to record its name, dependencies and provider. Some other useful
 #' metadata are also recorded, like timestamps, various flags and counters, and
 #' a digest. When an existing module is redefined, the internal state is updated
 #' accordingly, unless no change is detected by digests comparison. No other
 #' side-effect occurs during the definition process, notably the evaluation of
-#' the factory which is postponed to a subsequent \code{\link{make}} call.
+#' the provider which is postponed to a subsequent \code{\link{make}} call.
 #' }
 #'
 #' \item{Implicit Definition}{ This is the natural
@@ -232,8 +234,8 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 #' }
 #'
 #' @section Syntactic Sugars:
-#'  \preformatted{name \%provides\% factory}
-#'  \preformatted{name \%requires\% dependencies \%provides\% factory}
+#'  \preformatted{name \%provides\% provider}
+#'  \preformatted{name \%requires\% dependencies \%provides\% provider}
 #'
 #' @section Warning:
 #'  It is considered a very bad practice to define, touch, undefine, load, make,
@@ -279,7 +281,7 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 #'
 #' @aliases %requires% %provides%
 #' @export
-define <- function(name, dependencies, factory) {
+define <- function(name, dependencies, provider) {
 
   .message_meta(sprintf("Entering define() for '%s' ...", name),
                 verbosity = +Inf)
@@ -290,27 +292,31 @@ define <- function(name, dependencies, factory) {
   }
 
   assert_that(
-    assertthat::is.string(name),
-    is.function(factory))
-
-  assert_that(
-    .is_regular(name) | .is_reserved(name),
+    assertthat::is.string(name) && (.is_regular(name) || .is_reserved(name)),
     msg = "module name is not regular nor reserved.")
 
   assert_that(
     is.null(dependencies) || is.list(dependencies),
-    is.function(factory)
+    msg = "dependencies are not in a list."
     )
+  if (is.null(dependencies)) dependencies <- list()
 
   assert_that(
-    is.null(dependencies) || (
-      setequal(names(dependencies), names(formals(factory))) || (
-        assertthat::are_equal(length(dependencies),
-                              length(formals(factory))) &&
-          is.null(names(dependencies)))),
-    msg = "dependencies and formals are not matching.")
+    is.function(provider),
+    msg = "provider is not a function."
+  )
 
-  if (is.null(dependencies)) dependencies <- list()
+  if (length(formals(provider)) == 0 && length(dependencies) > 0 &&
+        all(names(dependencies) != "")) {
+    formals(provider) <- as.pairlist(dependencies)
+  } else {
+    assert_that(
+      setequal(names(dependencies), names(formals(provider))) || (
+        assertthat::are_equal(length(dependencies),
+                              length(formals(provider))) &&
+          is.null(names(dependencies))),
+      msg = "dependencies and formals are not matching.")
+  }
 
   timestamp <- Sys.time()
 
@@ -322,8 +328,8 @@ define <- function(name, dependencies, factory) {
         modulr_env$register[[name]] <- list(
           "name" = name,
           "dependencies" = dependencies,
-          "factory" = factory,
-          "digest" = .digest(dependencies, factory),
+          "provider" = provider,
+          "digest" = .digest(dependencies, provider),
           "instanciated" = F,
           "calls" = 0,
           "duration" = NA_integer_,
@@ -338,12 +344,12 @@ define <- function(name, dependencies, factory) {
   } else if (.is_regular(name)) {
 
     previous_digest <- modulr_env$register[[c(name, "digest")]]
-    digest <- .digest(dependencies, factory)
+    digest <- .digest(dependencies, provider)
     if (digest != previous_digest) {
       .message_meta(sprintf("Re-defining '%s'", name), {
 
         modulr_env$register[[c(name, "dependencies")]] <- dependencies
-        modulr_env$register[[c(name, "factory")]] <- factory
+        modulr_env$register[[c(name, "provider")]] <- provider
         modulr_env$register[[c(name, "digest")]] <- digest
         modulr_env$register[[c(name, "instance")]] <- NULL
         modulr_env$register[[c(name, "instanciated")]] <- F
@@ -368,19 +374,19 @@ define <- function(name, dependencies, factory) {
 
 }
 
-#' Get the Factory of a Module.
+#' Get the provider of a Module.
 #'
-#' Get the factory function of a module.
+#' Get the provider function of a module.
 #'
 #' @inheritParams define
 #' @inheritParams get_digest
 #'
-#' @return A function identical to the factory function of the module.
+#' @return A function identical to the provider function of the module.
 #'
 #' @details
 #'
 #'  For testing purposes, it is often useful for mocks to be able to refer to
-#'  the factory of a module.
+#'  the provider of a module.
 #'
 #' @section Warning:
 #'  It is considered a very bad practice to define, touch, undefine, load, make,
@@ -395,7 +401,7 @@ define <- function(name, dependencies, factory) {
 #' define("foo", NULL, function() "foo")
 #' define("bar", list(foo = "foo"), function(foo) paste0(foo, "bar"))
 #' define("foo/mock", NULL, function() "foooooo")
-#' define("bar/mock", list(foo = "foo/mock"), get_factory("bar"))
+#' define("bar/mock", list(foo = "foo/mock"), get_provider("bar"))
 #' make("bar/mock")
 #'
 #' reset()
@@ -404,14 +410,14 @@ define <- function(name, dependencies, factory) {
 #' tmp_file <- file.path(tmp_dir, "foo.R")
 #' cat('define("foo", NULL, function() "Hello World!")', file = tmp_file)
 #' root_config$set(tmp_dir)
-#' \dontrun{get_factory("foo", load = FALSE)}
-#' get_factory("foo", load = TRUE)
+#' \dontrun{get_provider("foo", load = FALSE)}
+#' get_provider("foo", load = TRUE)
 #' unlink(tmp_dir, recursive = TRUE)
 #'
 #' @export
-get_factory <- function(name = .Last.name, load = FALSE) {
+get_provider <- function(name = .Last.name, load = FALSE) {
 
-  .message_meta(sprintf("Entering get_factory() for '%s' ...", name),
+  .message_meta(sprintf("Entering get_provider() for '%s' ...", name),
                 verbosity = +Inf)
 
   assert_that(assertthat::is.flag(load))
@@ -419,7 +425,7 @@ get_factory <- function(name = .Last.name, load = FALSE) {
   if (.is_undefined(name) && load) {
 
     if (.is_called_from_within_module()) {
-      warning("get_factory is called from within a module.",
+      warning("get_provider is called from within a module.",
               call. = FALSE, immediate. = TRUE)
     }
 
@@ -428,7 +434,7 @@ get_factory <- function(name = .Last.name, load = FALSE) {
 
   assert_that(.is_defined(name))
 
-  modulr_env$register[[c(name, "factory")]]
+  modulr_env$register[[c(name, "provider")]]
 
 }
 
@@ -568,17 +574,12 @@ undefine <- function(name = .Last.name) {
 }
 
 #' @export
-`%provides%` <- function(lhs, factory) {
+`%provides%` <- function(lhs, provider) {
 
   if (.is_called_from_within_module()) {
     warning("`%provides%` is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
-
-  assert_that(
-    is.function(factory),
-    msg = "right-hand side of `%provides%` is not a factory."
-    )
 
   assert_that(
     assertthat::is.string(lhs) || (
@@ -596,12 +597,17 @@ undefine <- function(name = .Last.name) {
     dependencies <- list()
   }
 
+  assert_that(
+    is.function(provider),
+    msg = "right-hand side of `%provides%` is not a provider."
+  )
+
   do.call(
     define,
     args =
       list(name = name,
            dependencies = dependencies,
-           factory = factory),
+           provider = provider),
     envir = parent.frame())
 
 }

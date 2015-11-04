@@ -30,7 +30,7 @@ Output the docstring info of a module.
 A docstring is intended to document a module and provide the user with the
 ability to inspect it at run time, for instance as an interactive help
 system, or as metadata. Formally, it is a block of commented lines prefixed
-with \code{#'} and located at the top of the module factory.
+with \code{#'} and located at the top of the module provider.
 
 The preferred formatting for a docstring is R Markdown, notabely for Modulr
 Gears (see \code{\link{prepare_gear}}).

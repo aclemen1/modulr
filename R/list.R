@@ -24,8 +24,8 @@
 #' \item{\code{dependencies}}{number of direct dependencies (parents).}
 #' \item{\code{childs}}{number of modules requiring the module (childs).}
 #' \item{\code{size}}{memory size occupied by the definition.}
-#' \item{\code{lines}}{number of lines of the factory.}
-#' \item{\code{chars}}{number of characters of the factory.}
+#' \item{\code{lines}}{number of lines of the provider.}
+#' \item{\code{chars}}{number of characters of the provider.}
 #' \item{\code{duration}}{duration of the evaluation.}
 #' \item{\code{modified}}{timestamp of last modification.}
 #' \item{\code{created}}{timestamp of creation.}
@@ -135,7 +135,7 @@ list_modules <-
         do.call(c, Map(function(name)
           (if (formatted) function(x) format(x, units = "auto") else identity)(
             utils::object.size(
-              modulr_env$register[[c(name, "factory")]])), flat))
+              modulr_env$register[[c(name, "provider")]])), flat))
 
       weights <-
         do.call(c, Map(function(name)
@@ -147,11 +147,12 @@ list_modules <-
 
       deparsed_factories <-
         Map(function(name)
-          deparse(modulr_env$register[[c(name, "factory")]]), flat)
+          deparse(modulr_env$register[[c(name, "provider")]]), flat)
 
       lines <- vapply(deparsed_factories, length, FUN.VALUE = 0)
 
-      chars <- vapply(deparsed_factories, function(factory) sum(nchar(factory)),
+      chars <- vapply(deparsed_factories,
+                      function(provider) sum(nchar(provider)),
                       FUN.VALUE = 0)
 
       durations <-

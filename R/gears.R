@@ -2,51 +2,65 @@
 
   assert_that(is.function(fun))
 
-  s <- capture.output(fun)
-  if (grepl("<[^<]*>", s[length(s)]))
-    s <- s[-length(s)]
-  paste(s, collapse = "\n")
+  paste(deparse(fun, control = "useSource"), collapse = "\n")
+
 }
 
 .module_to_string <- function(name, base = NULL) {
 
   assert_that(
-    .is_defined_regular(name),
-    is.null(base) || .is_defined_regular(base))
+    .is_defined(name),
+    is.null(base) || .is_defined(base))
 
-  factory <- get_factory(name, load = FALSE)
+  provider <- get_provider(name, load = FALSE)
   if (!is.null(base) &&
-       identical(factory, get_factory(base))) {
-    factory_string <- sprintf("get_factory(\"%s\")", base)
+       identical(provider, get_provider(base))) {
+    provider_string <- sprintf("get_provider(\"%s\")", base)
   } else {
-    factory_string <- .function_to_string(factory)
+    provider_string <- .function_to_string(provider)
   }
 
   dependencies <- modulr_env$register[[name]]$dependencies
   if (isTRUE(length(dependencies) > 0)) {
     if (length(dependencies) == 1) {
-      deps <-
-        sprintf("list(%s = \"%s\")",
-                names(dependencies),
-                unlist(dependencies))
-    } else {
-      deps <- paste0(
-        "list(\n    ",
-        paste(
-          sprintf("%s = \"%s\"",
+      if(is.null(names(dependencies))) {
+        deps <-
+          sprintf("list(\"%s\")",
+                  unlist(dependencies))
+      } else {
+        deps <-
+          sprintf("list(%s = \"%s\")",
                   names(dependencies),
-                  unlist(dependencies)),
-          collapse = ",\n    "),
-        ")")
+                  unlist(dependencies))
+      }
+    } else {
+      if(is.null(names(dependencies))) {
+        deps <- paste0(
+          "list(\n    ",
+          paste(
+            sprintf("\"%s\"",
+                    unlist(dependencies)),
+            collapse = ",\n    "),
+          ")")
+      } else {
+        deps <- paste0(
+          "list(\n    ",
+          paste(
+            sprintf("%s = \"%s\"",
+                    names(dependencies),
+                    unlist(dependencies)),
+            collapse = ",\n    "),
+          ")")
+      }
     }
     module <- sprintf(paste0(
       "\"%s\" %%requires%%\n",
       "  %s %%provides%%\n",
-      "  %s\n"), name, deps, factory_string)
+      "  %s\n"), name, deps, provider_string)
   } else {
     module <- sprintf(paste0(
       "\"%s\" %%provides%%\n",
-      "  %s\n"), name, factory_string)
+      "  %s\n"), name, provider_string)
   }
   module
 }

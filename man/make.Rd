@@ -44,8 +44,8 @@ considered?}
 \item{...}{Further arguments to be passed to \code{\link{load_all_modules}}.}
 }
 \value{
-The object resulting of the evaluation of the factory function of the
-  module.
+The object resulting of the evaluation of the provider function of
+  the module.
 }
 \description{
 Make or remake a module.
@@ -68,11 +68,11 @@ performed before others.
 \item If no cycle among dependencies is detected, the graph is then a
 Directed Acyclic Graph (DAG), and a so called topological sorting can be
 performed on it to compute a well ordered sequence of evaluations.
-\item Each module factory is then evaluated in the order, or re-evaluated if
+\item Each module provider is then evaluated in the order, or re-evaluated if
 outdated, with all its dependencies passed as arguments. A module is
 considered outdated when it has been explicitly \code{\link{touch}}ed or if
 one of its dependencies has been redefined or is itself outdated. The result
-of the evaluation of every module factory is stored in the modulr internal
+of the evaluation of every module provider is stored in the modulr internal
 state, so that it can be reused when appropriate, without re-evaluation.
 }
 
@@ -104,16 +104,35 @@ are just \emph{syntactic sugars} for the expression
 }
 \examples{
 reset()
-define("foo", NULL, function() format(Sys.time(), "\%H:\%M:\%OS6"))
-foo <- make("foo")
+define("foo", NULL, function() {
+  message("Generating timestamp ...")
+  format(Sys.time(), "\%H:\%M:\%OS6")
+})
+foo <- make("foo") # timestamp evaluated at *make-time*, only once
 foo
 foo
 
 reset()
-define("foo", NULL, function() function() format(Sys.time(), "\%H:\%M:\%OS6"))
+define("foo", NULL, function() function() {
+  message("Generating timestamp ...")
+  format(Sys.time(), "\%H:\%M:\%OS6")
+})
 foo \%<=\% "foo"
-foo()
-foo()
+foo() # timestamp evaluated at *run-time*, ...
+foo() # again, ...
+foo() # and again
+
+reset()
+define("foo", NULL, function() {
+  library(memoise)
+  memoise(function() {
+    message("Generating timestamp ...")
+    format(Sys.time(), "\%H:\%M:\%OS6")
+  })
+})
+foo \%<=\% "foo"
+foo() # timestamp evaluated at *run-time*, but ...
+foo() # only once
 
 reset()
 define("A", NULL, function() "(A)")

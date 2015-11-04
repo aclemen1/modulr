@@ -4,8 +4,8 @@
 #'
 #' @inheritParams define
 #'
-#' @return The object resulting of the evaluation of the factory function of the
-#'   module.
+#' @return The object resulting of the evaluation of the provider function of
+#'   the module.
 #'
 #' @details
 #'
@@ -26,11 +26,11 @@
 #' \item If no cycle among dependencies is detected, the graph is then a
 #' Directed Acyclic Graph (DAG), and a so called topological sorting can be
 #' performed on it to compute a well ordered sequence of evaluations.
-#' \item Each module factory is then evaluated in the order, or re-evaluated if
+#' \item Each module provider is then evaluated in the order, or re-evaluated if
 #' outdated, with all its dependencies passed as arguments. A module is
 #' considered outdated when it has been explicitly \code{\link{touch}}ed or if
 #' one of its dependencies has been redefined or is itself outdated. The result
-#' of the evaluation of every module factory is stored in the modulr internal
+#' of the evaluation of every module provider is stored in the modulr internal
 #' state, so that it can be reused when appropriate, without re-evaluation.
 #' }
 #'
@@ -64,16 +64,35 @@
 #'
 #' @examples
 #' reset()
-#' define("foo", NULL, function() format(Sys.time(), "%H:%M:%OS6"))
-#' foo <- make("foo")
+#' define("foo", NULL, function() {
+#'   message("Generating timestamp ...")
+#'   format(Sys.time(), "%H:%M:%OS6")
+#' })
+#' foo <- make("foo") # timestamp evaluated at *make-time*, only once
 #' foo
 #' foo
 #'
 #' reset()
-#' define("foo", NULL, function() function() format(Sys.time(), "%H:%M:%OS6"))
+#' define("foo", NULL, function() function() {
+#'   message("Generating timestamp ...")
+#'   format(Sys.time(), "%H:%M:%OS6")
+#' })
 #' foo %<=% "foo"
-#' foo()
-#' foo()
+#' foo() # timestamp evaluated at *run-time*, ...
+#' foo() # again, ...
+#' foo() # and again
+#'
+#' reset()
+#' define("foo", NULL, function() {
+#'   library(memoise)
+#'   memoise(function() {
+#'     message("Generating timestamp ...")
+#'     format(Sys.time(), "%H:%M:%OS6")
+#'   })
+#' })
+#' foo %<=% "foo"
+#' foo() # timestamp evaluated at *run-time*, but ...
+#' foo() # only once
 #'
 #' reset()
 #' define("A", NULL, function() "(A)")
@@ -127,6 +146,9 @@ make <- function(name = .Last.name) {
             call. = FALSE, immediate. = TRUE)
   }
 
+  verbosity_level <- .get_0("verbosity", envir = modulr_env,
+                            ifnotfound = 2)
+
   .message_meta(sprintf("Making '%s' ...", name), {
 
     .message_meta("Visiting and defining dependencies ...", {
@@ -167,12 +189,13 @@ make <- function(name = .Last.name) {
 
               layers_count <- length(layers)
 
-              if(deps_count > 1 && layers_count > 1)
+              if(deps_count > 1 && layers_count > 1 &&
+                   2 <= verbosity_level)
                 message(sprintf("%d layers, ", layers_count - 1),
                         appendLF = FALSE)
 
             },
-        ok = T, verbosity = 2)
+        ok = TRUE, verbosity = 2)
     }
 
     .message_meta(
@@ -239,14 +262,14 @@ make <- function(name = .Last.name) {
 
                               }
 
-                              factory <-
+                              provider <-
                                 modulr_env$register[[
-                                  c(ordered_name, "factory")]]
+                                  c(ordered_name, "provider")]]
 
-                              environment(factory) <- env
+                              environment(provider) <- env
 
                               instance <- withVisible(do.call(
-                                factory,
+                                provider,
                                 args = args, quote = TRUE, envir = env))
 
                               modulr_env$register[[
@@ -261,6 +284,8 @@ make <- function(name = .Last.name) {
                               modulr_env$register[[
                                 c(ordered_name, "timestamp")]] <- Sys.time()
 
+                              gc(verbose = FALSE)
+
                             },
                   verbosity = 1)
 
@@ -269,7 +294,8 @@ make <- function(name = .Last.name) {
             }
           }
 
-        })
+        },
+      verbosity = 2)
 
     instance <- modulr_env$register[[c(name, "instance")]]
 

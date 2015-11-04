@@ -49,7 +49,7 @@ test_that("make writes to the register", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list())
-  expect_equal(module$factory, function() {
+  expect_equal(module$provider, function() {
     return("foo")
   })
   expect_equal(module$digest, get_digest("some/module"))
@@ -322,7 +322,7 @@ test_that("make_tests makes all tests", {
 
   "test_1" %provides% function() "hello world"
 
-  "test_1/mock" %provides% get_factory("test_1")
+  "test_1/mock" %provides% get_provider("test_1")
 
   "test_1/test" %requires% list(test_1 = "test_1/mock") %provides%
     function(test_1) {
@@ -349,7 +349,7 @@ test_that("make_tests fails on error", {
 
   "test_1" %provides% function() "hello world"
 
-  "test_1/mock" %provides% get_factory("test_1")
+  "test_1/mock" %provides% get_provider("test_1")
 
   "test_1/test" %requires% list(test_1 = "test_1/mock") %provides%
     function(test_1) {
@@ -369,7 +369,7 @@ test_that("make_tests fails on malformed tests", {
 
   "test_1" %provides% function() "hello world"
 
-  "test_1/mock" %provides% get_factory("test_1")
+  "test_1/mock" %provides% get_provider("test_1")
 
   "test_1/test" %requires% list(test_1 = "test_1/mock") %provides%
     function(test_1) {
