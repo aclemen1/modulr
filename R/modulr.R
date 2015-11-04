@@ -22,6 +22,15 @@ NULL
 
 modulr_env <- new.env(parent = emptyenv())
 
+# the base::get0 function exsists only since R 3.2
+.get_0 <- function(var, ..., ifnotfound = NULL) {
+  if (exists(var, ...)) get(var, ...) else ifnotfound
+}
+
+.dir_exists <- function(file) {
+  isTRUE(file.info(file)[1, "isdir"])
+}
+
 #' @name .Last.name
 #' @aliases .Last.name
 #' @rdname last_name
@@ -125,17 +134,8 @@ set_verbosity <- function(level = 2) {
 #' @export
 get_verbosity <- function() {
 
-  modulr_env$verbosity
+  .get_0("verbosity", envir = modulr_env, ifnotfound = 2)
 
-}
-
-# the base::get0 function exsists only since R 3.2
-.get_0 <- function(var, ..., ifnotfound = NULL) {
-  if (exists(var, ...)) get(var, ...) else ifnotfound
-}
-
-.dir_exists <- function(file) {
-  isTRUE(file.info(file)[1, "isdir"])
 }
 
 PRAISE <- c(

@@ -154,8 +154,7 @@ make <- function(name = .Last.name, ...) {
             call. = FALSE, immediate. = TRUE)
   }
 
-  verbosity_level <- .get_0("verbosity", envir = modulr_env,
-                            ifnotfound = 2)
+  verbosity_level <- get_verbosity()
 
   .message_meta(sprintf("Making '%s' ...", name), {
 

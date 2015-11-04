@@ -122,11 +122,11 @@ NULL
       # Deprecated and kept for backward compatibility.
       get_module_options = function() {
 
-        .Deprecated(msg = paste0(
+        suppressWarnings(.Deprecated(msg = paste0(
           "Module options are deprecated. As a replacement, you can add a ",
           "dependency with a dedicated module containing an appropriate ",
           "mechanism for your options and configurations settings. "
-        ))
+        )))
 
         name <- get(".__name__", pos = parent.frame())
         module_options(name)$get_all()
@@ -150,7 +150,7 @@ NULL
       # Deprecated and kept for backward compatibility.
       # nocov start
       resolve_path = function(...) {
-        .Deprecated(old = "$resolve_path")
+        .Deprecated("$get_dirname", old = "$resolve_path")
         eval(.resolve_path(...), envir = parent.frame(1L))
       },
       # nocov end
