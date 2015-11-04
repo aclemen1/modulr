@@ -11,7 +11,7 @@
 \alias{make_tests}
 \title{Make a Module.}
 \usage{
-make(name = .Last.name)
+make(name = .Last.name, ...)
 
 make_all(regexp, reserved = FALSE, error = stop)
 
@@ -33,6 +33,10 @@ make_all_tests(...)
   The name "modulr" corresponds to a special module and is therefore
   reserved.}
 
+\item{...}{For \code{make}, further arguments to be passed for evaluation to
+  the resulting function, if any. For \code{make_all_tests}, further
+  arguments to be passed to \code{\link{load_all_modules}}.}
+
 \item{regexp}{A regular expression. If not missing, the regular expression
 is used to filter the names of the modules to be made.}
 
@@ -40,12 +44,11 @@ is used to filter the names of the modules to be made.}
 considered?}
 
 \item{error}{A function. This function is triggered on error.}
-
-\item{...}{Further arguments to be passed to \code{\link{load_all_modules}}.}
 }
 \value{
 The object resulting of the evaluation of the provider function of
-  the module.
+  the module. If the object is a function and arguments are passed, returns
+  the object resulting of the evaluation of the function on these arguments.
 }
 \description{
 Make or remake a module.
@@ -108,16 +111,15 @@ define("foo", NULL, function() {
   message("Generating timestamp ...")
   format(Sys.time(), "\%H:\%M:\%OS6")
 })
-foo <- make("foo") # timestamp evaluated at *make-time*, only once
-foo
-foo
+make("foo") # timestamp evaluated at *make-time*, ...
+make("foo") # only once
 
 reset()
 define("foo", NULL, function() function() {
   message("Generating timestamp ...")
   format(Sys.time(), "\%H:\%M:\%OS6")
 })
-foo \%<=\% "foo"
+foo <- make("foo")
 foo() # timestamp evaluated at *run-time*, ...
 foo() # again, ...
 foo() # and again
@@ -130,9 +132,14 @@ define("foo", NULL, function() {
     format(Sys.time(), "\%H:\%M:\%OS6")
   })
 })
-foo \%<=\% "foo"
+foo <- make("foo")
 foo() # timestamp evaluated at *run-time*, but ...
 foo() # only once
+
+reset()
+define("foo", NULL, function() function(a) a + 1)
+foo <- make("foo"); foo(1)
+make("foo", 1)
 
 reset()
 define("A", NULL, function() "(A)")

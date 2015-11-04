@@ -3,9 +3,13 @@
 #' Make or remake a module.
 #'
 #' @inheritParams define
+#' @param ... For \code{make}, further arguments to be passed for evaluation to
+#'   the resulting function, if any. For \code{make_all_tests}, further
+#'   arguments to be passed to \code{\link{load_all_modules}}.
 #'
 #' @return The object resulting of the evaluation of the provider function of
-#'   the module.
+#'   the module. If the object is a function and arguments are passed, returns
+#'   the object resulting of the evaluation of the function on these arguments.
 #'
 #' @details
 #'
@@ -68,16 +72,15 @@
 #'   message("Generating timestamp ...")
 #'   format(Sys.time(), "%H:%M:%OS6")
 #' })
-#' foo <- make("foo") # timestamp evaluated at *make-time*, only once
-#' foo
-#' foo
+#' make("foo") # timestamp evaluated at *make-time*, ...
+#' make("foo") # only once
 #'
 #' reset()
 #' define("foo", NULL, function() function() {
 #'   message("Generating timestamp ...")
 #'   format(Sys.time(), "%H:%M:%OS6")
 #' })
-#' foo %<=% "foo"
+#' foo <- make("foo")
 #' foo() # timestamp evaluated at *run-time*, ...
 #' foo() # again, ...
 #' foo() # and again
@@ -90,9 +93,14 @@
 #'     format(Sys.time(), "%H:%M:%OS6")
 #'   })
 #' })
-#' foo %<=% "foo"
+#' foo <- make("foo")
 #' foo() # timestamp evaluated at *run-time*, but ...
 #' foo() # only once
+#'
+#' reset()
+#' define("foo", NULL, function() function(a) a + 1)
+#' foo <- make("foo"); foo(1)
+#' make("foo", 1)
 #'
 #' reset()
 #' define("A", NULL, function() "(A)")
@@ -134,7 +142,7 @@
 #'
 #' @aliases %<=% %=>% %<<=% %=>>%
 #' @export
-make <- function(name = .Last.name) {
+make <- function(name = .Last.name, ...) {
 
   .message_meta(sprintf("Entering make() for '%s' ...", name),
                 verbosity = +Inf)
@@ -304,10 +312,13 @@ make <- function(name = .Last.name) {
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
-    return(
-      ifelse(instance[["visible"]], identity, invisible)
-      (instance[["value"]])
-    )
+    if(!missing(...) && is.function(instance[["value"]])) {
+      return(instance[["value"]](...)) # Exclude Linting
+    } else {
+      return(
+        ifelse(instance[["visible"]], identity, invisible)(instance[["value"]])
+      )
+    }
 
   },
   verbosity = 2)
@@ -406,7 +417,6 @@ make_tests <- function() {
 }
 
 #' @rdname make
-#' @param ... Further arguments to be passed to \code{\link{load_all_modules}}.
 #' @export
 make_all_tests <- function(...) {
 

@@ -65,11 +65,17 @@ test_that("make handles invisibility correctly", {
 
   define("foo", NULL, function() invisible("phantom"))
   define("bar", NULL, function() "incarned")
+  define("tricky", NULL, function() invisible(function(a) a + 1))
+  define("tricky2", NULL, function() function(a) invisible(a + 1))
 
   expect_false(withVisible(make("foo"))$visible)
   expect_equal(make("foo"), "phantom")
   expect_true(withVisible(make("bar"))$visible)
   expect_equal(make("bar"), "incarned")
+  expect_false(withVisible(make("tricky"))$visible)
+  expect_true(withVisible(make("tricky")(1))$visible)
+  expect_true(withVisible(make("tricky2"))$visible)
+  expect_false(withVisible(make("tricky2")(1))$visible)
 })
 
 test_that("make instanciates dependencies", {
@@ -164,6 +170,13 @@ test_that("make reinstanciates touched deps for chained modules, scenario 2", {
   module_timestamp_2 <-
     get("register", pos = modulr_env)[["module_2"]]$timestamp
   expect_less_than(module_timestamp_2, module_timestamp)
+})
+
+test_that("make applies function to arguments, if any", {
+  reset()
+  define("foo", NULL, function() function(a) a + 1)
+  expect_true(is.function(make("foo")))
+  expect_equal(make("foo")(1), make("foo", 1))
 })
 
 test_that("%<=% is a syntactic sugar for `<- make`", {
