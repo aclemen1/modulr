@@ -529,7 +529,8 @@ touch <- function(name = .Last.name) {
     if (.is_regular(name))
       modulr_env$.Last.name <- name
 
-    module_options(name)$unset() # Deprecated, kept for backward compatibility.
+    # Deprecated, kept for backward compatibility.
+    suppressWarnings(module_options(name)$unset())
 
   },
   ok = TRUE, verbosity = 2)

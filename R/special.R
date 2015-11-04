@@ -121,6 +121,13 @@ NULL
       # returns module options
       # Deprecated and kept for backward compatibility.
       get_module_options = function() {
+
+        .Deprecated(msg = paste0(
+          "Module options are deprecated. As a replacement, you can add a ",
+          "dependency with a dedicated module containing an appropriate ",
+          "mechanism for your options and configurations settings. "
+        ))
+
         name <- get(".__name__", pos = parent.frame())
         module_options(name)$get_all()
       },
@@ -141,11 +148,21 @@ NULL
 
       # returns .resolve_path function
       # Deprecated and kept for backward compatibility.
-      resolve_path = .resolve_path,
+      # nocov start
+      resolve_path = function(...) {
+        .Deprecated(old = "$resolve_path")
+        eval(.resolve_path(...), envir = parent.frame(1L))
+      },
+      # nocov end
 
       # returns .resolve_mapping function
       # Deprecated and kept for backward compatibility.
-      resolve_mapping = .resolve_mapping,
+      # nocov start
+      resolve_mapping = function(...) {
+        .Deprecated(old = "$resolve_mapping")
+        eval(.resolve_mapping(...), envir = parent.frame(1L))
+      },
+      # nocov end
 
       # returns .message_info function
       message_info = function(...) {

@@ -179,6 +179,12 @@ get_configs <- function() get("config", pos = modulr_env)
 #' @export
 module_options <- function(name = .Last.name) {
 
+  .Deprecated(msg = paste0(
+    "Module options are deprecated. As a replacement, you can add a ",
+    "dependency with a dedicated module containing an appropriate mechanism ",
+    "for your options and configurations settings. "
+  ))
+
   assert_that(.is_regular(name))
 
   .config(c("modules", name))

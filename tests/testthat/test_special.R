@@ -33,20 +33,6 @@ test_that("$get_dirname returns the module directory, if any", {
   expect_equal(make("module_5"), "lib")
 })
 
-test_that("$resolve_path gives access to .resolve_path", {
-  reset()
-  define("my/great/module", list(modulr = "modulr"),
-         function(modulr) modulr$resolve_path)
-  expect_equal(make("my/great/module"), .resolve_path)
-})
-
-test_that("$resolve_mapping gives access to .resolve_mapping", {
-  reset()
-  define("my/great/module", list(modulr = "modulr"),
-         function(modulr) modulr$resolve_mapping)
-  expect_equal(make("my/great/module"), .resolve_mapping)
-})
-
 test_that("$message_info outputs the module name", {
   reset()
   define("module_foobar", list(modulr = "modulr"),
