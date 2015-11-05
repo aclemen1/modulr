@@ -73,6 +73,7 @@ test_that("get_digest detects changes", {
 })
 
 test_that("get_digest detects comments", {
+  reset()
   define("foo", NULL, function() {
     # comment
     NULL
@@ -85,6 +86,22 @@ test_that("get_digest detects comments", {
   sig_2 <- get_digest("bar")
 
   expect_false(sig_1 == sig_2)
+
+  reset()
+  define("foobar", NULL, function() NULL)
+  define("foo", list(foobar = "foobar"), function() {
+    # comment
+    NULL
+  })
+  sig_1 <- get_digest("foo")
+
+  define("bar", list(foobar = "foobar"), function() {
+    NULL
+  })
+  sig_2 <- get_digest("bar")
+
+  expect_false(sig_1 == sig_2)
+
 })
 
 test_that("get_digest calls are warned from within a module", {
@@ -302,6 +319,23 @@ test_that("get_provider returns comments", {
   define(
     "foo",
     NULL,
+    function() {
+      # comment
+      NULL
+    })
+
+  expect_match(
+    paste(deparse(get_provider("foo"), control = "useSource"),
+          collapse = "\n"),
+    "# comment"
+  )
+
+  # also with non-trivial dependencies
+  reset()
+  define("bar", NULL, function() NULL)
+  define(
+    "foo",
+    list(bar = "bar"),
     function() {
       # comment
       NULL

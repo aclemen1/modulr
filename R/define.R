@@ -308,7 +308,9 @@ define <- function(name, dependencies, provider) {
 
   if (length(formals(provider)) == 0 && length(dependencies) > 0 &&
         all(names(dependencies) != "")) {
+    attrs <- attributes(provider)
     formals(provider) <- as.pairlist(dependencies)
+    attributes(provider) <- attrs
   } else {
     assert_that(
       setequal(names(dependencies), names(formals(provider))) || (
