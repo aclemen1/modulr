@@ -67,8 +67,45 @@ test_that(".docstring justifies on left", {
 })
 
 test_that("info returns a module docstring, if any", {
+
+  reset()
+  define("module", NULL, {
+  })
+  expect_equal(capture.output(info("module")), character(0))
+
+  reset()
+  define("module", NULL, {
+    #' docstring
+  })
+  expect_match(capture.output(info("module")), "docstring")
+
+  reset()
+  define("module", NULL, {
+    #' docstring
+    NULL
+  })
+  expect_match(capture.output(info("module")), "docstring")
+
   reset()
   define("module", NULL, function() {
+    #' docstring
+  })
+  expect_match(capture.output(info("module")), "docstring")
+
+  reset()
+  define("module", list(foo = "foo"), {
+    #' docstring
+  })
+  expect_match(capture.output(info("module")), "docstring")
+
+  reset()
+  define("module", list(foo = "foo"), function() {
+    #' docstring
+  })
+  expect_match(capture.output(info("module")), "docstring")
+
+  reset()
+  define("module", list(foo = "foo"), function(foo) {
     #' docstring
   })
   expect_match(capture.output(info("module")), "docstring")

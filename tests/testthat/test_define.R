@@ -35,6 +35,8 @@ test_that(".digest computes a module digest", {
 })
 
 test_that("get_digest detects changes", {
+  reset()
+
   define(
     "some/module",
     list(dep = "foo/bar"),
@@ -73,6 +75,20 @@ test_that("get_digest detects changes", {
 })
 
 test_that("get_digest detects comments", {
+  reset()
+  define("foo", NULL, {
+    # comment
+    NULL
+  })
+  sig_1 <- get_digest("foo")
+
+  define("bar", NULL, {
+    NULL
+  })
+  sig_2 <- get_digest("bar")
+
+  expect_false(sig_1 == sig_2)
+
   reset()
   define("foo", NULL, function() {
     # comment
@@ -234,6 +250,30 @@ test_that("define calls are warned from within a module", {
   expect_warning(make("module"))
 })
 
+test_that("define accepts provider as braced expression", {
+  reset()
+
+  define("foo", NULL, {
+    "foo"
+  })
+  define("foobar", list(foo = "foo"), {
+    paste0(foo, "bar")
+  })
+
+  expect_equal(make("foobar"), "foobar")
+
+  reset()
+
+  "foo" %provides% {
+    "foo"
+  }
+  "foobar" %requires% list(foo = "foo") %provides% {
+    paste0(foo, "bar")
+  }
+
+  expect_equal(make("foobar"), "foobar")
+})
+
 test_that("define accepts provider without formals", {
   reset()
 
@@ -315,7 +355,19 @@ test_that("get_provider returns the body of the module", {
 
 test_that("get_provider returns comments", {
   reset()
+  define(
+    "foo", NULL, {
+      # comment
+      NULL
+    })
 
+  expect_match(
+    paste(deparse(get_provider("foo"), control = "useSource"),
+          collapse = "\n"),
+    "# comment"
+  )
+
+  reset()
   define(
     "foo",
     NULL,

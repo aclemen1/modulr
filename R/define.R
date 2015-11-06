@@ -301,10 +301,23 @@ define <- function(name, dependencies, provider) {
     )
   if (is.null(dependencies)) dependencies <- list()
 
+  provider_subst <- substitute(provider)
+
   assert_that(
-    is.function(provider),
-    msg = "provider is not a function."
+    .is_braced_expression(provider_subst) || is.function(provider),
+    msg = "provider is not a braced expression or a function."
   )
+
+  if (.is_braced_expression(provider_subst)) {
+    provider <- eval(call("function", NULL, provider_subst))
+    attr(provider, which = "srcref") <-
+      srcref(
+        attr(provider_subst, "srcfile"),
+        c(
+          attr(provider_subst, which = "srcref")[[1]],
+          attr(provider_subst, which = "wholeSrcref")
+        )[c(1, 2, 11, 12, 5, 14, 7, 16)])
+  }
 
   if (length(formals(provider)) == 0 && length(dependencies) > 0 &&
         all(names(dependencies) != "")) {
@@ -608,10 +621,16 @@ undefine <- function(name = .Last.name) {
     dependencies <- list()
   }
 
+  provider_subst <- substitute(provider)
+
   assert_that(
-    is.function(provider),
-    msg = "right-hand side of `%provides%` is not a provider."
+    .is_braced_expression(provider_subst) || is.function(provider),
+    msg = "provider is not a braced expression or a function."
   )
+
+  if (.is_braced_expression(provider_subst)) {
+    provider <- provider_subst
+  }
 
   do.call(
     define,

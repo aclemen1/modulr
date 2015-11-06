@@ -77,3 +77,8 @@ assertthat::on_failure(.is_defined_regular) <- function(call, env) {
   isTRUE(exists(".__name__", inherits = TRUE,
          mode = "character", envir = parent.frame(2L)))
 }
+
+# Test if object is a braced expression
+.is_braced_expression <- function(object) {
+  is.call(object) && object[[1]] == as.name("{")
+}

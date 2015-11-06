@@ -9,4 +9,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The goal of this document is to get you up and running with modulr.
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse = T, comment = "#>")
+library(modulr)
+```
+
+# Defining Modules
+
+```{r}
+"my_first_module" %provides% function() {
+    
+}
+```
