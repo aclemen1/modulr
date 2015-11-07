@@ -20,7 +20,7 @@ vignette: >
 library(modulr)
 library(htmltools)
 library(networkD3)
-library(webshot)
+require(webshot) # not on CRAN
 library(dplyr)
 Sys.setlocale("LC_TIME", "en_DK.UTF-8")
 options(width = 120)
@@ -123,11 +123,15 @@ lsmod()
 As you can see, `foobar` has two dependencies, and `foo` and `bar` both have one child. This can be viewed graphically:
 
 ```{r, echo=F}
-graph_dependencies() %>%
-  html_print %>%
-  webshot(file = "quickstart-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
-  resize("730x") %>%
-  shrink()
+# Do not try to produce a snapshot on Travis CI or CRAN
+if (!identical(Sys.getenv("TRAVIS"), "true") &&
+      identical(Sys.getenv("NOT_CRAN"), "true")) {
+  graph_dependencies() %>%
+    html_print %>%
+    webshot(file = "quickstart-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
+    resize("730x") %>%
+    shrink()
+}
 ```
 
 ```{r, echo=T, eval=F}
