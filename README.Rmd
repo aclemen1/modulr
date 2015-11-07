@@ -86,7 +86,7 @@ devtools::install_github("aclemen1/modulr")
 install.packages("devtools")
 devtools::install_github("hadley/devtools")
 devtools::install_github("hadley/assertthat")
-devtools::install_github("aclemen1/modulr@devel", build_vignettes = TRUE)
+devtools::install_github("aclemen1/modulr@devel")
 ```
 
 If you encounter a clear bug, please [file a minimal reproducible example](https://github.com/aclemen1/modulr/issues).
