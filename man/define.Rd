@@ -26,9 +26,9 @@ define(name, dependencies, provider)
 
   Elements of the list of dependencies designate modules by their name.}
 
-\item{provider}{A function.
+\item{provider}{A string, a braced expression, or a function.
 
-  If any, formals must coincide with the list of dependencies.}
+  If any, function's formals must coincide with the list of dependencies.}
 }
 \value{
 A wrapper function around a make call for the defined module.
@@ -174,19 +174,21 @@ called \emph{modulr gears}.
 }
 \examples{
 reset()
-define("foo", NULL, function() "Hello")
-bar <- define("bar", list(foo = "foo"), function(foo) paste(foo, "World!"))
+define("foo", NULL, "Hello")
+bar <- define("bar", list(foo = "foo"), { paste(foo, "World!") })
 bar()
-define("foo", NULL, function() "Again, Hello")
+define("foo", NULL, "Again, Hello")
 bar()
 
 reset()
-"foo" \%provides\% function() "Hello"
-"bar" \%requires\%
-  list(foo = "foo") \%provides\%
-  function(foo) paste(foo, "World!")
+"foo" \%provides\% "Hello"
+"bar" \%requires\% list(
+  foo = "foo"
+) \%provides\% {
+  paste(foo, "World!")
+}
 make()
-"foo" \%provides\% function() "Again, Hello"
+"foo" \%provides\% "Again, Hello"
 make("bar")
 
 reset()

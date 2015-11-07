@@ -68,3 +68,26 @@ test_that(".is_defined_regular detects regular defined modules", {
   expect_false(.is_defined_regular("undefined/module"))
   expect_false(.is_defined_regular("modulr"))
 })
+
+test_that(".is_braced_expression detects braced expressions", {
+  expect_true(.is_braced_expression(quote({
+    })))
+  expect_false(.is_braced_expression({
+    }))
+})
+
+test_that(".is_constant detects constants", {
+  expect_true(.is_constant("foo"))
+  expect_true(.is_constant(1L))
+  expect_true(.is_constant(1.0))
+  expect_true(.is_constant(TRUE))
+  expect_true(.is_constant(NA))
+  expect_true(.is_constant(NULL))
+  expect_false(.is_constant(c("foo", "bar")))
+  expect_false(.is_constant(list("foo")))
+  expect_false(.is_constant(list(foo = "foo")))
+  expect_false(.is_constant(list("foo", "bar")))
+  expect_false(.is_constant(function() NULL))
+  expect_false(.is_constant(expression(x + 1)))
+  expect_false(.is_constant(quote(exp)))
+})

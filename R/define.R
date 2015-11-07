@@ -102,9 +102,9 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 #'
 #'   Elements of the list of dependencies designate modules by their name.
 #'
-#' @param provider A function.
+#' @param provider A string, a braced expression, or a function.
 #'
-#'   If any, formals must coincide with the list of dependencies.
+#'   If any, function's formals must coincide with the list of dependencies.
 #'
 #' @return A wrapper function around a make call for the defined module.
 #'
@@ -249,19 +249,21 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 #'
 #' @examples
 #' reset()
-#' define("foo", NULL, function() "Hello")
-#' bar <- define("bar", list(foo = "foo"), function(foo) paste(foo, "World!"))
+#' define("foo", NULL, "Hello")
+#' bar <- define("bar", list(foo = "foo"), { paste(foo, "World!") })
 #' bar()
-#' define("foo", NULL, function() "Again, Hello")
+#' define("foo", NULL, "Again, Hello")
 #' bar()
 #'
 #' reset()
-#' "foo" %provides% function() "Hello"
-#' "bar" %requires%
-#'   list(foo = "foo") %provides%
-#'   function(foo) paste(foo, "World!")
+#' "foo" %provides% "Hello"
+#' "bar" %requires% list(
+#'   foo = "foo"
+#' ) %provides% {
+#'   paste(foo, "World!")
+#' }
 #' make()
-#' "foo" %provides% function() "Again, Hello"
+#' "foo" %provides% "Again, Hello"
 #' make("bar")
 #'
 #' reset()
@@ -304,19 +306,25 @@ define <- function(name, dependencies, provider) {
   provider_subst <- substitute(provider)
 
   assert_that(
-    .is_braced_expression(provider_subst) || is.function(provider),
-    msg = "provider is not a braced expression or a function."
+    .is_braced_expression(provider_subst) || is.function(provider) ||
+      .is_constant(provider),
+    msg = "provider is not a constant, a braced expression or a function."
   )
 
   if (.is_braced_expression(provider_subst)) {
     provider <- eval(call("function", NULL, provider_subst))
-    attr(provider, which = "srcref") <-
-      srcref(
-        attr(provider_subst, "srcfile"),
-        c(
-          attr(provider_subst, which = "srcref")[[1]],
-          attr(provider_subst, which = "wholeSrcref")
-        )[c(1, 2, 11, 12, 5, 14, 7, 16)])
+    src_file <- attr(provider_subst, "srcfile")
+    if(inherits(src_file, "srcfile")) {
+      attr(provider, which = "srcref") <-
+        srcref(
+          src_file,
+          c(
+            attr(provider_subst, which = "srcref")[[1]],
+            attr(provider_subst, which = "wholeSrcref")
+          )[c(1, 2, 11, 12, 5, 14, 7, 16)])
+    }
+  } else if (!is.function(provider) && .is_constant(provider)) {
+    provider <- eval(call("function", NULL, provider))
   }
 
   if (length(formals(provider)) == 0 && length(dependencies) > 0 &&
@@ -624,8 +632,9 @@ undefine <- function(name = .Last.name) {
   provider_subst <- substitute(provider)
 
   assert_that(
-    .is_braced_expression(provider_subst) || is.function(provider),
-    msg = "provider is not a braced expression or a function."
+    .is_braced_expression(provider_subst) || is.function(provider) ||
+      .is_constant(provider),
+    msg = "provider is not a constant, a braced expression, or a function."
   )
 
   if (.is_braced_expression(provider_subst)) {

@@ -250,6 +250,60 @@ test_that("define calls are warned from within a module", {
   expect_warning(make("module"))
 })
 
+test_that("define accepts provider as constant", {
+  reset()
+  define("foo", NULL, "foo")
+  expect_equal(make("foo"), "foo")
+
+  define("foo", NULL, 1L)
+  expect_equal(make("foo"), 1L)
+
+  define("foo", NULL, 1.0)
+  expect_equal(make("foo"), 1.0)
+
+  define("foo", NULL, T)
+  expect_equal(make("foo"), T)
+
+  define("foo", NULL, NA)
+  expect_equal(make("foo"), NA)
+
+  define("foo", NULL, NULL)
+  expect_equal(make("foo"), NULL)
+
+  expect_error(define("foo", NULL, c("foo", "bar")))
+  expect_error(define("foo", NULL, list("foo")))
+  expect_error(define("foo", NULL, list(foo = "foo")))
+  expect_error(define("foo", NULL, list("foo", "bar")))
+  expect_error(define("foo", NULL, expression(x + 1)))
+  expect_error(define("foo", NULL, quote(exp)))
+
+  reset()
+  "foo" %provides% "foo"
+  expect_equal(make("foo"), "foo")
+
+  "foo" %provides% 1L
+  expect_equal(make("foo"), 1L)
+
+  "foo" %provides% 1.0
+  expect_equal(make("foo"), 1.0)
+
+  "foo" %provides% T
+  expect_equal(make("foo"), T)
+
+  "foo" %provides% NA
+  expect_equal(make("foo"), NA)
+
+  "foo" %provides% NULL
+  expect_equal(make("foo"), NULL)
+
+  expect_error("foo" %provides% c("foo", "bar"))
+  expect_error("foo" %provides% list("foo"))
+  expect_error("foo" %provides% list(foo = "foo"))
+  expect_error("foo" %provides% list("foo", "bar"))
+  expect_error("foo" %provides% expression(x + 1))
+  expect_error("foo" %provides% quote(exp))
+})
+
 test_that("define accepts provider as braced expression", {
   reset()
 

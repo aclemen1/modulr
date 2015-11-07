@@ -82,3 +82,13 @@ assertthat::on_failure(.is_defined_regular) <- function(call, env) {
 .is_braced_expression <- function(object) {
   is.call(object) && object[[1]] == as.name("{")
 }
+
+# Test if object is a constant
+.is_constant <- function(object) {
+  is.null(object) || (
+    assertthat::is.scalar(object) &&
+      !is.list(object) &&
+      !is.function(object) &&
+      !is.expression(object) &&
+      !is.language(object))
+}

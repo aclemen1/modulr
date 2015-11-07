@@ -128,7 +128,7 @@ list_modules <-
       types <-
         do.call(c, Map(function(name)
           ifelse(modulr_env$register[[c(name, "instanciated")]],
-                 typeof(modulr_env$register[[c(name, "instance")]]),
+                 typeof(modulr_env$register[[c(name, "instance", "value")]]),
                  NA_character_), flat))
 
       sizes <-
@@ -142,7 +142,8 @@ list_modules <-
           ifelse(
             modulr_env$register[[c(name, "instanciated")]],
             (if (formatted) function(x) format(x, units = "auto") else identity)
-            (utils::object.size(modulr_env$register[[c(name, "instance")]])),
+            (utils::object.size(modulr_env$register[[
+              c(name, "instance", "value")]])),
             NA_character_), flat))
 
       deparsed_factories <-

@@ -1,23 +1,325 @@
 ---
-title: "Modulr Quickstart Guide"
+title: "Modulr Quick-start Guide"
 author: "Alain Clément-Pavon"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    mathjax: null
+    keep_md: yes
+    self_contained: yes
+    variant: markdown_github
 vignette: >
-  %\VignetteIndexEntry{Modulr Quickstart Guide}
+  %\VignetteIndexEntry{Modulr Quick-start Guide}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = FALSE, message = FALSE}
-knitr::opts_chunk$set(collapse = T, comment = "#>")
+```{r, echo = FALSE, message = FALSE, results = 'hide'}
 library(modulr)
+library(htmltools)
+library(networkD3)
+library(webshot)
+library(dplyr)
+Sys.setlocale("LC_TIME", "en_DK.UTF-8")
+options(width = 120)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "quickstart-"
+)
 ```
 
-# Defining Modules
+Have you ever felt like writing [big balls of mud](https://en.wikipedia.org/wiki/Big_ball_of_mud) in R? Wouldn't it be great if such [spaghetti code](https://en.wikipedia.org/wiki/Spaghetti_code) could be simply turned into more [ravioli](https://en.wikipedia.org/wiki/Spaghetti_code#Ravioli_code) and [lasagna](https://en.wikipedia.org/wiki/Spaghetti_code#Lasagna_code) code? Give modulr a try!
 
-```{r}
-"my_first_module" %provides% function() {
-    
+# Introduction
+
+Technically, modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) framework for R. It allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share. 
+
+As every DI framework, modulr aims for a clear separation between code complication and complexity, highlighting the 
+core purpose and behavior of objects (application code), and hiding their construction and wiring (infrastructure code).
+
+Less pompously, modulr deals with modules and their dependencies. 
+
+Modules are declaratively defined and have four main components:
+
+* A name, which uniquely identifies the module.
+* A list of required dependencies, if any.
+* A provider, which expresses the module's feature(s).
+* An optional docstring, intended to document the module.
+
+A typical module looks like the following:
+
+```r
+"name" %requires% list(
+
+  # a list of dependencies
+  dependency_1 = "name_of_dependency_1",
+  dependency_2 = "name_of_dependency_1"
+
+) %provides% {
+
+  #' a docstring intended to document the module
+  
+  # some code that uses the objects `dependency_1` and `dependency_2"
+  # returned by the modules "name_of_dependency_1" and "name_of_dependency_2"
+  object <- { ... }
+  
+  # a resulting object, exposed by the module
+  return(object)
+
 }
 ```
+
+When a module is defined, modulr has to make it in order to evaluate the code it provides is not evaluated. To do so, modulr has to make it:
+
+```r
+result <- make("name")
+```
+
+or alternatively with a handy syntactic sugar:
+
+```r
+result %<=% "name"
+```
+
+The result contains the object computed and exposed by the module. Under the hood, the dependencies have been sorted and also made, and their resulting objects finally injected.
+
+# First example
+
+```{r, echo=FALSE, results='hide', message=FALSE}
+reset()
+```
+
+Let us start by defining some modules and dependencies:
+
+```{r}
+"foo" %provides% "foo"
+
+"bar" %provides% "bar"
+
+"foobar" %requires% list(
+  foo = "foo",
+  bar = "bar"
+) %provides% {
+  #' Return a string containing "foobar".
+  paste0(foo, bar)
+}
+```
+
+To see a module's docstring, you can use `info`:
+
+```{r}
+info("foobar")
+```
+
+To list all the defined modules, you can use `lsmod` (or `list_modules`):
+
+```{r}
+lsmod()
+```
+
+As you can see, `foobar` has two dependencies, and `foo` and `bar` both have one child. This can be viewed graphically:
+
+```{r, echo=F}
+graph_dependencies() %>%
+  html_print %>%
+  webshot(file = "quickstart-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
+  resize("730x") %>%
+  shrink()
+```
+
+```{r, echo=T, eval=F}
+graph_dependencies()
+```
+
+![](quickstart-foobar.png)
+
+Let us make the module `foobar` and see what it returns:
+
+```{r}
+make("foobar")
+```
+
+Voilà! All the depencencies have been evaluated, injected and processed by modulr to return the expected `"foobar"`.
+
+```{r}
+lsmod()
+```
+
+# Singletons
+
+```{r, echo=FALSE, results='hide', message=FALSE}
+reset()
+```
+
+All modules are singletons in the sense that once evaluated, they always return the same cached object. This is one of the great advantages of modulr: module evaluation takes place parsimoniously, only when changes are detected or explicitely required.
+
+```{r}
+"timestamp" %provides% {
+  #' Return a string containing a timestamp.
+  format(Sys.time(), "%H:%M:%OS6")
+}
+```
+
+Successive make calls on the module will not imply its re-evaluation:
+
+```{r}
+make("timestamp")
+make("timestamp")
+```
+
+To force the re-evaluation of a module, you can use `touch`:
+
+```{r}
+touch("timestamp")
+make("timestamp")
+```
+
+Otherwise, modulr will detect any change in the module's definition and re-evaluate accordingly:
+
+```{r}
+"timestamp" %provides% {
+  #' Return a string containing a timestamp with more information.
+  format(Sys.time(), "%Y-%m-%d %H:%M:%OS6")
+}
+```
+
+```{r}
+make("timestamp")
+```
+
+# Prototypes
+
+```{r, echo=FALSE, results='hide', message=FALSE}
+reset()
+```
+
+This is a fact that all modules are singletons. Nonetheless, it is possible for a module to return a function (or closure) that itself returns a desired object. In this case, such a module fakes and behaves like a so-called prototype.
+
+```{r}
+"timestamp" %provides% {
+  function() format(Sys.time(), "%H:%M:%OS6")
+}
+```
+
+```{r}
+make("timestamp")()
+make("timestamp")()
+```
+
+It is important to emphasize that the module is still a singleton: the second make call doesn't re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called.
+
+# Lazy modules
+
+```{r, echo=FALSE, results='hide', message=FALSE}
+reset()
+```
+
+Singletons produce cached objects at make-time and prototypes produce computed objects at run-time. Lazy modules should produce cached objects at run-time. [Memoisation](https://en.wikipedia.org/wiki/Memoization) and [Hadley Wickam's memoise package](https://github.com/hadley/memoise) give an elegant solution to this requirement.
+
+To see the essence of what is happening, we decrease the verbosity of modulr and define a module `foo` that requires
+`timestamp`, defined as a singleton:
+
+```{r}
+set_verbosity(1) # messages are shown only when changes occur
+
+"timestamp" %provides% {
+  # This is a singleton.
+  message("'timestamp' is evaluated...")
+  format(Sys.time(), "%H:%M:%OS6")
+}
+
+"foo" %requires% list(
+  timestamp = "timestamp"
+) %provides% {
+  "foo"
+}
+
+make("foo")
+```
+
+In this example, `timestamp` is evaluated even though it is not explicitely used by `foo`. It just computes a timestamp, but it could be virtually very time- and/or space-consuming at make-time.
+
+Let us re-define `timestamp` as a prototype:
+
+```{r}
+"timestamp" %provides% {
+  # This is a prototype.
+  function() {
+    message("'timestamp' is evaluated...")
+    format(Sys.time(), "%H:%M:%OS6")
+  }
+}
+
+make("foo")
+```
+
+Here, the evaluation consists of defining a function that returns a timestamp, only when the function is explicitely called. Even if the computation encapsulated by the function is very time- and/or space-consuming, no evaluation of the returned function takes place at make-time.
+
+Finally, let us re-define `timestamp` as a lazy module:
+
+```{r}
+"timestamp" %provides% {
+  # This is a lazy module.
+  library(memoise)
+  memoise(
+    function() {
+      message("'timestamp' is evaluated...")
+      format(Sys.time(), "%H:%M:%OS6")
+    }
+  )
+}
+
+make("foo")
+```
+
+The `timestamp` module returns a function which will be evaluated only when explicitely called at run-time. Let us re-define `foo` in order that it uses `timestamp`.
+
+```{r}
+"foo" %requires% list(
+  timestamp = "timestamp"
+) %provides% {
+  message("It is ", timestamp())
+  "foo"
+}
+
+make("foo")
+```
+
+Here, a timestamped message is outputed. Let us force the re-evaluation of `foo`.
+
+```{r}
+touch("foo")
+make("foo")
+```
+
+The lazy version of `timestamp` is evaluated only at run-time, not at make-time; moreover, the string containing the actual timestamp is computed only once and then cached for future calls, avoiding re-evaluation.
+
+# Mixed modules
+
+It is also possible to define modules which simultaneously present the three above properties:
+
+```{r}
+"timestamp" %provides% {
+  timestamp <- function() {
+    message("'timestamp' is evaluated...")
+    format(Sys.time(), "%H:%M:%OS6")
+  }
+  list(
+    singleton = timestamp(),
+    prototype = timestamp,
+    lazy = memoise(timestamp)
+  )
+}
+
+timestamp %<=% "timestamp"
+
+timestamp$singleton
+timestamp$prototype()
+timestamp$prototype()
+timestamp$lazy()
+timestamp$lazy()
+```
+
