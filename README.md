@@ -98,7 +98,7 @@ library(modulr)
       stringsAsFactors = F)
     return(students)
   }
-#> [2015-11-07T03:19:25 CET] Defining 'data/students' ... OK
+#> [2015-11-07T11:27:28 CET] Defining 'data/students' ... OK
 ```
 
 The anatomy of this module is very simple: "data/student" is its name and the 
@@ -125,7 +125,7 @@ In parallel, let's ask Bob to provide us with a similar module.
       stringsAsFactors = F)
     return(teachers)
   }
-#> [2015-11-07T03:19:25 CET] Defining 'data/teachers' ... OK
+#> [2015-11-07T11:27:28 CET] Defining 'data/teachers' ... OK
 ```
 
 Now that we have these two modules at our disposal, let's combine them into 
@@ -142,7 +142,7 @@ another module that returns a (bad) student-teacher ratio.
     ratio <- length(unique(students$id)) / length(unique(teachers$id))
     return(ratio)
   }
-#> [2015-11-07T03:19:25 CET] Defining 'bad_stat/student_teacher_ratio' ... OK
+#> [2015-11-07T11:27:28 CET] Defining 'bad_stat/student_teacher_ratio' ... OK
 ```
 
 The `%requires%` operator allows us to specify the modules we rely on for the 
@@ -156,14 +156,14 @@ It is now time to see the DI framework in action.
 
 ```r
 bad_ratio %<=% "bad_stat/student_teacher_ratio"
-#> [2015-11-07T03:19:25 CET] Making 'bad_stat/student_teacher_ratio' ...
-#> [2015-11-07T03:19:25 CET] * Visiting and defining dependencies ...
-#> [2015-11-07T03:19:25 CET] * Constructing dependency graph ... OK
-#> [2015-11-07T03:19:25 CET] * Sorting 2 dependencies with 2 relations ... 1 layers, OK
-#> [2015-11-07T03:19:25 CET] * Evaluating new or outdated dependencies ...
-#> [2015-11-07T03:19:25 CET] ** Evaluating #1/2 (1/1): 'data/teachers' ...
-#> [2015-11-07T03:19:25 CET] ** Evaluating #2/2 (1/1): 'data/students' ...
-#> [2015-11-07T03:19:25 CET] DONE ('bad_stat/student_teacher_ratio')
+#> [2015-11-07T11:27:28 CET] Making 'bad_stat/student_teacher_ratio' ...
+#> [2015-11-07T11:27:28 CET] * Visiting and defining dependencies ...
+#> [2015-11-07T11:27:28 CET] * Constructing dependency graph ... OK
+#> [2015-11-07T11:27:28 CET] * Sorting 2 dependencies with 2 relations ... 2 layers, OK
+#> [2015-11-07T11:27:28 CET] * Evaluating new or outdated dependencies ...
+#> [2015-11-07T11:27:28 CET] ** Evaluating #1/2 (1/1): 'data/teachers' ...
+#> [2015-11-07T11:27:28 CET] ** Evaluating #2/2 (1/1): 'data/students' ...
+#> [2015-11-07T11:27:28 CET] DONE ('bad_stat/student_teacher_ratio')
 ```
 
 We say that the `%<=%` operator **makes** the module given on its 

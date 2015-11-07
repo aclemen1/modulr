@@ -179,11 +179,15 @@ graph (DAG) of the dependencies and computes a topological sort, grouped by
 independent modules into layers. 
 
 ```{r fig1, echo=F}
-graph_dependencies("bad_stat/student_teacher_ratio") %>%
-  html_print %>%
-  webshot(file = "README-fig1.png", selector = ".sankeyNetwork", delay = 2) %>%
-  resize("730x") %>%
-  shrink()
+# Do not try to produce a snapshot on Travis CI or CRAN
+if (!identical(Sys.getenv("TRAVIS"), "true") &&
+      identical(Sys.getenv("NOT_CRAN"), "true")) {
+  graph_dependencies("bad_stat/student_teacher_ratio") %>%
+    html_print %>%
+    webshot(file = "README-fig1.png", selector = ".sankeyNetwork", delay = 2) %>%
+    resize("730x") %>%
+    shrink()
+}
 ```
 
 ```{r, echo=T, eval=F}

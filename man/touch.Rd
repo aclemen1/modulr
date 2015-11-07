@@ -52,10 +52,10 @@ define("F", list(c = "C", d = "D", e = "E"),
 make()
 touch("B")
 make("F")
-graph_dependencies()
+plot_dependencies()
 }
 \seealso{
-\code{\link{.Last.name}}, \code{\link{graph_dependencies}},
+\code{\link{.Last.name}}, \code{\link{plot_dependencies}},
   \code{\link{make}}, \code{\link{module_options}},
   and \code{\link{reset}}.
 }

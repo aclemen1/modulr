@@ -1,6 +1,6 @@
-#' Graph Dependencies.
+#' Plot Dependencies.
 #'
-#' Graph the directed acyclic graph (DAG) of modules and dependencies.
+#' Plot the directed acyclic graph (DAG) of modules and dependencies.
 #'
 #' @inheritParams make
 #' @param group A character vector of module names (cf. \code{\link{define}}) to
@@ -16,15 +16,16 @@
 #' define("foobuzz", list(f = "foo", b = "buzz"), function(f, b) NULL)
 #' define("fizz", list(f1 = "foobar", f2 = "foobuz"), function(f1, f2) NULL)
 #' wait <- function() invisible(readline(prompt="Press [enter] to continue"))
-#' graph_dependencies("foobar", reserved = FALSE); wait()
-#' graph_dependencies("foobar"); wait()
-#' graph_dependencies(reserved = FALSE); wait()
-#' graph_dependencies()
+#' plot_dependencies("foobar", reserved = FALSE); wait()
+#' plot_dependencies("foobar"); wait()
+#' plot_dependencies(reserved = FALSE); wait()
+#' plot_dependencies()
 #'
+#' @aliases graph_dependencies
 #' @export
-graph_dependencies <- function(group, reserved = TRUE) {
+plot_dependencies <- function(group, reserved = TRUE) {
 
-  .message_meta("Entering graph_dependencies() ...",
+  .message_meta("Entering plot_dependencies() ...",
                 verbosity = +Inf)
 
   # nocov start
@@ -35,7 +36,7 @@ graph_dependencies <- function(group, reserved = TRUE) {
   # nocov end
 
   if (.is_called_from_within_module()) {
-    warning("graph_dependencies is called from within a module.",
+    warning("plot_dependencies is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
 
@@ -105,4 +106,10 @@ graph_dependencies <- function(group, reserved = TRUE) {
 
   invisible()
 
+}
+
+#' @export
+graph_dependencies <- function(...) {
+  .Deprecated("plot_dependencies")
+  eval(substitute(plot_dependencies(...)), envir = parent.frame(1L))
 }

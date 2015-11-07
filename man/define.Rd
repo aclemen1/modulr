@@ -203,11 +203,11 @@ define("C", list(a = "A"), function(a) NULL)
 define("D", list(a = "A", b = "B"), function(a, b) NULL)
 define("E", list(d = "D"), function(d) NULL)
 define("F", list(c = "C", d = "D", e = "E"), function(c, d, e) NULL)
-graph_dependencies()
+plot_dependencies()
 make()
 }
 \seealso{
-\code{\link{.Last.name}}, \code{\link{graph_dependencies}},
+\code{\link{.Last.name}}, \code{\link{plot_dependencies}},
   \code{\link{import_module}}, \code{\link{make}},
   \code{\link{maps_config}}, \code{\link{paths_config}}, \code{\link{reset}},
   \code{\link{touch}}, and \code{\link{undefine}}.

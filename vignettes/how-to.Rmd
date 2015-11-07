@@ -1,17 +1,17 @@
 ---
-title: "Modulr Quick-start Guide"
+title: "Modulr How-To Guide"
 author: "Alain Clément-Pavon"
 date: "`r Sys.Date()`"
 output: 
-  html_document:
+  rmarkdown::html_vignette:
     toc: true
     toc_depth: 4
-    mathjax: null
-    keep_md: yes
-    self_contained: yes
-    variant: markdown_github
+    #mathjax: null
+    #keep_md: yes
+    #self_contained: yes
+    #variant: markdown_github
 vignette: >
-  %\VignetteIndexEntry{Modulr Quick-start Guide}
+  %\VignetteIndexEntry{Modulr How-To Guide}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,13 +27,18 @@ options(width = 120)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "quickstart-"
+  fig.path = "how-to-"
 )
 ```
 
+```{r}
+rstudioapi::isAvailable()
+```
+
+
 Have you ever felt like writing [big balls of mud](https://en.wikipedia.org/wiki/Big_ball_of_mud) in R? Wouldn't it be great if such [spaghetti code](https://en.wikipedia.org/wiki/Spaghetti_code) could be simply turned into more [ravioli](https://en.wikipedia.org/wiki/Spaghetti_code#Ravioli_code) and [lasagna](https://en.wikipedia.org/wiki/Spaghetti_code#Lasagna_code) code? Give modulr a try!
 
-# Introduction
+## Introduction
 
 Technically, modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) framework for R. It allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share. 
 
@@ -86,7 +91,7 @@ result %<=% "name"
 
 The result contains the object computed and exposed by the module. Under the hood, the dependencies have been sorted and also made, and their resulting objects finally injected.
 
-# First example
+## First example
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -128,7 +133,7 @@ if (!identical(Sys.getenv("TRAVIS"), "true") &&
       identical(Sys.getenv("NOT_CRAN"), "true")) {
   graph_dependencies() %>%
     html_print %>%
-    webshot(file = "quickstart-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
+    webshot(file = "how-to-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
     resize("730x") %>%
     shrink()
 }
@@ -138,7 +143,7 @@ if (!identical(Sys.getenv("TRAVIS"), "true") &&
 graph_dependencies()
 ```
 
-![](quickstart-foobar.png)
+![](how-to-foobar.png)
 
 Let us make the module `foobar` and see what it returns:
 
@@ -152,7 +157,7 @@ Voilà! All the depencencies have been evaluated, injected and processed by modu
 lsmod()
 ```
 
-# Singletons
+## Singletons
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -194,7 +199,7 @@ Otherwise, modulr will detect any change in the module's definition and re-evalu
 make("timestamp")
 ```
 
-# Prototypes
+## Prototypes
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -215,7 +220,7 @@ make("timestamp")()
 
 It is important to emphasize that the module is still a singleton: the second make call doesn't re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called.
 
-# Lazy modules
+## Lazy modules
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -301,7 +306,7 @@ make("foo")
 
 The lazy version of `timestamp` is evaluated only at run-time, not at make-time; moreover, the string containing the actual timestamp is computed only once and then cached for future calls, avoiding re-evaluation.
 
-# Mixed modules
+## Mixed modules
 
 It is also possible to define modules which simultaneously present the three above properties:
 

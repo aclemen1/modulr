@@ -1,4 +1,4 @@
-context("graph")
+context("plot")
 
 test_that("correct Sankey graph is returned for dependent modules", {
   if (!requireNamespace("networkD3", quietly = TRUE))
@@ -12,13 +12,13 @@ test_that("correct Sankey graph is returned for dependent modules", {
   define("module_layer3_1", list("module_layer2_1", "module_layer1_3"),
          function(m1, m2) NULL)
 
-  graph_1 <- graph_dependencies("module_layer3_1")
+  graph_1 <- plot_dependencies("module_layer3_1")
 
   expect_equal(
     graph_1$x[c("links", "nodes")],
     structure(list(links = structure(list(source = c(0, 1, 2, 3), target = c(2, 2, 4, 4), value = c(1, 1, 1, 1)), .Names = c("source", "target", "value"), row.names = c(NA, -4L), class = "data.frame"), nodes = structure(list(name = structure(c(1L, 2L, 4L, 3L, 5L), .Label = c("module_layer1_1", "module_layer1_2", "module_layer1_3", "module_layer2_1", "module_layer3_1"), class = "factor")), .Names = "name", row.names = c(NA, -5L), class = "data.frame")), .Names = c("links", "nodes"))) # Exclude Linting
 
-  graph_2 <- graph_dependencies("module_layer2_1")
+  graph_2 <- plot_dependencies("module_layer2_1")
 
   expect_equal(
     graph_2$x[c("links", "nodes")],
@@ -38,9 +38,9 @@ test_that("correct Sankey graph is returned for the whole register", {
   define("module_layer3_1", list("module_layer2_1", "module_layer1_3"),
          function(m1, m2) NULL)
 
-  expect_equal(graph_dependencies(), graph_dependencies("module_layer3_1"))
-  expect_equal(graph_dependencies(reserved = FALSE),
-               graph_dependencies("module_layer3_1", reserved = FALSE))
+  expect_equal(plot_dependencies(), plot_dependencies("module_layer3_1"))
+  expect_equal(plot_dependencies(reserved = FALSE),
+               plot_dependencies("module_layer3_1", reserved = FALSE))
 
 })
 
@@ -50,15 +50,15 @@ test_that("an error message is raised for an undefined module name", {
   reset()
   define("module_layer1_1", NULL, function() NULL)
 
-  expect_error(graph_dependencies("undefined_module"))
+  expect_error(plot_dependencies("undefined_module"))
 })
 
-test_that("graph_dependencies calls are warned from within a module", {
+test_that("plot_dependencies calls are warned from within a module", {
   if (!requireNamespace("networkD3", quietly = TRUE))
     skip("networkD3 not installed")
   reset()
   define("module", NULL, function() {
-    graph_dependencies()
+    plot_dependencies()
   })
   expect_warning(make("module"))
 })

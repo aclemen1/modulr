@@ -152,7 +152,7 @@ define("F", list(c = "C", d = "D", e = "E"),
 make()
 define("B", NULL, function() "(B')")
 make("F")
-graph_dependencies()
+plot_dependencies()
 
 reset()
 tmp_dir <- tempfile("modulr_")
@@ -180,7 +180,7 @@ touch("modulr/vault")
 make_all()}
 }
 \seealso{
-\code{\link{.Last.name}}, \code{\link{graph_dependencies}},
+\code{\link{.Last.name}}, \code{\link{plot_dependencies}},
   \code{\link{import_module}}, \code{\link{make}},
   \code{\link{maps_config}}, \code{\link{paths_config}}, \code{\link{reset}},
   and \code{\link{touch}}.

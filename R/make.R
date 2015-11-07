@@ -61,7 +61,7 @@
 #'  reset, or perform any other operation from within a module definition that
 #'  may alterate the internal state of modulr.
 #'
-#' @seealso \code{\link{.Last.name}}, \code{\link{graph_dependencies}},
+#' @seealso \code{\link{.Last.name}}, \code{\link{plot_dependencies}},
 #'   \code{\link{import_module}}, \code{\link{make}},
 #'   \code{\link{maps_config}}, \code{\link{paths_config}}, \code{\link{reset}},
 #'   and \code{\link{touch}}.
@@ -113,7 +113,7 @@
 #' make()
 #' define("B", NULL, function() "(B')")
 #' make("F")
-#' graph_dependencies()
+#' plot_dependencies()
 #'
 #' reset()
 #' tmp_dir <- tempfile("modulr_")
@@ -197,10 +197,15 @@ make <- function(name = .Last.name, ...) {
               layers_count <- length(layers)
 
               if(deps_count > 1 && layers_count > 1 &&
-                   2 <= verbosity_level)
-                message(sprintf("%d layers, ", layers_count - 1),
-                        appendLF = FALSE)
-
+                   2 <= verbosity_level) {
+                message(
+                  if (layers_count == 2) {
+                    "1 layer, "
+                  } else {
+                    sprintf("%d layers, ", layers_count - 1)
+                  },
+                  appendLF = FALSE)
+              }
             },
         ok = TRUE, verbosity = 2)
     }
@@ -492,7 +497,7 @@ make_all_tests <- function(...) {
 #'  reset, or perform any other operation from within a module definition that
 #'  may alterate the internal state of modulr.
 #'
-#' @seealso \code{\link{.Last.name}}, \code{\link{graph_dependencies}},
+#' @seealso \code{\link{.Last.name}}, \code{\link{plot_dependencies}},
 #'   \code{\link{make}}, \code{\link{module_options}},
 #'   and \code{\link{reset}}.
 #'
@@ -515,7 +520,7 @@ make_all_tests <- function(...) {
 #' make()
 #' touch("B")
 #' make("F")
-#' graph_dependencies()
+#' plot_dependencies()
 #'
 #' @export
 touch <- function(name = .Last.name) {
