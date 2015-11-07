@@ -6,6 +6,7 @@ warnings_are_errors: false
 r_github_packages:
   - hadley/assertthat
   - hadley/testthat
+  - wch/webshot
   - jimhester/covr
   - jimhester/lintr
 
