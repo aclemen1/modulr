@@ -1,3 +1,4 @@
+# parse the docstring of a function
 .docstring <- function(fun) {
 
   assert_that(is.function(fun))
@@ -64,20 +65,20 @@
 #'   \code{\link{reset}}.
 #'
 #' @examples
-#' define("foo", NULL, function() {
+#' define("foo", NULL, {
 #'  #' # Info
 #'  #' This is a docstring for `foo`.
 #' })
-#' info("foo")
+#' print_info("foo")
 #'
 #' \dontrun{
 #' tmp <- tempfile(fileext = ".html")
 #' cat((knitr::knit2html(text = info("foo"))), file = tmp)
 #' if(interactive()) rstudio::viewer(tmp)
 #' Sys.sleep(1); unlink(tmp)}
-#' @aliases docstring
+#' @aliases docstring info
 #' @export
-info <- function(name = .Last.name, load = TRUE) {
+print_info <- function(name = .Last.name, load = TRUE) {
 
   assert_that(
     .is_conform(name),
@@ -101,3 +102,7 @@ info <- function(name = .Last.name, load = TRUE) {
 
   invisible(docstring)
 }
+
+#' @rdname print_info
+#' @export
+info <- print_info

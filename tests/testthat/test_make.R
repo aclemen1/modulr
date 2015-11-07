@@ -396,3 +396,13 @@ test_that("make_tests fails on malformed tests", {
 
   expect_error(make_tests())
 })
+
+test_that("make outputs a correct layer message", {
+  reset()
+  define("foo", NULL, NULL)
+  define("bar", NULL, NULL)
+  define("foobar", list(foo = "foo", bar = "bar"), NULL)
+  expect_message(make("foobar"), "1 layer,")
+  define("super", list(foobar = "foobar"), NULL)
+  expect_message(make("super"), "2 layers,")
+})

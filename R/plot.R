@@ -109,7 +109,9 @@ plot_dependencies <- function(group, reserved = TRUE) {
 }
 
 #' @export
+# nocov start
 graph_dependencies <- function(...) {
   .Deprecated("plot_dependencies")
   eval(substitute(plot_dependencies(...)), envir = parent.frame(1L))
 }
+# nocov end
