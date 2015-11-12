@@ -587,6 +587,7 @@ test_that("touch updates the register", {
 
   expect_null(module$instance)
   expect_false(module$instanciated)
+  expect_null(module$digest)
   expect_less_than(module$timestamp, Sys.time())
   expect_more_than(module$timestamp, timestamp)
 

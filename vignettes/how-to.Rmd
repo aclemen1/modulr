@@ -31,14 +31,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r}
-rstudioapi::isAvailable()
-```
-
-
 Have you ever felt like writing [big balls of mud](https://en.wikipedia.org/wiki/Big_ball_of_mud) in R? Wouldn't it be great if such [spaghetti code](https://en.wikipedia.org/wiki/Spaghetti_code) could be simply turned into more [ravioli](https://en.wikipedia.org/wiki/Spaghetti_code#Ravioli_code) and [lasagna](https://en.wikipedia.org/wiki/Spaghetti_code#Lasagna_code) code? Give modulr a try!
 
-## Introduction
+# What is modulr?
 
 Technically, modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) framework for R. It allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share. 
 
@@ -91,7 +86,7 @@ result %<=% "name"
 
 The result contains the object computed and exposed by the module. Under the hood, the dependencies have been sorted and also made, and their resulting objects finally injected.
 
-## First example
+# A first, minimal example
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -157,7 +152,7 @@ Voilà! All the depencencies have been evaluated, injected and processed by modu
 lsmod()
 ```
 
-## Singletons
+# All modules are singletons
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -199,7 +194,7 @@ Otherwise, modulr will detect any change in the module's definition and re-evalu
 make("timestamp")
 ```
 
-## Prototypes
+# Modules as prototypes
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -220,7 +215,7 @@ make("timestamp")()
 
 It is important to emphasize that the module is still a singleton: the second make call doesn't re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called.
 
-## Lazy modules
+# Lazy modules
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -228,8 +223,7 @@ reset()
 
 Singletons produce cached objects at make-time and prototypes produce computed objects at run-time. Lazy modules should produce cached objects at run-time. [Memoisation](https://en.wikipedia.org/wiki/Memoization) and [Hadley Wickam's memoise package](https://github.com/hadley/memoise) give an elegant solution to this requirement.
 
-To see the essence of what is happening, we decrease the verbosity of modulr and define a module `foo` that requires
-`timestamp`, defined as a singleton:
+To see the essence of what is happening, we decrease the verbosity of modulr and define `foo` requiring `timestamp`, defined as a singleton at first:
 
 ```{r}
 set_verbosity(1) # messages are shown only when changes occur
@@ -306,7 +300,7 @@ make("foo")
 
 The lazy version of `timestamp` is evaluated only at run-time, not at make-time; moreover, the string containing the actual timestamp is computed only once and then cached for future calls, avoiding re-evaluation.
 
-## Mixed modules
+# Mixed modules
 
 It is also possible to define modules which simultaneously present the three above properties:
 
@@ -331,4 +325,18 @@ timestamp$prototype()
 timestamp$lazy()
 timestamp$lazy()
 ```
+
+# Organizing modules
+
+# Debugging and testing modules
+
+# Sharing modules
+
+# Frequently asked questions
+
+## Is it possible to encrypt sensitive data within a module?
+
+## How can I deal with various versions of a module?
+
+## Is it possible to define a module dynamically?
 

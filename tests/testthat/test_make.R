@@ -406,3 +406,20 @@ test_that("make outputs a correct layer message", {
   define("super", list(foobar = "foobar"), NULL)
   expect_message(make("super"), "2 layers,")
 })
+
+test_that("make keeps the provider environment", {
+  reset()
+  foo <- "foo"
+  provider <- function() foo
+  define("foo", NULL, provider)
+  expect_true(isTRUE(make("foo") == "foo"))
+  rm(foo)
+
+  reset()
+  provider <- function() {
+    foo <- "foo"
+    function() foo
+  }
+  define("foo", NULL, provider)
+  expect_equal(make("foo")(), "foo")
+})

@@ -343,6 +343,9 @@ define <- function(name, dependencies, provider) {
 
   timestamp <- Sys.time()
 
+  environment(provider) <- new.env(parent = environment(provider))
+  environment(provider)$.__name__ <- name
+
   if (.is_undefined(name)) {
 
     .message_meta(
@@ -368,7 +371,7 @@ define <- function(name, dependencies, provider) {
 
     previous_digest <- modulr_env$register[[c(name, "digest")]]
     digest <- .digest(dependencies, provider)
-    if (digest != previous_digest) {
+    if (!identical(digest, previous_digest)) {
       .message_meta(sprintf("Re-defining '%s'", name), {
 
         modulr_env$register[[c(name, "dependencies")]] <- dependencies

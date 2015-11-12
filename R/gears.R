@@ -14,7 +14,7 @@
 
   provider <- get_provider(name, load = FALSE)
   if (!is.null(base) &&
-       identical(provider, get_provider(base))) {
+       identical(provider, get_provider(base), ignore.environment = TRUE)) {
     provider_string <- sprintf("get_provider(\"%s\")", base)
   } else {
     provider_string <- .function_to_string(provider)

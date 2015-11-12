@@ -200,9 +200,9 @@ make <- function(name = .Last.name, ...) {
                    2 <= verbosity_level) {
                 message(
                   if (layers_count == 2) {
-                    "1 layer, "
+                    "on 1 layer, "
                   } else {
-                    sprintf("%d layers, ", layers_count - 1)
+                    sprintf("on %d layers, ", layers_count - 1)
                   },
                   appendLF = FALSE)
               }
@@ -212,7 +212,7 @@ make <- function(name = .Last.name, ...) {
 
     .message_meta(
       if (deps_count > 1)
-        "Evaluating new or outdated dependencies ...", {
+        "Evaluating new and outdated dependencies ...", {
 
           digest <- get_digest(name)
           nodes <- unlist(layers, use.names = FALSE)
@@ -245,60 +245,56 @@ make <- function(name = .Last.name, ...) {
 
                 .message_meta(
                   if (eval_counter != nodes_count)
-                    sprintf("Evaluating #%d/%d (%d/%d): '%s' ...",
-                            eval_counter, nodes_count - 1,
-                            layer_idx, layers_count - 1,
-                            ordered_name), {
+                    sprintf(
+                      "Evaluating #%d/%d (layer #%d/%d): '%s' ...",
+                      eval_counter, nodes_count - 1,
+                      layer_idx, layers_count - 1,
+                      ordered_name), {
 
-                              timestamp <- Sys.time()
+                        timestamp <- Sys.time()
 
-                              env <- new.env()
+                        args <- list()
 
-                              env$.__name__ <- ordered_name
+                        if (length(modulr_env$register[[
+                          c(ordered_name, "dependencies")]]) > 0) {
 
-                              args <- list()
-
-                              if (length(modulr_env$register[[
-                                c(ordered_name, "dependencies")]]) > 0) {
-
-                                args <-
-                                  lapply(
-                                    modulr_env$register[[
-                                      c(ordered_name, "dependencies")]],
-                                    function(name) {
-                                      modulr_env$register[[c(
-                                        .resolve_mapping(name, ordered_name),
-                                        "instance", "value")]]
-                                    }
-                                  )
-
+                          args <-
+                            lapply(
+                              modulr_env$register[[
+                                c(ordered_name, "dependencies")]],
+                              function(name) {
+                                modulr_env$register[[c(
+                                  .resolve_mapping(name, ordered_name),
+                                  "instance", "value")]]
                               }
+                            )
 
-                              provider <-
-                                modulr_env$register[[
-                                  c(ordered_name, "provider")]]
+                        }
 
-                              environment(provider) <- env
+                        provider <-
+                          modulr_env$register[[
+                            c(ordered_name, "provider")]]
 
-                              instance <- withVisible(do.call(
-                                provider,
-                                args = args, quote = TRUE, envir = env))
+                        instance <- withVisible(do.call(
+                          provider,
+                          args = args, quote = TRUE,
+                          envir = new.env(parent = baseenv())))
 
-                              modulr_env$register[[
-                                c(ordered_name, "instance")]] <- instance
-                              modulr_env$register[[
-                                c(ordered_name, "duration")]] <-
-                                as.numeric(Sys.time() - timestamp)
-                              modulr_env$register[[
-                                c(ordered_name, "instanciated")]] <- TRUE
-                              modulr_env$register[[
-                                c(ordered_name, "first_instance")]] <- FALSE
-                              modulr_env$register[[
-                                c(ordered_name, "timestamp")]] <- Sys.time()
+                        modulr_env$register[[
+                          c(ordered_name, "instance")]] <- instance
+                        modulr_env$register[[
+                          c(ordered_name, "duration")]] <-
+                          as.numeric(Sys.time() - timestamp)
+                        modulr_env$register[[
+                          c(ordered_name, "instanciated")]] <- TRUE
+                        modulr_env$register[[
+                          c(ordered_name, "first_instance")]] <- FALSE
+                        modulr_env$register[[
+                          c(ordered_name, "timestamp")]] <- Sys.time()
 
-                              gc(verbose = FALSE)
+                        gc(verbose = FALSE)
 
-                            },
+                      },
                   verbosity = 1)
 
               }
@@ -539,6 +535,7 @@ touch <- function(name = .Last.name) {
 
     modulr_env$register[[c(name, "instance")]] <- NULL
     modulr_env$register[[c(name, "instanciated")]] <- F
+    modulr_env$register[[c(name, "digest")]] <- NULL
     modulr_env$register[[c(name, "timestamp")]] <- Sys.time()
 
     if (.is_regular(name))

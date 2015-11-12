@@ -57,4 +57,98 @@ test_that("$message_stop outputs the module name", {
   expect_error(module(), regexp = "module_foobar")
 })
 
+test_that("options_provider accepts an empty list of arguments", {
+  provider <- options_provider()
+  expect_true(is.function(provider))
+  expect_true(is.environment(provider()))
+})
+
+test_that("options_provider accepts a named list of arguments", {
+  provider <- options_provider(foo = "foo", bar = "bar")
+  env <- provider()
+  expect_true(is.function(provider))
+  expect_true(is.environment(env))
+  expect_equal(env$foo, "foo")
+  expect_equal(env$bar, "bar")
+  expect_equal(ls(env, sorted = TRUE, all.names = TRUE), sort(c("foo", "bar")))
+})
+
+test_that("options_provider doesn't accept non-named arguments", {
+  expect_error(options_provider("foo"))
+  expect_error(options_provider("foo", "bar"))
+  expect_error(options_provider(foo = "foo", "bar"))
+})
+
+test_that("`%provides_options%` calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    "foo" %provides_options% list(bar = "bar")
+  })
+  expect_warning(make("module"))
+})
+
+test_that("`%provides_options%` is a syntactic sugar", {
+  reset()
+  "foo" %provides_options% NULL
+  foo <- make("foo")
+  expect_true(is.environment(foo))
+  expect_equal(ls(foo, sorted = TRUE, all.names = TRUE), character(0))
+
+  reset()
+  "foo" %provides_options% list()
+  foo <- make("foo")
+  expect_true(is.environment(foo))
+  expect_equal(ls(foo, sorted = TRUE, all.names = TRUE), character(0))
+
+  reset()
+  "foo" %provides_options% c()
+  foo <- make("foo")
+  expect_true(is.environment(foo))
+  expect_equal(ls(foo, sorted = TRUE, all.names = TRUE), character(0))
+
+  reset()
+  "foo" %provides_options% list(a=1, b="beta")
+  foo <- make("foo")
+  expect_true(is.environment(foo))
+  expect_equal(foo$a, 1)
+  expect_equal(foo$b, "beta")
+  expect_equal(ls(foo, sorted = TRUE, all.names = TRUE), sort(c("a", "b")))
+
+  reset()
+  "foo" %provides_options% c(a = 1, b = 2)
+  foo <- make("foo")
+  expect_true(is.environment(foo))
+  expect_equal(foo$a, 1)
+  expect_equal(foo$b, 2)
+  expect_equal(ls(foo, sorted = TRUE, all.names = TRUE), sort(c("a", "b")))
+
+  reset()
+  expect_error("foo" %provides_options% list(a=1, "beta"))
+
+  reset()
+  expect_error("foo" %provides_options% c(a=1, 2))
+})
+
+test_that("`%provides_options%` acts as a module option", {
+  reset()
+  "foo/config" %provides_options% list(opt_1 = "foo", opt_2 = "bar")
+  "foo" %requires% list(config = "foo/config") %provides% {
+    function() {
+      paste0(config$opt_1, config$opt_2)
+    }
+  }
+  foo <- make("foo")
+  expect_equal(foo(), "foobar")
+  config <- make("foo/config")
+  config$opt_2 <- "BAR"
+  expect_equal(foo(), "fooBAR")
+  "foo/config" %provides_options% list(opt_1 = "foo", opt_2 = "bar")
+  foo <- make("foo")
+  expect_equal(foo(), "fooBAR")
+  touch("foo/config")
+  "foo/config" %provides_options% list(opt_1 = "foo", opt_2 = "bar")
+  foo <- make("foo")
+  expect_equal(foo(), "foobar")
+})
+
 suppressMessages(reset())

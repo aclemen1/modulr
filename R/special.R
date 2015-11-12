@@ -193,3 +193,105 @@ NULL
   })
 
 }
+
+#' Module Options Provider
+#'
+#' Construct a module provider intended for defining modules that can be used as
+#' general purpose options and configuration containers.
+#'
+#' @param ... Named arguments used as default options. If void, no default
+#'   option is set.
+#'
+#' @return A module provider which exposes an R environment. The default options
+#'   arguments, if any, are used to assign the values to their corresponding
+#'   names in the returned environment.
+#'
+#' @section Syntactic Sugars:
+#'  \preformatted{name \%provides_options\% options}
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{\%<=\%}}, \code{\link{define}}, \code{\link{make}},
+#'   \code{\link{\%provides\%}}, \code{\link{\%requires\%}},
+#'   \code{\link{reset}}, and \code{\link{touch}}.
+#'
+#' @examples
+#' reset()
+#'
+#' "foo/config" %provides% options_provider(upper = FALSE)
+#'
+#' "foo" %requires% list(config = "foo/config") %provides% {
+#'   function() casefold("foo", upper = config$upper)
+#' }
+#'
+#' foo %<=% "foo"
+#' foo()
+#'
+#' config %<=% "foo/config"
+#' config$upper <- TRUE
+#' foo()
+#'
+#' "foo/config" %provides_options% list(upper = FALSE)
+#' foo %<=% "foo"
+#' foo()
+#'
+#' touch("foo/config")
+#' "foo/config" %provides_options% list(upper = FALSE)
+#' foo %<=% "foo"
+#' foo()
+#'
+#' @aliases %provides_options%
+#' @export
+# TODO: tester
+# TODO: documenter
+options_provider <- function(...) {
+
+  args <- list(...)
+
+  assert_that(
+    length(args) == 0 || (
+      !is.null(names(args)) && all(names(args) != "")),
+    msg = "arguments are not all named.")
+
+  options <- new.env(parent = emptyenv())
+
+  vapply(names(args), function(name) {
+    options[[name]] <- args[[name]]
+    NA
+  },
+  FUN.VALUE = NA)
+
+  function() {
+    #' Options module which exposes an R environment. See ?options_provider.
+    return(options)
+  }
+
+}
+
+#' @export
+`%provides_options%` <- function(lhs, options) {
+
+  if (.is_called_from_within_module()) {
+    warning("`%provides_options%` is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  assert_that(
+    assertthat::is.string(lhs),
+    msg = paste0("left-hand side of `%provides_options%` ",
+                 "is not a module name.")
+  )
+
+  assert_that(
+    is.list(options) || is.vector(options) || is.null(options),
+    msg = "right-hand side of `%provides_options%` is not a list or a vector.")
+
+  if(is.null(options)) options <- list()
+
+  eval(substitute(
+    `%provides%`(lhs, do.call(options_provider, args = as.list(options)))),
+    envir = parent.frame(1L))
+}
