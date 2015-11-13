@@ -245,27 +245,28 @@ NULL
 #'
 #' @aliases %provides_options%
 #' @export
-# TODO: tester
-# TODO: documenter
 options_provider <- function(...) {
 
-  args <- list(...)
-
-  assert_that(
-    length(args) == 0 || (
-      !is.null(names(args)) && all(names(args) != "")),
-    msg = "arguments are not all named.")
-
-  options <- new.env(parent = emptyenv())
-
-  vapply(names(args), function(name) {
-    options[[name]] <- args[[name]]
-    NA
-  },
-  FUN.VALUE = NA)
+  args <- substitute(as.list(c(...))) # Exclude Linting
 
   function() {
     #' Options module which exposes an R environment. See ?options_provider.
+
+    args <- eval(args, envir = environment())
+
+    assert_that(
+      length(args) == 0 || (
+        !is.null(names(args)) && all(names(args) != "")),
+      msg = "arguments are not all named.")
+
+    options <- new.env(parent = emptyenv())
+
+    vapply(names(args), function(name) {
+      options[[name]] <- args[[name]]
+      NA
+    },
+    FUN.VALUE = NA)
+
     return(options)
   }
 
@@ -279,19 +280,7 @@ options_provider <- function(...) {
             call. = FALSE, immediate. = TRUE)
   }
 
-  assert_that(
-    assertthat::is.string(lhs),
-    msg = paste0("left-hand side of `%provides_options%` ",
-                 "is not a module name.")
-  )
-
-  assert_that(
-    is.list(options) || is.vector(options) || is.null(options),
-    msg = "right-hand side of `%provides_options%` is not a list or a vector.")
-
-  if(is.null(options)) options <- list()
-
   eval(substitute(
-    `%provides%`(lhs, do.call(options_provider, args = as.list(options)))),
+    `%provides%`(lhs, options_provider(options))),
     envir = parent.frame(1L))
 }

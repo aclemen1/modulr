@@ -73,10 +73,10 @@ test_that("options_provider accepts a named list of arguments", {
   expect_equal(ls(env, sorted = TRUE, all.names = TRUE), sort(c("foo", "bar")))
 })
 
-test_that("options_provider doesn't accept non-named arguments", {
-  expect_error(options_provider("foo"))
-  expect_error(options_provider("foo", "bar"))
-  expect_error(options_provider(foo = "foo", "bar"))
+test_that("options_provider'provider doesn't accept non-named arguments", {
+  expect_error(options_provider("foo")())
+  expect_error(options_provider("foo", "bar")())
+  expect_error(options_provider(foo = "foo", "bar")())
 })
 
 test_that("`%provides_options%` calls are warned from within a module", {
@@ -123,10 +123,12 @@ test_that("`%provides_options%` is a syntactic sugar", {
   expect_equal(ls(foo, sorted = TRUE, all.names = TRUE), sort(c("a", "b")))
 
   reset()
-  expect_error("foo" %provides_options% list(a=1, "beta"))
+  "foo" %provides_options% list(a=1, "beta")
+  expect_error(make("foo"))
 
   reset()
-  expect_error("foo" %provides_options% c(a=1, 2))
+  "foo" %provides_options% c(a=1, 2)
+  expect_error(make("foo"))
 })
 
 test_that("`%provides_options%` acts as a module option", {
@@ -149,6 +151,22 @@ test_that("`%provides_options%` acts as a module option", {
   "foo/config" %provides_options% list(opt_1 = "foo", opt_2 = "bar")
   foo <- make("foo")
   expect_equal(foo(), "foobar")
+})
+
+test_that("options see dependencies, if any", {
+  reset()
+  "foo" %provides% "FOO"
+  "foobar" %requires% list(foo = "foo") %provides% options_provider(
+    foobar = paste0(foo, "BAR"))
+  foobar <- make("foobar")
+  expect_equal(foobar$foobar, "FOOBAR")
+
+  reset()
+  "foo" %provides% "FOO"
+  "foobar" %requires% list(foo = "foo") %provides_options% list(
+    foobar = paste0(foo, "BAR"))
+  foobar <- make("foobar")
+  expect_equal(foobar$foobar, "FOOBAR")
 })
 
 suppressMessages(reset())
