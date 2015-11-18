@@ -250,3 +250,69 @@ test_that("load_all_modules calls are warned from within a module", {
 
   expect_warning(make("module"))
 })
+
+test_that("load_module doesn't recurse infinitely when sourced", {
+  reset()
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  name <- tools::file_path_sans_ext(basename(file))
+  path <- dirname(file)
+
+  test_env <- new.env()
+  assign("test_env", test_env, globalenv())
+  on.exit(rm(list = "test_env", pos = globalenv()))
+  test_env$deep <- 1
+  module_text <-
+    sprintf(
+      paste(
+        "define('%s', NULL, function() NULL)",
+        "env <- get('test_env', envir = globalenv())",
+        "if(env$deep > 3) stop()",
+        "env$deep <- env$deep + 1",
+        "load_module()", sep = "\n"),
+      name)
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+
+  root_config$set(path)
+
+  source(file)
+
+  expect_lte(test_env$deep, 3)
+
+  expect_true(.is_defined(name))
+})
+
+test_that("load_module doesn't recurse infinitely when called", {
+  reset()
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  name <- tools::file_path_sans_ext(basename(file))
+  path <- dirname(file)
+
+  test_env <- new.env()
+  assign("test_env", test_env, globalenv())
+  on.exit(rm(list = "test_env", pos = globalenv()))
+  test_env$deep <- 1
+  module_text <-
+    sprintf(
+      paste(
+        "define('%s', NULL, function() NULL)",
+        "env <- get('test_env', envir = globalenv())",
+        "if(env$deep > 2) stop()",
+        "env$deep <- env$deep + 1",
+        "load_module()", sep = "\n"),
+      name)
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+
+  root_config$set(path)
+
+  module_file <- load_module(name)
+
+  expect_lte(test_env$deep, 2)
+
+  expect_equal(module_file, file)
+
+  expect_true(.is_defined(name))
+})

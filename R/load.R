@@ -86,6 +86,12 @@ load_module <- function(name = .Last.name) {
             call. = FALSE, immediate. = TRUE)
   }
 
+  if (.is_nested_load()) {
+    warning("load_module calls are nested. Stopping recursion.",
+            call. = FALSE, immediate. = TRUE)
+    return(invisible(NULL))
+  }
+
   if (.is_regular(name)) {
 
     path <- .resolve_path(name)

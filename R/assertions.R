@@ -78,6 +78,15 @@ assertthat::on_failure(.is_defined_regular) <- function(call, env) {
          mode = "character", envir = parent.frame(2L)))
 }
 
+# Test if a load is nested
+.is_nested_load <- function() {
+  any(
+    vapply(
+      seq_along(sys.frames())[-length(sys.frames())],
+      function(x) identical(sys.function(x), .load_module),
+      FUN.VALUE = T))
+}
+
 # Test if object is a braced expression
 .is_braced_expression <- function(object) {
   is.call(object) && object[[1]] == as.name("{")

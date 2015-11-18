@@ -154,6 +154,12 @@ make <- function(name = .Last.name, ...) {
             call. = FALSE, immediate. = TRUE)
   }
 
+  if (.is_nested_load()) {
+    warning("make calls are nested. Stopping recursion.",
+            call. = FALSE, immediate. = TRUE)
+    return(invisible(NULL))
+  }
+
   verbosity_level <- get_verbosity()
 
   .message_meta(sprintf("Making '%s' ...", name), {
