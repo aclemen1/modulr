@@ -122,7 +122,7 @@ NULL
       # Deprecated and kept for backward compatibility.
       get_module_options = function() {
 
-        suppressWarnings(.Deprecated(msg = paste0(
+        suppressWarnings(.deprecated(msg = paste0(
           "Module options are deprecated. As a replacement, you can add a ",
           "dependency with a dedicated module containing an appropriate ",
           "mechanism for your options and configurations settings. "
@@ -150,7 +150,8 @@ NULL
       # Deprecated and kept for backward compatibility.
       # nocov start
       resolve_path = function(...) {
-        .Deprecated("$get_dirname", old = "$resolve_path")
+        .deprecated("$get_dirname", old = "$resolve_path",
+                    msg = get_breadcrumbs(verbose = FALSE))
         eval(.resolve_path(...), envir = parent.frame(1L))
       },
       # nocov end
@@ -159,7 +160,7 @@ NULL
       # Deprecated and kept for backward compatibility.
       # nocov start
       resolve_mapping = function(...) {
-        .Deprecated(old = "$resolve_mapping")
+        .deprecated(old = "$resolve_mapping")
         eval(.resolve_mapping(...), envir = parent.frame(1L))
       },
       # nocov end

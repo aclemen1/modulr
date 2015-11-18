@@ -179,7 +179,7 @@ get_configs <- function() get("config", pos = modulr_env)
 #' @export
 module_options <- function(name = .Last.name) {
 
-  if (3 <= get_verbosity()) .Deprecated(msg = paste0(
+  if (3 <= get_verbosity()) .deprecated(msg = paste0(
     "Module options are deprecated. As a replacement, you can add a ",
     "dependency with a dedicated module containing an appropriate mechanism ",
     "for your options and configurations settings. "

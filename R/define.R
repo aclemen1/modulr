@@ -468,7 +468,7 @@ get_provider <- function(name = .Last.name, load = FALSE) {
 #' @export
 # nocov start
 get_factory <- function(...) {
-  .Deprecated("get_provider")
+  .deprecated("get_provider")
   eval(substitute(get_provider(...)), envir = parent.frame(1L))
 }
 # nocov end

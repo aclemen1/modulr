@@ -31,6 +31,26 @@ modulr_env <- new.env(parent = emptyenv())
   isTRUE(file.info(file)[1, "isdir"])
 }
 
+.deprecated <- function(new, package = NULL, msg,
+                        old = as.character(sys.call(sys.parent()))[1L]) {
+  bc <- get_breadcrumbs(verbose = FALSE)
+  if (is.null(bc)) {
+    .Deprecated(new = new, package = package, msg = msg, old = old)
+  } else {
+    .Deprecated(
+      new = new, package = package,
+      msg = sprintf(
+        paste(
+          "modulr breadcrumbs: %s",
+          "'graph_dependencies' is deprecated.",
+          "Use 'plot_dependencies' instead.",
+          "See help(\"Deprecated\").",
+          sep = "\n"),
+        paste(sprintf("'%s'", bc), collapse = " > ")),
+      old = old)
+  }
+}
+
 #' @name .Last.name
 #' @aliases .Last.name
 #' @rdname last_name
