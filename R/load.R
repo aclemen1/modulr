@@ -87,7 +87,7 @@ load_module <- function(name = .Last.name) {
   }
 
   if (.is_nested_load()) {
-    warning("load_module calls are nested. Stopping recursion.",
+    warning("loading calls are nested. Stopping recursion.",
             call. = FALSE, immediate. = TRUE)
     return(invisible(NULL))
   }

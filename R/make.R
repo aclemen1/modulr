@@ -155,7 +155,7 @@ make <- function(name = .Last.name, ...) {
   }
 
   if (.is_nested_load()) {
-    warning("make calls are nested. Stopping recursion.",
+    warning("loading calls are nested. Stopping recursion.",
             call. = FALSE, immediate. = TRUE)
     return(invisible(NULL))
   }
