@@ -31,24 +31,32 @@ modulr_env <- new.env(parent = emptyenv())
   isTRUE(file.info(file)[1, "isdir"])
 }
 
-.deprecated <- function(new, package = NULL, msg,
-                        old = as.character(sys.call(sys.parent()))[1L]) {
-  bc <- get_breadcrumbs(verbose = FALSE)
-  if (is.null(bc)) {
-    .Deprecated(new = new, package = package, msg = msg, old = old)
-  } else {
-    .Deprecated(
-      new = new, package = package,
-      msg = sprintf(
-        paste(
-          "modulr breadcrumbs: %s",
-          "'graph_dependencies' is deprecated.",
-          "Use 'plot_dependencies' instead.",
-          "See help(\"Deprecated\").",
-          sep = "\n"),
-        paste(sprintf("'%s'", bc), collapse = " > ")),
-      old = old)
+.deprecated <- function(
+  new, package = NULL, msg,
+  old = as.character(sys.call(sys.parent()))[1L],
+  immediate. = F) {
+  msg <- if (missing(msg)) {
+    msg <- c()
+    bc <- get_breadcrumbs(verbose = FALSE)
+    if(!is.null(bc))
+      msg <- gettextf("modulr breadcrumbs: %s",
+                      paste(gettextf("'%s'", bc), collapse = " > "))
+    msg <- c(msg, gettextf("'%s' is deprecated.\n", old))
+    if (!missing(new))
+      msg <- c(msg, gettextf("Use '%s' instead.\n", new))
+    c(
+      msg,
+      if (!is.null(package))
+        gettextf("See help(\"Deprecated\") and help(\"%s-deprecated\").",
+                 package)
+      else
+        gettext("See help(\"Deprecated\")"))
   }
+  else as.character(msg)
+  warning(
+    paste(msg, collapse = ""),
+    call. = FALSE, domain = NA,
+    immediate. = immediate.)
 }
 
 #' @name .Last.name
