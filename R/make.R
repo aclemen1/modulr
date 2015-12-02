@@ -298,8 +298,6 @@ make <- function(name = .Last.name, ...) {
                         modulr_env$register[[
                           c(ordered_name, "timestamp")]] <- Sys.time()
 
-                        gc(verbose = FALSE)
-
                       },
                   verbosity = 1)
 
@@ -315,6 +313,8 @@ make <- function(name = .Last.name, ...) {
 
   },
   verbosity = 2)
+
+  gc(verbose = FALSE)
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
