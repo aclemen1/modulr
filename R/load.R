@@ -3,13 +3,55 @@
 
   if (!is.null(path)) {
 
+    register <- modulr_env$register
+    .Last.name <- modulr_env$.Last.name
+    config <- modulr_env$config
+    verbosity <- modulr_env$verbosity
+    stash <- modulr_env$stash
+
+    rollback <- function() {
+      modulr_env$register <- register
+      modulr_env$.Last.name <- .Last.name
+      modulr_env$config <- config
+      modulr_env$verbosity <- verbosity
+      modulr_env$stash <- stash
+    }
+
     if (tolower(tools::file_ext(path)) == "r") {
 
       if(interactive() && requireNamespace("rstudioapi", quietly = TRUE) &&
            rstudioapi::isAvailable()) {
-        local(do.call("debugSource", args = list(path, echo = FALSE))) # nocov
+
+        # nocov start
+        tryCatch({
+          # Seems that tryCatch is unable to catch errors happening in an
+          # RStudio's debugSource call (version 0.98.1103).
+          try(stop("fake error", call. = FALSE), silent = TRUE)
+          last_error <- geterrmessage()
+          local(do.call("debugSource", args = list(path, echo = FALSE))) # nocov
+          if(last_error != geterrmessage()) {
+            stop(sub("\n$", "", geterrmessage()), call. = FALSE)
+          } else {
+            try(stop(last_error, call. = FALSE), silent = TRUE)
+          }
+        },
+        error = function(e) {
+          rollback()
+          e$message <- sprintf("%s. Rolling back.", e$message)
+          on.exit(try(stop(e), silent = TRUE))
+          stop("Rolling back.", call. = FALSE)
+        })
+        # nocov end
+
       } else {
-        source(path, local = TRUE, echo = FALSE, keep.source = TRUE)
+        tryCatch({
+          source(path, local = TRUE, echo = FALSE, keep.source = TRUE)
+        },
+        error = function(e) {
+          rollback()
+          e$message <- sprintf("%s. Rolling back.", e$message)
+          stop(e)
+        })
       }
 
     } else if (tolower(tools::file_ext(path)) %in% c("rmd", "rnw")) {
@@ -22,7 +64,14 @@
       script <- knitr::knit(text = readChar(path, file.info(path)$size),
                             tangle = TRUE, quiet = TRUE)
 
-      local(eval(parse(text = script, keep.source = TRUE)))
+      tryCatch({
+        local(eval(parse(text = script, keep.source = TRUE)))
+      },
+      error = function(e) {
+        rollback()
+        e$message <- sprintf("%s. Rolling back.", e$message)
+        stop(e)
+      })
 
       knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
 

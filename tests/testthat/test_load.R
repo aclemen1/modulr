@@ -30,6 +30,24 @@ test_that("load_module finds and loads .R files", {
 
   })
 
+test_that("load_module rolls back on errors in .R files", {
+  reset()
+  register <- get("register", pos = modulr_env)
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  name <- tools::file_path_sans_ext(basename(file))
+  path <- dirname(file)
+
+  module_text <-
+    sprintf("define('%s', NULL, function() NULL); stop()", name)
+  write(module_text, file)
+  on.exit(unlink(file))
+
+  root_config$set(path)
+  expect_error(load_module(name))
+  expect_identical(register, get("register", pos = modulr_env))
+})
+
 test_that("load_module finds and loads .Rmd files", {
   reset()
   file <- tempfile("modulr_test", fileext = ".Rmd")
@@ -55,6 +73,28 @@ test_that("load_module finds and loads .Rmd files", {
 
 })
 
+test_that("load_module rolls back on errors in .Rmd files", {
+  reset()
+  register <- get("register", pos = modulr_env)
+
+  file <- tempfile("modulr_test", fileext = ".Rmd")
+  name <- tools::file_path_sans_ext(basename(file))
+  path <- dirname(file)
+
+  module_text <-
+    sprintf(
+      paste0(
+      "```{r}\nlibrary(modulr)\ndefine('%s', NULL, function() NULL)\n",
+      "stop()```\n"),
+      name)
+  write(module_text, file)
+  on.exit(unlink(file))
+
+  root_config$set(path)
+  expect_error(load_module(name))
+  expect_identical(register, get("register", pos = modulr_env))
+})
+
 test_that("load_module finds and loads .Rnw files", {
   reset()
   file <- tempfile("modulr_test", fileext = ".Rnw")
@@ -78,6 +118,28 @@ test_that("load_module finds and loads .Rnw files", {
 
   expect_equal(module$name, name)
 
+})
+
+test_that("load_module rolls back on errors in .Rnw files", {
+  reset()
+  register <- get("register", pos = modulr_env)
+
+  file <- tempfile("modulr_test", fileext = ".Rnw")
+  name <- tools::file_path_sans_ext(basename(file))
+  path <- dirname(file)
+
+  module_text <-
+    sprintf(
+      paste0(
+        "<<>>=\nlibrary(modulr)\ndefine('%s', NULL, function() NULL)\n",
+        "stop()\n@\n"),
+      name)
+  write(module_text, file)
+  on.exit(unlink(file))
+
+  root_config$set(path)
+  expect_error(load_module(name))
+  expect_identical(register, get("register", pos = modulr_env))
 })
 
 test_that("load_module re-loads modified .R files", {
