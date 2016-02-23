@@ -1,7 +1,7 @@
 context("stash")
 
 test_that("stash() stashes internals to the modulr environment", {
-  reset(all=T)
+  reset(all = T)
   define("module", NULL, function() NULL)
   expect_equal(length(modulr_env$stash), 0)
   stash()
@@ -14,7 +14,7 @@ test_that("stash() stashes internals to the modulr environment", {
 })
 
 test_that("stash() accepts comment", {
-  reset(all=T)
+  reset(all = T)
   stash(comment = "this is a comment")
   stashed <- modulr_env$stash[[1]]
   expect_equal(stashed$comment, "this is a comment")

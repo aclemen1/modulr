@@ -110,7 +110,7 @@ test_that(".message_stop calls .message(..., fun = stop)", {
 })
 
 test_that("get_verbosity and set_verbosity are getter and setter", {
-  for(level in c(0, 1, 2, +Inf)) {
+  for (level in c(0, 1, 2, +Inf)) {
     set_verbosity(level)
     expect_equal(get_verbosity(), level)
   }

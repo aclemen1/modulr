@@ -167,8 +167,8 @@ test_that("load_module re-loads modified .R files", {
   module <- register[[name]]
 
   expect_false(module$first_instance)
-  expect_less_than(module$timestamp, Sys.time())
-  expect_more_than(module$timestamp, timestamp)
+  expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
+  expect_gt(as.numeric(module$timestamp), as.numeric(timestamp))
 
 })
 
@@ -204,8 +204,8 @@ test_that("load_module re-loads modified .Rmd files", {
   module <- register[[name]]
 
   expect_false(module$first_instance)
-  expect_less_than(module$timestamp, Sys.time())
-  expect_more_than(module$timestamp, timestamp)
+  expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
+  expect_gt(as.numeric(module$timestamp), as.numeric(timestamp))
 
 })
 
@@ -241,8 +241,8 @@ test_that("load_module re-loads modified .Rnw files", {
   module <- register[[name]]
 
   expect_false(module$first_instance)
-  expect_less_than(module$timestamp, Sys.time())
-  expect_more_than(module$timestamp, timestamp)
+  expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
+  expect_gt(as.numeric(module$timestamp), as.numeric(timestamp))
 
 })
 

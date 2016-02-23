@@ -107,7 +107,7 @@ test_that("`%provides_options%` is a syntactic sugar", {
   expect_equal(ls(foo, sorted = TRUE, all.names = TRUE), character(0))
 
   reset()
-  "foo" %provides_options% list(a=1, b="beta")
+  "foo" %provides_options% list(a = 1, b = "beta")
   foo <- make("foo")
   expect_true(is.environment(foo))
   expect_equal(foo$a, 1)
@@ -123,11 +123,11 @@ test_that("`%provides_options%` is a syntactic sugar", {
   expect_equal(ls(foo, sorted = TRUE, all.names = TRUE), sort(c("a", "b")))
 
   reset()
-  "foo" %provides_options% list(a=1, "beta")
+  "foo" %provides_options% list(a = 1, "beta")
   expect_error(make("foo"))
 
   reset()
-  "foo" %provides_options% c(a=1, 2)
+  "foo" %provides_options% c(a = 1, 2)
   expect_error(make("foo"))
 })
 

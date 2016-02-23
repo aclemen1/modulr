@@ -19,8 +19,8 @@
 
     if (tolower(tools::file_ext(path)) == "r") {
 
-      if(interactive() && requireNamespace("rstudioapi", quietly = TRUE) &&
-           rstudioapi::isAvailable()) {
+      if (interactive() && requireNamespace("rstudioapi", quietly = TRUE) &&
+            rstudioapi::isAvailable()) {
 
         # nocov start
         tryCatch({
@@ -29,7 +29,7 @@
           try(stop("fake error", call. = FALSE), silent = TRUE)
           last_error <- geterrmessage()
           local(do.call("debugSource", args = list(path, echo = FALSE))) # nocov
-          if(last_error != geterrmessage()) {
+          if (last_error != geterrmessage()) {
             stop(sub("\n$", "", geterrmessage()), call. = FALSE)
           } else {
             try(stop(last_error, call. = FALSE), silent = TRUE)
@@ -59,7 +59,7 @@
       unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
 
       knitr::opts_knit$set("unnamed.chunk.label" =
-                             paste("modulr", name, sep="/"))
+                             paste("modulr", name, sep = "/"))
 
       script <- knitr::knit(text = readChar(path, file.info(path)$size),
                             tangle = TRUE, quiet = TRUE)
@@ -79,7 +79,7 @@
 
   }
 
-  if(check)
+  if (check)
     assert_that(.is_defined(name))
 
   return(path)
@@ -197,7 +197,7 @@ load_all_modules <- function(
     path = path, pattern = pattern,
     full.names = full.names, recursive = recursive, ...)
 
-  if(length(files) > 0)
+  if (length(files) > 0)
     Map(.load_module, files, check = FALSE)
 
   invisible(NULL)

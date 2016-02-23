@@ -1,15 +1,23 @@
-# TODO: write documentation
-# TODO: test that
-# TODO: use it to send on a parallel process
+#' Bundle Module
+#'
+#' Bundle a module and its dependencies.
+#'
+#' @param ... Module name as first argument. Further arguments can be passed
+#'   for evaluation to the resulting function, if any (see \code{\link{make}}).
+#'
+#' @details
+#'
+#' TODO documentation
+#'
 #' @export
 bundle <- function(...) {
 
-  if(nargs() == 0L) {
+  if (nargs() == 0L) {
     name <- .Last.name
-    args <- list()
+    args <- list() # Exclude Linting
   } else {
     name <- list(...)[[1]]
-    args <- substitute(list(...))[-2]
+    args <- substitute(as.list(...))[-2]
   }
 
   .message_meta(sprintf("Entering batchify() for '%s' ...", name),
@@ -76,7 +84,7 @@ bundle <- function(...) {
 
               layers_count <- length(layers)
 
-              if(deps_count > 1 && layers_count > 1)
+              if (deps_count > 1 && layers_count > 1)
                 message(sprintf("%d layers, ", layers_count - 1),
                         appendLF = FALSE)
 
@@ -90,7 +98,7 @@ bundle <- function(...) {
 
           batch <- character(0)
 
-          for(layer_idx in c(1:layers_count)) {
+          for (layer_idx in c(1:layers_count)) {
 
             ordered_names <- layers[[layer_idx]]
 
@@ -100,7 +108,7 @@ bundle <- function(...) {
 
               assert_that(.is_defined(ordered_name))
 
-              if(.is_regular(ordered_name)) {
+              if (.is_regular(ordered_name)) {
                 batch <- paste(
                   batch,
                   paste(

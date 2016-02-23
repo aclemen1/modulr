@@ -150,16 +150,17 @@ test_that("define writes to the register", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$provider, function(dep) {
+  expect_equal(module$provider, (function(dep) {
     return(dep)
-  })
+  }))
   expect_equal(module$digest, get_digest("some/module"))
   expect_true(is.null(module$instance))
   expect_false(module$instanciated)
   expect_true(module$first_instance)
   expect_null(module$url)
-  expect_less_than(module$timestamp, Sys.time())
-  expect_more_than(module$timestamp, timestamp)
+
+  expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
+  expect_gt(as.numeric(module$timestamp), as.numeric(timestamp))
 })
 
 test_that("re-define doesn't write to the register when no changes occur", {
@@ -189,16 +190,16 @@ test_that("re-define doesn't write to the register when no changes occur", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$provider, function(dep) {
+  expect_equal(module$provider, (function(dep) {
     return(dep)
-  })
+  }))
   expect_equal(module$digest, get_digest("some/module"))
   expect_true(is.null(module$instance))
   expect_false(module$instanciated)
   expect_true(module$first_instance)
-  expect_less_than(module$timestamp, Sys.time())
-  expect_more_than(module$timestamp, timestamp_1)
-  expect_less_than(module$timestamp, timestamp_2)
+  expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
+  expect_gt(as.numeric(module$timestamp), as.numeric(timestamp_1))
+  expect_lt(as.numeric(module$timestamp), as.numeric(timestamp_2))
 })
 
 test_that("re-define writes to the register when changes occur", {
@@ -226,16 +227,16 @@ test_that("re-define writes to the register when changes occur", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$provider, function(dep) {
+  expect_equal(module$provider, (function(dep) {
     return(sprintf("%s", dep))
-  })
+  }))
   expect_equal(module$digest, get_digest("some/module"))
   expect_true(is.null(module$instance))
   expect_false(module$instanciated)
   expect_false(module$first_instance)
   expect_null(module$url)
-  expect_less_than(module$timestamp, Sys.time())
-  expect_more_than(module$timestamp, timestamp)
+  expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
+  expect_gt(as.numeric(module$timestamp), as.numeric(timestamp))
 })
 
 test_that("define calls are warned from within a module", {
@@ -387,9 +388,9 @@ test_that("get_provider returns the body of the module", {
     })
 
   expect_equal(get_provider("some/module"),
-               function(dep) {
+               (function(dep) {
                  return(dep)
-               })
+               }))
 
   reset()
 
@@ -401,9 +402,9 @@ test_that("get_provider returns the body of the module", {
     })
 
   expect_equal(get_provider("some/module"),
-               function(dep) {
+               (function(dep) {
                  return(dep)
-               })
+               }))
 
 })
 
@@ -588,8 +589,8 @@ test_that("touch updates the register", {
   expect_null(module$instance)
   expect_false(module$instanciated)
   expect_null(module$digest)
-  expect_less_than(module$timestamp, Sys.time())
-  expect_more_than(module$timestamp, timestamp)
+  expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
+  expect_gt(as.numeric(module$timestamp), as.numeric(timestamp))
 
   })
 

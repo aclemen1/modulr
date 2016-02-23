@@ -68,7 +68,7 @@
 
     layers <- list()
 
-    while(length(deps) > 0) {
+    while (length(deps) > 0) {
 
       idx <- sapply(
         1:length(deps),
@@ -97,7 +97,10 @@
       deps <- factor(unlist(modulr_env$register[[c(name, "dependencies")]]),
                      levels = group)
 
-      data.frame(from=factor(rep(name, length(deps)), levels = group), to=deps)
+      data.frame(
+        from = factor(rep(name, length(deps)), levels = group),
+        to = deps
+      )
 
     },
 

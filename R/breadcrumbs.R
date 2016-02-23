@@ -95,7 +95,7 @@ reactivate_breadcrumbs <- function() {
     wrapper <- function() {
       modulr::get_breadcrumbs("installed")
       eval(parse(text = deparse(handler)), envir = parent.frame())
-      if(!interactive()) stop(call. = FALSE) # nocov
+      if (!interactive()) stop(call. = FALSE) # nocov
     }
 
     options(error = wrapper)

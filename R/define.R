@@ -314,7 +314,7 @@ define <- function(name, dependencies, provider) {
   if (.is_braced_expression(provider_subst)) {
     provider <- eval(call("function", NULL, provider_subst))
     src_file <- attr(provider_subst, "srcfile")
-    if(inherits(src_file, "srcfile")) {
+    if (inherits(src_file, "srcfile")) {
       attr(provider, which = "srcref") <-
         srcref(
           src_file,

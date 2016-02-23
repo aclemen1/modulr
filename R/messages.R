@@ -19,7 +19,7 @@
     if (level > 0) {
       out <- paste0(out, sprintf(
         "%s ",
-        paste(rep("*", level), collapse="")))
+        paste(rep("*", level), collapse = "")))
     }
 
     out <- paste0(out, msg, ifelse(ok, " ... ", ""))
@@ -32,7 +32,7 @@
 
   if (!is.null(expr)) eval(expr)
 
-  if(ok && verbose && !is.null(msg)) message("OK", appendLF = TRUE)
+  if (ok && verbose && !is.null(msg)) message("OK", appendLF = TRUE)
 
 }
 
@@ -72,7 +72,7 @@
 
     if (level > 0) {
       out <- paste0(out, sprintf(
-        "%s ", paste(rep("*", level), collapse="")))
+        "%s ", paste(rep("*", level), collapse = "")))
     }
 
     out <- paste0(out, paste0(kwargs[["core"]], collapse = ""))

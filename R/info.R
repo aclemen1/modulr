@@ -7,20 +7,20 @@
 
   lines <- deparse(fun, control = "useSource")
 
-  if(!isTRUE(length(lines) >= 2)) return(docstring)
+  if (!isTRUE(length(lines) >= 2)) return(docstring)
 
   lines <- lines[2:length(lines)]
 
   empty <- rle(grepl("^\\s*$|^\\s*#[^']", lines))
   start <- empty$lengths[1][empty$values[1]]
 
-  if(isTRUE(start >= 1))
+  if (isTRUE(start >= 1))
     lines <- lines[(start + 1):length(lines)]
 
   comment <- rle(grepl("^\\s*#'", lines))
   end <- comment$lengths[1][comment$values[1]]
 
-  if(!isTRUE(end >= 1)) return(docstring)
+  if (!isTRUE(end >= 1)) return(docstring)
 
   lines <- lines[1:end]
 

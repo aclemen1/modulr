@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9076
+Version: 0.1.7.9077
 Date: 2015-12-03
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
@@ -37,8 +37,8 @@ Suggests:
     htmltools,
     lintr,
     covr,
-    testthat,
-    networkD3,
+    testthat (>= 0.11.0.9000),
+    networkD3 (>= 0.2.9),
     gistr,
     rmarkdown,
     memoise,

@@ -127,7 +127,7 @@ import_module <- function(name, url, digest = NULL,
       unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
 
       knitr::opts_knit$set("unnamed.chunk.label" =
-                             paste("modulr", name, sep="/"))
+                             paste("modulr", name, sep = "/"))
 
       script <- knitr::knit(text = script,
                             tangle = TRUE, quiet = TRUE)

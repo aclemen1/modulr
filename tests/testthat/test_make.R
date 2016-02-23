@@ -49,15 +49,15 @@ test_that("make writes to the register", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list())
-  expect_equal(module$provider, function() {
+  expect_equal(module$provider, (function() {
     return("foo")
-  })
+  }))
   expect_equal(module$digest, get_digest("some/module"))
   expect_equal(module$instance$value, "foo")
   expect_true(module$instanciated)
   expect_false(module$first_instance)
-  expect_less_than(module$timestamp, Sys.time())
-  expect_more_than(module$timestamp, timestamp)
+  expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
+  expect_gt(as.numeric(module$timestamp), as.numeric(timestamp))
 })
 
 test_that("make handles invisibility correctly", {
@@ -97,18 +97,18 @@ test_that("make reinstanciates touched dependency, only once", {
   touch("module_1")
 
   module_timestamp <- get("register", pos = modulr_env)[["module_2"]]$timestamp
-  expect_less_than(module_timestamp, timestamp)
+  expect_lt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
   module_timestamp <- get("register", pos = modulr_env)[["module_2"]]$timestamp
-  expect_more_than(module_timestamp, timestamp)
+  expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
   module_timestamp_2 <-
     get("register", pos = modulr_env)[["module_2"]]$timestamp
-  expect_equal(module_timestamp_2, module_timestamp)
+  expect_equal(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
 
 test_that("make reinstanciates touched dependencies for each child module", {
@@ -123,14 +123,14 @@ test_that("make reinstanciates touched dependencies for each child module", {
   make("module_2")
 
   module_timestamp <- get("register", pos = modulr_env)[["module_2"]]$timestamp
-  expect_more_than(module_timestamp, timestamp)
+  expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2bis")
 
   module_timestamp_2 <-
     get("register", pos = modulr_env)[["module_2bis"]]$timestamp
-  expect_more_than(module_timestamp_2, timestamp)
-  expect_more_than(module_timestamp_2, module_timestamp)
+  expect_gt(as.numeric(module_timestamp_2), as.numeric(timestamp))
+  expect_gt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
 
 test_that("make reinstanciates touched dependencies for chained modules", {
@@ -143,14 +143,14 @@ test_that("make reinstanciates touched dependencies for chained modules", {
   make("module_2")
 
   module_timestamp <- get("register", pos = modulr_env)[["module_2"]]$timestamp
-  expect_more_than(module_timestamp, timestamp)
+  expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_3")
 
   module_timestamp_2 <-
     get("register", pos = modulr_env)[["module_3"]]$timestamp
-  expect_more_than(module_timestamp_2, timestamp)
-  expect_more_than(module_timestamp_2, module_timestamp)
+  expect_gt(as.numeric(module_timestamp_2), as.numeric(timestamp))
+  expect_gt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
 
 test_that("make reinstanciates touched deps for chained modules, scenario 2", {
@@ -163,13 +163,13 @@ test_that("make reinstanciates touched deps for chained modules, scenario 2", {
   make("module_3")
 
   module_timestamp <- get("register", pos = modulr_env)[["module_3"]]$timestamp
-  expect_more_than(module_timestamp, timestamp)
+  expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
   module_timestamp_2 <-
     get("register", pos = modulr_env)[["module_2"]]$timestamp
-  expect_less_than(module_timestamp_2, module_timestamp)
+  expect_lt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
 
 test_that("make applies function to arguments, if any", {
@@ -195,7 +195,7 @@ test_that("%=>% is a syntactic sugar for `make() ->`", {
 
 test_that("%<=% assigns value in current frame only", {
   reset()
-  if(exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
+  if (exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
                                           pos = .GlobalEnv)
   (function() {
     m1_sugar %<=% "module_1"
@@ -206,7 +206,7 @@ test_that("%<=% assigns value in current frame only", {
 
 test_that("%=>% assigns value in current frame only", {
   reset()
-  if(exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
+  if (exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
                                           pos = .GlobalEnv)
   (function() {
     "module_1" %=>% m1_sugar
@@ -217,7 +217,7 @@ test_that("%=>% assigns value in current frame only", {
 
 test_that("%<<=% assigns value in global environment", {
   reset()
-  if(exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
+  if (exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
                                           pos = .GlobalEnv)
   (function() {
     m1_sugar %<<=% "module_1"
@@ -230,7 +230,7 @@ test_that("%<<=% assigns value in global environment", {
 
 test_that("%=>>% assigns value in global environment", {
   reset()
-  if(exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
+  if (exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
                                           pos = .GlobalEnv)
   (function() {
     "module_1" %=>>% m1_sugar
@@ -243,7 +243,7 @@ test_that("%=>>% assigns value in global environment", {
 
 test_that("%<<=% assigns value in parent frame", {
   reset()
-  if(exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
+  if (exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
                                           pos = .GlobalEnv)
   m1_sugar <- NULL
   (function() {
@@ -257,7 +257,7 @@ test_that("%<<=% assigns value in parent frame", {
 
 test_that("%=>>% assigns value in parent frame", {
   reset()
-  if(exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
+  if (exists("m1_sugar", inherits = T)) rm("m1_sugar", inherits = T,
                                           pos = .GlobalEnv)
   m1_sugar <- NULL
   (function() {
@@ -440,7 +440,7 @@ test_that("make doesn't recurse infinitely when sourced", {
       paste(
         "define('%s', NULL, function() NULL)",
         "env <- get('test_env', envir = globalenv())",
-        "if(env$deep > 3) stop()",
+        "if (env$deep > 3) stop()",
         "env$deep <- env$deep + 1",
         "make()", sep = "\n"),
       name)
@@ -472,7 +472,7 @@ test_that("make doesn't recurse infinitely when called", {
       paste(
         "define('%s', NULL, function() NULL)",
         "env <- get('test_env', envir = globalenv())",
-        "if(env$deep > 2) stop()",
+        "if (env$deep > 2) stop()",
         "env$deep <- env$deep + 1",
         "make()", sep = "\n"),
       name)

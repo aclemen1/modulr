@@ -64,7 +64,7 @@ plot_dependencies <- function(group, reserved = TRUE) {
       deps <- intersect(unlist(module$dependencies),
                         names(universe))
 
-      data.frame(module=deps, dependency=rep(module$name, length(deps)),
+      data.frame(module = deps, dependency = rep(module$name, length(deps)),
                  # MAYBE: adapt values for nicer output
                  value = rep(1, length(deps)),
                  stringsAsFactors = FALSE)

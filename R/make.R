@@ -202,7 +202,7 @@ make <- function(name = .Last.name, ...) {
 
               layers_count <- length(layers)
 
-              if(deps_count > 1 && layers_count > 1 &&
+              if (deps_count > 1 && layers_count > 1 &&
                    2 <= verbosity_level) {
                 message(
                   if (layers_count == 2) {
@@ -225,7 +225,7 @@ make <- function(name = .Last.name, ...) {
           nodes_count <- length(nodes)
           eval_counter <- 0
 
-          for(layer_idx in c(1:layers_count)) {
+          for (layer_idx in c(1:layers_count)) {
 
             ordered_names <- layers[[layer_idx]]
 
@@ -318,7 +318,7 @@ make <- function(name = .Last.name, ...) {
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
-    if(!missing(...) && is.function(instance[["value"]])) {
+    if (!missing(...) && is.function(instance[["value"]])) {
       return(eval(substitute(instance[["value"]](...)), # Exclude Linting
                   envir = parent.frame(1L)))
     } else {

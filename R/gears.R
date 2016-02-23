@@ -23,7 +23,7 @@
   dependencies <- modulr_env$register[[name]]$dependencies
   if (isTRUE(length(dependencies) > 0)) {
     if (length(dependencies) == 1) {
-      if(is.null(names(dependencies))) {
+      if (is.null(names(dependencies))) {
         deps <-
           sprintf("list(\"%s\")",
                   unlist(dependencies))
@@ -34,7 +34,7 @@
                   unlist(dependencies))
       }
     } else {
-      if(is.null(names(dependencies))) {
+      if (is.null(names(dependencies))) {
         deps <- paste0(
           "list(\n    ",
           paste(
@@ -160,7 +160,7 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
            .module_to_string, FUN.VALUE = "")
 
   gear <- paste(
-    if(isTRUE(nchar(docstring) > 0)) {
+    if (isTRUE(nchar(docstring) > 0)) {
       format(docstring)
     } else {
       sprintf("# `%s` (Modulr Gear)", name)
