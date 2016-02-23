@@ -5,6 +5,7 @@ src/*.o-*
 .Rproj.user
 .Rhistory
 .RData
+.Rprofile
 tmp/
 /lib/
 inst/doc
@@ -13,3 +14,4 @@ vignettes/*.R
 *_SECRET_*
 README.html
 README_files
+.modulr_profile.R
