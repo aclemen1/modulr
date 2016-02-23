@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9075
+Version: 0.1.7.9076
 Date: 2015-12-03
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
@@ -48,6 +48,7 @@ Encoding: UTF-8
 Collate:
     'assertions.R'
     'breadcrumbs.R'
+    'bundle.R'
     'modulr.R'
     'config.R'
     'dag.R'

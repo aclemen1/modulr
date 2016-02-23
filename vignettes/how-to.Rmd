@@ -12,7 +12,7 @@ output:
     #variant: markdown_github
 vignette: >
   %\VignetteIndexEntry{Modulr How-To Guide}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
