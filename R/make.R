@@ -2,10 +2,11 @@
 #'
 #' Make or remake a module.
 #'
-#' @inheritParams define
-#' @param ... For \code{make}, further arguments to be passed for evaluation to
-#'   the resulting function, if any. For \code{make_all_tests}, further
-#'   arguments to be passed to \code{\link{load_all_modules}}.
+#' @param ... For \code{make}, module name is the first argument and further
+#'   arguments can be passed for evaluation to the resulting function, if any.
+#'   If no argument, \code{make} refers to the name of the last used module (see
+#'   \code{\link{.Last.name}}). For \code{make_all_tests}, further arguments to
+#'   be passed to \code{\link{load_all_modules}}.
 #'
 #' @return The object resulting of the evaluation of the provider function of
 #'   the module. If the object is a function and arguments are passed, returns
@@ -142,7 +143,15 @@
 #'
 #' @aliases %<=% %=>% %<<=% %=>>%
 #' @export
-make <- function(name = .Last.name, ...) {
+make <- function(...) {
+
+  if (nargs() == 0L) {
+    name <- .Last.name
+    args_ <- list() # Exclude Linting
+  } else {
+    name <- list(...)[[1L]]
+    args_ <- list(...)[-1L]
+  }
 
   .message_meta(sprintf("Entering make() for '%s' ...", name),
                 verbosity = +Inf)
@@ -318,9 +327,9 @@ make <- function(name = .Last.name, ...) {
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
-    if (!missing(...) && is.function(instance[["value"]])) {
-      return(eval(substitute(instance[["value"]](...)), # Exclude Linting
-                  envir = parent.frame(1L)))
+    if (length(args_) > 0 && is.function(instance[["value"]])) {
+      return(do.call(instance[["value"]], args = args_,
+                     envir = parent.frame(1L)))
     } else {
       return(
         ifelse(instance[["visible"]], identity, invisible)(instance[["value"]])

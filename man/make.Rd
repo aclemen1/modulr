@@ -11,7 +11,7 @@
 \alias{make_tests}
 \title{Make a Module.}
 \usage{
-make(name = .Last.name, ...)
+make(...)
 
 make_all(regexp, reserved = FALSE, error = stop)
 
@@ -20,22 +20,11 @@ make_tests()
 make_all_tests(...)
 }
 \arguments{
-\item{name}{A string (character vector of lenght one).
-
-  A module name can contain letters, figures and some special characters,
-  namely \code{_}, \code{-}, and \code{/}. The latter is a namespace
-  separator.
-
-  Names containing \code{/mock/}, \code{/mocks/}, \code{/test/},
-  \code{/tests/}, \code{/example/}, or \code{/examples/} have a special
-  meaning related to code testing and examples.
-
-  The name "modulr" corresponds to a special module and is therefore
-  reserved.}
-
-\item{...}{For \code{make}, further arguments to be passed for evaluation to
-  the resulting function, if any. For \code{make_all_tests}, further
-  arguments to be passed to \code{\link{load_all_modules}}.}
+\item{...}{For \code{make}, module name is the first argument and further
+  arguments can be passed for evaluation to the resulting function, if any.
+  If no argument, \code{make} refers to the name of the last used module (see
+  \code{\link{.Last.name}}). For \code{make_all_tests}, further arguments to
+  be passed to \code{\link{load_all_modules}}.}
 
 \item{regexp}{A regular expression. If not missing, the regular expression
 is used to filter the names of the modules to be made.}

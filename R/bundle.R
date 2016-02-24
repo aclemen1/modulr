@@ -1,6 +1,6 @@
-#' Bundle Module
+#' Bundle a Module.
 #'
-#' Bundle a module and its dependencies.
+#' Bundle a module and its dependencies for standalone use.
 #'
 #' @param ... Module name as first argument. Further arguments can be passed
 #'   for evaluation to the resulting function, if any (see \code{\link{make}}).
@@ -16,8 +16,8 @@ bundle <- function(...) {
     name <- .Last.name
     args <- list() # Exclude Linting
   } else {
-    name <- list(...)[[1]]
-    args <- substitute(as.list(...))[-2]
+    name <- list(...)[[1L]]
+    args <- substitute(list(...))[-2L]
   }
 
   .message_meta(sprintf("Entering batchify() for '%s' ...", name),
