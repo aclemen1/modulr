@@ -14,6 +14,7 @@ test_that("correct Sankey graph is returned for dependent modules", {
 
   graph_1 <- plot_dependencies("module_layer3_1")
 
+  # Begin Exclude Linting
   expect_equal(
     graph_1$x[c("links", "nodes")],
     structure(list(links = structure(list(source = c(0, 1, 2, 3),
@@ -26,11 +27,13 @@ test_that("correct Sankey graph is returned for dependent modules", {
           "module_layer1_2", "module_layer1_3", "module_layer2_1",
           "module_layer3_1"), class = "factor")), .Names = c("name",
       "group"), row.names = c(NA, -5L), class = "data.frame")),
-      .Names = c("links", "nodes"))) # Exclude Linting
+      .Names = c("links", "nodes")))
+  # End Exclude Linting
 
 
   graph_2 <- plot_dependencies("module_layer2_1")
 
+  # Begin Exclude Linting
   expect_equal(
     graph_2$x[c("links", "nodes")],
     structure(list(links = structure(list(source = c(0, 1), target = c(2,
@@ -39,9 +42,10 @@ test_that("correct Sankey graph is returned for dependent modules", {
 "module_layer1_2", "module_layer2_1"), class = "factor"), group = structure(1:3, .Label = c("module_layer1_1",
 "module_layer1_2", "module_layer2_1"), class = "factor")), .Names = c("name",
 "group"), row.names = c(NA, -3L), class = "data.frame")), .Names = c("links",
-"nodes"))) # Exclude Linting
+"nodes")))
+  # End Exclude Linting
 
-  })
+})
 
 test_that("correct Sankey graph is returned for the whole register", {
   if (!requireNamespace("networkD3", quietly = TRUE))
