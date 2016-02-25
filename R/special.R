@@ -248,29 +248,33 @@ NULL
 #' @export
 options_provider <- function(...) {
 
-  args <- substitute(as.list(c(...))) # Exclude Linting
+  args <- substitute(as.list(c(...)))
 
-  function() {
-    #' Options module which exposes an R environment. See ?options_provider.
+  environment(options_provider_) <- environment()
 
-    args <- eval(args, envir = environment())
+  return(options_provider_)
 
-    assert_that(
-      length(args) == 0 || (
-        !is.null(names(args)) && all(names(args) != "")),
-      msg = "arguments are not all named.")
+}
 
-    options <- new.env(parent = emptyenv())
+options_provider_ <- function() {
+  #' Options module which exposes an R environment. See ?options_provider.
 
-    vapply(names(args), function(name) {
-      options[[name]] <- args[[name]]
-      NA
-    },
-    FUN.VALUE = NA)
+  args <- eval(args, envir = environment())
 
-    return(options)
-  }
+  assert_that(
+    length(args) == 0 || (
+      !is.null(names(args)) && all(names(args) != "")),
+    msg = "arguments are not all named.")
 
+  options <- new.env(parent = emptyenv())
+
+  vapply(names(args), function(name) {
+    options[[name]] <- args[[name]]
+    NA
+  },
+  FUN.VALUE = NA)
+
+  return(options)
 }
 
 #' @export

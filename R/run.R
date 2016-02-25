@@ -75,7 +75,7 @@ run_async <- function(...) {
   }
 
   restitute_ <- function(result) {
-      if (class(result) == "try-error") {
+      if ("try-error" %in% class(result)) {
         stop(attr(result, "condition"))
       } else {
         return(result)

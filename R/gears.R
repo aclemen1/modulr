@@ -15,8 +15,16 @@
   provider <- get_provider(name, load = FALSE)
   if (!is.null(base) &&
        identical(provider, get_provider(base), ignore.environment = TRUE)) {
+    provider_sugar <- "%provides%"
     provider_string <- sprintf("get_provider(\"%s\")", base)
+  } else if (identical(body(provider), body(options_provider_))) {
+    provider_sugar <- "%provides_options%"
+    provider_string <-
+      paste(deparse(parent.env(environment(provider))$args,
+                  width.cutoff = 78L),
+            collapse = "\n")
   } else {
+    provider_sugar <- "%provides%"
     provider_string <- .function_to_string(provider)
   }
 
@@ -55,12 +63,12 @@
     }
     module <- sprintf(paste0(
       "\"%s\" %%requires%%\n",
-      "  %s %%provides%%\n",
-      "  %s\n"), name, deps, provider_string)
+      "  %s %s\n",
+      "  %s\n"), name, deps, provider_sugar, provider_string)
   } else {
     module <- sprintf(paste0(
-      "\"%s\" %%provides%%\n",
-      "  %s\n"), name, provider_string)
+      "\"%s\" %s\n",
+      "  %s\n"), name, provider_sugar, provider_string)
   }
   module
 }

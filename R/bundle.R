@@ -44,7 +44,7 @@ bundle <- function(...) {
     modulr_env$stash <- stash
   }
 
-  .message_meta(sprintf("Turning '%s' into a batch file ...", name), {
+  .message_meta(sprintf("Bundling '%s' ...", name), {
 
     .message_meta("Visiting and defining dependencies ...", {
 
