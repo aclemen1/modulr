@@ -13,6 +13,14 @@ test_that("stash() stashes internals to the modulr environment", {
   expect_equal(stashed$verbosity, modulr_env$verbosity)
 })
 
+test_that("stash() returns an incrementing ID", {
+  reset(all = T)
+  id <- stash()
+  expect_equal(id, 1L)
+  id <- stash()
+  expect_equal(id, 2L)
+})
+
 test_that("stash() accepts comment", {
   reset(all = T)
   stash(comment = "this is a comment")

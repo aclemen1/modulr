@@ -22,6 +22,9 @@ remove_stash(id, all)
 
 \item{all}{A flag. Should all stashes be removed?}
 }
+\value{
+A scalar (integer vector of length one) containing the stash ID.
+}
 \description{
 Stash and unstash all modules and internal state. List and remove stashes.
 }

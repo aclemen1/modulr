@@ -1,31 +1,57 @@
-#' Bundle a Module.
+#' Bundle a Module (experimental).
 #'
-#' Bundle a module and its dependencies for standalone use.
+#' Bundle a module for script use.
 #'
-#' @param ... Module name as first argument. Further arguments can be passed
+#' @inheritParams define
+#' @inheritParams make
+#' @param ... For \code{bundle}, further arguments to be passed
 #'   for evaluation to the resulting function, if any (see \code{\link{make}}).
+#'   For \code{do_bundle}, further arguments to be passed to
+#'   \code{\link{cat}}.
 #'
 #' @details
 #'
-#' TODO documentation
+#' Experimental.
 #'
 #' @export
-bundle <- function(...) {
+bundle <- function(name = .Last.name, ...) {
 
-  if (nargs() == 0L) {
-    name <- .Last.name
-    args <- list() # Exclude Linting
-  } else {
-    name <- list(...)[[1L]]
-    args <- substitute(list(...))[-2L]
+  if (.is_called_from_within_module()) {
+    warning("bundle is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
   }
 
-  .message_meta(sprintf("Entering batchify() for '%s' ...", name),
+  do_bundle(name = name, args = list(...))
+
+}
+
+#' @rdname bundle
+#' @inheritParams make
+#' @inheritParams do_make
+#' @param pre_hook An expression. Code to be evaluated before the script.
+#' @param post_hook An expression. Code to be evaluated after the script. The
+#'   `result` variable contains the result of the script evaluation.
+#' @export
+do_bundle <- function(name = .Last.name, args = list(),
+                     quote = FALSE, envir = parent.frame(1L),
+                     pre_hook = NULL, post_hook = NULL, ...) {
+
+  assert_that(is.list(args), msg = "second argument must be a list.")
+
+  assert_that(
+    mode(pre_hook) %in% c("NULL", "call", "expression", "(", "function"),
+    msg = "pre_hook must be an expression")
+
+  assert_that(
+    mode(post_hook) %in% c("NULL", "call", "expression", "(", "function"),
+    msg = "post_hook must be an expression")
+
+  .message_meta(sprintf("Entering bundle() for '%s' ...", name),
                 verbosity = +Inf)
 
   assert_that(.is_conform(name))
 
-  if (.is_called_from_within_module()) {
+    if (.is_called_from_within_module()) {
     warning("make is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
@@ -129,38 +155,70 @@ bundle <- function(...) {
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
-    batch <- paste(
-      batch,
-      paste(
-        sprintf("# ---- Make '%s' --------", name),
-        sprintf(""),
-        sprintf("result <- make(\"%s\")", name),
-        sprintf("if(is.function(result)) {"),
-        sprintf("  result <- do.call(result, args = %s)",
-                deparse(substitute(args))),
-        sprintf("}"),
-        sprintf("return(result)"),
-        sep = "\n"),
-      sep = "\n")
-
-    batch <- paste(
+    bundle <- paste(c(
+      sprintf("#!%s R", system("which env", intern = TRUE)),
+      sprintf(""),
       sprintf("# ---- BEGIN SCRIPT --------"),
+      sprintf(""),
+      sprintf("(function() {"),
       sprintf(""),
       sprintf("# ---- Setup --------"),
       sprintf(""),
-      sprintf("(function() {"),
+      sprintf("wd <- setwd(\"%s\")", getwd()),
+      sprintf("on.exit(setwd(wd), add = TRUE)", name),
       sprintf("library(modulr)"),
-      sprintf("modulr::reset()\n"),
-      batch,
+      sprintf("stash_id <- modulr::stash(\"Pre-bundle for '%s'.\")", name),
+      sprintf("on.exit(modulr::unstash(id = stash_id), add = TRUE)", name),
+      sprintf("modulr::reset(all = FALSE)"),
+      sprintf("modulr::root_config$set(%s)",
+              deparse(root_config$get_all()[[1]])),
+      if (!is.null(pre_hook)) {
+        paste(
+          sprintf(""),
+          sprintf("# ---- Pre Hook --------"),
+          sprintf(""),
+          sprintf("eval(%s)",
+                  paste(deparse(substitute(pre_hook)), collapse = "\n")),
+          sep = "\n"
+        )
+      },
+      paste(
+        batch,
+        sprintf(""),
+        paste(
+          sprintf("# ---- Make '%s' --------", name),
+          sprintf(""),
+          sprintf(
+            paste0("result <- do_make(name = \"%s\", ",
+                   "args = %s, quote = %s, envir = %s)"),
+            name, deparse(args), deparse(quote), deparse(substitute(envir))),
+          sep = "\n"),
+        sep = "\n"),
+      if (!is.null(post_hook)) {
+        paste(
+          sprintf(""),
+          sprintf("# ---- Post Hook --------"),
+          sprintf(""),
+          sprintf("eval(%s)",
+                  paste(deparse(substitute(post_hook)), collapse = "\n")),
+          sep = "\n"
+        )
+      },
+      sprintf(""),
       sprintf("})()"),
       sprintf(""),
-      sprintf("# ---- END SCRIPT --------"),
-      sep = "\n")
+      sprintf("# ---- END SCRIPT --------")),
+      collapse = "\n")
 
-    cat(batch)
-    return(invisible(batch))
+    cat(bundle, ...)
+
+    return(invisible(bundle))
 
   },
   verbosity = 2)
 
 }
+
+#' @rdname bundle
+#' @export
+do.bundle <- do_bundle

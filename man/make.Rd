@@ -5,13 +5,21 @@
 \alias{\%<=\%}
 \alias{\%=>>\%}
 \alias{\%=>\%}
+\alias{do.make}
+\alias{do_make}
 \alias{make}
 \alias{make_all}
 \alias{make_all_tests}
 \alias{make_tests}
 \title{Make a Module.}
 \usage{
-make(...)
+make(name = .Last.name, ...)
+
+do_make(name = .Last.name, args = list(), quote = FALSE,
+  envir = parent.frame(1L))
+
+do.make(name = .Last.name, args = list(), quote = FALSE,
+  envir = parent.frame(1L))
 
 make_all(regexp, reserved = FALSE, error = stop)
 
@@ -20,11 +28,31 @@ make_tests()
 make_all_tests(...)
 }
 \arguments{
-\item{...}{For \code{make}, module name is the first argument and further
-  arguments can be passed for evaluation to the resulting function, if any.
-  If no argument, \code{make} refers to the name of the last used module (see
-  \code{\link{.Last.name}}). For \code{make_all_tests}, further arguments to
-  be passed to \code{\link{load_all_modules}}.}
+\item{name}{A string (character vector of lenght one).
+
+  A module name can contain letters, figures and some special characters,
+  namely \code{_}, \code{-}, and \code{/}. The latter is a namespace
+  separator.
+
+  Names containing \code{/mock/}, \code{/mocks/}, \code{/test/},
+  \code{/tests/}, \code{/example/}, or \code{/examples/} have a special
+  meaning related to code testing and examples.
+
+  The name "modulr" corresponds to a special module and is therefore
+  reserved.}
+
+\item{...}{For \code{make}, further arguments to be passed for evaluation to
+  the resulting function, if any. For \code{make_all_tests}, further
+  arguments to be passed to \code{\link{load_all_modules}}.}
+
+\item{args}{A list of arguments to be passed to the resulting function, if
+any. The \code{names} attribute of \code{args} gives the argument names.}
+
+\item{quote}{A flag. Should the arguments be quoted?}
+
+\item{envir}{An environment within which to evaluate the function call, if
+any. This will be most useful if the arguments are symbols or quoted
+expressions.}
 
 \item{regexp}{A regular expression. If not missing, the regular expression
 is used to filter the names of the modules to be made.}
@@ -129,6 +157,7 @@ reset()
 define("foo", NULL, function() function(a) a + 1)
 foo <- make("foo"); foo(1)
 make("foo", 1)
+do_make("foo", args = list(a = 1))
 
 reset()
 define("A", NULL, function() "(A)")
@@ -170,8 +199,7 @@ make_all()}
 }
 \seealso{
 \code{\link{.Last.name}}, \code{\link{plot_dependencies}},
-  \code{\link{import_module}}, \code{\link{make}},
-  \code{\link{maps_config}}, \code{\link{paths_config}}, \code{\link{reset}},
-  and \code{\link{touch}}.
+  \code{\link{import_module}}, \code{\link{maps_config}},
+  \code{\link{paths_config}}, \code{\link{reset}}, and \code{\link{touch}}.
 }
 

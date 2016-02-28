@@ -1,33 +1,78 @@
-#' Run a Module.
+#' Run a Module (experimental).
 #'
-#' Run a module as a standalone script.
+#' Run a module as a standalone script. Asynchronous functions are based on
+#' forking and so are not available on Windows.
 #'
-#' @param ... Module name as first argument. Further arguments can be passed
-#'   for evaluation to the resulting function, if any (see \code{\link{make}}).
+#' @inheritParams make
+#' @param ... For \code{run} and \code{run_async}, further arguments to be
+#'   passed for evaluation to the resulting function, if any (see
+#'   \code{\link{make}}). For \code{do_run_async}, further arguments to be
+#'   passed to \code{\link[parallel]{mcparallel}}.
 #'
 #' @details
 #'
-#' TODO documentation
+#' Experimental.
 #'
 #' @export
-run <- function(...) {
-  script <- capture.output(bundle(...))
-  local(eval(parse(text = script)))
+run <- function(name = .Last.name, ...) {
+
+  if (.is_called_from_within_module()) {
+    warning("run is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  do_run(name = name, args = list(...))
+
 }
 
-#' Run a Module Asynchronously.
-#'
-#' Run a module asynchronously as a standalone script.
-#'
-#' @param ... Module name as first argument. Further arguments can be passed
-#'   for evaluation to the resulting function, if any (see \code{\link{make}}).
-#'
-#' @details
-#'
-#' TODO documentation
-#'
+#' @rdname run
+#' @inheritParams do_bundle
 #' @export
-run_async <- function(...) {
+do_run <- function(name = .Last.name, args = list(),
+                   quote = FALSE, envir = parent.frame(1L),
+                   pre_hook = NULL, post_hook = NULL) {
+
+  if (.is_called_from_within_module()) {
+    warning("do_run is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  capture.output(script <- do_bundle(
+    name = name, args = args,
+    quote = quote, envir = envir,
+    pre_hook = pre_hook, post_hook = post_hook))
+
+  (local(eval(parse(text = script))))
+
+}
+
+#' @rdname run
+#' @export
+do.run <- do_run
+
+#' @rdname run
+#' @export
+run_async <- function(name = .Last.name, ...) {
+
+  if (.is_called_from_within_module()) {
+    warning("do_run_async is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  do_run_async(name = name, args = list(...))
+
+}
+
+#' @rdname run
+#' @export
+do_run_async <- function(name = .Last.name, args = list(),
+                         quote = FALSE, envir = parent.frame(1L),
+                         pre_hook = NULL, post_hook = NULL, ...) {
+
+  if (.is_called_from_within_module()) {
+    warning("do_run_async is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
 
   on.exit(
     message(
@@ -36,10 +81,12 @@ run_async <- function(...) {
       "Similarily, use `job$terminate()` ",
       "to terminate the parallel process."))
 
-  name <- list(...)[[1]]
-
   timestamp <- Sys.time()
-  job <- parallel::mcparallel(run(...), name = name)
+  job <- parallel::mcparallel(do_run(
+    name = name, args = args,
+    quote = quote, envir = envir,
+    pre_hook = pre_hook, post_hook = post_hook),
+    name = name, ...)
   result <- NULL
   done <- FALSE
 
@@ -110,3 +157,7 @@ run_async <- function(...) {
   )
 
 }
+
+#' @rdname run
+#' @export
+do.run_async <- do_run_async

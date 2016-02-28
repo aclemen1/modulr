@@ -59,6 +59,15 @@ test_that(".module_to_string shows name", {
   expect_match(.module_to_string("module_foobar"), "%provides%")
 })
 
+test_that(".module_to_string shows options", {
+  reset()
+  define("module_foobar", NULL, options_provider(foo = 1, bar = "bar"))
+  expect_match(.module_to_string("module_foobar"), "module_foobar")
+  expect_match(.module_to_string("module_foobar"), "%provides_options%")
+  expect_match(.module_to_string("module_foobar"), "foo = 1")
+  expect_match(.module_to_string("module_foobar"), "bar = \"bar\"")
+})
+
 test_that(".module_to_string shows dependencies", {
   reset()
   define("module", list(other = "other_module"), function(other) NULL)

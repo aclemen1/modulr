@@ -2,18 +2,55 @@
 % Please edit documentation in R/bundle.R
 \name{bundle}
 \alias{bundle}
-\title{Bundle a Module.}
+\alias{do.bundle}
+\alias{do_bundle}
+\title{Bundle a Module (experimental).}
 \usage{
-bundle(...)
+bundle(name = .Last.name, ...)
+
+do_bundle(name = .Last.name, args = list(), quote = FALSE,
+  envir = parent.frame(1L), pre_hook = NULL, post_hook = NULL, ...)
+
+do.bundle(name = .Last.name, args = list(), quote = FALSE,
+  envir = parent.frame(1L), pre_hook = NULL, post_hook = NULL, ...)
 }
 \arguments{
-\item{...}{Module name as first argument. Further arguments can be passed
-  for evaluation to the resulting function, if any (see \code{\link{make}}).}
+\item{name}{A string (character vector of lenght one).
+
+  A module name can contain letters, figures and some special characters,
+  namely \code{_}, \code{-}, and \code{/}. The latter is a namespace
+  separator.
+
+  Names containing \code{/mock/}, \code{/mocks/}, \code{/test/},
+  \code{/tests/}, \code{/example/}, or \code{/examples/} have a special
+  meaning related to code testing and examples.
+
+  The name "modulr" corresponds to a special module and is therefore
+  reserved.}
+
+\item{...}{For \code{bundle}, further arguments to be passed
+  for evaluation to the resulting function, if any (see \code{\link{make}}).
+  For \code{do_bundle}, further arguments to be passed to
+  \code{\link{cat}}.}
+
+\item{args}{A list of arguments to be passed to the resulting function, if
+any. The \code{names} attribute of \code{args} gives the argument names.}
+
+\item{quote}{A flag. Should the arguments be quoted?}
+
+\item{envir}{An environment within which to evaluate the function call, if
+any. This will be most useful if the arguments are symbols or quoted
+expressions.}
+
+\item{pre_hook}{An expression. Code to be evaluated before the script.}
+
+\item{post_hook}{An expression. Code to be evaluated after the script. The
+`result` variable contains the result of the script evaluation.}
 }
 \description{
-Bundle a module and its dependencies for standalone use.
+Bundle a module for script use.
 }
 \details{
-TODO documentation
+Experimental.
 }
 

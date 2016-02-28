@@ -248,7 +248,7 @@ NULL
 #' @export
 options_provider <- function(...) {
 
-  args <- substitute(as.list(c(...)))
+  args <- substitute(as.list(c(...))) # Exclude Linting
 
   environment(options_provider_) <- environment()
 

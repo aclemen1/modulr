@@ -4,6 +4,8 @@
 #'
 #' @param comment A string (character vector of length one).
 #'
+#' @return A scalar (integer vector of length one) containing the stash ID.
+#'
 #' @details
 #'
 #' \code{stash} allows to stash all modules and the internal state of modulr.
@@ -60,7 +62,7 @@ stash <- function(comment = NA_character_) {
     },
     ok = TRUE, verbosity = 2)
 
-  invisible()
+  return(invisible(len_plus_1))
 
 }
 

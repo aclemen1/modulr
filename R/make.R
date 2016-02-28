@@ -2,11 +2,10 @@
 #'
 #' Make or remake a module.
 #'
-#' @param ... For \code{make}, module name is the first argument and further
-#'   arguments can be passed for evaluation to the resulting function, if any.
-#'   If no argument, \code{make} refers to the name of the last used module (see
-#'   \code{\link{.Last.name}}). For \code{make_all_tests}, further arguments to
-#'   be passed to \code{\link{load_all_modules}}.
+#' @inheritParams define
+#' @param ... For \code{make}, further arguments to be passed for evaluation to
+#'   the resulting function, if any. For \code{make_all_tests}, further
+#'   arguments to be passed to \code{\link{load_all_modules}}.
 #'
 #' @return The object resulting of the evaluation of the provider function of
 #'   the module. If the object is a function and arguments are passed, returns
@@ -63,9 +62,8 @@
 #'  may alterate the internal state of modulr.
 #'
 #' @seealso \code{\link{.Last.name}}, \code{\link{plot_dependencies}},
-#'   \code{\link{import_module}}, \code{\link{make}},
-#'   \code{\link{maps_config}}, \code{\link{paths_config}}, \code{\link{reset}},
-#'   and \code{\link{touch}}.
+#'   \code{\link{import_module}}, \code{\link{maps_config}},
+#'   \code{\link{paths_config}}, \code{\link{reset}}, and \code{\link{touch}}.
 #'
 #' @examples
 #' reset()
@@ -102,6 +100,7 @@
 #' define("foo", NULL, function() function(a) a + 1)
 #' foo <- make("foo"); foo(1)
 #' make("foo", 1)
+#' do_make("foo", args = list(a = 1))
 #'
 #' reset()
 #' define("A", NULL, function() "(A)")
@@ -143,15 +142,38 @@
 #'
 #' @aliases %<=% %=>% %<<=% %=>>%
 #' @export
-make <- function(...) {
+make <- function(name = .Last.name, ...) {
 
-  if (nargs() == 0L) {
-    name <- .Last.name
-    args_ <- list() # Exclude Linting
-  } else {
-    name <- list(...)[[1L]]
-    args_ <- list(...)[-1L]
+  if (.is_called_from_within_module()) {
+    warning("make is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
   }
+
+  if (.is_nested_load()) {
+    warning("loading calls are nested. Stopping recursion.",
+            call. = FALSE, immediate. = TRUE)
+    return(invisible(NULL))
+  }
+
+  do_make(name = name, args = list(...))
+
+}
+
+
+#' @rdname make
+#' @inheritParams define
+#' @param args A list of arguments to be passed to the resulting function, if
+#'   any. The \code{names} attribute of \code{args} gives the argument names.
+#' @param quote A flag. Should the arguments be quoted?
+#' @param envir An environment within which to evaluate the function call, if
+#'   any. This will be most useful if the arguments are symbols or quoted
+#'   expressions.
+#' @aliases do.make
+#' @export
+do_make <- function(name = .Last.name, args = list(),
+                    quote = FALSE, envir = parent.frame(1L)) {
+
+  assert_that(is.list(args), msg = "second argument must be a list.")
 
   .message_meta(sprintf("Entering make() for '%s' ...", name),
                 verbosity = +Inf)
@@ -159,7 +181,7 @@ make <- function(...) {
   assert_that(.is_conform(name))
 
   if (.is_called_from_within_module()) {
-    warning("make is called from within a module.",
+    warning("do_make is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
 
@@ -268,12 +290,12 @@ make <- function(...) {
 
                         timestamp <- Sys.time()
 
-                        args <- list()
+                        args_ <- list()
 
                         if (length(modulr_env$register[[
                           c(ordered_name, "dependencies")]]) > 0) {
 
-                          args <-
+                          args_ <-
                             lapply(
                               modulr_env$register[[
                                 c(ordered_name, "dependencies")]],
@@ -292,7 +314,7 @@ make <- function(...) {
 
                         instance <- withVisible(do.call(
                           provider,
-                          args = args, quote = TRUE,
+                          args = args_, quote = TRUE,
                           envir = new.env(parent = baseenv())))
 
                         modulr_env$register[[
@@ -327,9 +349,9 @@ make <- function(...) {
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
-    if (length(args_) > 0 && is.function(instance[["value"]])) {
-      return(do.call(instance[["value"]], args = args_,
-                     envir = parent.frame(1L)))
+    if (length(args) > 0 && is.function(instance[["value"]])) {
+      return(do.call(instance[["value"]], args = args,
+                     quote = quote, envir = envir))
     } else {
       return(
         ifelse(instance[["visible"]], identity, invisible)(instance[["value"]])
@@ -340,6 +362,10 @@ make <- function(...) {
   verbosity = 2)
 
 }
+
+#' @rdname make
+#' @export
+do.make <- do_make
 
 #' @rdname make
 #' @param regexp A regular expression. If not missing, the regular expression

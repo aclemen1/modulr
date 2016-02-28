@@ -304,6 +304,21 @@ test_that("make calls are warned from within a module", {
     foo %<<=% "modulr"
   })
   expect_warning(make("module"))
+  reset()
+  define("module", NULL, function() {
+    modulr <- do_make("modulr")
+  })
+  expect_warning(make("module"))
+  reset()
+  define("module", NULL, function() {
+    modulr <- make("modulr")
+  })
+  expect_warning(do_make("module"))
+  reset()
+  define("module", NULL, function() {
+    modulr <- do_make("modulr")
+  })
+  expect_warning(do_make("module"))
 })
 
 test_that("make returns an instance", {
@@ -482,6 +497,38 @@ test_that("make doesn't recurse infinitely when called", {
   root_config$set(path)
 
   module_file <- make(name)
+
+  expect_lte(test_env$deep, 2)
+
+  expect_true(.is_defined(name))
+})
+
+test_that("do_make doesn't recurse infinitely when called", {
+  reset()
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  name <- tools::file_path_sans_ext(basename(file))
+  path <- dirname(file)
+
+  test_env <- new.env()
+  assign("test_env", test_env, globalenv())
+  on.exit(rm(list = "test_env", pos = globalenv()))
+  test_env$deep <- 1
+  module_text <-
+    sprintf(
+      paste(
+        "define('%s', NULL, function() NULL)",
+        "env <- get('test_env', envir = globalenv())",
+        "if (env$deep > 2) stop()",
+        "env$deep <- env$deep + 1",
+        "do_make()", sep = "\n"),
+      name)
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+
+  root_config$set(path)
+
+  module_file <- do_make(name)
 
   expect_lte(test_env$deep, 2)
 
