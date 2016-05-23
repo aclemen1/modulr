@@ -155,7 +155,7 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
 
   module <- .module_to_string(name)
 
-  capture.output(docstring <- info(name))
+  utils::capture.output(docstring <- info(name))
 
   mocks <-
     vapply(list_modules(regexp = sprintf("^%s/.*mocks?$", name), wide = F),
@@ -230,7 +230,7 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
     sprintf("---"),
     sprintf(paste0("_Gear prepared with the R package ",
                    "[_modulr_](https://github.com/aclemen1/modulr) (v%s) ",
-                   "on %s._"), packageVersion("modulr"), Sys.time()),
+                   "on %s._"), utils::packageVersion("modulr"), Sys.time()),
     sep = "\n")
 
   gear
