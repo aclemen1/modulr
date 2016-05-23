@@ -39,7 +39,7 @@ modulr_env <- new.env(parent = emptyenv())
     msg <- c()
     bc <- get_breadcrumbs(verbose = FALSE)
     if (!is.null(bc))
-      msg <- gettextf("modulr breadcrumbs: %s",
+      msg <- gettextf("modulr breadcrumbs: %s\n",
                       paste(gettextf("'%s'", bc), collapse = " > "))
     msg <- c(msg, gettextf("'%s' is deprecated.\n", old))
     if (!missing(new))
