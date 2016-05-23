@@ -189,8 +189,10 @@ do_bundle <- function(name = .Last.name, args = list(),
           sprintf("# ---- Make '%s' --------", name),
           sprintf(""),
           sprintf(
-            paste0("result <- do_make(name = \"%s\", ",
-                   "args = %s, quote = %s, envir = %s)"),
+            paste0(
+              "result <- ",
+              "do_make(name = \"%s\", args = %s, quote = %s, envir = %s)"
+            ),
             name, deparse(args), deparse(quote), deparse(substitute(envir))),
           sep = "\n"),
         sep = "\n"),

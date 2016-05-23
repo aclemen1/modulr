@@ -37,7 +37,7 @@ do_run <- function(name = .Last.name, args = list(),
             call. = FALSE, immediate. = TRUE)
   }
 
-  capture.output(script <- do_bundle(
+  utils::capture.output(script <- do_bundle(
     name = name, args = args,
     quote = quote, envir = envir,
     pre_hook = pre_hook, post_hook = post_hook))
@@ -76,6 +76,7 @@ do_run_async <- function(name = .Last.name, args = list(),
 
   on.exit(
     message(
+      "Your job has PID ", job$pid, ". ",
       "Provided `job <- .Last.value`, use `job$collect()` ",
       "to check and collect the result. ",
       "Similarily, use `job$terminate()` ",
@@ -106,18 +107,14 @@ do_run_async <- function(name = .Last.name, args = list(),
   terminate <- function() {
     if (!is.null(job)) {
       if (terminate_()) {
-        .message_info(
-          sprintf("Parallel job '%s' successfully terminated",
-                  name))
+        .message_info("Job successfully terminated")
       } else {
         .message_stop(
-          sprintf("Something went wrong with terminating parallel job '%s'.",
-                  name))
+          sprintf("Something went wrong terminating job '%s' (PID %d).",
+                  name, job$pid))
       }
     } else {
-      .message_info(
-        sprintf("Parallel job '%s' already terminated.",
-                name))
+      .message_info("Job already terminated.")
     }
   }
 
@@ -130,22 +127,58 @@ do_run_async <- function(name = .Last.name, args = list(),
   }
 
   collect <- function(wait = FALSE, ...) {
-    if (done) return(restitute_(result))
+
+    is_running <- !is.null(job) &&
+      system(sprintf("ps -p %d", as.integer(job$pid)),
+             ignore.stdout = TRUE, ignore.stderr = TRUE) == 0
+
+    if (done) {
+      if (is_running) {
+        sprintf(
+          "Job '%s' (PID %d) has not been terminated correctly. Trying again.",
+          name, job$pid)
+        on.exit(
+          if (!isTRUE(terminate_())) .message_stop(
+            sprintf("Something went wrong terminating job '%s' (PID %d).",
+                    name, job$pid))
+        )
+      }
+      return(restitute_(result))
+    }
+
+    if (is.null(job)) {
+      if (is_running) {
+        sprintf(
+          "Job '%s' (PID %d) has not been terminated correctly. Trying again.",
+          name, job$pid)
+        on.exit(
+          if (!isTRUE(terminate_())) .message_stop(
+            sprintf("Something went wrong terminating job '%s' (PID %d).",
+                    name, job$pid))
+        )
+      } else {
+        .message_info("Job has been terminated. No result available.")
+      }
+      return(invisible(NULL))
+    }
+
     rs <- parallel::mccollect(job, wait = wait, ...)
+
     if (is.null(rs)) {
       .message_info(
-        sprintf("Parallel job '%s' still running. Please try again later.",
-                name))
+        sprintf("Job '%s' (PID %d) still running. Please try again later.",
+                name, job$pid))
     } else {
       on.exit(
         if (!isTRUE(terminate_())) .message_stop(
-          sprintf("Something went wrong with terminating parallel job '%s'.",
-                  name))
+          sprintf("Something went wrong terminating job '%s' (PID %d).",
+                  name, job$pid))
       )
       result <<- rs[[1L]]
       done <<- TRUE
       return(restitute_(result))
     }
+
   }
 
   list(
@@ -158,6 +191,34 @@ do_run_async <- function(name = .Last.name, args = list(),
 
 }
 
+
 #' @rdname run
 #' @export
 do.run_async <- do_run_async
+
+# Begin Exclude Linting
+# #' @rdname run
+# #' @export
+# list_async_jobs <- function(intern = FALSE) {
+#   jobs <- grep(
+#     "parallel:::.slaveR",
+#     system("ps -o pid,cmd", intern = TRUE),
+#     value = T)
+#   if(length(jobs) > 0) {
+#     if (!intern) {
+#       cat(jobs, collapse = "\n")
+#       return(invisible(paste(jobs, collapse = "\n")))
+#     } else jobs
+#   }
+# }
+#
+# #' @rdname run
+# #' @export
+# terminate_async_jobs <- function() {
+#   pids <- as.integer(unlist(
+#     lapply(strsplit(list_async_jobs(intern = TRUE)," ", fixed = T),
+#            function(x) x[1])))
+#   if(length(pids) > 0)
+#     tools::pskill(pids)
+# }
+# End Exclude Linting
