@@ -23,11 +23,11 @@
 
   comment <- rle(grepl("^\\s*#'", lines))
 
-  starts <- (head(cumsum(c(0L, comment$lengths)) + 1L, -1L))[comment$value]
+  starts <- (utils::head(cumsum(c(0L, comment$lengths)) + 1L, -1L))[comment$value]
   ends <- cumsum(comment$lengths)[comment$values]
 
   line_offset <- as.integer(attr(fun, "srcref", exact = TRUE))[1L]
-  line_string_width <- nchar(sprintf("%s", tail(ends, 1L) + line_offset))
+  line_string_width <- nchar(sprintf("%s", utils::tail(ends, 1L) + line_offset))
 
   for (bloc_idx in 1L:length(starts)) {
     start <- starts[bloc_idx]
