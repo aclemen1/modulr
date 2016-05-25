@@ -1,3 +1,5 @@
+# nocov start
+
 #' Bundle a Module (experimental).
 #'
 #' Bundle a module for script use.
@@ -224,3 +226,5 @@ do_bundle <- function(name = .Last.name, args = list(),
 #' @rdname bundle
 #' @export
 do.bundle <- do_bundle
+
+# nocov end

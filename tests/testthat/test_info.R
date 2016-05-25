@@ -16,12 +16,12 @@ test_that(".docstring strips empty lines and comments before docstring", {
 
     #' docstring
   }
-  expect_equal(.docstring(foo), "docstring\n")
+  expect_equal(.docstring(foo), "docstring")
   foo <- function() {
     # comment
     #' docstring
   }
-  expect_equal(.docstring(foo), "docstring\n")
+  expect_equal(.docstring(foo), "docstring")
   foo <- function() {
 
     # comment
@@ -30,7 +30,7 @@ test_that(".docstring strips empty lines and comments before docstring", {
 
     #' docstring
   }
-  expect_equal(.docstring(foo), "docstring\n")
+  expect_equal(.docstring(foo), "docstring")
 })
 
 test_that(".docstring justifies on left", {
@@ -38,12 +38,12 @@ test_that(".docstring justifies on left", {
     #' line 1
     #' line 2
   }
-  expect_equal(.docstring(foo), "line 1\nline 2\n")
+  expect_equal(.docstring(foo), "line 1\nline 2")
   foo <- function() {
     #' line 1
     #'  line 2
   }
-  expect_equal(.docstring(foo), "line 1\n line 2\n")
+  expect_equal(.docstring(foo), "line 1\n line 2")
   foo <- function() {
     #'line 1
     #'line 2
@@ -52,13 +52,40 @@ test_that(".docstring justifies on left", {
     #'  line 1
     #'  line 2
   }
-  expect_equal(.docstring(foo), "line 1\nline 2\n")
+  expect_equal(.docstring(foo), "line 1\nline 2")
   foo <- function() {
     #'    line 1
     #'     line 2
     #'   line 3
   }
-  expect_equal(.docstring(foo), " line 1\n  line 2\nline 3\n")
+  expect_equal(.docstring(foo), " line 1\n  line 2\nline 3")
+})
+
+test_that(".docstring outputs all blocs", {
+  foo <- function() {
+    #' bloc 1
+    NULL
+    #' bloc 2
+  }
+  expect_equal(.docstring(foo, sep = "\n"), "bloc 1\n\nbloc 2")
+})
+
+test_that(".docstring separates blocs correctly", {
+  foo <- function() {
+    #' bloc 1
+    NULL
+    #' bloc 2
+  }
+  expect_equal(.docstring(foo, sep = "\n---"), "bloc 1\n---\nbloc 2")
+})
+
+test_that(".docstring shows line numbers", {
+  foo <- function() {
+    #' bloc 1
+    NULL
+    #' bloc 2
+  }
+  expect_match(.docstring(foo, line_numbers = TRUE, sep = "\n"), "^\\[\\d+\\]")
 })
 
 test_that("info returns a module docstring, if any", {

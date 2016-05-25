@@ -6,9 +6,10 @@
 \alias{print_info}
 \title{Output Docstring Info.}
 \usage{
-print_info(name = .Last.name, load = TRUE)
+print_info(name = .Last.name, line_numbers = F, sep = "\\n",
+  load = TRUE)
 
-info(name = .Last.name, load = TRUE)
+info(name = .Last.name, line_numbers = F, sep = "\\n", load = TRUE)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -24,16 +25,21 @@ info(name = .Last.name, load = TRUE)
   The name "modulr" corresponds to a special module and is therefore
   reserved.}
 
+\item{line_numbers}{A flag. Should the source line numbers be outputed?}
+
+\item{sep}{A string (character vector of length one) containing the separator
+  between docstrings blocs.}
+
 \item{load}{A flag. Should the module be loaded?}
 }
 \description{
 Output the docstring info of a module.
 }
 \details{
-A docstring is intended to document a module and provide the user with the
-ability to inspect it at run time, for instance as an interactive help
-system, or as metadata. Formally, it is a block of commented lines prefixed
-with \code{#'} and located at the top of the module provider.
+A docstring is intended to document a module and provide the user
+with the ability to inspect it at run time, for instance as an interactive
+help system, or as metadata. Formally, it is a block of commented lines
+prefixed with \code{#'} and located at the top of the module provider.
 
 The preferred formatting for a docstring is R Markdown, notabely for Modulr
 Gears (see \code{\link{prepare_gear}}).

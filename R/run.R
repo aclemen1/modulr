@@ -1,3 +1,5 @@
+# nocov start
+
 #' Run a Module (experimental).
 #'
 #' Run a module as a standalone script. Asynchronous functions are based on
@@ -222,3 +224,5 @@ do.run_async <- do_run_async
 #     tools::pskill(pids)
 # }
 # End Exclude Linting
+
+# nocov end

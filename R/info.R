@@ -1,28 +1,35 @@
 # parse the docstring of a function
-.docstring <- function(fun) {
+.docstring <- function(fun, line_numbers = F, sep = "\n") {
 
-  assert_that(is.function(fun))
+  assert_that(
+    is.function(fun),
+    assertthat::is.flag(line_numbers),
+    assertthat::is.string(sep)
+  )
 
-  docstring <- character(0)
+  docstring <- character(0L)
 
   lines <- deparse(fun, control = "useSource")
 
-  if (!isTRUE(length(lines) >= 2)) return(docstring)
+  if (!isTRUE(length(lines) >= 2L)) return(docstring)
 
   lines <- lines[2:length(lines)]
 
   empty <- rle(grepl("^\\s*$|^\\s*#[^']", lines))
-  start <- empty$lengths[1][empty$values[1]]
+  start <- empty$lengths[1L][empty$values[1L]]
 
-  if (isTRUE(start >= 1))
-    lines <- lines[(start + 1):length(lines)]
+  if (isTRUE(start >= 1L))
+    lines <- lines[(start + 1L):length(lines)]
 
   comment <- rle(grepl("^\\s*#'", lines))
 
-  starts <- (head(cumsum(c(0, comment$lengths))+1, -1))[comment$value]
+  starts <- (head(cumsum(c(0L, comment$lengths)) + 1L, -1L))[comment$value]
   ends <- cumsum(comment$lengths)[comment$values]
 
-  for(bloc_idx in 1:length(starts)) {
+  line_offset <- as.integer(attr(fun, "srcref", exact = TRUE))[1L]
+  line_string_width <- nchar(sprintf("%s", tail(ends, 1L) + line_offset))
+
+  for (bloc_idx in 1L:length(starts)) {
     start <- starts[bloc_idx]
     end <- ends[bloc_idx]
 
@@ -34,21 +41,35 @@
 
       docstring_raw_margin <-
         min(Filter(
-          function(x) x >= 0,
+          function(x) x >= 0L,
           vapply(docstring_raw,
                  function(x)
                    attr(gregexpr("^[ \t]*", x)[[1]], "match.length"),
-                 FUN.VALUE = 0)))
+                 FUN.VALUE = 0L)))
 
       docstring_lines <-
-        vapply(docstring_raw,
-               function(x)
-                 substr(x, min(nchar(x), docstring_raw_margin + 1), nchar(x)),
-               FUN.VALUE = "", USE.NAMES = F)
+        vapply(
+          c(1:length(docstring_raw)),
+          function(idx) {
+            x <- docstring_raw[idx]
+            content <-
+              substr(x, min(nchar(x), docstring_raw_margin + 1L), nchar(x))
+            if (line_numbers && !is.na(line_offset)) {
+              content <- paste(
+                format(sprintf("[%s]", start + line_offset + idx),
+                       justify = "right", width = line_string_width + 2L),
+                content, sep = " ")
+            }
+            content
+          },
+          FUN.VALUE = "", USE.NAMES = F)
 
-      docstring <- paste(c(docstring, docstring_lines, ""), collapse = "\n")
+      docstring <- paste(c(docstring, docstring_lines), collapse = "\n")
 
     }
+
+    if (bloc_idx < length(starts))
+      docstring <- paste(c(docstring, sep), collapse = "")
 
   }
 
@@ -61,12 +82,14 @@
 #'
 #' @inheritParams define
 #' @param load A flag. Should the module be loaded?
+#' @param line_numbers A flag. Should the source line numbers be outputed?
+#' @param sep A string (character vector of length one) containing the separator
+#'   between docstrings blocs.
 #'
-#' @details
-#' A docstring is intended to document a module and provide the user with the
-#' ability to inspect it at run time, for instance as an interactive help
-#' system, or as metadata. Formally, it is a block of commented lines prefixed
-#' with \code{#'} and located at the top of the module provider.
+#' @details A docstring is intended to document a module and provide the user
+#' with the ability to inspect it at run time, for instance as an interactive
+#' help system, or as metadata. Formally, it is a block of commented lines
+#' prefixed with \code{#'} and located at the top of the module provider.
 #'
 #' The preferred formatting for a docstring is R Markdown, notabely for Modulr
 #' Gears (see \code{\link{prepare_gear}}).
@@ -88,10 +111,14 @@
 #' Sys.sleep(1); unlink(tmp)}
 #' @aliases docstring info
 #' @export
-print_info <- function(name = .Last.name, load = TRUE) {
+print_info <- function(name = .Last.name,
+                       line_numbers = F, sep = "\n",
+                       load = TRUE) {
 
   assert_that(
     .is_conform(name),
+    assertthat::is.flag(line_numbers),
+    assertthat::is.string(sep),
     assertthat::is.flag(load)
   )
 
@@ -106,7 +133,8 @@ print_info <- function(name = .Last.name, load = TRUE) {
 
   }
 
-  docstring <- .docstring(get_provider(name = name, load = FALSE))
+  docstring <- .docstring(get_provider(name = name, load = FALSE),
+                          line_numbers = line_numbers, sep = sep)
 
   cat(docstring)
 
