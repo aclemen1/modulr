@@ -9,11 +9,6 @@ test_that(".docstring returns the docstring of a function, if any", {
   foo <- function() NULL
   expect_identical(.docstring(foo), character(0))
 
-  foo <- function() {
-    NULL
-    #' this is not a docstring (preceded by NULL)
-  }
-  expect_identical(.docstring(foo), character(0))
 })
 
 test_that(".docstring strips empty lines and comments before docstring", {

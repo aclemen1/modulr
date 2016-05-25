@@ -18,29 +18,39 @@
     lines <- lines[(start + 1):length(lines)]
 
   comment <- rle(grepl("^\\s*#'", lines))
-  end <- comment$lengths[1][comment$values[1]]
 
-  if (!isTRUE(end >= 1)) return(docstring)
+  starts <- (head(cumsum(c(0, comment$lengths))+1, -1))[comment$value]
+  ends <- cumsum(comment$lengths)[comment$values]
 
-  lines <- lines[1:end]
+  for(bloc_idx in 1:length(starts)) {
+    start <- starts[bloc_idx]
+    end <- ends[bloc_idx]
 
-  docstring_raw <- sub("^\\s*#'", "", lines)
+    if (isTRUE(end >= start)) {
 
-  docstring_raw_margin <-
-    min(Filter(
-      function(x) x >= 0,
-      vapply(docstring_raw,
-             function(x)
-               attr(gregexpr("^[ \t]*", x)[[1]], "match.length"),
-             FUN.VALUE = 0)))
+      bloc_lines <- lines[start:end]
 
-  docstring_lines <-
-    vapply(docstring_raw,
-           function(x)
-             substr(x, min(nchar(x), docstring_raw_margin + 1), nchar(x)),
-           FUN.VALUE = "", USE.NAMES = F)
+      docstring_raw <- sub("^\\s*#'", "", bloc_lines)
 
-  docstring <- paste(c(docstring_lines, ""), collapse = "\n")
+      docstring_raw_margin <-
+        min(Filter(
+          function(x) x >= 0,
+          vapply(docstring_raw,
+                 function(x)
+                   attr(gregexpr("^[ \t]*", x)[[1]], "match.length"),
+                 FUN.VALUE = 0)))
+
+      docstring_lines <-
+        vapply(docstring_raw,
+               function(x)
+                 substr(x, min(nchar(x), docstring_raw_margin + 1), nchar(x)),
+               FUN.VALUE = "", USE.NAMES = F)
+
+      docstring <- paste(c(docstring, docstring_lines, ""), collapse = "\n")
+
+    }
+
+  }
 
   docstring
 }
