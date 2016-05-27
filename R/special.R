@@ -150,7 +150,7 @@ NULL
       # Deprecated and kept for backward compatibility.
       # nocov start
       resolve_path = function(...) {
-        .deprecated("$get_dirname or find_path", old = "$resolve_path")
+        .deprecated("$get_dirname' or 'find_path", old = "$resolve_path")
         eval(find_path(...), envir = parent.frame(1L))
       },
       # nocov end
