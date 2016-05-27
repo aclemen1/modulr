@@ -111,17 +111,17 @@ test_that(".resolve_mapping resolves module names", {
 
 })
 
-test_that(".resolve_path returns path relative to config", {
+test_that("find_path returns path relative to config", {
   paths_config$set(
     "bundle_1" = "lib/bundle_1",
     "bundle_2" = "lib/bundle_2")
-  expect_equal(.resolve_path("bundle_1/foo/bar", absolute = F),
+  expect_equal(find_path("bundle_1/foo/bar", absolute = F),
                "lib/bundle_1/foo/bar")
-  expect_equal(.resolve_path("bundle_2/foo/baz", absolute = F),
+  expect_equal(find_path("bundle_2/foo/baz", absolute = F),
                "lib/bundle_2/foo/baz")
 })
 
-test_that(".resolve_path returns path relative to mappings", {
+test_that("find_path returns path relative to mappings", {
   paths_config$set(
     "3rd_party_modules" = "lib/vendor",
     "my_modules" = "lib/modules")
@@ -130,20 +130,20 @@ test_that(".resolve_path returns path relative to mappings", {
       "3rd_party_modules/foo/bar" = "3rd_party_modules/foo/bar_V2"
       )
     )
-  expect_equal(.resolve_path("3rd_party_modules/foo/bar",
+  expect_equal(find_path("3rd_party_modules/foo/bar",
                             "my_modules/old/module", absolute = F),
                "lib/vendor/foo/bar_V2")
-  expect_equal(.resolve_path("3rd_party_modules/foo/bar", absolute = F),
+  expect_equal(find_path("3rd_party_modules/foo/bar", absolute = F),
                "lib/vendor/foo/bar")
 })
 
-test_that(".resolve_path returns absolute path relative to config", {
+test_that("find_path returns absolute path relative to config", {
   root_config$set(".")
   paths_config$set(
     "bundle_1" = "lib/bundle_1",
     "bundle_2" = "lib/bundle_2")
-  expect_equal(.resolve_path("bundle_1/foo/bar", absolute = T),
+  expect_equal(find_path("bundle_1/foo/bar", absolute = T),
                "./lib/bundle_1/foo/bar.R")
-  expect_equal(.resolve_path("bundle_2/foo/baz", absolute = T),
+  expect_equal(find_path("bundle_2/foo/baz", absolute = T),
                "./lib/bundle_2/foo/baz.R")
 })

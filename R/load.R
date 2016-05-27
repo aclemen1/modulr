@@ -143,7 +143,7 @@ load_module <- function(name = .Last.name) {
 
   if (.is_regular(name)) {
 
-    path <- .resolve_path(name)
+    path <- find_path(name)
 
     .load_module(path = path, name = name, check = TRUE)
 

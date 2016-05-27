@@ -23,7 +23,8 @@
 
   comment <- rle(grepl("^\\s*#'", lines))
 
-  starts <- (utils::head(cumsum(c(0L, comment$lengths)) + 1L, -1L))[comment$value]
+  starts <-
+    (utils::head(cumsum(c(0L, comment$lengths)) + 1L, -1L))[comment$value]
   ends <- cumsum(comment$lengths)[comment$values]
 
   line_offset <- as.integer(attr(fun, "srcref", exact = TRUE))[1L]

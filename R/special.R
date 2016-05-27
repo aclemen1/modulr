@@ -135,23 +135,23 @@ NULL
       # returns module filename
       get_filename = function() {
         name <- get(".__name__", pos = parent.frame())
-        .resolve_path(name)
+        find_path(name)
       },
 
       # returns module directory
       get_dirname = function() {
         name <- get(".__name__", pos = parent.frame())
-        file <- .resolve_path(name)
+        file <- find_path(name)
         if (is.null(file)) return(NULL)
         dirname(file)
       },
 
-      # returns .resolve_path function
+      # returns find_path function
       # Deprecated and kept for backward compatibility.
       # nocov start
       resolve_path = function(...) {
-        .deprecated("$get_dirname", old = "$resolve_path")
-        eval(.resolve_path(...), envir = parent.frame(1L))
+        .deprecated("$get_dirname or find_path", old = "$resolve_path")
+        eval(find_path(...), envir = parent.frame(1L))
       },
       # nocov end
 

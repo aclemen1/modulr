@@ -3,7 +3,7 @@
 \name{get_provider}
 \alias{get_factory}
 \alias{get_provider}
-\title{Get the provider of a Module.}
+\title{Get the Provider of a Module.}
 \usage{
 get_provider(name = .Last.name, load = FALSE)
 }

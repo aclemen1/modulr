@@ -127,13 +127,64 @@
 
 }
 
-# From a module name, we want to infer its (absolute) path.
-.resolve_path <- function(name, scope_name = NULL, absolute = TRUE, ...) {
+#' Find the Path of a Module.
+#'
+#' Find the path of a module, in the context of a module scope, if any. The
+#' returned path can be absolute or relative to a root directory.
+#'
+#' @inheritParams define
+#' @param scope_name A module name to use as scope (see \code{\link{define}},
+#'   \code{\link{maps_config}}, and examples).
+#' @param absolute A flag. Should the returned path be absolute? (see
+#'   \code{\link{define}}, \code{\link{root_config}}, and examples)
+#' @param extensions A character vector. File extensions to consider.
+#'
+#' @return A string containing the path of the module.
+#'
+#' @seealso \code{\link{define}}, \code{\link{maps_config}},
+#'   \code{\link{reset}}, and \code{\link{root_config}},
+#'
+#' @examples
+#' reset()
+#' tmp_dir <- tempfile("modulr_")
+#' dir.create(tmp_dir)
+#' tmp_file <- file.path(tmp_dir, "foo.R")
+#' cat('define("foo", NULL, function() "Hello World!")', file = tmp_file)
+#' root_config$set(tmp_dir)
+#' set_verbosity(1L)
+#' find_path("foo")
+#' unlink(tmp_dir, recursive = TRUE)
+#'
+#' reset()
+#' tmp_dir <- tempfile("modulr_")
+#' dir.create(file.path(tmp_dir, 'foo'), recursive = TRUE)
+#' dir.create(file.path(tmp_dir, 'vendor'), recursive = TRUE)
+#' cat(paste0('define("bar", list(great_module = "vendor/great_module"), ',
+#'            'function() great_module)'),
+#'     file = file.path(tmp_dir, "foo", "bar.R"))
+#' cat('define("great_module", NULL, function() "Great Module")',
+#'     file = file.path(tmp_dir, "vendor", "great_module.R"))
+#' cat('define("great_module", NULL, function() "Old Great Module")',
+#'     file = file.path(tmp_dir, "vendor", "old_great_module.R"))
+#' root_config$set(tmp_dir)
+#' set_verbosity(1L)
+#' find_path("vendor/great_module")
+#' maps_config$set("foo/bar" = list("vendor/great_module" =
+#'                                  "vendor/old_great_module"))
+#' find_path("vendor/great_module", "foo/bar")
+#' unlink(tmp_dir, recursive = TRUE)
+#'
+#' @export
+find_path <- function(name, scope_name = NULL, absolute = TRUE,
+                      extensions = c(".R", ".r",
+                                     ".Rmd", ".rmd",
+                                     ".Rnw", ".rnw")) {
 
   assert_that(
     assertthat::is.string(name),
     is.null(scope_name) || assertthat::is.string(scope_name),
-    assertthat::is.flag(absolute))
+    assertthat::is.flag(absolute),
+    is.character(extensions))
 
   if (is.null(scope_name)) injected_name <- name else
     injected_name <- .resolve_mapping(name, scope_name)
@@ -195,7 +246,7 @@
   }
 
   if (absolute)
-    return(.find_absolute_path(candidate, ...))
+    return(.find_absolute_path(candidate, extensions))
 
   candidate
 

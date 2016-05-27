@@ -400,7 +400,7 @@ define <- function(name, dependencies, provider) {
 
 }
 
-#' Get the provider of a Module.
+#' Get the Provider of a Module.
 #'
 #' Get the provider function of a module.
 #'
