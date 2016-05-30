@@ -21,12 +21,12 @@ RESERVED_NAMES <- c("modulr")
 #' Returns a list containing the module options. See
 #' \code{\link{module_options}}. \bold{Deprecated and kept for backward
 #' compatibility.}
-#' @section \code{get_filename()}:
+#' @section \code{get_filename(absolute = TRUE)}:
 #' Returns a string (character vector of lenght one) containing the module
-#' filename.
-#' @section \code{get_dirname()}:
+#' (absolute) filename.
+#' @section \code{get_dirname(absolute = TRUE)}:
 #' Returns a string (character vector of lenght one) containing the module
-#' dirname.
+#' (absolute) dirname.
 #' @section \code{message_info(...), message_warn(...), and message_stop(...)}:
 #' Outputs an informative, warning, or critical and stopping message, prefixed
 #' with a timestamp and the module name. Such messages are particularily useful
@@ -133,15 +133,15 @@ NULL
       },
 
       # returns module filename
-      get_filename = function() {
+      get_filename = function(absolute = TRUE) {
         name <- get(".__name__", pos = parent.frame())
-        find_path(name)
+        find_path(name, absolute = absolute)
       },
 
       # returns module directory
-      get_dirname = function() {
+      get_dirname = function(absolute = TRUE) {
         name <- get(".__name__", pos = parent.frame())
-        file <- find_path(name)
+        file <- find_path(name, absolute = absolute)
         if (is.null(file)) return(NULL)
         dirname(file)
       },

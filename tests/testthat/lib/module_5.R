@@ -1,2 +1,3 @@
 define("module_5", list(modulr = "modulr"),
-       function(modulr) modulr$get_dirname())
+       function(modulr) list(modulr$get_dirname(),
+                             modulr$get_dirname(absolute = FALSE)))

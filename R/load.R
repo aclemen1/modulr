@@ -143,7 +143,14 @@ load_module <- function(name = .Last.name) {
 
   if (.is_regular(name)) {
 
-    path <- find_path(name)
+    candidates <- .find_candidates(name = name)
+    if (length(candidates) > 0L) {
+      path <- candidates[[1]]$filename
+      name <- candidates[[1]]$resolved_name
+    } else {
+      path <- NULL
+      name <- .resolve_mapping(name)
+    }
 
     .load_module(path = path, name = name, check = TRUE)
 

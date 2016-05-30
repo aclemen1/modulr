@@ -185,7 +185,7 @@ module_options <- function(name = .Last.name) {
     "for your options and configurations settings. "
   ))
 
-  assert_that(.is_regular(name))
+  assert_that(.is_regular(name), .is_exact(name))
 
   .config(c("modules", name))
 
@@ -201,6 +201,13 @@ module_options <- function(name = .Last.name) {
     .is_regular(name),
     msg =
       "left-hand side of `%has_default_option%` is not a regular module name."
+  )
+
+  assert_that(
+    .is_exact(name),
+    msg =
+      paste0("left-hand side of `%has_default_option%` ",
+             "contains a prefixed version number.")
   )
 
   assert_that(
@@ -226,6 +233,12 @@ module_options <- function(name = .Last.name) {
   assert_that(
     .is_regular(name),
     msg = "left-hand side of `%has_option%` is not a regular module name."
+  )
+
+  assert_that(
+    .is_exact(name),
+    msg =
+      "left-hand side of `%has_option%` contains a prefixed version number."
   )
 
   assert_that(

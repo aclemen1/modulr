@@ -360,7 +360,7 @@ test_that("make_tests makes all tests", {
       })
     }
 
-  "test_1/2/test" %requires% list(test_1 = "test_1/mock") %provides%
+  "test_1/sub_2/test" %requires% list(test_1 = "test_1/mock") %provides%
     function(test_1) {
       library(testthat)
       test_that("all is ok", {
@@ -384,7 +384,7 @@ test_that("make_tests fails on error", {
       return(T)
     }
 
-  "test_1/2/test" %requires% list(test_1 = "test_1/mock") %provides%
+  "test_1/sub_2/test" %requires% list(test_1 = "test_1/mock") %provides%
     function(test_1) {
       return(F)
     }
@@ -404,7 +404,7 @@ test_that("make_tests fails on malformed tests", {
       return("malformed")
     }
 
-  "test_1/2/test" %requires% list(test_1 = "test_1/mock") %provides%
+  "test_1/sub_2/test" %requires% list(test_1 = "test_1/mock") %provides%
     function(test_1) {
       return(T)
     }

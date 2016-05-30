@@ -298,10 +298,21 @@ define <- function(name, dependencies, provider) {
     msg = "module name is not regular nor reserved.")
 
   assert_that(
+    .is_exact(name),
+    msg = "module name contains a prefixed version number.")
+
+  assert_that(
+    assertthat::is.string(name) && (.is_regular(name) || .is_reserved(name)),
+    msg = "module name is not regular nor reserved.")
+
+  assert_that(
     is.null(dependencies) || is.list(dependencies),
     msg = "dependencies are not in a list."
     )
   if (is.null(dependencies)) dependencies <- list()
+
+  aliases <- dependencies
+  dependencies <- lapply(dependencies, resolve_name, name)
 
   provider_subst <- substitute(provider)
 
@@ -353,6 +364,7 @@ define <- function(name, dependencies, provider) {
 
         modulr_env$register[[name]] <- list(
           "name" = name,
+          "aliases" = aliases,
           "dependencies" = dependencies,
           "provider" = provider,
           "digest" = .digest(dependencies, provider),
@@ -374,6 +386,7 @@ define <- function(name, dependencies, provider) {
     if (!identical(digest, previous_digest)) {
       .message_meta(sprintf("Re-defining '%s'", name), {
 
+        modulr_env$register[[c(name, "aliases")]] <- aliases
         modulr_env$register[[c(name, "dependencies")]] <- dependencies
         modulr_env$register[[c(name, "provider")]] <- provider
         modulr_env$register[[c(name, "digest")]] <- digest
