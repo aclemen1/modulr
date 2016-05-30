@@ -559,6 +559,16 @@ make_all_tests <- function(...) {
 #' make("F")
 #' plot_dependencies()
 #'
+#' reset()
+#' define("foo", list(bar = "bar#latest"), function(bar) bar)
+#' define("bar#1.0.0", NULL, function() "bar v1.0.0")
+#' define("bar#1.0.1", NULL, function() "bar v1.0.1")
+#' make("foo")
+#' maps_config$set(foo = list("bar#latest" = "bar#1.0.0"))
+#' make("foo")
+#' touch("foo")
+#' make("foo")
+#'
 #' @export
 touch <- function(name = .Last.name) {
 
@@ -574,6 +584,8 @@ touch <- function(name = .Last.name) {
 
   .message_meta(sprintf("Touching '%s'", name), {
 
+    modulr_env$register[[c(name, "dependencies")]] <-
+      lapply(modulr_env$register[[c(name, "aliases")]], resolve_name, name)
     modulr_env$register[[c(name, "instance")]] <- NULL
     modulr_env$register[[c(name, "instanciated")]] <- F
     modulr_env$register[[c(name, "digest")]] <- NULL
