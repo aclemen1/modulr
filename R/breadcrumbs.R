@@ -98,7 +98,7 @@ reactivate_breadcrumbs <- function() {
       if (!interactive()) stop(call. = FALSE) # nocov
     }
 
-    options(error = wrapper)
+    options(error = wrapper, show.error.locations = "top")
 
   }
 

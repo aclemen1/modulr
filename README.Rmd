@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 Sys.setlocale("LC_TIME", "en_DK.UTF-8")
 ```
 
-[![Build status](https://travis-ci.org/aclemen1/modulr.svg)](https://travis-ci.org/aclemen1/modulr)
+[![Build status](https://travis-ci.org/aclemen1/modulr.svg?branch=devel)](https://travis-ci.org/aclemen1/modulr?branch=devel)
 [![Coverage status](https://codecov.io/github/aclemen1/modulr/coverage.svg?branch=devel)](http://codecov.io/github/aclemen1/modulr?branch=devel)
 [![Pending pull-requests](https://githubbadges.herokuapp.com/aclemen1/modulr/pulls.svg?style=flat)](https://github.com/aclemen1/modulr/pulls)
 [![GitHub issues](http://img.shields.io/github/issues-raw/aclemen1/modulr.svg)](http://waffle.io/aclemen1/modulr)
@@ -182,7 +182,7 @@ independent modules into layers.
 # Do not try to produce a snapshot on Travis CI or CRAN
 if (!identical(Sys.getenv("TRAVIS"), "true") &&
       identical(Sys.getenv("NOT_CRAN"), "true")) {
-  graph_dependencies("bad_stat/student_teacher_ratio") %>%
+  plot_dependencies("bad_stat/student_teacher_ratio") %>%
     html_print %>%
     webshot(file = "README-fig1.png", selector = ".sankeyNetwork", delay = 2) %>%
     resize("730x") %>%
@@ -191,7 +191,7 @@ if (!identical(Sys.getenv("TRAVIS"), "true") &&
 ```
 
 ```{r, echo=T, eval=F}
-graph_dependencies("bad_stat/student_teacher_ratio")
+plot_dependencies("bad_stat/student_teacher_ratio")
 ```
 
 ![](README-fig1.png)
