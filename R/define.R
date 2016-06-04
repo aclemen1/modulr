@@ -311,9 +311,6 @@ define <- function(name, dependencies, provider) {
     )
   if (is.null(dependencies)) dependencies <- list()
 
-  aliases <- dependencies
-  dependencies <- lapply(dependencies, resolve_name, name)
-
   provider_subst <- substitute(provider)
 
   assert_that(
@@ -350,7 +347,16 @@ define <- function(name, dependencies, provider) {
                               length(formals(provider))) &&
           is.null(names(dependencies))),
       msg = "dependencies and formals are not matching.")
+    if (is.null(names(dependencies))) {
+      names(dependencies) <- names(formals(provider))
+    }
   }
+
+  aliases <- dependencies
+
+  dependencies <- lapply(lapply(
+    lapply(dependencies, .resolve_namespace, name),
+    `[[`, "resolved"), unname)
 
   timestamp <- Sys.time()
 
@@ -372,6 +378,8 @@ define <- function(name, dependencies, provider) {
           "calls" = 0,
           "duration" = NA_integer_,
           "first_instance" = T,
+          "storage" = "in-memory",
+          "along" = NA_character_,
           "timestamp" = timestamp,
           "created" = timestamp
           )
@@ -397,11 +405,13 @@ define <- function(name, dependencies, provider) {
         modulr_env$register[[c(name, "first_instance")]] <- F
         modulr_env$register[[c(name, "url")]] <- NULL
         modulr_env$register[[c(name, "timestamp")]] <- timestamp
+        modulr_env$register[[c(name, "storage")]] <- "in-memory"
+        modulr_env$register[[c(name, "along")]] <- NA_character_
 
       },
       ok = TRUE, verbosity = 1)
-
     }
+
   } else {
     assert_that(.is_regular(name))
   }

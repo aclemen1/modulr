@@ -6,12 +6,12 @@
 \title{List Defined Modules.}
 \usage{
 list_modules(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
-  formatted = TRUE, cols = c("name", "type", "weight", "calls",
-  "dependencies", "childs", "size", "lines", "modified"))
+  formatted = TRUE, cols = c("name", "storage", "along", "type", "weight",
+  "calls", "dependencies", "childs", "size", "lines", "modified"))
 
 lsmod(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
-  formatted = TRUE, cols = c("name", "type", "weight", "calls",
-  "dependencies", "childs", "size", "lines", "modified"))
+  formatted = TRUE, cols = c("name", "storage", "along", "type", "weight",
+  "calls", "dependencies", "childs", "size", "lines", "modified"))
 }
 \arguments{
 \item{regexp}{A regular expression. If not missing, the regular expression
@@ -41,6 +41,9 @@ For each module, the following details can be returned in the columns of the
 data frame:
 \describe{
 \item{\code{name}}{name.}
+\item{\code{storage}}{storage of the module, `in-memory` or `on-disk`.}
+\item{\code{along}}{name of the on-disk module along which the definition
+takes place.}
 \item{\code{type}}{type of the object returned.}
 \item{\code{weight}}{memory size of the object.}
 \item{\code{calls}}{number of explicit make calls.}

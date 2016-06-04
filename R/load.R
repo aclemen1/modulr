@@ -1,7 +1,9 @@
 # Load a module at a given location.
-.load_module <- function(path, name = path, check = TRUE) {
+.load_module <- function(path, name = NULL, check = TRUE) {
 
   if (!is.null(path)) {
+
+    loaded <- FALSE
 
     register <- modulr_env$register
     .Last.name <- modulr_env$.Last.name
@@ -34,6 +36,7 @@
           } else {
             try(stop(last_error, call. = FALSE), silent = TRUE)
           }
+          loaded <- TRUE
         },
         error = function(e) {
           rollback()
@@ -46,6 +49,7 @@
       } else {
         tryCatch({
           source(path, local = TRUE, echo = FALSE, keep.source = TRUE)
+          loaded <- TRUE
         },
         error = function(e) {
           rollback()
@@ -66,6 +70,7 @@
 
       tryCatch({
         local(eval(parse(text = script, keep.source = TRUE)))
+        loaded <- TRUE
       },
       error = function(e) {
         rollback()
@@ -76,6 +81,19 @@
       knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
 
     }
+
+    loaded_names <- setdiff(names(modulr_env$register), names(register))
+    if (loaded)
+      loaded_names <- c(name, loaded_names)
+    loaded_names <- unique(loaded_names)
+
+    Map(function(name_) {
+      modulr_env$register[[c(name_, "storage")]] <- "on-disk"
+      modulr_env$register[[c(name_, "filepath")]] <- path
+      modulr_env$register[[c(name_, "along")]] <-
+        ifelse(name == name_, NA_character_, name)
+    },
+    loaded_names)
 
   }
 
@@ -130,6 +148,8 @@ load_module <- function(name = .Last.name) {
   .message_meta(sprintf("Entering load_module() for '%s' ...", name),
                 verbosity = +Inf)
 
+  assert_that(.is_conform(name))
+
   if (.is_called_from_within_module()) {
     warning("load_module is called from within a module.",
             call. = FALSE, immediate. = TRUE)
@@ -141,19 +161,20 @@ load_module <- function(name = .Last.name) {
     return(invisible(NULL))
   }
 
-  if (.is_regular(name)) {
 
-    candidates <- .find_candidates(name = name)
-    if (length(candidates) > 0L) {
-      path <- candidates[[1]]$filename
-      name <- candidates[[1]]$resolved_name
-    } else {
-      path <- NULL
-      name <- .resolve_mapping(name)
-    }
-
-    .load_module(path = path, name = name, check = TRUE)
-
+  resolved_name <- .resolve_name(name, all = FALSE, absolute = FALSE)
+  path <- resolved_name[[c("resolved", "filepath")]]
+  name_ <- resolved_name[[c("resolved", "name")]]
+  namespace <- resolved_name[[c("candidates", "namespace")]]
+  if (!is.null(path) && file.exists(path)) {
+    loaded_module <-
+      setNames(.load_module(path = path, name = name_, check = TRUE), name_)
+    assert_that(.is_defined(name_))
+    loaded_module
+  } else if (.is_defined(namespace[["resolved"]])) {
+    setNames(NA, namespace[["resolved"]])
+  } else {
+    assert_that(.is_defined(name))
   }
 
 }
@@ -216,20 +237,30 @@ load_all_modules <- function(
 
   assert_that(is.character(group))
 
-  visited_dependencies <- list()
+  visited_dependencies <- c()
 
   iteration <- function(name, scope_name = NULL) {
 
-    name <- .resolve_mapping(name, scope_name)
-
     if (!(name %in% visited_dependencies)) {
 
-      load_module(name)
+      loaded_module <- load_module(name)
 
-      visited_dependencies <<- c(visited_dependencies, name)
+      if (!is.null(loaded_module)) {
+        loaded_module <- setNames(names(loaded_module), name)
+      } else {
+        loaded_module <-
+          .resolve_namespace(name = name,
+                             scope_name = scope_name)[["resolved"]]
+      }
 
-      Map(function(dependency) iteration(dependency, name),
-          modulr_env$register[[c(name, "dependencies")]])
+      visited_dependencies <<- c(visited_dependencies, loaded_module)
+
+      assert_that(.is_defined(loaded_module))
+
+      if(.is_defined(loaded_module)) {
+        Map(function(dependency) iteration(dependency, name),
+          modulr_env$register[[c(loaded_module, "dependencies")]])
+      }
 
     }
 
@@ -238,6 +269,6 @@ load_all_modules <- function(
   for (name in group)
     iteration(name)
 
-  unlist(visited_dependencies)
+  visited_dependencies
 
 }

@@ -332,10 +332,12 @@ test_that("make assigns the last regular module name to .Last.name", {
   expect_null(.Last.name) # Exclude Linting
   define("module_1", NULL, function() NULL)
   make("module_1")
-  expect_equal(.Last.name, "module_1") # Exclude Linting
+  expect_equal(.Last.name, setNames("module_1", "module_1")) # Exclude Linting
   define("module_1/test/a/dependency", NULL, function() NULL)
   make("module_1/test/a/dependency")
-  expect_equal(.Last.name, "module_1/test/a/dependency") # Exclude Linting
+  expect_equal(.Last.name,
+               setNames("module_1/test/a/dependency",
+                       "module_1/test/a/dependency")) # Exclude Linting
 })
 
 test_that("make_all makes all regular defined modules and returns results", {
@@ -414,6 +416,7 @@ test_that("make_tests fails on malformed tests", {
 
 test_that("make outputs a correct layer message", {
   reset()
+  root_config$set(".")
   define("foo", NULL, NULL)
   define("bar", NULL, NULL)
   define("foobar", list(foo = "foo", bar = "bar"), NULL)

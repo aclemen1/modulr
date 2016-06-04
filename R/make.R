@@ -1,3 +1,12 @@
+# TODO test that!
+.align_named_vectors <- function(ab, bc) {
+  selected_ab <- ab[ab %in% names(bc)]
+  selected_bc <- bc[names(bc) %in% ab]
+  aligned_ab <- selected_ab[order(selected_ab)]
+  aligned_bc <- selected_bc[order(names(selected_bc))]
+  setNames(aligned_bc, names(aligned_ab))
+}
+
 #' Make a Module.
 #'
 #' Make or remake a module.
@@ -203,6 +212,8 @@ do_make <- function(name = .Last.name, args = list(),
     },
     verbosity = 2)
 
+    name <- all_dependencies[1L]
+
     if (.is_regular(name))
       modulr_env$.Last.name <- name
 
@@ -269,7 +280,8 @@ do_make <- function(name = .Last.name, args = list(),
               assert_that(.is_defined(ordered_name))
 
               reinstanciated_by_parent <- any(unlist(lapply(
-                modulr_env$register[[c(ordered_name, "dependencies")]],
+                all_dependencies[
+                  names(all_dependencies) %in% modulr_env$register[[c(ordered_name, "dependencies")]]],
                 function(name) {
                   modulr_env$register[[c(name, "timestamp")]] >=
                     modulr_env$register[[c(ordered_name, "timestamp")]]
@@ -295,17 +307,29 @@ do_make <- function(name = .Last.name, args = list(),
                         if (length(modulr_env$register[[
                           c(ordered_name, "dependencies")]]) > 0) {
 
+#                           args_ <-
+#                             lapply(
+#                               modulr_env$register[[
+#                                 c(ordered_name, "dependencies")]],
+#                               function(name) {
+#                                 modulr_env$register[[c(
+#                                   .resolve_mapping(name, ordered_name),
+#                                   "instance", "value")]]
+#                               }
+#                             )
+
                           args_ <-
                             lapply(
-                              modulr_env$register[[
-                                c(ordered_name, "dependencies")]],
+                              .align_named_vectors(
+                                unlist(modulr_env$register[[
+                                  c(ordered_name, "dependencies")]]),
+                                all_dependencies
+                              ),
                               function(name) {
                                 modulr_env$register[[c(
-                                  .resolve_mapping(name, ordered_name),
-                                  "instance", "value")]]
+                                  name, "instance", "value")]]
                               }
                             )
-
                         }
 
                         provider <-
@@ -585,7 +609,8 @@ touch <- function(name = .Last.name) {
   .message_meta(sprintf("Touching '%s'", name), {
 
     modulr_env$register[[c(name, "dependencies")]] <-
-      lapply(modulr_env$register[[c(name, "aliases")]], resolve_name, name)
+      lapply(lapply(modulr_env$register[[c(name, "aliases")]],
+             .resolve_name, name), `[[`, "resolved_names")
     modulr_env$register[[c(name, "instance")]] <- NULL
     modulr_env$register[[c(name, "instanciated")]] <- F
     modulr_env$register[[c(name, "digest")]] <- NULL

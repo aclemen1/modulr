@@ -148,7 +148,7 @@ test_that("define writes to the register", {
   module <- register[["some/module"]]
 
   expect_equal(module$name, "some/module")
-  expect_equal(module$name, "some/module")
+  expect_equal(module$aliases, list(dep = "foo/bar"))
   expect_equal(module$dependencies, list(dep = "foo/bar"))
   expect_equal(module$provider, (function(dep) {
     return(dep)
@@ -157,6 +157,7 @@ test_that("define writes to the register", {
   expect_true(is.null(module$instance))
   expect_false(module$instanciated)
   expect_true(module$first_instance)
+  expect_true(is.na(module$along))
   expect_null(module$url)
 
   expect_lt(as.numeric(module$timestamp), as.numeric(Sys.time()))
@@ -188,7 +189,8 @@ test_that("re-define doesn't write to the register when no changes occur", {
   module <- register[["some/module"]]
 
   expect_equal(module$name, "some/module")
-  expect_equal(module$name, "some/module")
+  expect_true(is.na(module$along))
+  expect_equal(module$aliases, list(dep = "foo/bar"))
   expect_equal(module$dependencies, list(dep = "foo/bar"))
   expect_equal(module$provider, (function(dep) {
     return(dep)
@@ -225,7 +227,8 @@ test_that("re-define writes to the register when changes occur", {
   module <- register[["some/module"]]
 
   expect_equal(module$name, "some/module")
-  expect_equal(module$name, "some/module")
+  expect_true(is.na(module$along))
+  expect_equal(module$aliases, list(dep = "foo/bar"))
   expect_equal(module$dependencies, list(dep = "foo/bar"))
   expect_equal(module$provider, (function(dep) {
     return(sprintf("%s", dep))

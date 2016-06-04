@@ -21,8 +21,10 @@ test_that("$get_filename returns the module filename, if any", {
          function(modulr) modulr$get_filename())
   expect_null(make("my/great/module"))
 
-  expect_equal(make("module_4"), list(normalizePath("lib/module_4.R"),
-                                      "lib/module_4.R"))
+  expect_equal(
+    make("module_4"),
+    list(setNames(normalizePath("lib/module_4.R"), "module_4"),
+         setNames("lib/module_4.R", "module_4")))
 })
 
 test_that("$get_dirname returns the module directory, if any", {

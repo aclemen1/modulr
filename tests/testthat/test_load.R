@@ -21,7 +21,8 @@ test_that("load_module finds and loads .R files", {
   root_config$set(path)
   module_file <- load_module(name)
 
-  expect_equal(module_file, file)
+  expect_equal(names(module_file), name)
+  expect_equal(unname(module_file), file)
 
   register <- get("register", pos = modulr_env)
   module <- register[[name]]
@@ -64,7 +65,8 @@ test_that("load_module finds and loads .Rmd files", {
   root_config$set(path)
   module_file <- load_module(name)
 
-  expect_equal(module_file, file)
+  expect_equal(names(module_file), name)
+  expect_equal(unname(module_file), file)
 
   register <- get("register", pos = modulr_env)
   module <- register[[name]]
@@ -111,7 +113,8 @@ test_that("load_module finds and loads .Rnw files", {
   root_config$set(path)
   module_file <- load_module(name)
 
-  expect_equal(module_file, file)
+  expect_equal(names(module_file), name)
+  expect_equal(unname(module_file), file)
 
   register <- get("register", pos = modulr_env)
   module <- register[[name]]
@@ -292,7 +295,8 @@ test_that("load_all_modules finds and loads files in dir", {
   cat('define("foo", NULL, function() print("Hello World!"))', file = tmp_file)
   tmp_file <- file.path(tmp_dir, "bar.R")
   cat('define("bar", NULL, function() print("hELLO wORLD?"))', file = tmp_file)
-  load_all_modules(tmp_dir)
+
+  load_all_modules(path = tmp_dir)
 
   register <- get("register", pos = modulr_env)
 
@@ -374,7 +378,8 @@ test_that("load_module doesn't recurse infinitely when called", {
 
   expect_lte(test_env$deep, 2)
 
-  expect_equal(module_file, file)
+  expect_equal(names(module_file), name)
+  expect_equal(unname(module_file), file)
 
   expect_true(.is_defined(name))
 })

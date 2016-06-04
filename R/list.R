@@ -9,6 +9,7 @@
 #' @param formatted A flag. Should columns with units be string formatted?
 #' @param cols A character vector. Details returned in the columns of the data
 #'   frame.
+#' @param absolute A flag. Should the file paths be absolute?
 #'
 #' @return A character vector or a data frame containing module informations.
 #'
@@ -18,6 +19,11 @@
 #' data frame:
 #' \describe{
 #' \item{\code{name}}{name.}
+#' \item{\code{version}}{version of the module.}
+#' \item{\code{storage}}{storage of the module, `in-memory` or `on-disk`.}
+#' \item{\code{along}}{name of the on-disk module along which the definition
+#' takes place.}
+#' \item{\code{filepath}}{file path of the `on-disk` module.}
 #' \item{\code{type}}{type of the object returned.}
 #' \item{\code{weight}}{memory size of the object.}
 #' \item{\code{calls}}{number of explicit make calls.}
@@ -59,9 +65,13 @@
 #' @export
 list_modules <-
   function(regexp,
-           reserved = FALSE, wide = TRUE, full = FALSE, formatted = TRUE,
+           reserved = FALSE, wide = TRUE, full = FALSE,
+           formatted = TRUE, absolute = FALSE,
            cols = c(
              "name",
+             "version",
+             "storage",
+             "along",
              "type",
              "weight",
              "calls",
@@ -85,6 +95,10 @@ list_modules <-
     is.character(cols) &&
       all(cols %in% c(
         "name",
+        "version",
+        "storage",
+        "filepath",
+        "along",
         "type",
         "weight",
         "calls",
@@ -160,6 +174,29 @@ list_modules <-
         do.call(c, Map(function(name)
           modulr_env$register[[c(name, "duration")]], flat))
 
+      storages <-
+        do.call(c, Map(function(name)
+          modulr_env$register[[c(name, "storage")]], flat))
+
+      filepaths <-
+        do.call(c, Map(function(name) {
+          if (!is.null(modulr_env$register[[c(name, "filepath")]])) {
+            ifelse(absolute, normalizePath, identity)(
+              modulr_env$register[[c(name, "filepath")]])
+          } else {
+            NA_character_
+          }
+        },
+        flat))
+
+      versions <-
+        do.call(c, Map(function(name)
+          .parse_version(name)[["version"]], flat))
+
+      alongs <-
+        do.call(c, Map(function(name)
+          modulr_env$register[[c(name, "along")]], flat))
+
       adj <- .compute_adjacency_matrix(flat)
       deps <- diag(adj %*% t(adj))
       childs <- diag(t(adj) %*% adj)
@@ -169,6 +206,10 @@ list_modules <-
 
       data <- data.frame(
         name = flat,
+        version = versions,
+        storage = storages,
+        filepath = filepaths,
+        along = alongs,
         type = types,
         weight = weights,
         calls = calls,

@@ -76,7 +76,7 @@ test_that(".module_to_string shows dependencies", {
   expect_match(.module_to_string("module"), "%requires%")
   reset()
   define("module", list("other_module"), function(other) NULL)
-  expect_match(.module_to_string("module"), "list\\(\"other_module")
+  expect_match(.module_to_string("module"), "list\\(other = \"other_module")
   expect_match(.module_to_string("module"), "%provides%")
   expect_match(.module_to_string("module"), "%requires%")
   reset()

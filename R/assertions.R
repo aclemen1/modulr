@@ -17,7 +17,7 @@ assertthat::on_failure(.is_undefined) <- function(call, env) {
   paste0(deparse(eval(call$name, envir = env)), " is defined.")
 }
 
-.version_regex <- "(?:(?:#([~^])?(\\d+(?:\\.\\d+){1,3}))|(?:#(latest)))"
+.version_regex <- "(?:(?:#([~^]|(?:>=))?(\\d+(?:\\.\\d+){0,3})))"
 
 .conform_regex <- paste0(
   "^$|",
@@ -35,38 +35,10 @@ assertthat::on_failure(.is_conform) <- function(call, env) {
          " contains reserved characters or is malformed.")
 }
 
-.parse_version <- function(string) {
-  matches <- regmatches(string, regexec(.version_regex, string))[[1]]
-  if (length(matches) > 0 && matches[4] == "latest") matches[2] <- "*"
-  list(
-    version = package_version(
-      matches[3],
-      strict = FALSE),
-    symbol = matches[2]
-  )
-}
-
-# TODO test that!
-# Parse a module name.
-.parse_name <- function(name) {
-  assert_that(assertthat::is.string(name), .is_conform(name))
-  matches <- regmatches(name, regexec(.conform_regex, name))[[1]]
-  matches <-
-    setNames(as.list(matches),
-             c("name", "root", "symbol", "version", "latest", "suffix"))
-  matches$suffix <- sub("^/", "", matches$suffix)
-  matches$version <- package_version(matches$version, strict = FALSE)
-  if (matches$latest == "latest") {
-    matches$latest <- NULL
-    matches$symbol <- "*"
-  }
-  matches
-}
-
 # Test if a name does not contain a semantic versioning symbol.
 .is_exact <- function(name) {
-  assert_that(assertthat::is.string(name))
-  nchar(.parse_name(name)$symbol) == 0
+  assert_that(.is_conform(name))
+  is.na(.parse_name(name)$symbol)
 }
 
 assertthat::on_failure(.is_exact) <- function(call, env) {
@@ -77,7 +49,7 @@ assertthat::on_failure(.is_exact) <- function(call, env) {
 # Test if a module has a regular name.
 .is_regular <- function(name) {
   assert_that(assertthat::is.string(name))
-  !(.parse_name(name)$root %in% RESERVED_NAMES) && .is_conform(name)
+  !(.parse_name(name)[["namespace"]] %in% RESERVED_NAMES) && .is_conform(name)
 }
 
 assertthat::on_failure(.is_regular) <- function(call, env) {
@@ -101,7 +73,7 @@ assertthat::on_failure(.is_regular_core) <- function(call, env) {
 
 # Test if a module name is reserved.
 .is_reserved <- function(name) {
-  .parse_name(name)$root %in% RESERVED_NAMES
+  .parse_name(name)[["namespace"]] %in% RESERVED_NAMES
 }
 
 assertthat::on_failure(.is_reserved) <- function(call, env) {

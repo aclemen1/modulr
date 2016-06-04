@@ -40,16 +40,16 @@ Returns a list containing the module options. See
 compatibility.}
 }
 
-\section{\code{get_filename()}}{
+\section{\code{get_filename(absolute = TRUE)}}{
 
 Returns a string (character vector of lenght one) containing the module
-filename.
+(absolute) filename.
 }
 
-\section{\code{get_dirname()}}{
+\section{\code{get_dirname(absolute = TRUE)}}{
 
 Returns a string (character vector of lenght one) containing the module
-dirname.
+(absolute) dirname.
 }
 
 \section{\code{message_info(...), message_warn(...), and message_stop(...)}}{

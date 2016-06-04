@@ -1,22 +1,35 @@
 # We need to figure out the directed acyclic graph (DAG) of the dependencies.
-.build_dependency_graph <- function(all_dependencies = NULL) {
+.build_dependency_graph <- function(named_dependencies = NULL) {
 
-  assert_that(is.null(all_dependencies) ||
-                            is.character(all_dependencies))
+  assert_that(
+    is.null(named_dependencies) ||
+      (is.character(named_dependencies) && !is.null(names(named_dependencies))))
 
   dependency <- c()
   module <- c()
 
-  for (name in all_dependencies) {
+  names_of_deps <- names(named_dependencies)
+
+  for (name in named_dependencies) {
 
     assert_that(.is_defined(name))
 
     dependencies <- modulr_env$register[[c(name, "dependencies")]]
+    resolved_dependencies <-
+      unname(named_dependencies[names_of_deps %in% dependencies])
 
-    if (isTRUE(length(dependencies) > 0)) {
+    if (isTRUE(length(resolved_dependencies) > 0)) {
 
-      array <- rbind(unlist(lapply(dependencies, .resolve_mapping, name)),
-                     name, deparse.level = 0)
+#       array <-
+#         rbind(unlist(
+#           lapply(
+#             lapply(dependencies, .resolve_mapping, name),
+#             `[[`, "resolved")),
+#           name, deparse.level = 0)
+
+      array <-
+        rbind(resolved_dependencies,
+              name, deparse.level = 0)
 
       dependency <- c(dependency, array[1, ])
       module <- c(module, array[2, ])
@@ -59,12 +72,20 @@
 
     ordered_names <- .topological_sort(graph)
 
-    deps <-
-      sapply(
-        ordered_names,
-        function(x)
-          unlist(modulr_env$register[[c(x, "dependencies")]],
-                 use.names = FALSE))
+#     deps <-
+#       sapply(
+#         ordered_names,
+#         function(x)
+#           unlist(modulr_env$register[[c(x, "dependencies")]],
+#                  use.names = FALSE))
+
+    deps <- Map(
+      function(name) {
+        deps_ <- graph[graph[["module"]] == name, ][["dependency"]]
+        if (length(deps_) == 0) return(NULL)
+        deps_
+      },
+      ordered_names)
 
     layers <- list()
 
