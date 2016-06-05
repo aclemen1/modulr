@@ -332,7 +332,7 @@
 # TODO test that!
 .flatten_versions <- function(versions) {
   versions <-
-    setNames(
+    stats::setNames(
       versions,
       Map(function(v) {
         ifelse(v[["storage"]] == "on-disk", v[["filepath"]], v[["name"]])
@@ -351,7 +351,8 @@
 .resolve_candidates <- function(name, scope_name = NULL, absolute = TRUE,
                                 extensions = c(".R", ".r",
                                                ".Rmd", ".rmd",
-                                               ".Rnw", ".rnw")) {
+                                               ".Rnw", ".rnw"),
+                                include.dirs = FALSE) {
   assert_that(
     .is_conform(name),
     is.null(scope_name) || .is_exact(scope_name),
@@ -366,7 +367,8 @@
   pattern <- sprintf("(?:%s)", paste(paste0(
     "^", sprintf("(?:%s)", parsed_name[["final"]]),
     paste0(.version_regex, "?"),
-    glob2rx(sprintf("*%s", extensions), trim.head = TRUE)),
+    sprintf(ifelse(include.dirs, "(?:%s)?$", "%s"),
+            utils::glob2rx(sprintf("*%s", extensions), trim.head = TRUE))),
     collapse = "|"))
 
   roots <- unique(c(root_config$get_all()[[1L]], "."))
@@ -378,7 +380,8 @@
     files_ <-
       ifelse(absolute, normalizePath,
              Vectorize(.remove_duplicate_filesep, "path"))(
-               list.files(path = path, pattern = pattern, full.names = TRUE))
+               list.files(path = path, pattern = pattern,
+                          full.names = TRUE, include.dirs = include.dirs))
     files <- c(files, files_)
   }
 
@@ -453,7 +456,8 @@
 .resolve_name <- function(name, scope_name = NULL, absolute = TRUE, all = TRUE,
                           extensions = c(".R", ".r",
                                          ".Rmd", ".rmd",
-                                         ".Rnw", ".rnw")) {
+                                         ".Rnw", ".rnw"),
+                          include.dirs = FALSE) {
 
   assert_that(
     .is_conform(name),
@@ -463,7 +467,8 @@
   candidates <-
     .resolve_candidates(
       name = name, scope_name = scope_name,
-      absolute = absolute, extensions = extensions)
+      absolute = absolute, extensions = extensions,
+      include.dirs = include.dirs)
 
   parsed_version <-
     .parse_version(candidates[[c("namespace", "resolved")]])
@@ -673,4 +678,21 @@ find_path <- function(name, scope_name = NULL, ...) {
                            module[["name"]]))
   }
 
+}
+
+.deprecated_resolve_path <- function(...) {
+  resolved <- .resolve_name(..., include.dirs = TRUE)[["resolved"]]
+  if (length(resolved) > 0L) {
+    resolved <- resolved[[1]]
+    if (resolved[["storage"]] == "on-disk") {
+      return(resolved[["filepath"]])
+    } else {
+      return(resolved[["name"]])
+    }
+  }
+}
+
+.deprecated_resolve_mapping <- function(...) {
+  mapping <- .resolve_mapping(...)
+  if (!is.null(mapping)) mapping[["resolved"]]
 }

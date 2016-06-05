@@ -150,8 +150,9 @@ NULL
       # Deprecated and kept for backward compatibility.
       # nocov start
       resolve_path = function(...) {
-        .deprecated("$get_dirname' or 'find_path", old = "$resolve_path")
-        eval(find_path(...), envir = parent.frame(1L))
+        .deprecated("$get_dirname', 'find_module' or 'find_path",
+                    old = "$resolve_path")
+        eval(.deprecated_resolve_path(...), envir = parent.frame(1L))
       },
       # nocov end
 
@@ -160,7 +161,7 @@ NULL
       # nocov start
       resolve_mapping = function(...) {
         .deprecated(old = "$resolve_mapping")
-        eval(.resolve_mapping(...), envir = parent.frame(1L))
+        eval(.deprecated_resolve_mapping(...), envir = parent.frame(1L))
       },
       # nocov end
 
