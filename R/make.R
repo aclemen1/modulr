@@ -4,7 +4,7 @@
   selected_bc <- bc[names(bc) %in% ab]
   aligned_ab <- selected_ab[order(selected_ab)]
   aligned_bc <- selected_bc[order(names(selected_bc))]
-  setNames(aligned_bc, names(aligned_ab))
+  stats::setNames(aligned_bc, names(aligned_ab))
 }
 
 #' Make a Module.
@@ -245,7 +245,7 @@ do_make <- function(name = .Last.name, args = list(),
               layers_count <- length(layers)
 
               if (deps_count > 1 && layers_count > 1 &&
-                   2 <= verbosity_level) {
+                    2 <= verbosity_level) {
                 message(
                   if (layers_count == 2) {
                     "on 1 layer, "
@@ -281,7 +281,8 @@ do_make <- function(name = .Last.name, args = list(),
 
               reinstanciated_by_parent <- any(unlist(lapply(
                 all_dependencies[
-                  names(all_dependencies) %in% modulr_env$register[[c(ordered_name, "dependencies")]]],
+                  names(all_dependencies) %in%
+                    modulr_env$register[[c(ordered_name, "dependencies")]]],
                 function(name) {
                   modulr_env$register[[c(name, "timestamp")]] >=
                     modulr_env$register[[c(ordered_name, "timestamp")]]
@@ -306,17 +307,6 @@ do_make <- function(name = .Last.name, args = list(),
 
                         if (length(modulr_env$register[[
                           c(ordered_name, "dependencies")]]) > 0) {
-
-#                           args_ <-
-#                             lapply(
-#                               modulr_env$register[[
-#                                 c(ordered_name, "dependencies")]],
-#                               function(name) {
-#                                 modulr_env$register[[c(
-#                                   .resolve_mapping(name, ordered_name),
-#                                   "instance", "value")]]
-#                               }
-#                             )
 
                           args_ <-
                             lapply(
@@ -584,11 +574,11 @@ make_all_tests <- function(...) {
 #' plot_dependencies()
 #'
 #' reset()
-#' define("foo", list(bar = "bar#latest"), function(bar) bar)
+#' define("foo", list(bar = "bar"), function(bar) bar)
 #' define("bar#1.0.0", NULL, function() "bar v1.0.0")
 #' define("bar#1.0.1", NULL, function() "bar v1.0.1")
 #' make("foo")
-#' maps_config$set(foo = list("bar#latest" = "bar#1.0.0"))
+#' maps_config$set(foo = list("bar" = "bar#1.0.0"))
 #' make("foo")
 #' touch("foo")
 #' make("foo")
@@ -609,8 +599,10 @@ touch <- function(name = .Last.name) {
   .message_meta(sprintf("Touching '%s'", name), {
 
     modulr_env$register[[c(name, "dependencies")]] <-
-      lapply(lapply(modulr_env$register[[c(name, "aliases")]],
-             .resolve_name, name), `[[`, "resolved_names")
+      lapply(lapply(
+        lapply(modulr_env$register[[c(name, "aliases")]],
+               .resolve_namespace, name),
+        `[[`, "resolved"), unname)
     modulr_env$register[[c(name, "instance")]] <- NULL
     modulr_env$register[[c(name, "instanciated")]] <- F
     modulr_env$register[[c(name, "digest")]] <- NULL

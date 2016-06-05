@@ -198,6 +198,7 @@ make("timestamp")
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
+root_config$set(".")
 ```
 
 This is a fact that all modules are singletons. Nonetheless, it is possible for a module to return a function (or closure) that itself returns a desired object. In this case, such a module fakes and behaves like a so-called prototype.

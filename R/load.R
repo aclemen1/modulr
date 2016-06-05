@@ -161,21 +161,18 @@ load_module <- function(name = .Last.name) {
     return(invisible(NULL))
   }
 
-
-  resolved_name <- .resolve_name(name, all = FALSE, absolute = FALSE)
-  path <- resolved_name[[c("resolved", "filepath")]]
-  name_ <- resolved_name[[c("resolved", "name")]]
-  namespace <- resolved_name[[c("candidates", "namespace")]]
-  if (!is.null(path) && file.exists(path)) {
-    loaded_module <-
-      setNames(.load_module(path = path, name = name_, check = TRUE), name_)
-    assert_that(.is_defined(name_))
-    loaded_module
-  } else if (.is_defined(namespace[["resolved"]])) {
-    setNames(NA, namespace[["resolved"]])
-  } else {
-    assert_that(.is_defined(name))
+  module <- find_module(name)
+  loaded_module <- NA
+  if (!is.null(module)) {
+    name <- module[["name"]]
+    if (module[["storage"]] == "on-disk" && file.exists(module[["filepath"]])) {
+      loaded_module <-
+        .load_module(path = module[["filepath"]], name = name,
+                     check = TRUE)
+    }
   }
+  assert_that(.is_defined(name))
+  stats::setNames(loaded_module, name)
 
 }
 
@@ -246,8 +243,9 @@ load_all_modules <- function(
       loaded_module <- load_module(name)
 
       if (!is.null(loaded_module)) {
-        loaded_module <- setNames(names(loaded_module), name)
-      } else {
+        loaded_module <- stats::setNames(names(loaded_module), name)
+      }
+      else {
         loaded_module <-
           .resolve_namespace(name = name,
                              scope_name = scope_name)[["resolved"]]
@@ -257,7 +255,7 @@ load_all_modules <- function(
 
       assert_that(.is_defined(loaded_module))
 
-      if(.is_defined(loaded_module)) {
+      if (.is_defined(loaded_module)) {
         Map(function(dependency) iteration(dependency, name),
           modulr_env$register[[c(loaded_module, "dependencies")]])
       }

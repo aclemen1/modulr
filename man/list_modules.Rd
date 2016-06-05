@@ -6,12 +6,14 @@
 \title{List Defined Modules.}
 \usage{
 list_modules(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
-  formatted = TRUE, cols = c("name", "storage", "along", "type", "weight",
-  "calls", "dependencies", "childs", "size", "lines", "modified"))
+  formatted = TRUE, absolute = FALSE, cols = c("name", "version",
+  "storage", "along", "type", "weight", "calls", "dependencies", "childs",
+  "size", "lines", "modified"))
 
 lsmod(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
-  formatted = TRUE, cols = c("name", "storage", "along", "type", "weight",
-  "calls", "dependencies", "childs", "size", "lines", "modified"))
+  formatted = TRUE, absolute = FALSE, cols = c("name", "version",
+  "storage", "along", "type", "weight", "calls", "dependencies", "childs",
+  "size", "lines", "modified"))
 }
 \arguments{
 \item{regexp}{A regular expression. If not missing, the regular expression
@@ -27,8 +29,10 @@ characted vector?}
 
 \item{formatted}{A flag. Should columns with units be string formatted?}
 
+\item{absolute}{A flag. Should the file paths be absolute?}
+
 \item{cols}{A character vector. Details returned in the columns of the data
-  frame.}
+frame.}
 }
 \value{
 A character vector or a data frame containing module informations.
@@ -41,9 +45,11 @@ For each module, the following details can be returned in the columns of the
 data frame:
 \describe{
 \item{\code{name}}{name.}
+\item{\code{version}}{version of the module.}
 \item{\code{storage}}{storage of the module, `in-memory` or `on-disk`.}
 \item{\code{along}}{name of the on-disk module along which the definition
 takes place.}
+\item{\code{filepath}}{file path of the `on-disk` module.}
 \item{\code{type}}{type of the object returned.}
 \item{\code{weight}}{memory size of the object.}
 \item{\code{calls}}{number of explicit make calls.}

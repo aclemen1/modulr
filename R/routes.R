@@ -14,15 +14,15 @@
   assert_that(assertthat::is.string(name), .is_conform(name))
   matches <- regmatches(name, regexec(.conform_regex, name))[[1]]
   matches <-
-    setNames(as.list(matches),
+    stats::setNames(as.list(matches),
              c("name", "namespace", "symbol", "version", "suffix"))
   matches[["suffix"]] <- sub("^/", "", matches[["suffix"]])
   matches[c("symbol", "version")] <-
     .parse_version(paste0("#", matches[["symbol"]], matches[["version"]]))[
       c("symbol", "version")]
   components <- strsplit(matches[["namespace"]], "/", fixed = TRUE)[[1]]
-  matches[["initials"]] <- paste(head(components, -1L), collapse = "/")
-  matches[["final"]] <- tail(components, 1L)
+  matches[["initials"]] <- paste(utils::head(components, -1L), collapse = "/")
+  matches[["final"]] <- utils::tail(components, 1L)
   matches[c(
     "name", "namespace", "initials", "final", "symbol", "version", "suffix")]
 }
@@ -238,7 +238,9 @@
 
 }
 
+# TODO test that it preserves the "storage" attribute
 .filter_versions <- function(versions, version, symbol) {
+  assert_that(is.list(versions))
   filter_ <- function(versions, version, symbol) {
     candidates <- Filter(function(v) {
       !isTRUE(v < version)
@@ -247,7 +249,9 @@
     keep <- FALSE
     if (length(candidates) > 0) {
       keep <- if (is.na(symbol)) {
-        Vectorize(identical)(candidates, version) | is.na(candidates)
+        unlist(Vectorize(identical)(
+          lapply(candidates, as.character),
+          as.character(version))) | unlist(lapply(candidates, is.na))
       } else {
         if (symbol == ">=") {
           TRUE
@@ -266,7 +270,7 @@
   if (!is.na(version)) {
     l_max <- length(do.call(c, version))
 
-    filtered <- c()
+    filtered <- list()
     for (l in seq_len(l_max)) {
       filtered <- c(
         filter_(versions, version[1, c(1:l)], ifelse(l == l_max, symbol, NA)),
@@ -274,27 +278,73 @@
     }
     filtered <- Filter(length, filtered)
 
-    if(is.na(symbol) && isTRUE(length(filtered) > 0L)) {
+    if (is.na(symbol) && isTRUE(length(filtered) > 0L)) {
       # looks strange, the following is true:
-      # numeric_version("1.0") == numeric_version("1.0.0")
-      # therefore we use 'identical'
-      strict <- Vectorize(identical)(filtered, version)
-      if(any(strict))
+      # numeric_version("1.0") == numeric_version("1.0.0") # Exclude Linting
+      # therefore we use 'identical' (on the strings to avoid comparing
+      # attributes which can legitimately be different)
+      strict <- Vectorize(identical)(lapply(filtered, as.character),
+                                     as.character(version))
+      if (any(strict))
         filtered <- filtered[strict]
     }
 
   } else {
-    filtered <- do.call(c, as.list(versions))
+    filtered <- versions
   }
 
-  filtered_str <- as.character(filtered)
-  ordering <- order(filtered_str, na.last = TRUE)
-  versions <-
-    filtered[ordering][!duplicated(filtered_str)[ordering]]
-
   # looks strange, see equality above:
-  # unique(numeric_version(c("1.0", "1.0.0")))
+  # unique(numeric_version(c("1.0", "1.0.0"))) # Exclude Linting
+  filtered_str <- do.call(c, lapply(filtered, as.character))
+  if (!is.null(filtered_str)) {
+    filtered_attr <- do.call(c, lapply(filtered, attr, "storage"))
+    filtered_criterion <- paste(filtered_str, filtered_attr, sep = "$")
+    ordering <- order(filtered_str, na.last = TRUE)
+    versions <-
+      filtered[ordering][!duplicated(filtered_criterion)[ordering]]
+  }
+
   as.list(versions)
+}
+
+# TODO test that!
+.unflatten_versions <- function(versions) {
+  lapply(names(versions), function(name) {
+    version <- versions[[name]]
+    storage <- attr(version, "storage")
+    node <- list(
+      storage = storage,
+      version = version
+    )
+    if (storage == "on-disk") {
+      node[["storage"]] <- "on-disk"
+      node[["filepath"]] <- name
+      node[["name"]] <- NA
+    } else {
+      node[["storage"]] <- "in-memory"
+      node[["filepath"]] <- NA
+      node[["name"]] <- name
+    }
+    node
+  })
+}
+
+# TODO test that!
+.flatten_versions <- function(versions) {
+  versions <-
+    setNames(
+      versions,
+      Map(function(v) {
+        ifelse(v[["storage"]] == "on-disk", v[["filepath"]], v[["name"]])
+      },
+      versions))
+  versions <- Map(function(version) {
+    node <- version[["version"]]
+    attr(node, "storage") <- version[["storage"]]
+    node
+  },
+  versions)
+  versions
 }
 
 # TODO test that!
@@ -311,8 +361,10 @@
   resolved_name <- resolved_namespace[["resolved"]]
   parsed_name <- .parse_name(resolved_name)
 
+  # looking for on-disk candidates
+
   pattern <- sprintf("(?:%s)", paste(paste0(
-    "^", parsed_name[["final"]],
+    "^", sprintf("(?:%s)", parsed_name[["final"]]),
     paste0(.version_regex, "?"),
     glob2rx(sprintf("*%s", extensions), trim.head = TRUE)),
     collapse = "|"))
@@ -330,28 +382,37 @@
     files <- c(files, files_)
   }
 
-  versions <- do.call(c, Map(function(file) {
+  on_disk_versions <- do.call(c, Map(function(file) {
     .parse_version(basename(file))[["version"]]
   },
   files))
+
+  on_disk_versions <-
+    lapply(as.list(on_disk_versions), `attr<-`, "storage", "on-disk")
+
+  # looking for in-memory candidates
+
+  pattern <- paste0(
+    "^", sprintf("(?:%s)", parsed_name[["namespace"]]),
+    .version_regex, "?$")
+  mods <- grep(pattern,
+               names(modulr_env$register),
+               value = TRUE)
+  in_memory_versions <-
+    do.call(c, lapply(Map(.parse_version, mods), `[[`, "version"))
+  in_memory_versions <-
+    lapply(as.list(in_memory_versions), `attr<-`, "storage", "in-memory")
+
+  versions <- c(
+    in_memory_versions,
+    on_disk_versions
+  )
 
   versions <- .filter_versions(
     versions = versions,
     version = parsed_name[["version"]], symbol = parsed_name[["symbol"]])
 
-  resolution <- lapply(names(versions), function(filepath) {
-    list(
-      filepath = filepath,
-      version = versions[[filepath]]
-    )
-  })
-
-#   candidates <- list()
-#   candidates[["versions"]] <- .filter_versions(
-#     versions = versions,
-#     version = parsed_name[["version"]], symbol = parsed_name[["symbol"]])
-#
-#   candidates[["resolved_name"]] <- parsed_name
+  resolution <- .unflatten_versions(versions)
 
   list(
     name = name,
@@ -363,8 +424,10 @@
 }
 
 # TODO test that!
+# lapply(parse(text = '"bar#1.0.0" %provides% function() "bar v1.0.0"'),
+# function(l) lapply(l, function(f) is.symbol(f) && f == as.symbol("%provides%")))
 .extract_name <- function(filepath) {
-  if(file.exists(filepath)) {
+  if (file.exists(filepath)) {
     con <- file(filepath, "r")
     on.exit(close(con))
     while (TRUE) {
@@ -407,36 +470,66 @@
   parsed_name <-
     .parse_name(candidates[[c("namespace", "resolved")]])
 
-  versions <- c()
-  for (filepath in unlist(
-    lapply(candidates[["resolved"]], `[[`, "filepath"))) {
+  # differentiate treatment of on-disk and in-memory modules
+
+  on_disk_candidates <-
+    Filter(function(candidate) {
+      candidate[["storage"]] == "on-disk"
+    },
+    candidates[["resolved"]])
+
+  on_disk_versions <- list()
+  filepaths <- unlist(lapply(on_disk_candidates, `[[`, "filepath"))
+  for (idx in seq_along(filepaths)) {
+    filepath <- filepaths[idx]
     extracted_name <- .extract_name(filepath)
     if (!is.null(extracted_name)) {
       parsed_name <- .parse_name(extracted_name)
     }
-    versions <- c(setNames(parsed_name[["version"]], filepath), versions)
+    node <- on_disk_candidates[[idx]]
+    node[["version"]] <- parsed_name[["version"]]
+    on_disk_versions <- c(list(node), on_disk_versions)
   }
 
-  versions <- as.list(versions)
+  in_memory_versions <-
+    Filter(function(candidate) {
+      candidate[["storage"]] == "in-memory"
+    },
+    candidates[["resolved"]])
+
+  versions <- .flatten_versions(c(on_disk_versions, in_memory_versions))
+
   versions <-
     .filter_versions(
       versions, parsed_version[["version"]], parsed_version[["symbol"]])
 
-  resolution <- list()
-  if (length(versions) > 0L) {
-    if (!all) versions <- tail(versions, 1L)
-    resolved_versions <- do.call(c, versions)
-    resolved_filepaths <- names(versions)
-    versions_str <- as.character(resolved_versions)
-    resolved_names <-
-      ifelse(is.na(versions_str), parsed_name[["namespace"]],
-             paste(parsed_name[["namespace"]], versions_str,
-                   sep = "#"))
-    resolution <- list(
-      name = resolved_names,
-      filepath = resolved_filepaths,
-      version = resolved_versions
-    )
+  versions <- .unflatten_versions(versions)
+
+  resolution <- lapply(versions, function(version) {
+    if (version[["storage"]] == "on-disk") {
+      version[["name"]] <-
+        ifelse(is.na(version[["version"]]), parsed_name[["namespace"]],
+               paste(parsed_name[["namespace"]],
+                     as.character(version[["version"]]),
+                     sep = "#"))
+    }
+    version
+  })
+
+  if (length(resolution) > 0L && !all) {
+    version <- as.character(utils::tail(resolution, 1L)[[1]][["version"]])
+    resolution <- Filter(function(node) {
+      !isTRUE(as.character(node[["version"]]) != version)
+    },
+    resolution)
+    if (length(resolution) > 1L) {
+      # if an in-memory module has a corresponding on-disk instance with same
+      # version number, we keep the on-disk module only
+      storages <- unlist(lapply(resolution, `[[`, "storage"))
+      if (any(storages == "on-disk")) {
+        resolution <- utils::tail(resolution[storages == "on-disk"], 1L)
+      }
+    }
   }
 
   list(
@@ -446,157 +539,11 @@
     candidates = candidates
   )
 
-# else {
-#       list(
-#         name = name,
-#         scope_name = scope_name,
-#         resolved = list(
-#           name = resolved_names
-#           filepath = resolved_filepath,
-#           version = resolved_versions,
-#         ),
-#         candidates = candidates
-#         versions = versions,
-#         resolved_names = setNames(parsed_name[["namespace"]], name)
-#       )
-#     }
-
 }
 
-#
-#
-# .parse_root <- function(name) {
-#   parts <- strsplit(name, "/", fixed = TRUE)[[1]]
-#   list(
-#     path = paste(head(parts, -1L), collapse = .Platform$file.sep),
-#     basename = tail(parts, 1L)
-#   )
-# }
-#
-# # TODO test that!
-# .find_candidates <- function(name, scope_name = NULL, absolute = TRUE,
-#                              extensions = c(".R", ".r",
-#                                             ".Rmd", ".rmd",
-#                                             ".Rnw", ".rnw"),
-#                              all = FALSE) {
-#
-#   assert_that(.is_conform(name))
-#
-#   resolved <-
-#     .resolve_namespace(name = name, scope_name = scope_name, extensions = extensions)
-#
-#   parsed_name <- .parse_name(resolved$name)
-#   parsed_root_name <- ..parse_root(parsed_name[["namespace"]])
-#   parsed_root_path <- ..parse_root(.parse_name(resolved$path)[["namespace"]])
-#
-#   pattern <- sprintf("(?:%s)", paste(paste0(
-#     "^", parsed_root_name$basename,
-#     paste0(.version_regex, "?"),
-#     glob2rx(sprintf("*%s", extensions), trim.head = TRUE)),
-#     collapse = "|"))
-#
-#   files <- c()
-#   roots <- unique(c(root_config$get_all()[[1L]], "."))
-#   for (root in roots) {
-#     path <- file.path(root, parsed_root_path$path)
-#     files_ <-
-#       ifelse(absolute, normalizePath,
-#              Vectorize(.remove_duplicate_filesep, "path"))(
-#                list.files(path = path, pattern = pattern, full.names = TRUE))
-#     files <- c(files, files_)
-#   }
-#
-#   candidates <- Filter(
-#     function(file) {
-#       .acceptable_version(parsed_name$version, parsed_name$symbol,
-#                           file$version, file$symbol)
-#     },
-#     Map(function(file) {
-#       parsed <- .parse_filepath(file)
-#       parsed[["namespace"]] <- parsed_name[["namespace"]]
-#       if (!is.na(parsed$version)) {
-#         resolved_name <- paste(parsed_name[["namespace"]], parsed$version, sep = "#")
-#       } else if (isTRUE(parsed$symbol == "*")) {
-#         resolved_name <- paste(parsed_name[["namespace"]], "latest", sep = "#")
-#       } else {
-#         resolved_name <- parsed_name[["namespace"]]
-#       }
-#       parsed$resolved_name <- resolved_name
-#       parsed
-#     },
-#     files)
-#   )
-#
-#   versions <- do.call(c, lapply(
-#     candidates, function(candidate) candidate$version))
-#   symbols <- do.call(c, lapply(
-#     candidates, function(candidate) candidate$symbol))
-#   latest <- which(symbols == "*")
-#   if (length(latest) > 0L) {
-#     candidates <- candidates[latest]
-#   } else if (length(versions) > 0L) {
-#     version_max <- max(versions, na.rm = TRUE)
-#     if (length(version_max) > 0L) {
-#       candidates <- Filter(function(candidate) {
-#         candidate$version == version_max
-#       },
-#       candidates)
-#     }
-#   }
-#
-#   if (!all && length(candidates) > 0L) candidates <- tail(candidates, 1L)
-#
-#   unname(candidates)
-#
-# }
-
-# # TODO test that!
-# resolve_name <- function(name, scope_name = NULL) {
-#   candidates <- .find_candidates(name = name, scope_name = scope_name)
-#   if (length(candidates) > 0L) {
-#     candidates[[1]]$resolved_name
-#   } else {
-#     .resolve_mapping(name = name, scope_name)$resolved
-#   }
-# }
-
-# # TODO test that!
-# .acceptable_version <- function(base_version, base_symbol, version, symbol) {
-#   return(TRUE)
-#   if (is.na(base_version)) {
-#     # no base version provided
-#     if (base_symbol == "*") {
-#       # latest version accepted, no version accepted
-#       !is.na(version) || isTRUE(symbol == "*") ||
-#         (is.na(version) && !isTRUE(symbol == "*"))
-#     } else {
-#       # only no version accepted
-#       is.na(version) && !isTRUE(symbol == "*")
-#     }
-#   } else {
-#     # base version provided
-#     if (base_symbol == "^") {
-#       # e.g. 1.x.x
-#       version$major == base_version$major &&
-#         (version$minor > base_version$minor ||
-#            (version$minor == base_version$minor &
-#               version$patchlevel >= base_version$patchlevel))
-#     } else if (base_symbol == "~") {
-#       # e.g. 1.2.x
-#       version$major == base_version$major &&
-#         version$minor == base_version$minor &&
-#         version$patchlevel >= base_version$patchlevel
-#     } else {
-#       # exact match
-#       base_version == version
-#     }
-#   }
-# }
-
-#' Find the Path of a Module.
+#' Find a Module.
 #'
-#' Find the path of a module, in the context of a module scope, if any. The
-#' returned path can be absolute or relative to a root directory.
+#' Find a module, in the context of a module scope, if any.
 #'
 #' @inheritParams define
 #' @param scope_name A module name to use as scope (see \code{\link{define}},
@@ -605,10 +552,82 @@
 #'   \code{\link{define}}, \code{\link{root_config}}, and examples)
 #' @param extensions A character vector. File extensions to consider.
 #'
-#' @return A string containing the path of the module.
+#' @return A list containing informations relative to the module: name, version,
+#'   in-memory or on-disk storage, and file path (absolute or relative).
 #'
-#' @seealso \code{\link{define}}, \code{\link{maps_config}},
-#'   \code{\link{reset}}, and \code{\link{root_config}},
+#' @seealso \code{\link{define}}, \code{\link{find_path}},
+#'   \code{\link{maps_config}}, \code{\link{reset}}, and
+#'   \code{\link{root_config}},
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() "Hello World!")
+#' find_module("foo")
+#'
+#' reset()
+#' tmp_dir <- tempfile("modulr_")
+#' dir.create(tmp_dir)
+#' tmp_file <- file.path(tmp_dir, "foo.R")
+#' cat('define("foo", NULL, function() "Hello World!")', file = tmp_file)
+#' root_config$set(tmp_dir)
+#' set_verbosity(1L)
+#' find_module("foo")
+#' unlink(tmp_dir, recursive = TRUE)
+#'
+#' reset()
+#' tmp_dir <- tempfile("modulr_")
+#' dir.create(file.path(tmp_dir, 'foo'), recursive = TRUE)
+#' dir.create(file.path(tmp_dir, 'vendor'), recursive = TRUE)
+#' cat(paste0('define("bar", list(great_module = "vendor/great_module"), ',
+#'            'function() great_module)'),
+#'     file = file.path(tmp_dir, "foo", "bar.R"))
+#' cat('define("great_module", NULL, function() "Great Module")',
+#'     file = file.path(tmp_dir, "vendor", "great_module.R"))
+#' cat('define("great_module", NULL, function() "Old Great Module")',
+#'     file = file.path(tmp_dir, "vendor", "old_great_module.R"))
+#' root_config$set(tmp_dir)
+#' set_verbosity(1L)
+#' find_module("vendor/great_module")
+#' maps_config$set("foo/bar" = list("vendor/great_module" =
+#'                                  "vendor/old_great_module"))
+#' find_module("vendor/great_module", "foo/bar")
+#' unlink(tmp_dir, recursive = TRUE)
+#'
+#' @export
+find_module <- function(name, scope_name = NULL, absolute = TRUE,
+                        extensions = c(".R", ".r",
+                                       ".Rmd", ".rmd",
+                                       ".Rnw", ".rnw")) {
+  assert_that(
+    .is_conform(name),
+    is.null(scope_name) || .is_exact(scope_name),
+    assertthat::is.flag(absolute),
+    is.character(extensions))
+
+  resolved <- .resolve_name(
+    name = name, scope_name = scope_name,
+    absolute = absolute, all = FALSE,
+    extensions = extensions)[["resolved"]]
+
+  if (length(resolved) > 0L) {
+    resolved[[1]][c("name", "version", "storage", "filepath")]
+  }
+
+}
+
+#' Find the Path of a Module.
+#'
+#' Find the path of a module, in the context of a module scope, if any. The
+#' returned path can be absolute or relative to a root directory.
+#'
+#' @inheritParams find_module
+#' @param ... Further arguments to be passed to \code{\link{find_module}}.
+#'
+#' @return A string containing the path (relative or absolute) of the module.
+#'
+#' @seealso \code{\link{define}}, \code{\link{find_module}},
+#'   \code{\link{maps_config}}, \code{\link{reset}}, and
+#'   \code{\link{root_config}},
 #'
 #' @examples
 #' reset()
@@ -641,17 +660,17 @@
 #' unlink(tmp_dir, recursive = TRUE)
 #'
 #' @export
-find_path <- function(name, scope_name = NULL, absolute = TRUE,
-                      extensions = c(".R", ".r",
-                                     ".Rmd", ".rmd",
-                                     ".Rnw", ".rnw")) {
-  resolved_name <- .resolve_name(
-    name = name, scope_name = scope_name,
-    absolute = absolute, all = FALSE,
-    extensions = extensions)[["resolved"]]
+find_path <- function(name, scope_name = NULL, ...) {
 
-  if (!is.null(resolved_name)) {
-    return(setNames(resolved_name[["filepath"]], resolved_name[["name"]]))
+  assert_that(
+    .is_conform(name),
+    is.null(scope_name) || .is_exact(scope_name))
+
+  module <- find_module(name = name, scope_name = scope_name, ...)
+
+  if (!is.null(module) && module[["storage"]] == "on-disk") {
+    return(stats::setNames(module[["filepath"]],
+                           module[["name"]]))
   }
 
 }
