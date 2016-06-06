@@ -1,5 +1,27 @@
 context("routes")
 
+test_that(".path_to_name and .name_to_path are inverses", {
+  name <- "foo/bar/foobar#^1.0.0/test"
+  expect_equal(
+    .path_to_name(.name_to_path(name)),
+    name
+  )
+  path <- "foo/bar/foobar#^1.0.0/test"
+  expect_equal(
+    .name_to_path(.path_to_name(path)),
+    path
+  )
+  good_path <- "foo/bar/foobar/"
+  expect_equal(.path_to_name(good_path), .remove_trailing_filesep(good_path))
+  good_path <- "foo/bar///foobar/"
+  expect_equal(.path_to_name(good_path),
+               .remove_trailing_filesep(.remove_duplicate_filesep(good_path)))
+  bad_path <- "foo/bar/foobar/."
+  expect_error(.path_to_name(bad_path))
+  bad_path <- "./foo/bar/foobar"
+  expect_error(.path_to_name(bad_path))
+})
+
 test_that(".parse_name returns a list of informations", {
   n <- .parse_name("foo/bar/foobar#^1.0.0/test")
   expect_true(is.list(n))

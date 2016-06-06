@@ -163,7 +163,8 @@
 
 .path_to_name <- function(path) {
   name <-
-    paste(strsplit(path, .Platform$file.sep, fixed = TRUE)[[1]], collapse = "/")
+    paste(strsplit(.remove_trailing_filesep(.remove_duplicate_filesep(path)),
+                   .Platform$file.sep, fixed = TRUE)[[1]], collapse = "/")
   assert_that(.is_conform(name))
   name
 }
