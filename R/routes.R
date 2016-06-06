@@ -1,3 +1,4 @@
+# Parse version from a string.
 .parse_version <- function(string) {
   assert_that(assertthat::is.string(string))
   matches <- regmatches(string, regexec(.version_regex, string))[[1]]
@@ -10,10 +11,9 @@
   )
 }
 
-# TODO test that!
 # Parse a module name.
 .parse_name <- function(name) {
-  assert_that(assertthat::is.string(name), .is_conform(name))
+  assert_that(.is_conform(name))
   matches <- regmatches(name, regexec(.conform_regex, name))[[1]]
   matches <-
     stats::setNames(as.list(matches),
