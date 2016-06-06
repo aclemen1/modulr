@@ -149,18 +149,19 @@
   .remove_duplicate_filesep(paste0(path, .Platform$file.sep))
 }
 
-# TODO test that!
+# Remove trailing file separators in a path.
 .remove_trailing_filesep <- function(path) {
   assert_that(assertthat::is.string(path))
   sub(paste0(.Platform$file.sep, "+$"), "", path)
 }
 
-# TODO test that!
+# Transform a module name to a path (with file separators replacing '/''s).
 .name_to_path <- function(name) {
   assert_that(.is_conform(name))
   paste(strsplit(name, "/", fixed = TRUE)[[1]], collapse = .Platform$file.sep)
 }
 
+# Transform a path into a module name (with '/'s replacing file separators).
 .path_to_name <- function(path) {
   name <-
     paste(strsplit(.remove_trailing_filesep(.remove_duplicate_filesep(path)),

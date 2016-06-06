@@ -106,6 +106,19 @@ test_that(".parse_version returns a list of version and symbol", {
   )
 })
 
+test_that(".remove_trailing_filesep removes trailing fileseps", {
+  expect_equal(
+    .remove_trailing_filesep("foo"),
+    "foo")
+  expect_equal(
+    .remove_trailing_filesep(paste0("foo", .Platform$file.sep)),
+    "foo")
+  expect_equal(
+    .remove_trailing_filesep(
+      paste(c("foo", rep(.Platform$file.sep, 2)), collapse = "")),
+    "foo")
+})
+
 test_that(".remove_duplicate_filesep removes duplicate fileseps", {
   expect_equal(
     .remove_duplicate_filesep(paste0("foo", .Platform$file.sep)),
