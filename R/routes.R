@@ -1,5 +1,7 @@
 .parse_version <- function(string) {
+  assert_that(assertthat::is.string(string))
   matches <- regmatches(string, regexec(.version_regex, string))[[1]]
+  assert_that(.is_version(matches[3]))
   list(
     symbol = as.character(ifelse(matches[2] == "", NA, matches[2])),
     version = numeric_version(

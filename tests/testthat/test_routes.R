@@ -1,5 +1,69 @@
 context("routes")
 
+test_that(".parse_version returns a list of version and symbol", {
+  v <- .parse_version("#^1.0.0")
+  expect_true(is.list(v))
+  expect_named(v, c("version", "symbol"), ignore.order = TRUE)
+  expect_equal(v[["version"]], numeric_version("1.0.0"))
+  expect_equal(v[["symbol"]], "^")
+  expect_equal(
+    .parse_version("#1"),
+    list(
+      version = numeric_version("1"),
+      symbol = NA_character_)[
+        names(v)]
+  )
+  expect_equal(
+    .parse_version("#1.0"),
+    list(
+      version = numeric_version("1.0"),
+      symbol = NA_character_)[
+        names(v)]
+  )
+  expect_equal(
+    .parse_version("#1.0.0"),
+    list(
+      version = numeric_version("1.0.0"),
+      symbol = NA_character_)[
+        names(v)]
+  )
+  expect_equal(
+    .parse_version("#~1.0.0"),
+    list(
+      version = numeric_version("1.0.0"),
+      symbol = "~")[
+        names(v)]
+  )
+  expect_equal(
+    .parse_version("#^1.0.0"),
+    list(
+      version = numeric_version("1.0.0"),
+      symbol = "^")[
+        names(v)]
+  )
+  expect_equal(
+    .parse_version("#>=1.0.0"),
+    list(
+      version = numeric_version("1.0.0"),
+      symbol = ">=")[
+        names(v)]
+  )
+  expect_equal(
+    .parse_version(""),
+    list(
+      version = numeric_version("", strict = FALSE),
+      symbol = NA_character_)[
+        names(v)]
+  )
+  expect_equal(
+    .parse_version("#"),
+    list(
+      version = numeric_version("", strict = FALSE),
+      symbol = NA_character_)[
+        names(v)]
+  )
+})
+
 test_that(".remove_duplicate_filesep removes duplicate fileseps", {
   expect_equal(
     .remove_duplicate_filesep(paste0("foo", .Platform$file.sep)),

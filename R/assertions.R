@@ -17,7 +17,18 @@ assertthat::on_failure(.is_undefined) <- function(call, env) {
   paste0(deparse(eval(call$name, envir = env)), " is defined.")
 }
 
-.version_regex <- "(?:(?:#([~^]|(?:>=))?(\\d+(?:\\.\\d+){0,3})))"
+.version_string_regex <- "([~^]|(?:>=))?(\\d+(?:\\.\\d+){0,3})"
+.version_regex <- sprintf("(?:(?:#%s))", .version_string_regex)
+
+.is_version <- function(string) {
+  assert_that(assertthat::is.string(string) || is.na(string))
+  is.na(string) || grepl(sprintf("^%s$", .version_string_regex), string)
+}
+
+assertthat::on_failure(.is_version) <- function(call, env) {
+  paste0(deparse(eval(call$name, envir = env)),
+         " is an invalid (semantic) version.")
+}
 
 .conform_regex <- paste0(
   "^$|",
