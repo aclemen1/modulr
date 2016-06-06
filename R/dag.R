@@ -72,13 +72,6 @@
 
     ordered_names <- .topological_sort(graph)
 
-#     deps <-
-#       sapply(
-#         ordered_names,
-#         function(x)
-#           unlist(modulr_env$register[[c(x, "dependencies")]],
-#                  use.names = FALSE))
-
     deps <- Map(
       function(name) {
         deps_ <- graph[graph[["module"]] == name, ][["dependency"]]
@@ -91,9 +84,10 @@
 
     while (length(deps) > 0) {
 
-      idx <- sapply(
+      idx <- vapply(
         1:length(deps),
-        function(n) any(deps[[n]] %in% names(deps)[1:n]))
+        FUN = function(n) any(deps[[n]] %in% names(deps)[1:n]),
+        FUN.VALUE = TRUE)
 
       layers[[length(layers) + 1]] <- names(deps)[!idx]
 
