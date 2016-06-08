@@ -3,7 +3,7 @@ if (requireNamespace("lintr", quietly = TRUE)) {
   test_that("Package Style", {
     testthat::skip_on_cran()
     testthat::skip_on_travis()
-    lint <- TRUE
+    lint <- FALSE
     if (interactive()) {
       lint <- FALSE
       answer <- readline("Test linting (y/N)? ")
