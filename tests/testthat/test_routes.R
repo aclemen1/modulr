@@ -1,5 +1,120 @@
 context("routes")
 
+# WIP
+test_that(".flatten_versions and .unflatten_versions are inverses", {
+  na_version <- numeric_version("", strict = FALSE)
+  na_in_memory <- na_version
+  attr(na_in_memory, "storage") <- "in-memory"
+  v101 <- numeric_version("1.0.1")
+  v101_in_memory <- v101
+  attr(v101_in_memory, "storage") <- "in-memory"
+  v101_on_disk <- v101
+  attr(v101_on_disk, "storage") <- "on-disk"
+  expect_error(
+    .unflatten_versions(stats::setNames(list(na_version), c("na_version"))))
+  expect_equal(
+    .unflatten_versions(stats::setNames(list(na_in_memory), c("na_in_memory"))),
+    list(
+      list(
+        storage = "in-memory",
+        version = na_version,
+        filepath = NA_character_,
+        name = "na_in_memory"
+      )
+    )
+  )
+  expect_equal(
+    .flatten_versions(
+      .unflatten_versions(stats::setNames(list(na_in_memory),
+                                          c("na_in_memory")))),
+    stats::setNames(list(na_in_memory), c("na_in_memory"))
+  )
+  expect_equal(
+    .unflatten_versions(stats::setNames(list(v101_on_disk), c("v101_on_disk"))),
+    list(
+      list(
+        storage = "on-disk",
+        version = v101,
+        filepath = "v101_on_disk",
+        name = NA_character_
+      )
+    )
+  )
+  expect_equal(
+    .flatten_versions(
+      .unflatten_versions(stats::setNames(list(v101_on_disk),
+                                          c("v101_on_disk")))),
+    stats::setNames(list(v101_on_disk), c("v101_on_disk"))
+  )
+  expect_equal(
+    .flatten_versions(list(
+      list(
+        storage = "in-memory",
+        version = na_version,
+        filepath = NA_character_,
+        name = "na_in_memory"
+      )
+    )),
+    stats::setNames(list(na_in_memory), c("na_in_memory"))
+  )
+  expect_equal(
+    .unflatten_versions(
+      .flatten_versions(list(
+      list(
+        storage = "in-memory",
+        version = na_version,
+        filepath = NA_character_,
+        name = "na_in_memory"
+      )
+    ))),
+    list(
+      list(
+        storage = "in-memory",
+        version = na_version,
+        filepath = NA_character_,
+        name = "na_in_memory"
+      )
+    )
+  )
+  expect_equal(
+    .flatten_versions(list(
+      list(
+        storage = "on-disk",
+        version = v101,
+        filepath = "v101_on_disk",
+        name = NA_character_
+      )
+    )),
+    stats::setNames(list(v101_on_disk), c("v101_on_disk"))
+  )
+  expect_equal(
+    .unflatten_versions(
+      .flatten_versions(list(
+      list(
+        storage = "on-disk",
+        version = v101,
+        filepath = "v101_on_disk",
+        name = NA_character_
+      )
+    ))),
+    list(
+      list(
+        storage = "on-disk",
+        version = v101,
+        filepath = "v101_on_disk",
+        name = NA_character_
+      )
+    )
+  )
+  expect_equal(
+    .flatten_versions(
+      .unflatten_versions(stats::setNames(list(na_in_memory, v101_in_memory, v101_on_disk),
+                                          c("na_in_memory", "v101_in_memory", "v101_on_disk")))),
+    stats::setNames(list(na_in_memory, v101_in_memory, v101_on_disk),
+                                          c("na_in_memory", "v101_in_memory", "v101_on_disk"))
+  )
+})
+
 test_that(".filter_versions filters versions", {
   na_version <- numeric_version("", strict = FALSE)
   expect_equal(.filter_versions(list(), na_version, NA), list())
