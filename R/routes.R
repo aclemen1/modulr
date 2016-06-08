@@ -1,8 +1,8 @@
 # Parse version from a string.
 .parse_version <- function(string) {
   assert_that(assertthat::is.string(string))
-  matches <- regmatches(string, regexec(.version_regex, string))[[1]]
-  assert_that(.is_version(matches[3]))
+  matches <- regmatches(string, regexec(.version_hash_string_regex, string))[[1]]
+  assert_that(.is_version_string(matches[3]))
   list(
     symbol = as.character(ifelse(matches[2] == "", NA, matches[2])),
     version = numeric_version(
@@ -242,9 +242,16 @@
 
 }
 
-# TODO test that it preserves the "storage" attribute
+# Filter versions relative to a base version and a version symbol.
 .filter_versions <- function(versions, version, symbol) {
-  assert_that(is.list(versions))
+
+  assert_that(
+    is.list(versions),
+    .is_version(version),
+    .is_version_symbol(symbol))
+
+  Map(assert_that, Map(.is_version, versions))
+
   filter_ <- function(versions, version, symbol) {
     candidates <- Filter(function(v) {
       !isTRUE(v < version)
@@ -301,7 +308,7 @@
   # unique(numeric_version(c("1.0", "1.0.0"))) # Exclude Linting
   filtered_str <- do.call(c, lapply(filtered, as.character))
   if (!is.null(filtered_str)) {
-    filtered_attr <- do.call(c, lapply(filtered, attr, "storage"))
+    filtered_attr <- lapply(filtered, attr, "storage")
     filtered_criterion <- paste(filtered_str, filtered_attr, sep = "$")
     ordering <- order(filtered_str, na.last = TRUE)
     versions <-
@@ -370,7 +377,7 @@
 
   pattern <- sprintf("(?:%s)", paste(paste0(
     "^", sprintf("(?:%s)", parsed_name[["final"]]),
-    paste0(.version_regex, "?"),
+    paste0(.version_hash_string_regex, "?"),
     sprintf(ifelse(include.dirs, "(?:%s)?$", "%s"),
             utils::glob2rx(sprintf("*%s", extensions), trim.head = TRUE))),
     collapse = "|"))
@@ -401,7 +408,7 @@
 
   pattern <- paste0(
     "^", sprintf("(?:%s)", parsed_name[["namespace"]]),
-    .version_regex, "?$")
+    .version_hash_string_regex, "?$")
   mods <- grep(pattern,
                names(modulr_env$register),
                value = TRUE)
@@ -445,7 +452,7 @@
         regexec(
           sprintf(
             "(?:^\\s*|(?:define\\())[\"']([^\"']*?(?:%s)[^\"']*?)[\"']",
-            .version_regex,
+            .version_hash_string_regex,
             perl = TRUE),
           line)
       )[[1]]

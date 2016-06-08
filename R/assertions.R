@@ -17,15 +17,37 @@ assertthat::on_failure(.is_undefined) <- function(call, env) {
   paste0(deparse(eval(call$name, envir = env)), " is defined.")
 }
 
-.version_string_regex <- "([~^]|(?:>=))?(\\d+(?:\\.\\d+){0,3})"
-.version_regex <- sprintf("(?:(?:#%s))", .version_string_regex)
+.is_version <- function(version) {
+  "numeric_version" %in% class(version)
+}
 
-.is_version <- function(string) {
+assertthat::on_failure(.is_version) <- function(call, env) {
+  paste0(deparse(eval(call$name, envir = env)),
+         " is not an element of the numeric version class.")
+}
+
+.version_symbol_regex <- "(?:[~^]|(?:>=))"
+
+.is_version_symbol <- function(symbol) {
+  assert_that(is.na(symbol) || assertthat::is.string(symbol))
+  is.na(symbol) || grepl(sprintf("^%s$", .version_symbol_regex), symbol)
+}
+
+assertthat::on_failure(.is_version_symbol) <- function(call, env) {
+  paste0(deparse(eval(call$name, envir = env)),
+         " is an invalid version symbol.")
+}
+
+.version_string_regex <-
+  sprintf("(%s)?(\\d+(?:\\.\\d+){0,3})", .version_symbol_regex)
+.version_hash_string_regex <- sprintf("(?:(?:#%s))", .version_string_regex)
+
+.is_version_string <- function(string) {
   assert_that(assertthat::is.string(string) || is.na(string))
   is.na(string) || grepl(sprintf("^%s$", .version_string_regex), string)
 }
 
-assertthat::on_failure(.is_version) <- function(call, env) {
+assertthat::on_failure(.is_version_string) <- function(call, env) {
   paste0(deparse(eval(call$name, envir = env)),
          " is an invalid (semantic) version.")
 }
@@ -33,7 +55,7 @@ assertthat::on_failure(.is_version) <- function(call, env) {
 .conform_regex <- paste0(
   "^$|",
   "^((?:[a-zA-Z0-9_-]+)(?:/[a-zA-Z0-9_-]+)*)",
-  .version_regex, "?",
+  .version_hash_string_regex, "?",
   "((?:/[a-zA-Z0-9_-]+)*)$")
 
 .is_conform <- function(name) {

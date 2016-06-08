@@ -1,5 +1,145 @@
 context("routes")
 
+test_that(".filter_versions filters versions", {
+  na_version <- numeric_version("", strict = FALSE)
+  expect_equal(.filter_versions(list(), na_version, NA), list())
+  expect_equal(
+    .filter_versions(list(na_version), na_version, NA),
+    list(na_version)
+  )
+  expect_equal(
+    .filter_versions(list(na_version, na_version), na_version, NA),
+    list(na_version)
+  )
+  na_in_memory <- na_version
+  attr(na_in_memory, "storage") <- "in-memory"
+  expect_equal(
+    .filter_versions(
+      list(
+        na_in_memory,
+        na_in_memory
+      ), na_version, NA),
+    list(na_in_memory)
+  )
+  na_on_disk <- na_version
+  attr(na_on_disk, "storage") <- "on-disk"
+  expect_equal(
+    .filter_versions(
+      list(
+        na_in_memory,
+        na_on_disk
+      ), na_version, NA),
+    list(na_in_memory, na_on_disk)
+  )
+  v100 <- numeric_version("1.0.0")
+  expect_equal(
+    .filter_versions(
+      list(
+        na_version,
+        v100
+      ), na_version, NA),
+    list(v100, na_version)
+  )
+  v101 <- numeric_version("1.0.1")
+  v110 <- numeric_version("1.1.0")
+  v111 <- numeric_version("1.1.1")
+  v200 <- numeric_version("2.0.0")
+  v101_in_memory <- v101
+  attr(v101_in_memory, "storage") <- "in-memory"
+  v101_on_disk <- v101
+  attr(v101_on_disk, "storage") <- "on-disk"
+  expect_equal(
+    .filter_versions(
+      list(
+        v110,
+        v101,
+        v200,
+        na_version,
+        v101_in_memory,
+        v100,
+        v101_on_disk,
+        v101,
+        v111
+      ), na_version, NA),
+    list(v100, v101, v101_in_memory, v101_on_disk, v110, v111, v200, na_version)
+  )
+  expect_equal(
+    .filter_versions(
+      list(
+        v110,
+        v101,
+        v200,
+        na_version,
+        v101_in_memory,
+        v100,
+        v101_on_disk,
+        v101,
+        v111
+      ), v101, NA),
+    list(v101, v101_in_memory, v101_on_disk)
+  )
+  expect_equal(
+    .filter_versions(
+      list(
+        v110,
+        v101,
+        v200,
+        na_version,
+        v101_in_memory,
+        v100,
+        v101_on_disk,
+        v101,
+        v111
+      ), v110, NA),
+    list(v110)
+  )
+  expect_equal(
+    .filter_versions(
+      list(
+        v110,
+        v101,
+        v200,
+        na_version,
+        v101_in_memory,
+        v100,
+        v101_on_disk,
+        v101,
+        v111
+      ), v100, "~"),
+    list(v100, v101, v101_in_memory, v101_on_disk, na_version)
+  )
+  expect_equal(
+    .filter_versions(
+      list(
+        v110,
+        v101,
+        v200,
+        na_version,
+        v101_in_memory,
+        v100,
+        v101_on_disk,
+        v101,
+        v111
+      ), v110, "^"),
+    list(v110, v111, na_version)
+  )
+  expect_equal(
+    .filter_versions(
+      list(
+        v110,
+        v101,
+        v200,
+        na_version,
+        v101_in_memory,
+        v100,
+        v101_on_disk,
+        v101,
+        v111
+      ), v111, ">="),
+    list(v111, v200, na_version)
+  )
+})
+
 test_that(".path_to_name and .name_to_path are inverses", {
   name <- "foo/bar/foobar#^1.0.0/test"
   expect_equal(
