@@ -79,6 +79,17 @@ assertthat::on_failure(.is_exact) <- function(call, env) {
          " contains a prefixed version number.")
 }
 
+# Test if a name does not contain a semantic version.
+.is_namespace <- function(namespace) {
+  assert_that(.is_exact(namespace))
+  is.na(.parse_name(namespace)[["version"]])
+}
+
+assertthat::on_failure(.is_namespace) <- function(call, env) {
+  paste0(deparse(eval(call$name, envir = env)),
+         " contains a version.")
+}
+
 # Test if a module has a regular name.
 .is_regular <- function(name) {
   assert_that(assertthat::is.string(name))

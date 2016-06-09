@@ -17,7 +17,7 @@
   matches <- regmatches(name, regexec(.conform_regex, name))[[1]]
   matches <-
     stats::setNames(as.list(matches),
-             c("name", "namespace", "symbol", "version", "suffix"))
+                    c("name", "namespace", "symbol", "version", "suffix"))
   matches[["suffix"]] <- sub("^/", "", matches[["suffix"]])
   matches[c("symbol", "version")] <-
     .parse_version(paste0("#", matches[["symbol"]], matches[["version"]]))[
@@ -356,7 +356,7 @@
       msg = "unnamed versions.")
   assert_that(
     all(do.call(c, Map(all, lapply(versions, assertthat::has_name,
-                    c("storage", "version", "filepath", "name"))))),
+                                   c("storage", "version", "filepath", "name"))))),
     msg = "badly structured versions.")
   assert_that(
     all(is.character(do.call(c, lapply(versions, `[[`, "storage")))),
@@ -399,7 +399,8 @@
   assert_that(
     .is_conform(name),
     is.null(scope_name) || .is_exact(scope_name),
-    is.character(extensions))
+    is.character(extensions),
+    assertthat::is.flag(include.dirs))
 
   resolved_namespace <- .resolve_namespace(name, scope_name)
   resolved_name <- resolved_namespace[["resolved"]]
@@ -449,6 +450,8 @@
   in_memory_versions <-
     lapply(as.list(in_memory_versions), `attr<-`, "storage", "in-memory")
 
+  # resolving on-disk and in-memory versions
+
   versions <- c(
     in_memory_versions,
     on_disk_versions
@@ -470,29 +473,63 @@
 }
 
 # TODO test that!
-# lapply(parse(text = '"bar#1.0.0" %provides% function() "bar v1.0.0"'),
-# function(l) lapply(l, function(f) is.symbol(f) && f == as.symbol("%provides%")))
-.extract_name <- function(filepath) {
-  if (file.exists(filepath)) {
-    con <- file(filepath, "r")
-    on.exit(close(con))
-    while (TRUE) {
-      line <- readLines(con = con, n = 1L, warn = FALSE)
-      if (length(line) == 0) break
-      matches <- regmatches(
-        line,
-        regexec(
-          sprintf(
-            "(?:^\\s*|(?:define\\())[\"']([^\"']*?(?:%s)[^\"']*?)[\"']",
-            .version_hash_string_regex,
-            perl = TRUE),
-          line)
-      )[[1]]
-      if (length(matches) > 0) {
-        return(matches[2])
+.extract_name <- function(filepath, namespace = NULL) {
+
+  assert_that(file.exists(filepath))
+  assert_that(is.null(namespace) || .is_namespace(namespace))
+
+  extract_ <- function(x, all = x, idx = c()) {
+    if (is.name(x)) {
+      if (x == as.name("define") ||
+            x == as.name("%requires%") ||
+            x == as.name("%provides%")) {
+        idx[length(idx)] <- idx[length(idx)] + 1
+        item <- all[[idx]]
+        if (is.character(item) && (
+          is.null(namespace) ||
+            grepl(sprintf("^(?:%s)(?:%s)?$", namespace,
+                          .version_hash_string_regex), item))) {
+          return(item)
+        }
       }
     }
+    if (is.expression(x) || (is.language(x) && !is.name(x))) for (i in 1:length(x)) {
+      rs <- extract_(x[[i]], all, c(idx, i))
+      if (!is.null(rs)) return(rs)
+    }
   }
+
+  if (tolower(tools::file_ext(filepath)) %in% c("rmd", "rnw")) {
+    script <-
+      knitr::knit(text = readChar(filepath, file.info(filepath)[["size"]]),
+                  tangle = TRUE, quiet = TRUE)
+    args <- list(text = script)
+  } else {
+    args <- list(file = filepath)
+  }
+
+  # Usually, the module is defined in the first expression, so we parse the
+  # beginning of the file only.
+  parsed <- tryCatch(
+    do.call(parse, args = c(args, list(n = 1L, keep.source = FALSE))),
+    error = function(e) {
+      e[["call"]] <- NULL
+      stop(e)
+    },
+    silent = TRUE)
+  name <- extract_(parsed)
+  if (!is.null(name)) return(name)
+
+  # If no name has been found in the first expression, we parse the whole file.
+  parsed <- tryCatch(
+    do.call(parse, args = c(args, list(keep.source = FALSE))),
+    error = function(e) {
+      e[["call"]] <- NULL
+      stop(e)
+    },
+    silent = TRUE)
+  return(extract_(parsed))
+
 }
 
 # TODO test that!
@@ -530,7 +567,7 @@
   filepaths <- unlist(lapply(on_disk_candidates, `[[`, "filepath"))
   for (idx in seq_along(filepaths)) {
     filepath <- filepaths[idx]
-    extracted_name <- .extract_name(filepath)
+    extracted_name <- .extract_name(filepath, parsed_name[["namespace"]])
     if (!is.null(extracted_name)) {
       parsed_name <- .parse_name(extracted_name)
     }
