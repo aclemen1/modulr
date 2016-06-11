@@ -1,5 +1,179 @@
 context("routes")
 
+test_that(".is_sub_version flags sub-versions correctly", {
+  expect_true(.is_sub_version(NA, numeric_version("1.0")))
+  expect_true(.is_sub_version(numeric_version("1.0"), numeric_version("1.0")))
+  expect_true(.is_sub_version(numeric_version("1.0"), numeric_version("1.0.1")))
+  expect_false(
+    .is_sub_version(numeric_version("1.0.0"), numeric_version("1.0")))
+  expect_false(
+    .is_sub_version(numeric_version("1.0"), numeric_version("1.1.0")))
+})
+
+test_that(".resolve_name resolves a module", {
+
+  na_version <- numeric_version("", strict = FALSE)
+
+  # Testing on-disk modules
+
+  reset()
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test.R")
+  cat('define("test", NULL, NULL)', file = tmp_file)
+  result <- .resolve_name("test")
+  resolved <- result[["resolved"]]
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = "test"
+    )[names(resolved[[1]])]
+  )
+  unlink(tmp_dir, recursive = TRUE)
+
+  reset()
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test.R")
+  cat('define("test#1.0.0", NULL, NULL)', file = tmp_file)
+  result <- .resolve_name("test")
+  resolved <- result[["resolved"]]
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  unlink(tmp_dir, recursive = TRUE)
+
+  reset()
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test#1.0.R")
+  cat('define("test#1.0.1", NULL, NULL)', file = tmp_file)
+  result <- .resolve_name("test")
+  resolved <- result[["resolved"]]
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.1"),
+      filepath = tmp_file,
+      name = "test#1.0.1"
+    )[names(resolved[[1]])]
+  )
+  unlink(tmp_dir, recursive = TRUE)
+
+  reset()
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test#1.0.R")
+  cat('define("test#1.1.0", NULL, NULL)', file = tmp_file)
+  result <- .resolve_name("test")
+  resolved <- result[["resolved"]]
+  expect_equal(resolved, list())
+  unlink(tmp_dir, recursive = TRUE)
+
+  reset()
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test.R")
+  cat('define("something_else", NULL, NULL)', file = tmp_file)
+  result <- .resolve_name("test")
+  resolved <- result[["resolved"]]
+  expect_equal(resolved, list())
+  unlink(tmp_dir, recursive = TRUE)
+
+  reset()
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test.R")
+  cat('define("test", NULL, NULL)', file = tmp_file)
+  tmp_file_100 <- file.path(tmp_dir, "test#1.0.0.R")
+  cat('define("test#1.0.0", NULL, NULL)', file = tmp_file_100)
+  result <- .resolve_name("test")
+  resolved <- result[["resolved"]]
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  expect_equal(
+    resolved[[2]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = "test"
+    )[names(resolved[[2]])]
+  )
+
+  # Testing that if an in-memory module has a corresponding on-disk instance
+  # with same version number, we keep the on-disk module only.
+  reset()
+  define("test#1.0.0", NULL, NULL)
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test.R")
+  cat('define("test#1.0.0", NULL, NULL)', file = tmp_file)
+  expect_equal(length(.resolve_name("test")[["resolved"]]), 2L)
+  result <- .resolve_name("test", all = FALSE)
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 1L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  unlink(tmp_dir, recursive = TRUE)
+
+  # Testing that we keep the highest version.
+  reset()
+  define("test#1.0.0", NULL, NULL)
+  define("test#0.0.0.9999", NULL, NULL)
+  define("test#1.0.1", NULL, NULL)
+  result <- .resolve_name("test", all = FALSE)
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 1L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.1"),
+      filepath = NA_character_,
+      name = "test#1.0.1"
+    )[names(resolved[[1]])]
+  )
+})
+
 test_that(".resolve_candidates resolves candidates for a module", {
 
   na_version <- numeric_version("", strict = FALSE)

@@ -477,11 +477,25 @@
 
 }
 
+# Flag sub-version of a version, e.g. 1.0.1 is sub-1.0.
+.is_sub_version <- function(version, sub_version) {
+  if (is.na(version)) return(TRUE)
+  version <- unclass(version)[[1]]
+  sub_version <- unclass(sub_version)[[1]]
+  level <- length(version)
+  if (level > length(sub_version)) return(FALSE)
+  all(vapply(seq_len(level), FUN = function(i) {
+    version[i] == sub_version[i]
+  },
+  FUN.VALUE = TRUE))
+}
+
 # Extract the name of a module definition in a file.
-.extract_name <- function(filepath, namespace = NULL) {
+.extract_name <- function(filepath, namespace = NULL, version = NA) {
 
   assert_that(file.exists(filepath))
   assert_that(is.null(namespace) || .is_namespace(namespace))
+  assert_that(is.na(version) || .is_version(version))
 
   extract_ <- function(x, all = x, idx = c()) {
     if (is.name(x)) {
@@ -490,11 +504,13 @@
             x == as.name("%provides%")) {
         idx[length(idx)] <- idx[length(idx)] + 1
         item <- all[[idx]]
-        if (is.character(item) && (
-          is.null(namespace) ||
-            grepl(sprintf("^(?:%s)(?:%s)?$", namespace,
-                          .version_hash_string_regex), item))) {
-          return(item)
+        if (is.character(item)) {
+          if (is.null(namespace)) return(item)
+          parsed_name <- .parse_name(item)
+          if (parsed_name[["namespace"]] == namespace &&
+                .is_sub_version(version, parsed_name[["version"]])) {
+            return(item)
+          }
         }
       }
     }
@@ -540,7 +556,7 @@
 
 }
 
-# TODO test that!
+# Parse all candidates for a module name to find the best fitting version.
 .resolve_name <- function(name, scope_name = NULL, absolute = TRUE, all = TRUE,
                           extensions = c(".R", ".r",
                                          ".Rmd", ".rmd",
@@ -572,16 +588,17 @@
     candidates[["resolved"]])
 
   on_disk_versions <- list()
-  filepaths <- unlist(lapply(on_disk_candidates, `[[`, "filepath"))
-  for (idx in seq_along(filepaths)) {
-    filepath <- filepaths[idx]
-    extracted_name <- .extract_name(filepath, parsed_name[["namespace"]])
+  for (idx in seq_along(on_disk_candidates)) {
+    filepath <- on_disk_candidates[[idx]][["filepath"]]
+    version <- on_disk_candidates[[idx]][["version"]]
+    extracted_name <- .extract_name(
+      filepath, parsed_name[["namespace"]], version)
     if (!is.null(extracted_name)) {
-      parsed_name <- .parse_name(extracted_name)
+      parsed_extracted_name <- .parse_name(extracted_name)
+      node <- on_disk_candidates[[idx]]
+      node[["version"]] <- parsed_extracted_name[["version"]]
+      on_disk_versions <- c(list(node), on_disk_versions)
     }
-    node <- on_disk_candidates[[idx]]
-    node[["version"]] <- parsed_name[["version"]]
-    on_disk_versions <- c(list(node), on_disk_versions)
   }
 
   in_memory_versions <-
