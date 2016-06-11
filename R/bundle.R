@@ -130,7 +130,7 @@ do_bundle <- function(name = .Last.name, args = list(),
 
             ordered_names <- layers[[layer_idx]]
 
-            for (ordered_name_idx in c(1:length(ordered_names))) {
+            for (ordered_name_idx in seq_len(length(ordered_names))) {
 
               ordered_name <- ordered_names[ordered_name_idx]
 

@@ -1,6 +1,64 @@
 context("routes")
 
-# WIP
+test_that(".extract_name extracts the module name of a module definition", {
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- ""
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_null(.extract_name(file))
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- "define('modulr_test', NULL, function() NULL)"
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test")
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- "define('modulr_test#1.2.3', NULL, function() NULL)"
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test#1.2.3")
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- "'modulr_test' %requires% list() %provides% {}"
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test")
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- "'modulr_test' %provides% {}"
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test")
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- "# This is a comment\n\n'modulr_test' %provides% {}"
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test")
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <-
+    paste(c(rep("foo <- 'bar'", 10L),
+            "'modulr_test' %provides% {}"), collapse = "\n")
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test")
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- paste(
+    "define('modulr_test_1', NULL, function() NULL)",
+    "define('modulr_test_2', NULL, function() NULL)",
+    sep = "\n")
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test_1")
+  expect_equal(.extract_name(file, "modulr_test_1"), "modulr_test_1")
+  expect_equal(.extract_name(file, "modulr_test_2"), "modulr_test_2")
+  expect_null(.extract_name(file, "modulr_test_foo"))
+
+})
+
 test_that(".flatten_versions and .unflatten_versions are inverses", {
   na_version <- numeric_version("", strict = FALSE)
   na_in_memory <- na_version

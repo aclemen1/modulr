@@ -85,7 +85,7 @@
     while (length(deps) > 0) {
 
       idx <- vapply(
-        1:length(deps),
+        seq_len(length(deps)),
         FUN = function(n) any(deps[[n]] %in% names(deps)[1:n]),
         FUN.VALUE = TRUE)
 

@@ -472,7 +472,7 @@
 
 }
 
-# TODO test that!
+# Extract the name of a module definition in a file.
 .extract_name <- function(filepath, namespace = NULL) {
 
   assert_that(file.exists(filepath))
@@ -493,9 +493,11 @@
         }
       }
     }
-    if (is.expression(x) || (is.language(x) && !is.name(x))) for (i in 1:length(x)) {
-      rs <- extract_(x[[i]], all, c(idx, i))
-      if (!is.null(rs)) return(rs)
+    if (is.expression(x) || (is.language(x) && !is.name(x))) {
+      for (i in seq_len(length(x))) {
+        rs <- extract_(x[[i]], all, c(idx, i))
+        if (!is.null(rs)) return(rs)
+      }
     }
   }
 
@@ -508,10 +510,10 @@
     args <- list(file = filepath)
   }
 
-  # Usually, the module is defined in the first expression, so we parse the
+  # Usually, the module is defined in the first expressions, so we parse the
   # beginning of the file only.
   parsed <- tryCatch(
-    do.call(parse, args = c(args, list(n = 1L, keep.source = FALSE))),
+    do.call(parse, args = c(args, list(n = 3L, keep.source = FALSE))),
     error = function(e) {
       e[["call"]] <- NULL
       stop(e)
@@ -520,7 +522,8 @@
   name <- extract_(parsed)
   if (!is.null(name)) return(name)
 
-  # If no name has been found in the first expression, we parse the whole file.
+  # If no name has been found in the first expression, we then parse the whole
+  # file.
   parsed <- tryCatch(
     do.call(parse, args = c(args, list(keep.source = FALSE))),
     error = function(e) {

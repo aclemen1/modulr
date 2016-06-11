@@ -50,7 +50,7 @@
 
       docstring_lines <-
         vapply(
-          c(1:length(docstring_raw)),
+          seq_len(length(docstring_raw)),
           function(idx) {
             x <- docstring_raw[idx]
             content <-
