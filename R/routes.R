@@ -1,7 +1,8 @@
 # Parse version from a string.
 .parse_version <- function(string) {
   assert_that(assertthat::is.string(string))
-  matches <- regmatches(string, regexec(.version_hash_string_regex, string))[[1]]
+  matches <-
+    regmatches(string, regexec(.version_hash_string_regex, string))[[1]]
   assert_that(.is_version_string(matches[3]))
   list(
     symbol = as.character(ifelse(matches[2] == "", NA, matches[2])),
@@ -321,76 +322,80 @@
 # Transform a named list of versions with 'storage' attributes into a structured
 # list.
 .unflatten_versions <- function(versions) {
-  assert_that(
-    is.list(versions),
-    assertthat::has_attr(versions, "names")
-  )
-  Map(assert_that, Map(assertthat::has_attr, versions, "storage"),
-      msg = "'storage' attribute missing.")
-  lapply(names(versions), function(name) {
-    version <- c(versions[[name]])
-    storage <- attr(versions[[name]], "storage")
-    node <- list(
-      storage = storage,
-      version = version
-    )
-    if (storage == "on-disk") {
-      node[["storage"]] <- "on-disk"
-      node[["filepath"]] <- name
-      node[["name"]] <- NA_character_
-    } else {
-      node[["storage"]] <- "in-memory"
-      node[["filepath"]] <- NA_character_
-      node[["name"]] <- name
-    }
-    node
-  })
+  assert_that(is.list(versions))
+  if (length(versions) > 0L) {
+    assert_that(assertthat::has_attr(versions, "names"))
+    Map(assert_that, Map(assertthat::has_attr, versions, "storage"),
+        msg = "'storage' attribute missing.")
+    versions <- lapply(names(versions), function(name) {
+      version <- c(versions[[name]])
+      storage <- attr(versions[[name]], "storage")
+      node <- list(
+        storage = storage,
+        version = version
+      )
+      if (storage == "on-disk") {
+        node[["storage"]] <- "on-disk"
+        node[["filepath"]] <- name
+        node[["name"]] <- NA_character_
+      } else {
+        node[["storage"]] <- "in-memory"
+        node[["filepath"]] <- NA_character_
+        node[["name"]] <- name
+      }
+      node
+    })
+  }
+  versions
 }
 
 # Transform a structured list of versions into a named list of versions with
 # 'storage' attributes.
 .flatten_versions <- function(versions) {
   assert_that(is.list(versions))
-  Map(assert_that, Map(is.list, versions), msg = "unstructured versions.")
-  Map(assert_that, Map(assertthat::has_attr, versions, "names"),
-      msg = "unnamed versions.")
-  assert_that(
-    all(do.call(c, Map(all, lapply(versions, assertthat::has_name,
-                                   c("storage", "version", "filepath", "name"))))),
-    msg = "badly structured versions.")
-  assert_that(
-    all(is.character(do.call(c, lapply(versions, `[[`, "storage")))),
-    msg = "badly structured versions.")
-  assert_that(
-    all(do.call(c, lapply(versions, `[[`, "storage")) %in%
-          c("in-memory", "on-disk")),
-    msg = "badly structured versions.")
-  assert_that(
-    all(.is_version(do.call(c, lapply(versions, `[[`, "version")))),
-    msg = "badly structured versions.")
-  assert_that(
-    all(is.character(do.call(c, lapply(versions, `[[`, "filepath")))),
-    msg = "badly structured versions.")
-  assert_that(
-    all(is.character(do.call(c, lapply(versions, `[[`, "name")))),
-    msg = "badly structured versions.")
-  versions <-
-    stats::setNames(
-      versions,
-      Map(function(v) {
-        ifelse(v[["storage"]] == "on-disk", v[["filepath"]], v[["name"]])
-      },
-      versions))
-  versions <- Map(function(version) {
-    node <- version[["version"]]
-    attr(node, "storage") <- version[["storage"]]
-    node
-  },
-  versions)
+  if (length(versions) > 0L) {
+    Map(assert_that, Map(is.list, versions), msg = "unstructured versions.")
+    Map(assert_that, Map(assertthat::has_attr, versions, "names"),
+        msg = "unnamed versions.")
+    assert_that(
+      all(do.call(c, Map(all, lapply(
+        versions, assertthat::has_name,
+        c("storage", "version", "filepath", "name"))))),
+      msg = "badly structured versions.")
+    assert_that(
+      all(is.character(do.call(c, lapply(versions, `[[`, "storage")))),
+      msg = "badly structured versions.")
+    assert_that(
+      all(do.call(c, lapply(versions, `[[`, "storage")) %in%
+            c("in-memory", "on-disk")),
+      msg = "badly structured versions.")
+    assert_that(
+      all(.is_version(do.call(c, lapply(versions, `[[`, "version")))),
+      msg = "badly structured versions.")
+    assert_that(
+      all(is.character(do.call(c, lapply(versions, `[[`, "filepath")))),
+      msg = "badly structured versions.")
+    assert_that(
+      all(is.character(do.call(c, lapply(versions, `[[`, "name")))),
+      msg = "badly structured versions.")
+    versions <-
+      stats::setNames(
+        versions,
+        Map(function(v) {
+          ifelse(v[["storage"]] == "on-disk", v[["filepath"]], v[["name"]])
+        },
+        versions))
+    versions <- Map(function(version) {
+      node <- version[["version"]]
+      attr(node, "storage") <- version[["storage"]]
+      node
+    },
+    versions)
+  }
   versions
 }
 
-# TODO test that!
+# Find all in-memory and on-disk candidates for a given module name.
 .resolve_candidates <- function(name, scope_name = NULL, absolute = TRUE,
                                 extensions = c(".R", ".r",
                                                ".Rmd", ".rmd",

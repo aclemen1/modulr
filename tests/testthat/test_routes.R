@@ -1,5 +1,546 @@
 context("routes")
 
+test_that(".resolve_candidates resolves candidates for a module", {
+
+  na_version <- numeric_version("", strict = FALSE)
+
+  # Testing in-memory candidates
+
+  reset()
+  resolved <- .resolve_candidates("unexisting")[["resolved"]]
+  expect_equal(resolved, list())
+
+  reset()
+  define("test", NULL, NULL)
+  result <- .resolve_candidates("test")
+  expect_named(result, c("name", "scope_name", "resolved", "namespace"),
+               ignore.order = TRUE)
+  resolved <- result[["resolved"]]
+  expect_named(resolved[[1]], c("storage", "version", "filepath", "name"),
+               ignore.order = TRUE)
+  expect_equal(
+    resolved,
+    list(list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[1]])])
+  )
+
+  reset()
+  define("test#1.0.0", NULL, NULL)
+  result <- .resolve_candidates("test")
+  resolved <- result[["resolved"]]
+  expect_equal(
+    resolved,
+    list(list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])])
+  )
+
+  reset()
+  define("test/module_test", NULL, NULL)
+  paths_config$set("other_test" = "test")
+  resolved <- .resolve_candidates("other_test/module_test")[["resolved"]]
+  expect_equal(
+    resolved,
+    list(list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test/module_test"
+    )[names(resolved[[1]])])
+  )
+
+  reset()
+  define("test", NULL, NULL)
+  maps_config$set(other = c("other_test" = "test"))
+  resolved <- .resolve_candidates("other_test", "other")[["resolved"]]
+  expect_equal(
+    resolved,
+    list(list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[1]])])
+  )
+
+  reset()
+  define("test/module_test", NULL, NULL)
+  paths_config$set("other_test" = "test")
+  maps_config$set(
+    test = c("other_test/module_other" = "other_test/module_test"))
+  resolved <-
+    .resolve_candidates("other_test/module_other", "test")[["resolved"]]
+  expect_equal(
+    resolved,
+    list(list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test/module_test"
+    )[names(resolved[[1]])])
+  )
+
+  reset()
+  define("test", NULL, NULL)
+  define("test#1.0.0", NULL, NULL)
+  define("test#1.0.1", NULL, NULL)
+  define("test#1.1.0", NULL, NULL)
+  define("test#2.0.0", NULL, NULL)
+
+  result <- .resolve_candidates("test")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 5L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[5]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[5]])]
+  )
+
+  result <- .resolve_candidates("test#>=1.0.1")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 4L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.1"),
+      filepath = NA_character_,
+      name = "test#1.0.1"
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[4]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[4]])]
+  )
+
+  result <- .resolve_candidates("test#^1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 4L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[4]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[4]])]
+  )
+
+  result <- .resolve_candidates("test#~1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 3L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[3]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[3]])]
+  )
+
+  result <- .resolve_candidates("test#1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 1L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+
+  # Testing on-disk candidates
+  reset()
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+
+  tmp_dir_300 <- file.path(tmp_dir, "test#3.0.0")
+  dir.create(tmp_dir_300)
+  result <- .resolve_candidates("test", include.dirs = TRUE)
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 1L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("3.0.0"),
+      filepath = tmp_dir_300,
+      name = NA_character_
+    )[names(resolved[[1]])]
+  )
+  unlink(tmp_dir_300, recursive = TRUE)
+  on.exit(unlink(tmp_dir_300, recursive = TRUE), add = TRUE)
+
+  tmp_file <- file.path(tmp_dir, "test.R")
+  cat('define("test", NULL, NULL)', file = tmp_file)
+  tmp_file_100 <- file.path(tmp_dir, "test#1.0.0.R")
+  cat('"test#1.0.0" %requires% list() %provides% {}', file = tmp_file_100)
+  tmp_file_101 <- file.path(tmp_dir, "test#1.0.1.Rmd")
+  cat('```{r}\nlibrary(modulr)\ndefine("test#1.0.1", NULL, NULL)\n```',
+      file = tmp_file_101)
+  tmp_file_110 <- file.path(tmp_dir, "test#1.1.0.Rnw")
+  cat('<<>>=\nlibrary(modulr)\ndefine("test#1.1.0", NULL, NULL)\n@\n',
+      file = tmp_file_110)
+  tmp_file_200 <- file.path(tmp_dir, "test#2.0.0.R")
+  cat('define("test#2.0.0", NULL, NULL)', file = tmp_file_200)
+
+  result <- .resolve_candidates("test")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 5L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = NA_character_
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[5]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = NA_character_
+    )[names(resolved[[5]])]
+  )
+
+  result <- .resolve_candidates("test#>=1.0.1")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 4L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.1"),
+      filepath = tmp_file_101,
+      name = NA_character_
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[4]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = NA_character_
+    )[names(resolved[[4]])]
+  )
+
+  result <- .resolve_candidates("test#^1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 4L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = NA_character_
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[4]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = NA_character_
+    )[names(resolved[[4]])]
+  )
+
+  result <- .resolve_candidates("test#~1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 3L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = NA_character_
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[3]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = NA_character_
+    )[names(resolved[[3]])]
+  )
+
+  result <- .resolve_candidates("test#1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 1L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = NA_character_
+    )[names(resolved[[1]])]
+  )
+
+  # Mixed (in-memory and on-disk)
+  define("test", NULL, NULL)
+  define("test#1.0.0", NULL, NULL)
+
+  result <- .resolve_candidates("test")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 7L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  expect_equal(
+    resolved[[2]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = NA_character_
+    )[names(resolved[[2]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[6]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[6]])]
+  )
+  expect_equal(
+    resolved[[7]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = NA_character_
+    )[names(resolved[[7]])]
+  )
+
+  result <- .resolve_candidates("test#>=1.0.1")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 5L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.1"),
+      filepath = tmp_file_101,
+      name = NA_character_
+    )[names(resolved[[1]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[4]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[4]])]
+  )
+  expect_equal(
+    resolved[[5]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = NA_character_
+    )[names(resolved[[4]])]
+  )
+
+  result <- .resolve_candidates("test#^1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 6L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  expect_equal(
+    resolved[[2]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = NA_character_
+    )[names(resolved[[2]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[5]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[5]])]
+  )
+  expect_equal(
+    resolved[[6]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = NA_character_
+    )[names(resolved[[6]])]
+  )
+
+  result <- .resolve_candidates("test#~1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 5L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  expect_equal(
+    resolved[[2]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = NA_character_
+    )[names(resolved[[2]])]
+  )
+  # ...
+  expect_equal(
+    resolved[[4]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[4]])]
+  )
+  expect_equal(
+    resolved[[5]],
+    list(
+      storage = "on-disk",
+      version = na_version,
+      filepath = tmp_file,
+      name = NA_character_
+    )[names(resolved[[5]])]
+  )
+
+  result <- .resolve_candidates("test#1.0.0")
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 2L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = numeric_version("1.0.0"),
+      filepath = NA_character_,
+      name = "test#1.0.0"
+    )[names(resolved[[1]])]
+  )
+  expect_equal(
+    resolved[[2]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = tmp_file_100,
+      name = NA_character_
+    )[names(resolved[[2]])]
+  )
+
+  undefine("test#1.0.0")
+  oldwd <- setwd(tmp_dir)
+  on.exit(try(setwd(oldwd), silent = TRUE), add = TRUE)
+  root_config$set(".")
+  result <- .resolve_candidates("test#1.0.0", absolute = FALSE)
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 1L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "on-disk",
+      version = numeric_version("1.0.0"),
+      filepath = file.path(".", "test#1.0.0.R"),
+      name = NA_character_
+    )[names(resolved[[1]])]
+  )
+  setwd(oldwd)
+})
+
 test_that(".extract_name extracts the module name of a module definition", {
   file <- tempfile("modulr_test", fileext = ".R")
   module_text <- ""
@@ -9,6 +550,20 @@ test_that(".extract_name extracts the module name of a module definition", {
 
   file <- tempfile("modulr_test", fileext = ".R")
   module_text <- "define('modulr_test', NULL, function() NULL)"
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test")
+
+  file <- tempfile("modulr_test", fileext = ".Rmd")
+  module_text <-
+    "```{r}\nlibrary(modulr)\ndefine('modulr_test', NULL, function() NULL)\n```"
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(.extract_name(file), "modulr_test")
+
+  file <- tempfile("modulr_test", fileext = ".Rnw")
+  module_text <-
+    "<<>>=\nlibrary(modulr)\ndefine('modulr_test', NULL, function() NULL)\n@\n"
   write(module_text, file)
   on.exit(unlink(file), add = TRUE)
   expect_equal(.extract_name(file), "modulr_test")
@@ -60,6 +615,8 @@ test_that(".extract_name extracts the module name of a module definition", {
 })
 
 test_that(".flatten_versions and .unflatten_versions are inverses", {
+  expect_equal(.flatten_versions(list()), list())
+  expect_equal(.unflatten_versions(list()), list())
   na_version <- numeric_version("", strict = FALSE)
   na_in_memory <- na_version
   attr(na_in_memory, "storage") <- "in-memory"
@@ -166,10 +723,11 @@ test_that(".flatten_versions and .unflatten_versions are inverses", {
   )
   expect_equal(
     .flatten_versions(
-      .unflatten_versions(stats::setNames(list(na_in_memory, v101_in_memory, v101_on_disk),
-                                          c("na_in_memory", "v101_in_memory", "v101_on_disk")))),
+      .unflatten_versions(
+        stats::setNames(list(na_in_memory, v101_in_memory, v101_on_disk),
+                        c("na_in_memory", "v101_in_memory", "v101_on_disk")))),
     stats::setNames(list(na_in_memory, v101_in_memory, v101_on_disk),
-                                          c("na_in_memory", "v101_in_memory", "v101_on_disk"))
+                    c("na_in_memory", "v101_in_memory", "v101_on_disk"))
   )
 })
 
