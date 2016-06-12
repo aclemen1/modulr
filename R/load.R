@@ -240,16 +240,7 @@ load_all_modules <- function(
 
     if (!(name %in% visited_dependencies)) {
 
-      loaded_module <- load_module(name)
-
-      if (!is.null(loaded_module)) {
-        loaded_module <- stats::setNames(names(loaded_module), name)
-      }
-      else {
-        loaded_module <-
-          .resolve_namespace(name = name,
-                             scope_name = scope_name)[["resolved"]]
-      }
+      loaded_module <- stats::setNames(names(load_module(name)), name)
 
       visited_dependencies <<- c(visited_dependencies, loaded_module)
 
