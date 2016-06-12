@@ -1,5 +1,17 @@
 context("routes")
 
+test_that("find_module finds modules", {
+  # Most of the tests are made for .resolve_name(). Therefore, we just test the
+  # output contract.
+  reset()
+  expect_null(find_module("unexisting"))
+  define("test", NULL, NULL)
+  expect_named(
+    find_module("test"),
+    c("name", "version", "storage", "filepath"),
+    ignore.order = TRUE)
+})
+
 test_that(".is_sub_version flags sub-versions correctly", {
   expect_true(.is_sub_version(NA, numeric_version("1.0")))
   expect_true(.is_sub_version(numeric_version("1.0"), numeric_version("1.0")))
