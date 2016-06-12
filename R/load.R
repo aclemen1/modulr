@@ -161,7 +161,7 @@ load_module <- function(name = .Last.name) {
     return(invisible(NULL))
   }
 
-  module <- find_module(name)
+  module <- find_module(name, absolute = FALSE)
   loaded_module <- NA
   if (!is.null(module)) {
     name <- module[["name"]]

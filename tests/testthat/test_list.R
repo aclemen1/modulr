@@ -1,5 +1,29 @@
 context("list")
 
+test_that("list_modules can show relative and absolute file paths", {
+  reset()
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE))
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test.R")
+  cat('define("test", NULL, NULL)', file = tmp_file)
+  load_module("test")
+  expect_equal(
+    list_modules(cols = c("filepath"), absolute = TRUE)[["filepath"]],
+    tmp_file)
+  wd <- setwd(tmp_dir)
+  on.exit(setwd(wd), add = TRUE)
+  root_config$set(".")
+  load_module("test")
+  expect_equal(
+    list_modules(cols = c("filepath"), absolute = TRUE)[["filepath"]],
+    tmp_file)
+  expect_equal(
+    list_modules(cols = c("filepath"), absolute = FALSE)[["filepath"]],
+    file.path(".", "test.R"))
+})
+
 test_that("list_modules can hide reserved modules", {
   reset()
   expect_equal(list_modules(reserved = T, wide = F), "modulr")
