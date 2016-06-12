@@ -479,15 +479,23 @@
 
 # Flag sub-version of a version, e.g. 1.0.1 is sub-1.0.
 .is_sub_version <- function(version, sub_version) {
+
+  assert_that(
+    is.na(version) || .is_version(version),
+    is.na(sub_version) || .is_version(sub_version))
+
   if (is.na(version)) return(TRUE)
+
   version <- unclass(version)[[1]]
   sub_version <- unclass(sub_version)[[1]]
   level <- length(version)
   if (level > length(sub_version)) return(FALSE)
+
   all(vapply(seq_len(level), FUN = function(i) {
     version[i] == sub_version[i]
   },
   FUN.VALUE = TRUE))
+
 }
 
 # Extract the name of a module definition in a file.

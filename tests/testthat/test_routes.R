@@ -728,6 +728,21 @@ test_that(".extract_name extracts the module name of a module definition", {
   on.exit(unlink(file), add = TRUE)
   expect_equal(.extract_name(file), "modulr_test")
 
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- "define('modulr_test', NULL, function() NULL" # syntax error
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_error(.extract_name(file))
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- paste(c(
+    rep("foo <- 'bar'", 10L),
+    "define('modulr_test', NULL, function() NULL"
+    ), collapse = "\n")
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_error(.extract_name(file))
+
   file <- tempfile("modulr_test", fileext = ".Rmd")
   module_text <-
     "```{r}\nlibrary(modulr)\ndefine('modulr_test', NULL, function() NULL)\n```"
