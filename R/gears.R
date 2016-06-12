@@ -31,35 +31,19 @@
   dependencies <- modulr_env$register[[name]]$dependencies
   if (isTRUE(length(dependencies) > 0)) {
     if (length(dependencies) == 1) {
-      if (is.null(names(dependencies))) {
-        deps <-
-          sprintf("list(\"%s\")",
-                  unlist(dependencies))
-      } else {
-        deps <-
-          sprintf("list(%s = \"%s\")",
-                  names(dependencies),
-                  unlist(dependencies))
-      }
+      deps <-
+        sprintf("list(%s = \"%s\")",
+                names(dependencies),
+                unlist(dependencies))
     } else {
-      if (is.null(names(dependencies))) {
-        deps <- paste0(
-          "list(\n    ",
-          paste(
-            sprintf("\"%s\"",
-                    unlist(dependencies)),
-            collapse = ",\n    "),
-          ")")
-      } else {
-        deps <- paste0(
-          "list(\n    ",
-          paste(
-            sprintf("%s = \"%s\"",
-                    names(dependencies),
-                    unlist(dependencies)),
-            collapse = ",\n    "),
-          ")")
-      }
+      deps <- paste0(
+        "list(\n    ",
+        paste(
+          sprintf("%s = \"%s\"",
+                  names(dependencies),
+                  unlist(dependencies)),
+          collapse = ",\n    "),
+        ")")
     }
     module <- sprintf(paste0(
       "\"%s\" %%requires%%\n",
