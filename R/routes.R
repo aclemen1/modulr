@@ -793,6 +793,8 @@ find_path <- function(name, scope_name = NULL, ...) {
 
 }
 
+# Deprecated and kept for backward compatibility.
+# nocov start
 .deprecated_resolve_path <- function(...) {
   resolved <- .resolve_name(..., include.dirs = TRUE)[["resolved"]]
   if (length(resolved) > 0L) {
@@ -804,8 +806,12 @@ find_path <- function(name, scope_name = NULL, ...) {
     }
   }
 }
+# nocov end
 
+# Deprecated and kept for backward compatibility.
+# nocov start
 .deprecated_resolve_mapping <- function(...) {
   mapping <- .resolve_mapping(...)
   if (!is.null(mapping)) mapping[["resolved"]]
 }
+# nocov end

@@ -1,5 +1,23 @@
 context("routes")
 
+test_that("find_path finds module paths", {
+  # Most of the tests are made for .resolve_name(). Therefore, we just test the
+  # output contract.
+  reset()
+  expect_null(find_path("unexisting"))
+  define("test", NULL, NULL)
+  expect_null(find_path("test"))
+  tmp_dir <- tempfile("modulr_")
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+  root_config$set(tmp_dir)
+  tmp_file <- file.path(tmp_dir, "test.R")
+  cat('define("test", NULL, NULL)', file = tmp_file)
+  result <- find_path("test")
+  expect_named(result, "test")
+  expect_equal(as.vector(result), tmp_file)
+})
+
 test_that("find_module finds modules", {
   # Most of the tests are made for .resolve_name(). Therefore, we just test the
   # output contract.
