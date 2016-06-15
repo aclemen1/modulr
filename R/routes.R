@@ -796,7 +796,9 @@ find_path <- function(name, scope_name = NULL, ...) {
 # Deprecated and kept for backward compatibility.
 # nocov start
 .deprecated_resolve_path <- function(...) {
-  resolved <- .resolve_name(..., include.dirs = TRUE)[["resolved"]]
+  resolved_name <- .resolve_name(..., include.dirs = TRUE)
+  resolved <- (if (length(resolved_name[["resolved"]]) > 0L)
+    resolved_name else resolved_name[["candidates"]])[["resolved"]]
   if (length(resolved) > 0L) {
     resolved <- resolved[[1]]
     if (resolved[["storage"]] == "on-disk") {
