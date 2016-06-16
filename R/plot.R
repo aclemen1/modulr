@@ -45,13 +45,13 @@ plot_dependencies <- function(group, reserved = TRUE) {
     assertthat::is.flag(reserved)
   )
 
-  universe <- modulr_env$register
+  universe <- .modulr_env$injector$register
 
   if (!missing(group)) {
 
     sub <- .define_all_dependent_modules(group)
 
-    register <- modulr_env$register
+    register <- .modulr_env$injector$register
 
     universe <- register[names(register) %in% sub]
 

@@ -215,10 +215,10 @@ do_make <- function(name = .Last.name, args = list(),
     name <- all_dependencies[1L]
 
     if (.is_regular(name))
-      modulr_env$.Last.name <- name
+      .modulr_env$injector$.Last.name <- name
 
-    modulr_env$register[[c(name, "calls")]] <-
-      modulr_env$register[[c(name, "calls")]] + 1
+    .modulr_env$injector$register[[c(name, "calls")]] <-
+      .modulr_env$injector$register[[c(name, "calls")]] + 1
 
     .message_meta("Constructing dependency graph", {
 
@@ -282,13 +282,16 @@ do_make <- function(name = .Last.name, args = list(),
               reinstanciated_by_parent <- any(unlist(lapply(
                 all_dependencies[
                   names(all_dependencies) %in%
-                    modulr_env$register[[c(ordered_name, "dependencies")]]],
+                    .modulr_env$injector$register[[c(ordered_name,
+                                                     "dependencies")]]],
                 function(name) {
-                  modulr_env$register[[c(name, "timestamp")]] >=
-                    modulr_env$register[[c(ordered_name, "timestamp")]]
+                  .modulr_env$injector$register[[c(name, "timestamp")]] >=
+                    .modulr_env$injector$register[[c(ordered_name,
+                                                     "timestamp")]]
                 })))
 
-              if (!modulr_env$register[[c(ordered_name, "instanciated")]]
+              if (!.modulr_env$injector$register[[c(ordered_name,
+                                                    "instanciated")]]
                   | reinstanciated_by_parent
                   | (ordered_name == name &
                        get_digest(ordered_name) != digest)) {
@@ -305,25 +308,25 @@ do_make <- function(name = .Last.name, args = list(),
 
                         args_ <- list()
 
-                        if (length(modulr_env$register[[
+                        if (length(.modulr_env$injector$register[[
                           c(ordered_name, "dependencies")]]) > 0) {
 
                           args_ <-
                             lapply(
                               .align_named_vectors(
-                                unlist(modulr_env$register[[
+                                unlist(.modulr_env$injector$register[[
                                   c(ordered_name, "dependencies")]]),
                                 all_dependencies
                               ),
                               function(name) {
-                                modulr_env$register[[c(
+                                .modulr_env$injector$register[[c(
                                   name, "instance", "value")]]
                               }
                             )
                         }
 
                         provider <-
-                          modulr_env$register[[
+                          .modulr_env$injector$register[[
                             c(ordered_name, "provider")]]
 
                         instance <- withVisible(do.call(
@@ -331,16 +334,16 @@ do_make <- function(name = .Last.name, args = list(),
                           args = args_, quote = TRUE,
                           envir = new.env(parent = baseenv())))
 
-                        modulr_env$register[[
+                        .modulr_env$injector$register[[
                           c(ordered_name, "instance")]] <- instance
-                        modulr_env$register[[
+                        .modulr_env$injector$register[[
                           c(ordered_name, "duration")]] <-
                           as.numeric(Sys.time() - timestamp)
-                        modulr_env$register[[
+                        .modulr_env$injector$register[[
                           c(ordered_name, "instanciated")]] <- TRUE
-                        modulr_env$register[[
+                        .modulr_env$injector$register[[
                           c(ordered_name, "first_instance")]] <- FALSE
-                        modulr_env$register[[
+                        .modulr_env$injector$register[[
                           c(ordered_name, "timestamp")]] <- Sys.time()
 
                       },
@@ -354,7 +357,7 @@ do_make <- function(name = .Last.name, args = list(),
         },
       verbosity = 2)
 
-    instance <- modulr_env$register[[c(name, "instance")]]
+    instance <- .modulr_env$injector$register[[c(name, "instance")]]
 
   },
   verbosity = 2)
@@ -598,18 +601,18 @@ touch <- function(name = .Last.name) {
 
   .message_meta(sprintf("Touching '%s'", name), {
 
-    modulr_env$register[[c(name, "dependencies")]] <-
+    .modulr_env$injector$register[[c(name, "dependencies")]] <-
       lapply(lapply(
-        lapply(modulr_env$register[[c(name, "aliases")]],
+        lapply(.modulr_env$injector$register[[c(name, "aliases")]],
                .resolve_namespace, name),
         `[[`, "resolved"), unname)
-    modulr_env$register[[c(name, "instance")]] <- NULL
-    modulr_env$register[[c(name, "instanciated")]] <- F
-    modulr_env$register[[c(name, "digest")]] <- NULL
-    modulr_env$register[[c(name, "timestamp")]] <- Sys.time()
+    .modulr_env$injector$register[[c(name, "instance")]] <- NULL
+    .modulr_env$injector$register[[c(name, "instanciated")]] <- F
+    .modulr_env$injector$register[[c(name, "digest")]] <- NULL
+    .modulr_env$injector$register[[c(name, "timestamp")]] <- Sys.time()
 
     if (.is_regular(name))
-      modulr_env$.Last.name <- name
+      .modulr_env$injector$.Last.name <- name
 
     # Deprecated, kept for backward compatibility.
     suppressWarnings(module_options(name)$unset())

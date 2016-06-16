@@ -144,7 +144,7 @@ test_that("define writes to the register", {
       return(dep)
     })
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[["some/module"]]
 
   expect_equal(module$name, "some/module")
@@ -185,7 +185,7 @@ test_that("re-define doesn't write to the register when no changes occur", {
       return(dep)
     })
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[["some/module"]]
 
   expect_equal(module$name, "some/module")
@@ -223,7 +223,7 @@ test_that("re-define writes to the register when changes occur", {
       return(sprintf("%s", dep))
     })
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[["some/module"]]
 
   expect_equal(module$name, "some/module")
@@ -491,7 +491,7 @@ test_that("reset purges the register", {
 
   reset()
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
 
   expect_equal(names(register), "modulr")
 
@@ -499,12 +499,12 @@ test_that("reset purges the register", {
 
 test_that("reset(all=T) purges the stashes", {
   reset(all = T)
-  expect_equal(length(modulr_env$stash), 0)
+  expect_equal(length(.modulr_env$injector$stash), 0)
   stash()
   reset(all = F)
-  expect_false(length(modulr_env$stash) == 0)
+  expect_false(length(.modulr_env$injector$stash) == 0)
   reset(all = T)
-  expect_equal(length(modulr_env$stash), 0)
+  expect_equal(length(.modulr_env$injector$stash), 0)
 })
 
 test_that("reset calls generate an error from within a module", {
@@ -523,14 +523,14 @@ test_that("undefine removes the module definition from the register", {
       return(dep)
     })
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
 
   expect_true("some/module" %in% names(register))
 
   status <- undefine("some/module")
   expect_null(status)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
 
   expect_false("some/module" %in% names(register))
 
@@ -586,7 +586,7 @@ test_that("touch updates the register", {
   status <- touch("some/module")
   expect_null(status)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[["some/module"]]
 
   expect_null(module$instance)

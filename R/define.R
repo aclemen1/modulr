@@ -75,8 +75,8 @@ get_digest <- function(name = .Last.name, load = FALSE) {
   assert_that(.is_defined(name))
 
   .digest(
-    modulr_env$register[[c(name, "dependencies")]],
-    modulr_env$register[[c(name, "provider")]]
+    .modulr_env$injector$register[[c(name, "dependencies")]],
+    .modulr_env$injector$register[[c(name, "provider")]]
   )
 
 }
@@ -368,7 +368,7 @@ define <- function(name, dependencies, provider) {
     .message_meta(
       sprintf("Defining '%s'", name), {
 
-        modulr_env$register[[name]] <- list(
+        .modulr_env$injector$register[[name]] <- list(
           "name" = name,
           "aliases" = aliases,
           "dependencies" = dependencies,
@@ -389,24 +389,24 @@ define <- function(name, dependencies, provider) {
 
   } else if (.is_regular(name)) {
 
-    previous_digest <- modulr_env$register[[c(name, "digest")]]
+    previous_digest <- .modulr_env$injector$register[[c(name, "digest")]]
     digest <- .digest(dependencies, provider)
     if (!identical(digest, previous_digest)) {
       .message_meta(sprintf("Re-defining '%s'", name), {
 
-        modulr_env$register[[c(name, "aliases")]] <- aliases
-        modulr_env$register[[c(name, "dependencies")]] <- dependencies
-        modulr_env$register[[c(name, "provider")]] <- provider
-        modulr_env$register[[c(name, "digest")]] <- digest
-        modulr_env$register[[c(name, "instance")]] <- NULL
-        modulr_env$register[[c(name, "instanciated")]] <- F
-        modulr_env$register[[c(name, "calls")]] <- 0
-        modulr_env$register[[c(name, "duration")]] <- NA_integer_
-        modulr_env$register[[c(name, "first_instance")]] <- F
-        modulr_env$register[[c(name, "url")]] <- NULL
-        modulr_env$register[[c(name, "timestamp")]] <- timestamp
-        modulr_env$register[[c(name, "storage")]] <- "in-memory"
-        modulr_env$register[[c(name, "along")]] <- NA_character_
+        .modulr_env$injector$register[[c(name, "aliases")]] <- aliases
+        .modulr_env$injector$register[[c(name, "dependencies")]] <- dependencies
+        .modulr_env$injector$register[[c(name, "provider")]] <- provider
+        .modulr_env$injector$register[[c(name, "digest")]] <- digest
+        .modulr_env$injector$register[[c(name, "instance")]] <- NULL
+        .modulr_env$injector$register[[c(name, "instanciated")]] <- F
+        .modulr_env$injector$register[[c(name, "calls")]] <- 0
+        .modulr_env$injector$register[[c(name, "duration")]] <- NA_integer_
+        .modulr_env$injector$register[[c(name, "first_instance")]] <- F
+        .modulr_env$injector$register[[c(name, "url")]] <- NULL
+        .modulr_env$injector$register[[c(name, "timestamp")]] <- timestamp
+        .modulr_env$injector$register[[c(name, "storage")]] <- "in-memory"
+        .modulr_env$injector$register[[c(name, "along")]] <- NA_character_
 
       },
       ok = TRUE, verbosity = 1)
@@ -417,7 +417,7 @@ define <- function(name, dependencies, provider) {
   }
 
   if (.is_regular_core(name))
-    modulr_env$.Last.name <- name
+    .modulr_env$injector$.Last.name <- name
 
   invisible(function(...) make(name, ...))
 
@@ -484,7 +484,7 @@ get_provider <- function(name = .Last.name, load = FALSE) {
 
   assert_that(.is_defined(name))
 
-  modulr_env$register[[c(name, "provider")]]
+  .modulr_env$injector$register[[c(name, "provider")]]
 
 }
 
@@ -554,16 +554,16 @@ reset <- function(all = FALSE, .verbose = TRUE) {
   .message_meta(
     if (.verbose) "Resetting modulr state", {
 
-      modulr_env$register <- list()
-      modulr_env$config <- list(modules = list())
-      modulr_env$verbosity <- 2
-      modulr_env$.Last.name <- NULL
+      .modulr_env$injector$register <- list()
+      .modulr_env$injector$config <- list(modules = list())
+      .modulr_env$injector$verbosity <- 2
+      .modulr_env$injector$.Last.name <- NULL
       if (all)
-        modulr_env$stash <- list()
+        .modulr_env$injector$stash <- list()
 
       .define_modulr()
 
-      root_config$set(c("module", "modules", "lib", "libs", "."))
+      root_config$set(DEFAULT_ROOT_CONFIG)
 
     },
     ok = TRUE, verbosity = 2)
@@ -608,7 +608,7 @@ undefine <- function(name = .Last.name) {
 
   .message_meta(sprintf("Undefining '%s'", name), {
 
-    modulr_env$register[[name]] <- NULL
+    .modulr_env$injector$register[[name]] <- NULL
 
   },
   ok = TRUE, verbosity = 2)

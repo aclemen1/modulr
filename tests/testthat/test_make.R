@@ -43,7 +43,7 @@ test_that("make writes to the register", {
 
   some_module <- make("some/module")
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[["some/module"]]
 
   expect_equal(module$name, "some/module")
@@ -82,7 +82,7 @@ test_that("make instanciates dependencies", {
   reset()
 
   make("module_2")
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
 
   expect_true("module_2" %in% names(register))
   expect_true("module_1" %in% names(register))
@@ -96,18 +96,20 @@ test_that("make reinstanciates touched dependency, only once", {
   timestamp <- Sys.time()
   touch("module_1")
 
-  module_timestamp <- get("register", pos = modulr_env)[["module_2"]]$timestamp
+  module_timestamp <-
+    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_lt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
-  module_timestamp <- get("register", pos = modulr_env)[["module_2"]]$timestamp
+  module_timestamp <-
+    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
   module_timestamp_2 <-
-    get("register", pos = modulr_env)[["module_2"]]$timestamp
+    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_equal(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
 
@@ -122,13 +124,14 @@ test_that("make reinstanciates touched dependencies for each child module", {
   touch("module_1")
   make("module_2")
 
-  module_timestamp <- get("register", pos = modulr_env)[["module_2"]]$timestamp
+  module_timestamp <-
+    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2bis")
 
   module_timestamp_2 <-
-    get("register", pos = modulr_env)[["module_2bis"]]$timestamp
+    get("register", pos = .modulr_env$injector)[["module_2bis"]]$timestamp
   expect_gt(as.numeric(module_timestamp_2), as.numeric(timestamp))
   expect_gt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
@@ -142,13 +145,14 @@ test_that("make reinstanciates touched dependencies for chained modules", {
   touch("module_1")
   make("module_2")
 
-  module_timestamp <- get("register", pos = modulr_env)[["module_2"]]$timestamp
+  module_timestamp <-
+    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_3")
 
   module_timestamp_2 <-
-    get("register", pos = modulr_env)[["module_3"]]$timestamp
+    get("register", pos = .modulr_env$injector)[["module_3"]]$timestamp
   expect_gt(as.numeric(module_timestamp_2), as.numeric(timestamp))
   expect_gt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
@@ -162,13 +166,14 @@ test_that("make reinstanciates touched deps for chained modules, scenario 2", {
   touch("module_1")
   make("module_3")
 
-  module_timestamp <- get("register", pos = modulr_env)[["module_3"]]$timestamp
+  module_timestamp <-
+    get("register", pos = .modulr_env$injector)[["module_3"]]$timestamp
   expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
   module_timestamp_2 <-
-    get("register", pos = modulr_env)[["module_2"]]$timestamp
+    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_lt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
 

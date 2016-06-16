@@ -28,7 +28,7 @@
     provider_string <- .function_to_string(provider)
   }
 
-  dependencies <- modulr_env$register[[name]]$dependencies
+  dependencies <- .modulr_env$injector$register[[name]]$dependencies
   if (isTRUE(length(dependencies) > 0)) {
     if (length(dependencies) == 1) {
       deps <-
@@ -61,7 +61,7 @@
 
   assert_that(.is_defined(name))
 
-  url <- modulr_env$register[[c(name, "url")]]
+  url <- .modulr_env$injector$register[[c(name, "url")]]
 
   if (!is.null(url)) {
     sprintf(
@@ -74,7 +74,7 @@
         "#   \"%3$s\"",
         "", sep = "\n"),
       name,
-      modulr_env$register[[c(name, "digest")]],
+      .modulr_env$injector$register[[c(name, "digest")]],
       url)
   }
 
@@ -174,7 +174,7 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
           "#   \"%3$s\"",
           sep = "\n"),
         name,
-        modulr_env$register[[c(name, "digest")]],
+        .modulr_env$injector$register[[c(name, "digest")]],
         ifelse(is.null(url), "<URL>", url)),
       sprintf("```"), sep = "\n"),
     paste(

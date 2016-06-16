@@ -9,7 +9,7 @@
 \usage{
 stash(comment = NA_character_)
 
-unstash(id = length(modulr_env$stash))
+unstash(id = length(.modulr_env$injector$stash))
 
 list_stashes()
 

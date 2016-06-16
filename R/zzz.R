@@ -14,7 +14,7 @@
   makeActiveBinding(
     as.symbol(".Last.name"),
     function() {
-      .get_0(".Last.name", envir = modulr_env, ifnotfound = NULL)
+      .get_0(".Last.name", envir = .modulr_env$injector, ifnotfound = NULL)
     },
     env = as.environment("package:modulr"))
 

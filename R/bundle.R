@@ -58,18 +58,18 @@ do_bundle <- function(name = .Last.name, args = list(),
             call. = FALSE, immediate. = TRUE)
   }
 
-  register <- modulr_env$register
-  .Last.name <- modulr_env$.Last.name
-  config <- modulr_env$config
-  verbosity <- modulr_env$verbosity
-  stash <- modulr_env$stash
+  register <- .modulr_env$injector$register
+  .Last.name <- .modulr_env$injector$.Last.name
+  config <- .modulr_env$injector$config
+  verbosity <- .modulr_env$injector$verbosity
+  stash <- .modulr_env$injector$stash
 
   rollback <- function() {
-    modulr_env$register <- register
-    modulr_env$.Last.name <- .Last.name
-    modulr_env$config <- config
-    modulr_env$verbosity <- verbosity
-    modulr_env$stash <- stash
+    .modulr_env$injector$register <- register
+    .modulr_env$injector$.Last.name <- .Last.name
+    .modulr_env$injector$config <- config
+    .modulr_env$injector$verbosity <- verbosity
+    .modulr_env$injector$stash <- stash
   }
 
   .message_meta(sprintf("Bundling '%s' ...", name), {
@@ -83,10 +83,10 @@ do_bundle <- function(name = .Last.name, args = list(),
     verbosity = 2)
 
     if (.is_regular(name))
-      modulr_env$.Last.name <- name
+      .modulr_env$injector$.Last.name <- name
 
-    modulr_env$register[[c(name, "calls")]] <-
-      modulr_env$register[[c(name, "calls")]] + 1
+    .modulr_env$injector$register[[c(name, "calls")]] <-
+      .modulr_env$injector$register[[c(name, "calls")]] + 1
 
     .message_meta("Constructing dependency graph", {
 

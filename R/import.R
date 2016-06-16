@@ -106,18 +106,18 @@ import_module <- function(name, url, digest = NULL,
 
     script <- httr::content(result, as = "text")
 
-    register <- modulr_env$register
-    .Last.name <- modulr_env$.Last.name
-    config <- modulr_env$config
-    verbosity <- modulr_env$verbosity
-    stash <- modulr_env$stash
+    register <- .modulr_env$injector$register
+    .Last.name <- .modulr_env$injector$.Last.name
+    config <- .modulr_env$injector$config
+    verbosity <- .modulr_env$injector$verbosity
+    stash <- .modulr_env$injector$stash
 
     rollback <- function() {
-      modulr_env$register <- register
-      modulr_env$.Last.name <- .Last.name
-      modulr_env$config <- config
-      modulr_env$verbosity <- verbosity
-      modulr_env$stash <- stash
+      .modulr_env$injector$register <- register
+      .modulr_env$injector$.Last.name <- .Last.name
+      .modulr_env$injector$config <- config
+      .modulr_env$injector$verbosity <- verbosity
+      .modulr_env$injector$stash <- stash
     }
 
     if (grepl("```\\s*\\{\\s*[rR]", script) ||
@@ -157,7 +157,7 @@ import_module <- function(name, url, digest = NULL,
            call. = FALSE)
     }
 
-    modulr_env$register[[c(name, "url")]] <- url
+    .modulr_env$injector$register[[c(name, "url")]] <- url
 
     return(invisible(ev))
 

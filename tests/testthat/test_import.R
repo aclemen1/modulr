@@ -30,7 +30,8 @@ test_that("import_module stores url to the register", {
     `httr::content` = function(...)
       'define("module", NULL, function() NULL)\n"remote"',
     import_module("module", "fake_url"),
-    expect_equal(modulr_env$register[[c("module", "url")]], "fake_url")
+    expect_equal(.modulr_env$injector$register[[c("module", "url")]],
+                 "fake_url")
   )
 })
 

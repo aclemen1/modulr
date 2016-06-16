@@ -20,7 +20,119 @@
 #' @author Alain Clément-Pavon <\email{alain.clement-pavon@@unil.ch}>
 NULL
 
-modulr_env <- new.env(parent = emptyenv())
+.modulr_env <- new.env(parent = emptyenv())
+
+.set_injector <- function(injector) {
+  .modulr_env$injector <- injector
+}
+
+.default_injector <- new.env(parent = emptyenv())
+.set_injector(injector = .default_injector)
+
+#' @title Create, Set, and Get Injectors (Modulr Internal States).
+#'
+#' @description Create an new injector, set and get the current injector, and
+#'   get the default injector.
+#'
+#' @return Every function returns an injector (R environment).
+#'
+#' @details
+#'
+#' An injector essentially carries an internal modulr state. Technically, it is
+#' is an R environment containing every piece of information needed by modulr to
+#' reflect the module definitions, the dependencies between them, the
+#' configurations, and all the associated metadata. As a PORO (Plain Old R
+#' Object), an injector can be stored to disk with the session data, or shared
+#' between Alice and Bob, for instance.
+#'
+#' When the modulr package is loaded, a default injector is created. This
+#' injector is returned by the \code{get_default_injector} function.
+#'
+#' @section Warning: Setting an injector from within a module is not allowed and
+#'   results in an error.
+#'
+#' @seealso \code{\link{define}}, \code{\link{list_modules}},
+#'   \code{\link{make}}, and \code{\link{reset}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() NULL)
+#' injector <- new_injector()
+#' previous_injector <- set_injector(injector)
+#' define("bar", NULL, function() NULL)
+#' lsmod()
+#' set_injector(previous_injector)
+#' lsmod()
+#'
+#' \dontrun{
+#' .Last <- function() {
+#'  # Bind the current injector (internal modulr state) to the environment.
+#'  injector <- get_injector()
+#' }
+#' quit(save = "yes")}
+#'
+#' reset()
+#' define("foo", NULL, function() "Hi Bob!")
+#' ## Alice saves its injector and sends it to ...
+#' saveRDS(get_injector(), file = "injector.R")
+#' ## ... Bob who restores it.
+#' injector <- readRDS("injector.R")
+#' set_injector(injector)
+#' make("foo")
+#'
+#' @name injector
+#' @aliases new_injector set_injector get_injector get_default_injector
+NULL
+
+#' @rdname injector
+#' @export
+new_injector <- function() {
+
+  injector <- new.env(parent = emptyenv())
+
+  injector_ <- get_injector()
+
+  .set_injector(injector = injector)
+
+  if (!.is_defined("modulr")) .define_modulr()
+
+  root_config$set(DEFAULT_ROOT_CONFIG)
+
+  .set_injector(injector = injector_)
+
+  injector
+}
+
+#' @rdname injector
+#' @param injector An injector returned by \code{new_injector}.
+#' @export
+set_injector <- function(injector = new_injector()) {
+
+  if (.is_called_from_within_module()) {
+    stop("set_injector is called from within a module.", call. = FALSE)
+  }
+
+  assert_that(is.environment(injector))
+
+  on.exit(gc())
+
+  injector_ <- get_injector()
+  .set_injector(injector = injector)
+
+  injector_
+}
+
+#' @rdname injector
+#' @export
+get_injector <- function() {
+  .modulr_env$injector
+}
+
+#' @rdname injector
+#' @export
+get_default_injector <- function() {
+  .default_injector
+}
 
 # the base::get0 function exsists only since R 3.2
 .get_0 <- function(var, ..., ifnotfound = NULL) {
@@ -154,7 +266,7 @@ set_verbosity <- function(level = 2) {
 
   assertthat::assert_that(assertthat::is.scalar(level))
 
-  modulr_env$verbosity <- level
+  .modulr_env$injector$verbosity <- level
 
 }
 
@@ -162,9 +274,11 @@ set_verbosity <- function(level = 2) {
 #' @export
 get_verbosity <- function() {
 
-  .get_0("verbosity", envir = modulr_env, ifnotfound = 2)
+  .get_0("verbosity", envir = .modulr_env$injector, ifnotfound = 2)
 
 }
+
+DEFAULT_ROOT_CONFIG <- c("module", "modules", "lib", "libs", ".")
 
 PRAISE <- c(
   "Outstanding",

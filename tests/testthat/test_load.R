@@ -24,7 +24,7 @@ test_that("load_module finds and loads .R files", {
   expect_equal(names(module_file), name)
   expect_equal(unname(module_file), file)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[[name]]
 
   expect_equal(module$name, name)
@@ -33,7 +33,7 @@ test_that("load_module finds and loads .R files", {
 
 test_that("load_module rolls back on errors in .R files", {
   reset()
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
 
   file <- tempfile("modulr_test", fileext = ".R")
   name <- tools::file_path_sans_ext(basename(file))
@@ -46,7 +46,7 @@ test_that("load_module rolls back on errors in .R files", {
 
   root_config$set(path)
   expect_error(load_module(name))
-  expect_identical(register, get("register", pos = modulr_env))
+  expect_identical(register, get("register", pos = .modulr_env$injector))
 })
 
 test_that("load_module finds and loads .Rmd files", {
@@ -68,7 +68,7 @@ test_that("load_module finds and loads .Rmd files", {
   expect_equal(names(module_file), name)
   expect_equal(unname(module_file), file)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[[name]]
 
   expect_equal(module$name, name)
@@ -77,7 +77,7 @@ test_that("load_module finds and loads .Rmd files", {
 
 test_that("load_module rolls back on errors in .Rmd files", {
   reset()
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
 
   file <- tempfile("modulr_test", fileext = ".Rmd")
   name <- tools::file_path_sans_ext(basename(file))
@@ -94,7 +94,7 @@ test_that("load_module rolls back on errors in .Rmd files", {
 
   root_config$set(path)
   expect_error(load_module(name))
-  expect_identical(register, get("register", pos = modulr_env))
+  expect_identical(register, get("register", pos = .modulr_env$injector))
 })
 
 test_that("load_module finds and loads .Rnw files", {
@@ -116,7 +116,7 @@ test_that("load_module finds and loads .Rnw files", {
   expect_equal(names(module_file), name)
   expect_equal(unname(module_file), file)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[[name]]
 
   expect_equal(module$name, name)
@@ -125,7 +125,7 @@ test_that("load_module finds and loads .Rnw files", {
 
 test_that("load_module rolls back on errors in .Rnw files", {
   reset()
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
 
   file <- tempfile("modulr_test", fileext = ".Rnw")
   name <- tools::file_path_sans_ext(basename(file))
@@ -142,7 +142,7 @@ test_that("load_module rolls back on errors in .Rnw files", {
 
   root_config$set(path)
   expect_error(load_module(name))
-  expect_identical(register, get("register", pos = modulr_env))
+  expect_identical(register, get("register", pos = .modulr_env$injector))
 })
 
 test_that("load_module re-loads modified .R files", {
@@ -166,7 +166,7 @@ test_that("load_module re-loads modified .R files", {
   on.exit(unlink(file))
   module_file <- load_module(name)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[[name]]
 
   expect_false(module$first_instance)
@@ -203,7 +203,7 @@ test_that("load_module re-loads modified .Rmd files", {
   on.exit(unlink(file))
   module_file <- load_module(name)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[[name]]
 
   expect_false(module$first_instance)
@@ -240,7 +240,7 @@ test_that("load_module re-loads modified .Rnw files", {
   on.exit(unlink(file))
   module_file <- load_module(name)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
   module <- register[[name]]
 
   expect_false(module$first_instance)
@@ -298,7 +298,7 @@ test_that("load_all_modules finds and loads files in dir", {
 
   load_all_modules(path = tmp_dir)
 
-  register <- get("register", pos = modulr_env)
+  register <- get("register", pos = .modulr_env$injector)
 
   expect_true(all(c("foo", "bar") %in% names(register)))
 

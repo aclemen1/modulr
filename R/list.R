@@ -113,7 +113,7 @@ list_modules <-
         "digest")),
     msg = "an invalid column name is specified.")
 
-  flat <- names(modulr_env$register)
+  flat <- names(.modulr_env$injector$register)
 
   if (!reserved)
     flat <- setdiff(flat, RESERVED_NAMES)
@@ -132,37 +132,39 @@ list_modules <-
       modified <-
         (if (formatted) function(x) format(x, format = "%c") else identity)(
           do.call(c, Map(function(name)
-            modulr_env$register[[c(name, "timestamp")]], flat)))
+            .modulr_env$injector$register[[c(name, "timestamp")]], flat)))
 
       created <-
         (if (formatted) function(x) format(x, format = "%c") else identity)(
           do.call(c, Map(function(name)
-            modulr_env$register[[c(name, "created")]], flat)))
+            .modulr_env$injector$register[[c(name, "created")]], flat)))
 
       types <-
         do.call(c, Map(function(name)
-          ifelse(modulr_env$register[[c(name, "instanciated")]],
-                 typeof(modulr_env$register[[c(name, "instance", "value")]]),
-                 NA_character_), flat))
+          ifelse(
+            .modulr_env$injector$register[[c(name, "instanciated")]],
+            typeof(
+              .modulr_env$injector$register[[c(name, "instance", "value")]]),
+            NA_character_), flat))
 
       sizes <-
         do.call(c, Map(function(name)
           (if (formatted) function(x) format(x, units = "auto") else identity)(
             utils::object.size(
-              modulr_env$register[[c(name, "provider")]])), flat))
+              .modulr_env$injector$register[[c(name, "provider")]])), flat))
 
       weights <-
         do.call(c, Map(function(name)
           ifelse(
-            modulr_env$register[[c(name, "instanciated")]],
+            .modulr_env$injector$register[[c(name, "instanciated")]],
             (if (formatted) function(x) format(x, units = "auto") else identity)
-            (utils::object.size(modulr_env$register[[
+            (utils::object.size(.modulr_env$injector$register[[
               c(name, "instance", "value")]])),
             NA_character_), flat))
 
       deparsed_factories <-
         Map(function(name)
-          deparse(modulr_env$register[[c(name, "provider")]]), flat)
+          deparse(.modulr_env$injector$register[[c(name, "provider")]]), flat)
 
       lines <- vapply(deparsed_factories, length, FUN.VALUE = 0)
 
@@ -172,17 +174,17 @@ list_modules <-
 
       durations <-
         do.call(c, Map(function(name)
-          modulr_env$register[[c(name, "duration")]], flat))
+          .modulr_env$injector$register[[c(name, "duration")]], flat))
 
       storages <-
         do.call(c, Map(function(name)
-          modulr_env$register[[c(name, "storage")]], flat))
+          .modulr_env$injector$register[[c(name, "storage")]], flat))
 
       filepaths <-
         do.call(c, Map(function(name) {
-          if (!is.null(modulr_env$register[[c(name, "filepath")]])) {
+          if (!is.null(.modulr_env$injector$register[[c(name, "filepath")]])) {
             ifelse(absolute, normalizePath, identity)(
-              modulr_env$register[[c(name, "filepath")]])
+              .modulr_env$injector$register[[c(name, "filepath")]])
           } else {
             NA_character_
           }
@@ -195,14 +197,14 @@ list_modules <-
 
       alongs <-
         do.call(c, Map(function(name)
-          modulr_env$register[[c(name, "along")]], flat))
+          .modulr_env$injector$register[[c(name, "along")]], flat))
 
       adj <- .compute_adjacency_matrix(flat)
       deps <- diag(adj %*% t(adj))
       childs <- diag(t(adj) %*% adj)
 
       calls <- do.call(c, Map(function(name)
-        modulr_env$register[[c(name, "calls")]], flat))
+        .modulr_env$injector$register[[c(name, "calls")]], flat))
 
       data <- data.frame(
         name = flat,

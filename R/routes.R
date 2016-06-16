@@ -448,7 +448,7 @@
     "^", sprintf("(?:%s)", parsed_name[["namespace"]]),
     .version_hash_string_regex, "?$")
   mods <- grep(pattern,
-               names(modulr_env$register),
+               names(.modulr_env$injector$register),
                value = TRUE)
   in_memory_versions <-
     do.call(c, lapply(Map(.parse_version, mods), `[[`, "version"))

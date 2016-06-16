@@ -8,14 +8,11 @@
 
   unset <- function() {
 
-    modulr_env$config[[scope]] <- NULL
+    .modulr_env$injector$config[[scope]] <- NULL
 
   }
 
   set <- function(..., drop = TRUE) {
-
-#     .message_meta("Entering .config$set() ...",
-#                   verbosity = +Inf)
 
     assert_that(assertthat::is.flag(drop))
 
@@ -28,22 +25,23 @@
 
     if (length(options_list) == 0) return(invisible())
 
-    if (is.null(modulr_env$config[[scope]])) {
+    if (is.null(.modulr_env$injector$config[[scope]])) {
 
-      modulr_env$config[[scope]] <- options_list
+      .modulr_env$injector$config[[scope]] <- options_list
 
     } else {
 
       if (is.null(names(options_list))) {
 
         if (drop)
-          modulr_env$config[[scope]] <- options_list
+          .modulr_env$injector$config[[scope]] <- options_list
 
       } else {
 
         for (key in names(options_list))
-          if (is.null(modulr_env$config[[c(scope, key)]]) | isTRUE(drop))
-            modulr_env$config[[c(scope, key)]] <- options_list[[key]]
+          if (is.null(.modulr_env$injector$config[[c(scope, key)]]) |
+                isTRUE(drop))
+            .modulr_env$injector$config[[c(scope, key)]] <- options_list[[key]]
 
       }
 
@@ -53,25 +51,19 @@
 
   get_all <- function() {
 
-#     .message_meta("Entering .config$get_all() ...",
-#                   verbosity = +Inf)
-
     if (is.na(scope[2])) {
 
-      modulr_env$config[[scope[1]]]
+      .modulr_env$injector$config[[scope[1]]]
 
     } else {
 
-      modulr_env$config[[scope[1:2]]]
+      .modulr_env$injector$config[[scope[1:2]]]
 
     }
 
   }
 
   get <- function(key) {
-
-#     .message_meta("Entering .config$get() ...",
-#                   verbosity = +Inf)
 
     assert_that(is.null(key) || assertthat::is.string(key))
 
@@ -146,7 +138,7 @@ maps_config <-
 #'
 #' @seealso \code{\link{config}} and \code{\link{reset}}.
 #' @export
-get_configs <- function() get("config", pos = modulr_env)
+get_configs <- function() get("config", pos = .modulr_env$injector)
 
 #' Module Options.
 #'

@@ -1,7 +1,7 @@
 # Test if a module is already defined.
 .is_defined <- function(name) {
   assert_that(assertthat::is.string(name))
-  name %in% names(modulr_env$register)
+  name %in% names(.modulr_env$injector$register)
 }
 
 assertthat::on_failure(.is_defined) <- function(call, env) {

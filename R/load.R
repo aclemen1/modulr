@@ -5,18 +5,18 @@
 
     loaded <- FALSE
 
-    register <- modulr_env$register
-    .Last.name <- modulr_env$.Last.name
-    config <- modulr_env$config
-    verbosity <- modulr_env$verbosity
-    stash <- modulr_env$stash
+    register <- .modulr_env$injector$register
+    .Last.name <- .modulr_env$injector$.Last.name
+    config <- .modulr_env$injector$config
+    verbosity <- .modulr_env$injector$verbosity
+    stash <- .modulr_env$injector$stash
 
     rollback <- function() {
-      modulr_env$register <- register
-      modulr_env$.Last.name <- .Last.name
-      modulr_env$config <- config
-      modulr_env$verbosity <- verbosity
-      modulr_env$stash <- stash
+      .modulr_env$injector$register <- register
+      .modulr_env$injector$.Last.name <- .Last.name
+      .modulr_env$injector$config <- config
+      .modulr_env$injector$verbosity <- verbosity
+      .modulr_env$injector$stash <- stash
     }
 
     if (tolower(tools::file_ext(path)) == "r") {
@@ -82,15 +82,16 @@
 
     }
 
-    loaded_names <- setdiff(names(modulr_env$register), names(register))
+    loaded_names <-
+      setdiff(names(.modulr_env$injector$register), names(register))
     if (loaded)
       loaded_names <- c(name, loaded_names)
     loaded_names <- unique(loaded_names)
 
     Map(function(name_) {
-      modulr_env$register[[c(name_, "storage")]] <- "on-disk"
-      modulr_env$register[[c(name_, "filepath")]] <- path
-      modulr_env$register[[c(name_, "along")]] <-
+      .modulr_env$injector$register[[c(name_, "storage")]] <- "on-disk"
+      .modulr_env$injector$register[[c(name_, "filepath")]] <- path
+      .modulr_env$injector$register[[c(name_, "along")]] <-
         ifelse(name == name_, NA_character_, name)
     },
     loaded_names)
@@ -248,7 +249,7 @@ load_all_modules <- function(
 
       if (.is_defined(loaded_module)) {
         Map(function(dependency) iteration(dependency, name),
-          modulr_env$register[[c(loaded_module, "dependencies")]])
+          .modulr_env$injector$register[[c(loaded_module, "dependencies")]])
       }
 
     }

@@ -7,8 +7,9 @@
 
   verbose <- verbosity <= get_verbosity()
 
-  level <- .get_0(".message_level", envir = modulr_env, ifnotfound = 0)
-  on.exit(modulr_env$.message_level <- level)
+  level <-
+    .get_0(".message_level", envir = .modulr_env$injector, ifnotfound = 0)
+  on.exit(.modulr_env$injector$.message_level <- level)
 
   if (verbose && !is.null(msg)) {
 
@@ -28,7 +29,7 @@
 
   }
 
-  if (verbose && !is.null(msg)) modulr_env$.message_level <- level + 1
+  if (verbose && !is.null(msg)) .modulr_env$injector$.message_level <- level + 1
 
   if (!is.null(expr)) eval(expr)
 
@@ -68,7 +69,8 @@
                      sprintf(" %s", kwargs[["module_name"]])
                    } else "")
 
-    level <- .get_0(".message_level", envir = modulr_env, ifnotfound = 0)
+    level <-
+      .get_0(".message_level", envir = .modulr_env$injector, ifnotfound = 0)
 
     if (level > 0) {
       out <- paste0(out, sprintf(
