@@ -88,11 +88,24 @@
       loaded_names <- c(name, loaded_names)
     loaded_names <- unique(loaded_names)
 
+    # TODO: test that!
+    along <- NA_character_
+    if (length(loaded_names) > 1L) {
+      along <- if (is.null(name)) {
+        parsed_names <- lapply(loaded_names, .parse_name)
+        finals <- do.call(c, lapply(parsed_names, `[[`, "final"))
+        file_final <-
+          .parse_name(basename(tools::file_path_sans_ext(path)))[["final"]]
+        along_ <-loaded_names[finals == file_final]
+        if (length(along_) > 0L) along_[1] else loaded_names[1]
+      } else name
+    }
+
     Map(function(name_) {
       .modulr_env$injector$register[[c(name_, "storage")]] <- "on-disk"
       .modulr_env$injector$register[[c(name_, "filepath")]] <- path
       .modulr_env$injector$register[[c(name_, "along")]] <-
-        ifelse(name == name_, NA_character_, name)
+        ifelse(isTRUE(name_ != along), along, NA_character_)
     },
     loaded_names)
 

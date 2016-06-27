@@ -202,6 +202,26 @@ test_that(".resolve_name resolves a module", {
       name = "test#1.0.1"
     )[names(resolved[[1]])]
   )
+
+  # Testing that we keep the unversionned module if present.
+  reset()
+  define("test#1.0.0", NULL, NULL)
+  define("test#0.0.0.9999", NULL, NULL)
+  define("test#1.0.1", NULL, NULL)
+  define("test", NULL, NULL)
+  result <- .resolve_name("test", all = FALSE)
+  resolved <- result[["resolved"]]
+  expect_equal(length(resolved), 1L)
+  expect_equal(
+    resolved[[1]],
+    list(
+      storage = "in-memory",
+      version = na_version,
+      filepath = NA_character_,
+      name = "test"
+    )[names(resolved[[1]])]
+  )
+
 })
 
 test_that(".resolve_candidates resolves candidates for a module", {

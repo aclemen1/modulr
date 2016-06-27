@@ -640,13 +640,15 @@
       !isTRUE(as.character(node[["version"]]) != version)
     },
     resolution)
+
     if (length(resolution) > 1L) {
       # if an in-memory module has a corresponding on-disk instance with same
       # version number, we keep the on-disk module only
       storages <- unlist(lapply(resolution, `[[`, "storage"))
       if (any(storages == "on-disk")) {
-        resolution <- utils::tail(resolution[storages == "on-disk"], 1L)
+        resolution <- resolution[storages == "on-disk"]
       }
+      resolution <- utils::tail(resolution, 1L)
     }
   }
 
