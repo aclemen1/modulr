@@ -88,7 +88,6 @@
       loaded_names <- c(name, loaded_names)
     loaded_names <- unique(loaded_names)
 
-    # TODO: test that!
     along <- NA_character_
     if (length(loaded_names) > 1L) {
       along <- if (is.null(name)) {
@@ -96,7 +95,7 @@
         finals <- do.call(c, lapply(parsed_names, `[[`, "final"))
         file_final <-
           .parse_name(basename(tools::file_path_sans_ext(path)))[["final"]]
-        along_ <-loaded_names[finals == file_final]
+        along_ <- loaded_names[finals == file_final]
         if (length(along_) > 0L) along_[1] else loaded_names[1]
       } else name
     }

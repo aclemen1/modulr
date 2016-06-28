@@ -7,6 +7,68 @@ test_that(".is_defined return only T or F", {
   expect_true(.is_defined("bar"))
   })
 
+test_that(".load_module loads modules along modules", {
+  reset()
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  name <- tools::file_path_sans_ext(basename(file))
+  other_name <- sprintf("%s/along", name)
+  path <- dirname(file)
+
+  module_text <- paste(
+    sprintf("define('%s', NULL, function() NULL)", name),
+    sprintf("define('%s', NULL, function() NULL)", other_name),
+    sep = "\n")
+  write(module_text, file)
+  on.exit(unlink(file))
+
+  root_config$set(path)
+  module_file <- .load_module(file, check = FALSE)
+
+  expect_equal(unname(module_file), file)
+  expect_true(.is_defined(other_name))
+
+  register <- get("register", pos = .modulr_env$injector)
+  module <- register[[name]]
+  other_module <- register[[other_name]]
+
+  expect_equal(module$name, name)
+  expect_equal(other_module$name, other_name)
+  expect_equal(other_module$along, name)
+
+})
+
+test_that(".load_module guesses correct along-defined module name", {
+  reset()
+
+  file <- tempfile("modulr_test", fileext = ".R")
+  name <- "foo_name"
+  other_name <- sprintf("%s/along", name)
+  path <- dirname(file)
+
+  module_text <- paste(
+    sprintf("define('%s', NULL, function() NULL)", name),
+    sprintf("define('%s', NULL, function() NULL)", other_name),
+    sep = "\n")
+  write(module_text, file)
+  on.exit(unlink(file))
+
+  root_config$set(path)
+  module_file <- .load_module(file, check = FALSE)
+
+  expect_equal(unname(module_file), file)
+  expect_true(.is_defined(other_name))
+
+  register <- get("register", pos = .modulr_env$injector)
+  module <- register[[name]]
+  other_module <- register[[other_name]]
+
+  expect_equal(module$name, name)
+  expect_equal(other_module$name, other_name)
+  expect_equal(other_module$along, name)
+
+})
+
 test_that("load_module finds and loads .R files", {
   reset()
 
