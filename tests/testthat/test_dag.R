@@ -41,16 +41,16 @@ test_that(".build_dependency_graph figures out the DAG of dependencies", {
 
 test_that(".topological_sort is NULL on singletons", {
   reset()
-  graph <- .build_dependency_graph(setNames("modulr", "modulr"))
+  graph <- .build_dependency_graph(setNames(MODULR_NAME, MODULR_NAME))
   expect_null(.topological_sort(graph))
 })
 
 test_that(".topological_sort has two lines on pairs", {
   reset()
-  define("module_1", list("modulr"), function(m) NULL)
-  graph <- .build_dependency_graph(setNames(c("module_1", "modulr"),
-                                            c("module_1", "modulr")))
+  define("module_1", list(MODULR_NAME), function(m) NULL)
+  graph <- .build_dependency_graph(setNames(c("module_1", MODULR_NAME),
+                                            c("module_1", MODULR_NAME)))
   expect_equal(
     .topological_sort(graph),
-    c("modulr", "module_1"))
+    c(MODULR_NAME, "module_1"))
 })

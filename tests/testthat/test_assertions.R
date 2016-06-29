@@ -2,13 +2,13 @@ context("assertions")
 
 test_that(".is_defined detects defined modules", {
   reset()
-  expect_true(.is_defined("modulr"))
+  expect_true(.is_defined(MODULR_NAME))
   expect_false(.is_defined("undefined/module"))
   })
 
 test_that(".is_undefined detects undefined modules", {
   reset()
-  expect_false(.is_undefined("modulr"))
+  expect_false(.is_undefined(MODULR_NAME))
   expect_true(.is_undefined("undefined/module"))
 })
 
@@ -21,7 +21,7 @@ test_that(".is_conform detects conform module names", {
 
 test_that(".is_reserved detects reserved module names", {
   reset()
-  expect_true(.is_reserved("modulr"))
+  expect_true(.is_reserved(RESERVED_NAMES[1]))
   expect_false(.is_reserved("foo"))
 })
 

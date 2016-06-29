@@ -4,7 +4,7 @@ test_that("new_injector returns a new injector", {
   injector <- new_injector()
   expect_true(is.environment(injector))
   expect_named(injector, c("register", ".message_level", "config"))
-  expect_named(injector$register, c("modulr"))
+  expect_named(injector$register, c(MODULR_NAME))
   expect_equal(injector$config[[".__root__"]][[1]], DEFAULT_ROOT_CONFIG)
 })
 

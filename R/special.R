@@ -1,4 +1,7 @@
-RESERVED_NAMES <- c("modulr")
+MODULR_NAMESPACE <- "modulr"
+MODULR_NAME <-
+  paste(MODULR_NAMESPACE, utils::packageVersion(pkg = "modulr"), sep = "#")
+RESERVED_NAMES <- c(MODULR_NAMESPACE)
 
 #' @title Special Module \code{'modulr'}
 #' @description Access module metadata and helper functions.
@@ -68,7 +71,7 @@ NULL
 
 .define_modulr <- function() {
 
-  define("modulr", list(), function() {
+  define(MODULR_NAME, list(), function() {
 
     # Begin Exclude Linting
 

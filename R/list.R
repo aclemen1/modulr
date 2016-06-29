@@ -116,7 +116,7 @@ list_modules <-
   flat <- names(.modulr_env$injector$register)
 
   if (!reserved)
-    flat <- setdiff(flat, RESERVED_NAMES)
+    flat <- Filter(.is_regular, flat)
 
   if (!missing(regexp))
     flat <- grep(paste0(regexp), flat, value = TRUE)

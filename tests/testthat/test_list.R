@@ -26,7 +26,7 @@ test_that("list_modules can show relative and absolute file paths", {
 
 test_that("list_modules can hide reserved modules", {
   reset()
-  expect_equal(list_modules(reserved = T, wide = F), "modulr")
+  expect_equal(list_modules(reserved = T, wide = F), MODULR_NAME)
   expect_null(list_modules(reserved = F, wide = F))
 })
 

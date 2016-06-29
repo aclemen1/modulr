@@ -130,7 +130,7 @@ test_that("get_digest calls are warned from within a module", {
 
 test_that("define does not re-define reserved modules", {
   reset()
-  expect_error(define("modulr", list(), function() NULL))
+  expect_error(define(MODULR_NAME, list(), function() NULL))
 })
 
 test_that("define writes to the register", {
@@ -493,7 +493,7 @@ test_that("reset purges the register", {
 
   register <- get("register", pos = .modulr_env$injector)
 
-  expect_equal(names(register), "modulr")
+  expect_equal(names(register), MODULR_NAME)
 
   })
 
