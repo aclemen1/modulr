@@ -145,9 +145,11 @@ test_that("info calls are warned from within a module", {
   expect_warning(make("module"))
 
   reset()
+  set_verbosity(0L)
   define("module", NULL, function() {
     #' docstring
     info("module", load = FALSE)
   })
   expect_match(capture.output(make("module")), "docstring")
+  reset()
 })

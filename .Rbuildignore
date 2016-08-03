@@ -6,6 +6,7 @@ inst/db
 man-roxygen
 ^NEWS\.md
 ^cran-comments\.md$
+^CONDUCT\.md
 ^README\.Rmd$
 ^README-.*\.png$
 ^README\.html$

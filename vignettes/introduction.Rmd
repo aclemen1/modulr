@@ -1,17 +1,10 @@
 ---
-title: "Modulr How-To Guide"
-author: "Alain Clément-Pavon"
+title: "Introduction to modulr"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette:
-    toc: true
-    toc_depth: 4
-    #mathjax: null
-    #keep_md: yes
-    #self_contained: yes
-    #variant: markdown_github
+  rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Modulr How-To Guide}
+  %\VignetteIndexEntry{Modulr Introduction Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,21 +14,21 @@ library(modulr)
 library(htmltools)
 library(networkD3)
 require(webshot) # not on CRAN
+library(future)
 library(dplyr)
+`%<=%` <- modulr::`%<=%`
 Sys.setlocale("LC_TIME", "en_DK.UTF-8")
-options(width = 120)
+Sys.setenv(TZ = 'UTC')
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "how-to-"
+  fig.path = "introduction-"
 )
 ```
 
-Have you ever felt like writing [big balls of mud](https://en.wikipedia.org/wiki/Big_ball_of_mud) in R? Wouldn't it be great if such [spaghetti code](https://en.wikipedia.org/wiki/Spaghetti_code) could be simply turned into more [ravioli](https://en.wikipedia.org/wiki/Spaghetti_code#Ravioli_code) and [lasagna](https://en.wikipedia.org/wiki/Spaghetti_code#Lasagna_code) code? Give modulr a try!
-
 # What is modulr?
 
-Technically, modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) framework for R. It allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share. 
+Technically, modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) (DI) framework for R. It allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share. 
 
 As every DI framework, modulr aims for a clear separation between code complication and complexity, highlighting the 
 core purpose and behavior of objects (application code), and hiding their construction and wiring (infrastructure code).
@@ -52,7 +45,7 @@ Modules are declaratively defined and have four main components:
 A typical module looks like the following:
 
 ```r
-"name" %requires% list(
+"name_of_module" %requires% list(
 
   # a list of dependencies
   dependency_1 = "name_of_dependency_1",
@@ -72,19 +65,19 @@ A typical module looks like the following:
 }
 ```
 
-When a module is defined, modulr has to make it in order to evaluate the code it provides is not evaluated. To do so, modulr has to make it:
+When a module is defined, modulr has to _make_ it in order to evaluate the code it provides:
 
 ```r
-result <- make("name")
+result <- make("name_of_module")
 ```
 
 or alternatively with a handy syntactic sugar:
 
 ```r
-result %<=% "name"
+result %<=% "name_of_module"
 ```
 
-The result contains the object computed and exposed by the module. Under the hood, the dependencies have been sorted and also made, and their resulting objects finally injected.
+The result contains the object computed and exposed by the module. Under the hood, the dependencies have been sorted and also made, and their resulting objects injected where required.
 
 # A first, minimal example
 
@@ -95,16 +88,16 @@ reset()
 Let us start by defining some modules and dependencies:
 
 ```{r}
-"foo" %provides% "foo"
+"foo" %provides% "Hello"
 
-"bar" %provides% "bar"
+"bar" %provides% "World"
 
 "foobar" %requires% list(
-  foo = "foo",
-  bar = "bar"
+  f = "foo",
+  b = "bar"
 ) %provides% {
-  #' Return a string containing "foobar".
-  paste0(foo, bar)
+  #' Return a string containing "Hello World!".
+  paste0(f, " ", b, "!")
 }
 ```
 
@@ -117,7 +110,7 @@ info("foobar")
 To list all the defined modules, you can use `lsmod` (or `list_modules`):
 
 ```{r}
-lsmod()
+lsmod(cols = c("name", "type", "dependencies", "childs", "size", "modified"))
 ```
 
 As you can see, `foobar` has two dependencies, and `foo` and `bar` both have one child. This can be viewed graphically:
@@ -126,19 +119,19 @@ As you can see, `foobar` has two dependencies, and `foo` and `bar` both have one
 # Do not try to produce a snapshot on Travis CI or CRAN
 if (!identical(Sys.getenv("TRAVIS"), "true") &&
       identical(Sys.getenv("NOT_CRAN"), "true")) {
-  graph_dependencies() %>%
+  plot_dependencies() %>%
     html_print %>%
-    webshot(file = "how-to-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
+    webshot(file = "introduction-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
     resize("730x") %>%
     shrink()
 }
 ```
 
 ```{r, echo=T, eval=F}
-graph_dependencies()
+plot_dependencies()
 ```
 
-![](how-to-foobar.png)
+![](introduction-foobar.png)
 
 Let us make the module `foobar` and see what it returns:
 
@@ -146,13 +139,13 @@ Let us make the module `foobar` and see what it returns:
 make("foobar")
 ```
 
-Voilà! All the depencencies have been evaluated, injected and processed by modulr to return the expected `"foobar"`.
+Voilà! All the depencencies have been evaluated, injected and processed by `modulr` to return the expected `"Hello World!"`.
 
 ```{r}
-lsmod()
+lsmod(cols = c("name", "type", "dependencies", "childs", "size", "modified"))
 ```
 
-# All modules are singletons
+# Modules are singletons
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -171,7 +164,7 @@ Successive make calls on the module will not imply its re-evaluation:
 
 ```{r}
 make("timestamp")
-make("timestamp")
+suppressMessages(make("timestamp"))
 ```
 
 To force the re-evaluation of a module, you can use `touch`:
@@ -188,20 +181,18 @@ Otherwise, modulr will detect any change in the module's definition and re-evalu
   #' Return a string containing a timestamp with more information.
   format(Sys.time(), "%Y-%m-%d %H:%M:%OS6")
 }
-```
 
-```{r}
 make("timestamp")
 ```
 
-# Modules as prototypes
+# Prototyped modules
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
 root_config$set(".")
 ```
 
-This is a fact that all modules are singletons. Nonetheless, it is possible for a module to return a function (or closure) that itself returns a desired object. In this case, such a module fakes and behaves like a so-called prototype.
+This is a fact that all modules are singletons. Nonetheless, it is possible for a module to return a function (or closure) that itself returns a desired object. In this case, such a module fakes and behaves like a so-called _prototype_.
 
 ```{r}
 "timestamp" %provides% {
@@ -211,18 +202,19 @@ This is a fact that all modules are singletons. Nonetheless, it is possible for 
 
 ```{r}
 make("timestamp")()
-make("timestamp")()
+
+suppressMessages(make("timestamp")())
 ```
 
 It is important to emphasize that the module is still a singleton: the second make call doesn't re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called.
 
-# Lazy modules
+# Memoised modules
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
 ```
 
-Singletons produce cached objects at make-time and prototypes produce computed objects at run-time. Lazy modules should produce cached objects at run-time. [Memoisation](https://en.wikipedia.org/wiki/Memoization) and [Hadley Wickam's memoise package](https://github.com/hadley/memoise) give an elegant solution to this requirement.
+Singletons produce cached objects at make-time and prototypes produce computed objects at run-time. Memoised modules should produce cached objects at run-time. [Memoisation](https://en.wikipedia.org/wiki/Memoization) and [Hadley Wickam's memoise package](https://github.com/hadley/memoise) give an elegant solution to this requirement.
 
 To see the essence of what is happening, we decrease the verbosity of modulr and define `foo` requiring `timestamp`, defined as a singleton at first:
 
@@ -262,13 +254,16 @@ make("foo")
 
 Here, the evaluation consists of defining a function that returns a timestamp, only when the function is explicitely called. Even if the computation encapsulated by the function is very time- and/or space-consuming, no evaluation of the returned function takes place at make-time.
 
-Finally, let us re-define `timestamp` as a lazy module:
+Finally, let us re-define `timestamp` as a memoised module:
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+library(memoise)
+```
 
 ```{r}
 "timestamp" %provides% {
-  # This is a lazy module.
-  library(memoise)
-  memoise(
+  # This is a memoised module.
+  memoise::memoise(
     function() {
       message("'timestamp' is evaluated...")
       format(Sys.time(), "%H:%M:%OS6")
@@ -299,11 +294,105 @@ touch("foo")
 make("foo")
 ```
 
-The lazy version of `timestamp` is evaluated only at run-time, not at make-time; moreover, the string containing the actual timestamp is computed only once and then cached for future calls, avoiding re-evaluation.
+The memoised version of `timestamp` is evaluated only at run-time, not at make-time; moreover, the string containing the actual timestamp is computed only once and then cached for future calls, avoiding re-evaluation.
+
+To force re-evaluation of the memoised function exposed by `timestamp`, use `memoise::forget`.
+
+```{r}
+memoise::forget(make("timestamp"))
+touch("foo")
+make("foo")
+```
+
+# Futurized modules
+
+Using [Henrik Bengtsson's future package](https://cran.r-project.org/web/packages/future), it is possible to evaluate modules asynchronously using various resources available to the user. For instance, evaluation of modules can be eager, lazy, and/or parallelized (on multiple cores and/or a cluster).
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+modulr::reset()
+library(future)
+```
+
+```{r}
+# How many cores are available?
+future::availableCores()
+
+"foo" %provides% {
+  future::future({
+    Sys.sleep(2L)
+    "Hello"
+  }) %plan% multicore
+}
+
+"bar" %provides% {
+  future::future({
+    Sys.sleep(2L)
+    "World"
+  }) %plan% multicore
+}
+
+"foobar" %requires% list(
+  f = "foo",
+  b = "bar"
+) %provides% {
+  paste0(future::value(f), " ", future::value(b), "!")
+}
+
+system.time(print(make("foobar")))
+```
+
+It is often interesting to parallelize an already existing module. `modulr` comes with the handy `futurize` function for this purpose.
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+modulr::reset()
+```
+
+```{r}
+"foo" %provides% { Sys.sleep(2L); "Hello" }
+"bar" %provides% { Sys.sleep(2L); "World" }
+"foobar" %requires% list(
+  f = "foo", 
+  b = "bar"
+) %provides% {
+  paste0(f, " ", b, "!")
+}
+
+futurize("foo", strategy = future::multicore)
+futurize("bar", strategy = future::multicore)
+
+futurize(
+  "foobar", 
+  name = "foobar/eager", 
+  dependencies = list(f = "foo/future", b = "bar/future"),
+  strategy = future::eager
+)
+
+system.time(fb_eager <- make("foobar/eager"))
+system.time(print(future::value(fb_eager)))
+```
+
+```{r}
+touch("foo/future")
+touch("bar/future")
+futurize(
+  "foobar", 
+  name = "foobar/lazy", 
+  dependencies = list(f = "foo/future", b = "bar/future"),
+  strategy = future::lazy
+)
+
+system.time(fb_lazy <- make("foobar/lazy"))
+system.time(print(future::value(fb_lazy)))
+```
+
 
 # Mixed modules
 
-It is also possible to define modules which simultaneously present the three above properties:
+It is also possible to define modules which simultaneously present the above properties:
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+modulr::reset()
+```
 
 ```{r}
 "timestamp" %provides% {
@@ -314,7 +403,7 @@ It is also possible to define modules which simultaneously present the three abo
   list(
     singleton = timestamp(),
     prototype = timestamp,
-    lazy = memoise(timestamp)
+    memorandum = memoise(timestamp)
   )
 }
 
@@ -323,8 +412,8 @@ timestamp %<=% "timestamp"
 timestamp$singleton
 timestamp$prototype()
 timestamp$prototype()
-timestamp$lazy()
-timestamp$lazy()
+timestamp$memorandum()
+timestamp$memorandum()
 ```
 
 # Organizing modules

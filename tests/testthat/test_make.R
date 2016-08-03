@@ -1,5 +1,44 @@
 context("make")
 
+test_that(".align_named_vectors aligns named vectors", {
+  expect_equal(
+    .align_named_vectors(
+      c(a = "A"), c(A = "alpha")
+    ),
+    c(a = "alpha")
+  )
+  expect_equal(
+    .align_named_vectors(
+      c(a = "A", b = "B"), c(A = "alpha")
+    ),
+    c(a = "alpha")
+  )
+  expect_equal(
+    .align_named_vectors(
+      c(b = "B"), c(A = "alpha")
+    ),
+    setNames(character(0), character(0))
+  )
+  expect_equal(
+    .align_named_vectors(
+      c(a = "A"), c(A = "alpha", A = "alpha")
+    ),
+    c(a = "alpha")
+  )
+  expect_equal(
+    .align_named_vectors(
+      c(a = "A"), c(A = "alpha", A = "beta")
+    ),
+    c(a = "alpha")
+  )
+  expect_equal(
+    .align_named_vectors(
+      c(a = "A", b = "B"), c(A = "alpha", B = "beta")
+    ),
+    c(a = "alpha", b = "beta")
+  )
+})
+
 test_that("mappings are resolved", {
   reset()
 
@@ -29,7 +68,7 @@ test_that("mappings are resolved", {
 
 })
 
-test_that("make writes to the register", {
+test_that("make writes to the registry", {
   reset()
 
   define(
@@ -43,8 +82,8 @@ test_that("make writes to the register", {
 
   some_module <- make("some/module")
 
-  register <- get("register", pos = .modulr_env$injector)
-  module <- register[["some/module"]]
+  registry <- get("registry", pos = .modulr_env$injector)
+  module <- registry[["some/module"]]
 
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
@@ -82,10 +121,10 @@ test_that("make instanciates dependencies", {
   reset()
 
   make("module_2")
-  register <- get("register", pos = .modulr_env$injector)
+  registry <- get("registry", pos = .modulr_env$injector)
 
-  expect_true("module_2" %in% names(register))
-  expect_true("module_1" %in% names(register))
+  expect_true("module_2" %in% names(registry))
+  expect_true("module_1" %in% names(registry))
 })
 
 test_that("make reinstanciates touched dependency, only once", {
@@ -97,19 +136,19 @@ test_that("make reinstanciates touched dependency, only once", {
   touch("module_1")
 
   module_timestamp <-
-    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_lt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
   module_timestamp <-
-    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
   module_timestamp_2 <-
-    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_equal(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
 
@@ -125,13 +164,13 @@ test_that("make reinstanciates touched dependencies for each child module", {
   make("module_2")
 
   module_timestamp <-
-    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2bis")
 
   module_timestamp_2 <-
-    get("register", pos = .modulr_env$injector)[["module_2bis"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_2bis"]]$timestamp
   expect_gt(as.numeric(module_timestamp_2), as.numeric(timestamp))
   expect_gt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
@@ -146,13 +185,13 @@ test_that("make reinstanciates touched dependencies for chained modules", {
   make("module_2")
 
   module_timestamp <-
-    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_3")
 
   module_timestamp_2 <-
-    get("register", pos = .modulr_env$injector)[["module_3"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_3"]]$timestamp
   expect_gt(as.numeric(module_timestamp_2), as.numeric(timestamp))
   expect_gt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
@@ -167,13 +206,13 @@ test_that("make reinstanciates touched deps for chained modules, scenario 2", {
   make("module_3")
 
   module_timestamp <-
-    get("register", pos = .modulr_env$injector)[["module_3"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_3"]]$timestamp
   expect_gt(as.numeric(module_timestamp), as.numeric(timestamp))
 
   make("module_2")
 
   module_timestamp_2 <-
-    get("register", pos = .modulr_env$injector)[["module_2"]]$timestamp
+    get("registry", pos = .modulr_env$injector)[["module_2"]]$timestamp
   expect_lt(as.numeric(module_timestamp_2), as.numeric(module_timestamp))
 })
 
@@ -425,9 +464,9 @@ test_that("make outputs a correct layer message", {
   define("foo", NULL, NULL)
   define("bar", NULL, NULL)
   define("foobar", list(foo = "foo", bar = "bar"), NULL)
-  expect_message(make("foobar"), "1 layer,")
+  expect_output(make("foobar"), "1 layer,")
   define("super", list(foobar = "foobar"), NULL)
-  expect_message(make("super"), "2 layers,")
+  expect_output(make("super"), "2 layers,")
 })
 
 test_that("make keeps the provider environment", {
@@ -456,7 +495,7 @@ test_that("make doesn't recurse infinitely when sourced", {
 
   test_env <- new.env()
   assign("test_env", test_env, globalenv())
-  on.exit(rm(list = "test_env", pos = globalenv()))
+  on.exit(rm(list = c("test_env", "env"), pos = globalenv()))
   test_env$deep <- 1
   module_text <-
     sprintf(
@@ -488,7 +527,7 @@ test_that("make doesn't recurse infinitely when called", {
 
   test_env <- new.env()
   assign("test_env", test_env, globalenv())
-  on.exit(rm(list = "test_env", pos = globalenv()))
+  on.exit(rm(list = c("test_env", "env"), pos = globalenv()))
   test_env$deep <- 1
   module_text <-
     sprintf(
@@ -520,7 +559,7 @@ test_that("do_make doesn't recurse infinitely when called", {
 
   test_env <- new.env()
   assign("test_env", test_env, globalenv())
-  on.exit(rm(list = "test_env", pos = globalenv()))
+  on.exit(rm(list = c("test_env", "env"), pos = globalenv()))
   test_env$deep <- 1
   module_text <-
     sprintf(

@@ -133,7 +133,7 @@ test_that("define does not re-define reserved modules", {
   expect_error(define(MODULR_NAME, list(), function() NULL))
 })
 
-test_that("define writes to the register", {
+test_that("define writes to the registry", {
   reset()
   timestamp <- Sys.time()
 
@@ -144,8 +144,8 @@ test_that("define writes to the register", {
       return(dep)
     })
 
-  register <- get("register", pos = .modulr_env$injector)
-  module <- register[["some/module"]]
+  registry <- get("registry", pos = .modulr_env$injector)
+  module <- registry[["some/module"]]
 
   expect_equal(module$name, "some/module")
   expect_equal(module$aliases, list(dep = "foo/bar"))
@@ -164,7 +164,7 @@ test_that("define writes to the register", {
   expect_gt(as.numeric(module$timestamp), as.numeric(timestamp))
 })
 
-test_that("re-define doesn't write to the register when no changes occur", {
+test_that("re-define doesn't write to the registry when no changes occur", {
   reset()
 
   timestamp_1 <- Sys.time()
@@ -185,8 +185,8 @@ test_that("re-define doesn't write to the register when no changes occur", {
       return(dep)
     })
 
-  register <- get("register", pos = .modulr_env$injector)
-  module <- register[["some/module"]]
+  registry <- get("registry", pos = .modulr_env$injector)
+  module <- registry[["some/module"]]
 
   expect_equal(module$name, "some/module")
   expect_true(is.na(module$along))
@@ -204,7 +204,7 @@ test_that("re-define doesn't write to the register when no changes occur", {
   expect_lt(as.numeric(module$timestamp), as.numeric(timestamp_2))
 })
 
-test_that("re-define writes to the register when changes occur", {
+test_that("re-define writes to the registry when changes occur", {
   reset()
 
   define(
@@ -223,8 +223,8 @@ test_that("re-define writes to the register when changes occur", {
       return(sprintf("%s", dep))
     })
 
-  register <- get("register", pos = .modulr_env$injector)
-  module <- register[["some/module"]]
+  registry <- get("registry", pos = .modulr_env$injector)
+  module <- registry[["some/module"]]
 
   expect_equal(module$name, "some/module")
   expect_true(is.na(module$along))
@@ -363,8 +363,8 @@ test_that("define doesn't require named dependencies if provider has formals", {
 test_that("define requires dependencies and provider to coincide", {
   reset()
 
-  expect_silent(suppressMessages(define("foobar", list(foo = "foo"),
-                       function(foo) paste0(foo, "bar"))))
+  expect_output(define("foobar", list(foo = "foo"),
+                       function(foo) paste0(foo, "bar")), "foobar")
 
   expect_error(define("foobar", list(foo = "foo"),
                       function(bad) paste0(foo, "bar")))
@@ -481,7 +481,61 @@ test_that("get_provider calls are warned from within a module", {
   expect_warning(make("module"))
 })
 
-test_that("reset purges the register", {
+test_that("get_dependencies returns the dependencies of the module", {
+  reset()
+
+  define(
+    "some/module",
+    list(dep = "foo/bar"),
+    NULL)
+
+  expect_equal(
+    get_dependencies("some/module"),
+    list(dep = "foo/bar")
+  )
+
+  define(
+    "some/other/module",
+    list(
+      module = "some/module",
+      dep = "foo/bar"),
+    NULL)
+
+  expect_equal(
+    get_dependencies("some/other/module"),
+    list(module = "some/module", dep = "foo/bar")
+  )
+
+})
+
+test_that("get_dependencies is able to find an undefined module", {
+  reset()
+
+  expect_error(get_dependencies("unexisting/module", load = F))
+
+  expect_error(get_dependencies("unexisting/module", load = T))
+
+  expect_error(get_dependencies("module_1", load = F))
+
+  expect_equal(get_dependencies("module_1", load = T),
+               list())
+
+  expect_error(get_dependencies("module_2", load = F))
+
+  expect_equal(get_dependencies("module_2", load = T),
+               list(m_1 = "module_1"))
+
+})
+
+test_that("get_dependencies calls are warned from within a module", {
+  reset()
+  define("module", NULL, function() {
+    get_dependencies("module_1", load = T)
+  })
+  expect_warning(make("module"))
+})
+
+test_that("reset purges the registry", {
   define(
     "some/module",
     list(dep = "foo/bar"),
@@ -491,9 +545,9 @@ test_that("reset purges the register", {
 
   reset()
 
-  register <- get("register", pos = .modulr_env$injector)
+  registry <- get("registry", pos = .modulr_env$injector)
 
-  expect_equal(names(register), MODULR_NAME)
+  expect_equal(names(registry), MODULR_NAME)
 
   })
 
@@ -515,7 +569,7 @@ test_that("reset calls generate an error from within a module", {
   expect_error(make("module"))
 })
 
-test_that("undefine removes the module definition from the register", {
+test_that("undefine removes the module definition from the registry", {
   define(
     "some/module",
     list(dep = "foo/bar"),
@@ -523,20 +577,20 @@ test_that("undefine removes the module definition from the register", {
       return(dep)
     })
 
-  register <- get("register", pos = .modulr_env$injector)
+  registry <- get("registry", pos = .modulr_env$injector)
 
-  expect_true("some/module" %in% names(register))
+  expect_true("some/module" %in% names(registry))
 
   status <- undefine("some/module")
   expect_null(status)
 
-  register <- get("register", pos = .modulr_env$injector)
+  registry <- get("registry", pos = .modulr_env$injector)
 
-  expect_false("some/module" %in% names(register))
+  expect_false("some/module" %in% names(registry))
 
   })
 
-test_that("undefine removes only registered modules", {
+test_that("undefine removes only registryed modules", {
   reset()
 
   define(
@@ -547,7 +601,7 @@ test_that("undefine removes only registered modules", {
     })
 
   expect_null(undefine("some/module"))
-  expect_error(undefine("some/unregistered/module"))
+  expect_error(undefine("some/unregistryed/module"))
 
 })
 
@@ -571,7 +625,7 @@ test_that("undefine calls are warned from within a module", {
   expect_error(make("module"))
 })
 
-test_that("touch updates the register", {
+test_that("touch updates the registry", {
   reset()
 
   define(
@@ -586,8 +640,8 @@ test_that("touch updates the register", {
   status <- touch("some/module")
   expect_null(status)
 
-  register <- get("register", pos = .modulr_env$injector)
-  module <- register[["some/module"]]
+  registry <- get("registry", pos = .modulr_env$injector)
+  module <- registry[["some/module"]]
 
   expect_null(module$instance)
   expect_false(module$instanciated)
@@ -597,7 +651,7 @@ test_that("touch updates the register", {
 
   })
 
-test_that("touch updates only registered modules", {
+test_that("touch updates only registryed modules", {
   reset()
 
   define(
@@ -608,7 +662,7 @@ test_that("touch updates only registered modules", {
     })
 
   expect_null(touch("some/module"))
-  expect_error(touch("some/unregistered/module"))
+  expect_error(touch("some/unregistryed/module"))
 
 })
 

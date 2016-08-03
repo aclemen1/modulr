@@ -1,7 +1,7 @@
 # Test if a module is already defined.
 .is_defined <- function(name) {
-  assert_that(assertthat::is.string(name))
-  name %in% names(.modulr_env$injector$register)
+  assertthat::see_if(assertthat::is.string(name)) &&
+    name %in% names(.modulr_env$injector$registry)
 }
 
 assertthat::on_failure(.is_defined) <- function(call, env) {
@@ -18,7 +18,7 @@ assertthat::on_failure(.is_undefined) <- function(call, env) {
 }
 
 .is_version <- function(version) {
-  "numeric_version" %in% class(version)
+  inherits(version, "numeric_version")
 }
 
 assertthat::on_failure(.is_version) <- function(call, env) {
@@ -29,8 +29,8 @@ assertthat::on_failure(.is_version) <- function(call, env) {
 .version_symbol_regex <- "(?:[~^]|(?:>=))"
 
 .is_version_symbol <- function(symbol) {
-  assert_that(is.na(symbol) || assertthat::is.string(symbol))
-  is.na(symbol) || grepl(sprintf("^%s$", .version_symbol_regex), symbol)
+  assertthat::see_if(is.na(symbol) || assertthat::is.string(symbol)) &&
+    (is.na(symbol) || grepl(sprintf("^%s$", .version_symbol_regex), symbol))
 }
 
 assertthat::on_failure(.is_version_symbol) <- function(call, env) {
@@ -43,8 +43,8 @@ assertthat::on_failure(.is_version_symbol) <- function(call, env) {
 .version_hash_string_regex <- sprintf("(?:(?:#%s))", .version_string_regex)
 
 .is_version_string <- function(string) {
-  assert_that(assertthat::is.string(string) || is.na(string))
-  is.na(string) || grepl(sprintf("^%s$", .version_string_regex), string)
+  assertthat::see_if(assertthat::is.string(string) || is.na(string)) &&
+    (is.na(string) || grepl(sprintf("^%s$", .version_string_regex), string))
 }
 
 assertthat::on_failure(.is_version_string) <- function(call, env) {
@@ -59,8 +59,8 @@ assertthat::on_failure(.is_version_string) <- function(call, env) {
   "((?:/[a-zA-Z0-9_-]+)*)$")
 
 .is_conform <- function(name) {
-  assert_that(assertthat::is.string(name))
-  grepl(.conform_regex, name)
+  assertthat::see_if(assertthat::is.string(name)) &&
+    grepl(.conform_regex, name)
 }
 
 assertthat::on_failure(.is_conform) <- function(call, env) {
@@ -70,8 +70,8 @@ assertthat::on_failure(.is_conform) <- function(call, env) {
 
 # Test if a name does not contain a semantic versioning symbol.
 .is_exact <- function(name) {
-  assert_that(.is_conform(name))
-  is.na(.parse_name(name)$symbol)
+  assertthat::see_if(.is_conform(name)) &&
+    is.na(.parse_name(name)$symbol)
 }
 
 assertthat::on_failure(.is_exact) <- function(call, env) {
@@ -81,8 +81,8 @@ assertthat::on_failure(.is_exact) <- function(call, env) {
 
 # Test if a name does not contain a semantic version.
 .is_namespace <- function(namespace) {
-  assert_that(.is_exact(namespace))
-  is.na(.parse_name(namespace)[["version"]])
+  assertthat::see_if(.is_exact(namespace)) &&
+    is.na(.parse_name(namespace)[["version"]])
 }
 
 assertthat::on_failure(.is_namespace) <- function(call, env) {
@@ -92,8 +92,8 @@ assertthat::on_failure(.is_namespace) <- function(call, env) {
 
 # Test if a module has a regular name.
 .is_regular <- function(name) {
-  assert_that(assertthat::is.string(name))
-  !(.parse_name(name)[["namespace"]] %in% RESERVED_NAMES) && .is_conform(name)
+  assertthat::see_if(assertthat::is.string(name)) &&
+    !(.parse_name(name)[["namespace"]] %in% RESERVED_NAMES) && .is_conform(name)
 }
 
 assertthat::on_failure(.is_regular) <- function(call, env) {

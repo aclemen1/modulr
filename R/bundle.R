@@ -58,14 +58,14 @@ do_bundle <- function(name = .Last.name, args = list(),
             call. = FALSE, immediate. = TRUE)
   }
 
-  register <- .modulr_env$injector$register
+  registry <- .modulr_env$injector$registry
   .Last.name <- .modulr_env$injector$.Last.name
   config <- .modulr_env$injector$config
   verbosity <- .modulr_env$injector$verbosity
   stash <- .modulr_env$injector$stash
 
   rollback <- function() {
-    .modulr_env$injector$register <- register
+    .modulr_env$injector$registry <- registry
     .modulr_env$injector$.Last.name <- .Last.name
     .modulr_env$injector$config <- config
     .modulr_env$injector$verbosity <- verbosity
@@ -85,8 +85,8 @@ do_bundle <- function(name = .Last.name, args = list(),
     if (.is_regular(name))
       .modulr_env$injector$.Last.name <- name
 
-    .modulr_env$injector$register[[c(name, "calls")]] <-
-      .modulr_env$injector$register[[c(name, "calls")]] + 1
+    .modulr_env$injector$registry[[c(name, "calls")]] <-
+      .modulr_env$injector$registry[[c(name, "calls")]] + 1
 
     .message_meta("Constructing dependency graph", {
 
@@ -113,8 +113,7 @@ do_bundle <- function(name = .Last.name, args = list(),
               layers_count <- length(layers)
 
               if (deps_count > 1 && layers_count > 1)
-                message(sprintf("%d layers, ", layers_count - 1),
-                        appendLF = FALSE)
+                cat(sprintf("%d layers, ", layers_count - 1))
 
             },
         ok = TRUE, verbosity = 2)

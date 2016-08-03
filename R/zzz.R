@@ -1,15 +1,19 @@
 # nocov start
 .onLoad <- function(libname, pkgname) {
 
+  .modulr_env$old_modulr_options <- options(
+    modulr.ignore_packages =
+      getOption("modulr.ignore_packages", DEFAULT_IGNORE_PACKAGES))
+
   reset(all = TRUE, .verbose = FALSE)
 
-  reactivate_breadcrumbs()
-
-  invisible()
+  invisible(NULL)
 
 }
 
 .onAttach <- function(libname, pkgname) {
+
+  .modulr_env$error_option <- reactivate_breadcrumbs()
 
   makeActiveBinding(
     as.symbol(".Last.name"),
@@ -32,5 +36,24 @@
       break
     }
 
+  invisible(NULL)
+
 }
+
+.onDetach <- function(libpath) {
+
+  if (exists("error_option", where = .modulr_env)) {
+    options(error = .modulr_env$error_option)
+  }
+
+  invisible(NULL)
+
+}
+
+.onUnload <- function(libpath) {
+
+  options(.modulr_env$old_modulr_options)
+
+}
+
 # nocov end

@@ -106,14 +106,14 @@ import_module <- function(name, url, digest = NULL,
 
     script <- httr::content(result, as = "text")
 
-    register <- .modulr_env$injector$register
+    registry <- .modulr_env$injector$registry
     .Last.name <- .modulr_env$injector$.Last.name
     config <- .modulr_env$injector$config
     verbosity <- .modulr_env$injector$verbosity
     stash <- .modulr_env$injector$stash
 
     rollback <- function() {
-      .modulr_env$injector$register <- register
+      .modulr_env$injector$registry <- registry
       .modulr_env$injector$.Last.name <- .Last.name
       .modulr_env$injector$config <- config
       .modulr_env$injector$verbosity <- verbosity
@@ -124,15 +124,31 @@ import_module <- function(name, url, digest = NULL,
          grepl("<<[^>]*>>=[^@]*@", script)) {
       # Rmd import
 
-      unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
+      opat <- knitr::knit_patterns$get()
+      oopts_knit <- knitr::opts_knit$get()
+      oopts_template <- knitr::opts_template$get()
+      oopts_hooks <- knitr::opts_hooks$get()
+      oopts_chunk <- knitr::opts_chunk$get()
+      oopts_current <- knitr::opts_current$get()
+
+      knitr::knit_patterns$restore()
+      on.exit(knitr::knit_patterns$set(opat), add = TRUE)
+      knitr::opts_knit$restore()
+      on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
+      knitr::opts_template$restore()
+      on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
+      knitr::opts_hooks$restore()
+      on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
+      knitr::opts_chunk$restore()
+      on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
+      knitr::opts_current$restore()
+      on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
 
       knitr::opts_knit$set("unnamed.chunk.label" =
-                             paste("modulr", name, sep = "/"))
+                           paste("modulr", url, sep = "-"))
 
-      script <- knitr::knit(text = script,
-                            tangle = TRUE, quiet = TRUE)
-
-      knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
+      script <-
+        knitr::knit(text = script, tangle = TRUE, quiet = TRUE)
 
     }
 
@@ -157,7 +173,7 @@ import_module <- function(name, url, digest = NULL,
            call. = FALSE)
     }
 
-    .modulr_env$injector$register[[c(name, "url")]] <- url
+    .modulr_env$injector$registry[[c(name, "url")]] <- url
 
     return(invisible(ev))
 

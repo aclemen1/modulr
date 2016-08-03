@@ -47,7 +47,7 @@ test_that("correct Sankey graph is returned for dependent modules", {
 
 })
 
-test_that("correct Sankey graph is returned for the whole register", {
+test_that("correct Sankey graph is returned for the whole registry", {
   if (!requireNamespace("networkD3", quietly = TRUE))
     skip("networkD3 not installed")
   reset()

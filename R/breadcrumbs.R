@@ -102,4 +102,6 @@ reactivate_breadcrumbs <- function() {
 
   }
 
+  handler
+
 }

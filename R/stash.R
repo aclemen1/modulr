@@ -52,7 +52,7 @@ stash <- function(comment = NA_character_) {
   .message_meta(
     sprintf("Stashing modulr state, stash #%s", len_plus_1), {
       .modulr_env$injector$stash[[len_plus_1]] <- list(
-        register = .modulr_env$injector$register,
+        registry = .modulr_env$injector$registry,
         .Last.name = .modulr_env$injector$.Last.name,
         config = .modulr_env$injector$config,
         verbosity = .modulr_env$injector$verbosity,
@@ -85,7 +85,7 @@ unstash <- function(id = length(.modulr_env$injector$stash)) {
     sprintf("Unstashing modulr state, stash #%s", id), {
 
       .modulr_env$injector$stash <- .modulr_env$injector$stash[-id]
-      .modulr_env$injector$register <- stash[["register"]]
+      .modulr_env$injector$registry <- stash[["registry"]]
       .modulr_env$injector$.Last.name <- stash[[".Last.name"]]
       .modulr_env$injector$config <- stash[["config"]]
       .modulr_env$injector$verbosity <- stash[["verbosity"]]

@@ -1,5 +1,5 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd. Please edit the .Rmd file -->
 
 
 
@@ -12,36 +12,342 @@
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org/license.html)
 [![Twitter](http://img.shields.io/twitter/url/https/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet?text=modulr%20-%20%20A%20Dependency%20Injection%20Framework%20for%20R)
 
-# modulr — A Dependency Injection Framework for R
+# Modulr — A Dependency Injection Framework for R
 
-*Until the release of the forthcoming stable version (0.2.0), the 
-documentation of the package is a work in progress. Thank you for your 
-understanding.*
+*Until the forthcoming CRAN submission, the documentation of modulr is "work in progress". Thank you for your understanding.*
 
 ## Description
 
-The `modulr` package is a Dependency Injection (DI) Framework for R. 
-By design, `modulr` allows to break down sequential programs into discrete, 
-modular units that are loosely coupled, simple to develop, test, reuse and 
-share in a wide range of situations. As every DI framework, it aims for a clear 
-separation between code complication and complexity, highlighting the 
-core purpose and behaviour of objects (application code), and hiding 
-their construction and wiring (infrastructure code). 
+Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share.
 
-## Advantages
+It is widely inspired from Google's [AngularJS](https://angularjs.org/) developpment framework for web applications in Javascript and from Google's [Guice](https://github.com/google/guice) developpment framework for Java. It is also slightly inspired from [GNU Make](https://www.gnu.org/software/make).
 
-  * modules are easy (and fun) to develop,
-  * modules are easy to debug,
-  * modules are easy to test,
-  * modules are easy to read,
-  * modules are easy to reuse,
-  * modules are easy to share,
-  * modules are easy to maintain, and
-  * modules force (a bit) to keep up with good practices.
+## Hello World!
 
-`modulr` is deeply inspired from [AngularJS](https://angularjs.org/) and 
-[RequireJS](http://requirejs.org) for Javascript, 
-as well as [guice](https://github.com/google/guice) for Java.
+
+```r
+library(modulr)
+
+# This is our first module definition: 
+# "foo" provides the "Hello" character string.
+"foo" %provides% { "Hello" }
+#> [2016-08-03T22:25:47 UTC] Defining 'foo' ... OK
+
+# The module "bar" provides "World".
+"bar" %provides% { "World" }
+#> [2016-08-03T22:25:47 UTC] Defining 'bar' ... OK
+
+# And the module "foobar" requires "foo" and "bar", 
+# and provides a concatenated string.
+"foobar" %requires% list(f = "foo", b = "bar") %provides% {
+  paste0(f, " ", b, "!")
+}
+#> [2016-08-03T22:25:47 UTC] Defining 'foobar' ... OK
+
+# "foobar" is evaluated and its result bound to a variable.
+result <- make("foobar")
+#> [2016-08-03T22:25:47 UTC] Making 'foobar' ...
+#> [2016-08-03T22:25:47 UTC] * Visiting and defining dependencies ...
+#> [2016-08-03T22:25:47 UTC] * Constructing dependency graph ... OK
+#> [2016-08-03T22:25:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2016-08-03T22:25:47 UTC] * Evaluating new and outdated dependencies ...
+#> [2016-08-03T22:25:47 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
+#> [2016-08-03T22:25:47 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
+#> [2016-08-03T22:25:47 UTC] DONE ('foobar')
+
+cat(result)
+#> Hello World!
+```
+
+## Why Dependency Injection?
+
+This section motivates the use of DI in R. It mainly resumes the motivation and explanation given for [Angular's use of DI](https://docs.angularjs.org/guide/di) (credit to Google). For in-depth discussion about DI, see [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection) at Wikipedia, [Inversion of Control](http://martinfowler.com/articles/injection.html) by Martin Fowler, or read about DI in your favorite software design pattern book.
+
+Generally speaking, there are only three ways a component can get a hold of its dependencies:
+
+1. The component can create the dependency, typically by binding a new object to an environment in R.
+2. The component can look up the dependency, by referring to a global variable.
+3. The component can have the dependency passed to it where it is needed.
+
+The first two options of creating or looking up dependencies are not optimal because they hard code the dependency to the component. This makes it difficult, if not impossible, to modify the dependencies. This is especially problematic in tests, where it is often desirable to provide mock dependencies for test isolation.
+
+The third option is the most viable, since it removes the responsibility of locating the dependency from the component. The dependency is simply handed to the component. To illustrate this, let's build a simplistic car composed of a roaring engine and some gleaming wheels.
+
+
+```r
+# This function returns a roaring engine.
+engine_provider <- function() {
+  list(
+    start = function() message("Engine started."),
+    stop = function() message("Engine stopped.")
+  )
+}
+
+# This function returns gleaming wheels.
+wheels_provider <- function() {
+  list(
+    roll = function() message("Wheels rolling."),
+    brake = function() message("Wheels braking.")
+  )
+}
+
+# This function returns a car provided with an engine and some wheels.
+car_provider <- function(engine, wheels) {
+  list(
+    start = function() {
+      message("Car started.")
+      engine$start()
+    },
+    drive = function(speed, destination) {
+      wheels$roll()
+      message("Car driving at ", speed, " to ", destination, ".")
+      wheels$brake()
+    },
+    stop = function() {
+      engine$stop()
+      message("Car stopped")
+    }
+  )
+}
+```
+
+In the above example, `car_provider` is not concerned with creating or locating the `engine` and `wheels` dependencies, it is simply handed the `engine` and `wheels` when it is called. It is desirable, but it puts the responsibility of getting hold of the dependencies on the code that calls `car_provider`.
+
+
+```r
+engine <- engine_provider()
+wheels <- wheels_provider()
+car <- car_provider(engine, wheels)
+
+car$start()
+#> Car started.
+#> Engine started.
+car$drive("50 km/h", "home")
+#> Wheels rolling.
+#> Car driving at 50 km/h to home.
+#> Wheels braking.
+car$stop()
+#> Engine stopped.
+#> Car stopped
+```
+
+For instance, if one decides to change `wheels`, a new dependency has to be explicitly created and passed to `car_provider`.
+
+To manage the responsibility of dependency creation, modulr relies on an _injector_. The injector is a [service locator](http://en.wikipedia.org/wiki/Service_locator_pattern) that is responsible for construction and lookup of dependencies. Here is an example of using the injector service:
+
+Create a new injector that can provide modules.
+
+
+```r
+library(modulr)
+my_injector <- new_injector()
+```
+
+Teach the injector how to build the `car`, `engine` and `wheels` modules. Notice that `car` is dependent on the `engine` and `wheels` modules.
+
+
+```r
+my_injector$provider(
+  name = "car", 
+  dependencies = list(engine = "engine", wheels = "wheels"), 
+  provider = car_provider)
+#> [2016-08-03T22:25:47 UTC] Defining 'car' ... OK
+
+my_injector$provider(name = "engine", provider = engine_provider)
+#> [2016-08-03T22:25:47 UTC] Defining 'engine' ... OK
+
+my_injector$provider(name = "wheels", provider = wheels_provider)
+#> [2016-08-03T22:25:47 UTC] Defining 'wheels' ... OK
+```
+
+Request our `car` module from the injector.
+
+
+```r
+car <- my_injector$get("car")
+#> [2016-08-03T22:25:47 UTC] Making 'car' ...
+#> [2016-08-03T22:25:47 UTC] * Visiting and defining dependencies ...
+#> [2016-08-03T22:25:47 UTC] * Constructing dependency graph ... OK
+#> [2016-08-03T22:25:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2016-08-03T22:25:47 UTC] * Evaluating new and outdated dependencies ...
+#> [2016-08-03T22:25:47 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2016-08-03T22:25:47 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
+#> [2016-08-03T22:25:47 UTC] DONE ('car')
+
+car$start(); car$drive("120 km/h", "the University of Lausanne"); car$stop()
+#> Car started.
+#> Engine started.
+#> Wheels rolling.
+#> Car driving at 120 km/h to the University of Lausanne.
+#> Wheels braking.
+#> Engine stopped.
+#> Car stopped
+```
+
+In this setting, changing `wheels` is then straightforward:
+
+
+```r
+my_injector$provider(
+  name = "wheels", 
+  provider = function() {
+    list(
+      roll = function() message("Brand-new wheels rolling."),
+      brake = function() message("Brand-new wheels braking.")
+    )
+  }
+)
+#> [2016-08-03T22:25:47 UTC] Re-defining 'wheels' ... OK
+
+car <- my_injector$get("car")
+#> [2016-08-03T22:25:47 UTC] Making 'car' ...
+#> [2016-08-03T22:25:47 UTC] * Visiting and defining dependencies ...
+#> [2016-08-03T22:25:47 UTC] * Constructing dependency graph ... OK
+#> [2016-08-03T22:25:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2016-08-03T22:25:47 UTC] * Evaluating new and outdated dependencies ...
+#> [2016-08-03T22:25:47 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2016-08-03T22:25:47 UTC] DONE ('car')
+
+car$start(); car$drive("150 km/h", "the University of Lausanne"); car$stop()
+#> Car started.
+#> Engine started.
+#> Brand-new wheels rolling.
+#> Car driving at 150 km/h to the University of Lausanne.
+#> Brand-new wheels braking.
+#> Engine stopped.
+#> Car stopped
+```
+
+Notice that the injector did only re-evaluate `wheels` and `car`, while `engine` was kept untouched: modulr treats modules as [singletons](https://en.wikipedia.org/wiki/Singleton_pattern).
+
+Asking for dependencies solves the issue of hard coding, but it also means that the injector needs to be passed throughout the application. Passing the injector breaks the [Law of Demeter](http://en.wikipedia.org/wiki/Law_of_Demeter). To remedy this, we combine the use of an ambient injector (a default injector is bound to modulr) and a declarative notation, to hand the responsibility of creating modules over the injector, as in this example:
+
+
+
+
+```r
+"car" %requires% list(engine = "engine", wheels = "wheels") %provides% car_provider
+#> [2016-08-03T22:25:47 UTC] Defining 'car' ... OK
+
+"engine" %provides% engine_provider
+#> [2016-08-03T22:25:47 UTC] Defining 'engine' ... OK
+
+"wheels" %provides% wheels_provider
+#> [2016-08-03T22:25:47 UTC] Defining 'wheels' ... OK
+
+car <- make("car")
+#> [2016-08-03T22:25:47 UTC] Making 'car' ...
+#> [2016-08-03T22:25:47 UTC] * Visiting and defining dependencies ...
+#> [2016-08-03T22:25:47 UTC] * Constructing dependency graph ... OK
+#> [2016-08-03T22:25:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2016-08-03T22:25:47 UTC] * Evaluating new and outdated dependencies ...
+#> [2016-08-03T22:25:47 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2016-08-03T22:25:47 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
+#> [2016-08-03T22:25:47 UTC] DONE ('car')
+
+car$start(); car$drive("120 km/h", "the University of Lausanne"); car$stop()
+#> Car started.
+#> Engine started.
+#> Wheels rolling.
+#> Car driving at 120 km/h to the University of Lausanne.
+#> Wheels braking.
+#> Engine stopped.
+#> Car stopped
+```
+
+When modulr _makes_ a module, it asks the ambient injector to create the dependencies. The injector infers the names of the dependencies by examining the module declaration, constructs the related [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) and computes a [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) to produce a well ordered sequence of evaluations. This is all done behind the scenes.
+
+
+```r
+# Read from right to left to follow the dependencies.
+plot_dependencies()
+```
+
+<!--html_preserve--><div id="htmlwidget-2545" style="width:672px;height:480px;" class="sankeyNetwork"></div>
+<script type="application/json" data-for="htmlwidget-2545">{"x":{"links":{"source":[0,1],"target":[2,2],"value":[1,1]},"nodes":{"name":["engine","wheels","car"],"group":["engine","wheels","car"]},"options":{"NodeID":"node","NodeGroup":"node","LinkGroup":null,"colourScale":"d3.scale.category20()","fontSize":10,"fontFamily":null,"nodeWidth":15,"nodePadding":10,"units":"","margin":{"top":null,"right":null,"bottom":null,"left":null},"iterations":32}},"evals":[]}</script><!--/html_preserve-->
+
+This is the best outcome. The application code simply declares the dependencies it needs, without having to deal with the injector. This setup does not break the Law of Demeter.
+
+Finally, here is how the above example typically looks like with the use of modulr DI's philosophy and implementation:
+
+
+
+
+```r
+library(modulr)
+
+"car" %requires% list(
+  engine = "engine"
+) %provides% {
+  #' This module can start, drive and stop a car.
+  # It just returns a list of methods.
+  list(
+    start = function() {
+      message("Car started.")
+      engine$start()
+    },
+    drive = function(speed, destination) {
+      wheels$roll()
+      message("Car driving at ", speed, " to ", destination, ".")
+      wheels$brake()
+    },
+    stop = function() {
+      engine$stop()
+      message("Car stopped")
+    }
+  )
+}
+#> [2016-08-03T22:25:47 UTC] Defining 'car' ... OK
+
+"engine" %provides% {
+  #' This module can start and stop an engine.
+  list(
+    start = function() message("Engine started."),
+    stop = function() message("Engine stopped.")
+  )
+}
+#> [2016-08-03T22:25:47 UTC] Defining 'engine' ... OK
+
+"wheels" %provides% {
+  #' This module can roll and brake wheels.
+  list(
+    roll = function() message("Wheels rolling."),
+    brake = function() message("Wheels braking."),
+  )
+}
+#> [2016-08-03T22:25:48 UTC] Defining 'wheels' ... OK
+
+info("car") ## `info()` outputs #'-comments (aka docstrings)
+#> This module can start, drive and stop a car.
+
+car %<=% "car" ## syntactic sugar for `<- make(`
+#> [2016-08-03T22:25:48 UTC] Making 'car' ...
+#> [2016-08-03T22:25:48 UTC] * Visiting and defining dependencies ...
+#> [2016-08-03T22:25:48 UTC] * Constructing dependency graph ... OK
+#> [2016-08-03T22:25:48 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...
+#> [2016-08-03T22:25:48 UTC] DONE ('car')
+
+car$start(); car$drive("the speed of light", "the boundaries of the universe"); car$stop()
+#> Car started.
+#> Engine started.
+#> Wheels rolling.
+#> Car driving at the speed of light to the boundaries of the universe.
+#> Wheels braking.
+#> Engine stopped.
+#> Car stopped
+```
+
+## Other Advantages
+
+* Modulr helps to circumvent an error occurring in a chain of nested dependent modules, showing __breadcrumbs__ that keep track of locations among dependencies.
+* Modulr understands [R Markdown](http://rmarkdown.rstudio.com/) and [Sweave](https://www.statistik.lmu.de/~leisch/Sweave/), thanks to Yihui Xie's [knitr](http://yihui.name/knitr/) package.
+* Modulr offers [docstrings](https://en.wikipedia.org/wiki/Docstring)-like comments for documenting the internals of a module.
+* Modulr takes advantage of [semantic versioning](http://semver.org/) to avoid _version lock_ and _version promiscuity_.
+* Modulr allows parallelization using [futures](https://en.wikipedia.org/wiki/Futures_and_promises), thanks to Henrik Bengtsson's [future](https://github.com/HenrikBengtsson/future) package.
+* Modulr can use [GitHub](http://github.com) (repositories and gists) to publish and share modules (so-called _gears_). See [`modulr/vault`](https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3) for an example.
+* Modulr implements __package isolation__ as an experimental feature: following the philosophy of Jim Hester's [withr](https://github.com/jimhester/withr) package, the 'with_' method `with_no_packages()` can be used to run code with temporarily no loaded or attached R packages.
+
+To get started, please read the introduction vignette: `vignette("introduction", package = "modulr")`.
 
 ## Installation
 
@@ -66,146 +372,23 @@ devtools::install_github("aclemen1/modulr")
 ``` r
 install.packages("devtools")
 devtools::install_github("hadley/devtools")
-devtools::install_github("hadley/assertthat")
 devtools::install_github("aclemen1/modulr@devel")
 ```
 
 If you encounter a clear bug, please [file a minimal reproducible example](https://github.com/aclemen1/modulr/issues).
 
-## A short example
+## Real World Application
 
-To get started with `modulr`, let us consider the following situation. 
-Suppose that a university needs to compute its student-teacher ratio. 
-This requires to gather at least a dataset about students and a 
-dataset about teachers. Due to the organization of the university, 
-suppose furthermore that these datasets are accessible, 
-kept and/or maintained by different people. Alice, say, 
-knows everything about students, when teachers have no secret for Bob. 
-To start with our calculation of a student-teacher ratio, let's ask Alice to 
-provide us with a usable dataset.
-
-
-```r
-library(modulr)
-
-# This module provides a dataset relating students and their inscriptions to courses.
-# Alice is the maintainer of this module.
-"data/students" %provides%
-  function() {
-    students <- data.frame(
-      id = c(1, 2, 2, 3, 3, 3),
-      course = c("maths", "maths", "physics", "maths", "physics", "chemistry"),
-      stringsAsFactors = F)
-    return(students)
-  }
-#> [2016-05-30T23:56:46 CEST] Defining 'data/students' ...
-#> OK
-```
-
-The anatomy of this module is very simple: "data/student" is its name and the 
-body of the function following the `%provides%` operator (which is part of a 
-_syntactic sugar_ for the more verbose `define` function) contains its core 
-functionality, namely returning the required data frame.
-
-It is important to note that no intrinsic computation takes place in this 
-**definition** process. The DI framework simply **registers** the module, 
-thus relaying the actual evaluation of its body to another **making** stage, 
-as we'll see below.
-
-In parallel, let's ask Bob to provide us with a similar module.
-
-
-```r
-# This module provides a dataset relating teachers and their courses.
-# Bob is the maintainer of this module.
-"data/teachers" %provides%
-  function() {
-    teachers <- data.frame(
-      id = c(1, 2, 3),
-      course = c("maths", "physics", "chemistry"),
-      stringsAsFactors = F)
-    return(teachers)
-  }
-#> [2016-05-30T23:56:46 CEST] Defining 'data/teachers' ...
-#> OK
-```
-
-Now that we have these two modules at our disposal, let's combine them into 
-another module that returns a (bad) student-teacher ratio.
-
-
-```r
-"bad_stat/student_teacher_ratio" %requires%
-  list(
-    students = "data/students",
-    teachers = "data/teachers"
-  ) %provides%
-  function(students, teachers) {
-    ratio <- length(unique(students$id)) / length(unique(teachers$id))
-    return(ratio)
-  }
-#> [2016-05-30T23:56:46 CEST] Defining 'bad_stat/student_teacher_ratio' ...
-#> OK
-```
-
-The `%requires%` operator allows us to specify the modules we rely on for the 
-calculation we provide. This list of **dependencies** assigns some arbitrary and
-ephemeral names to the required modules. These are those names that are then 
-used to call objects into which the results of the required modules are 
-**injected**, and available for use in the body of the module's definition.
-
-It is now time to see the DI framework in action.
-
-
-```r
-bad_ratio %<=% "bad_stat/student_teacher_ratio"
-#> [2016-05-30T23:56:46 CEST] Making 'bad_stat/student_teacher_ratio' ...
-#> [2016-05-30T23:56:46 CEST] * Visiting and defining dependencies ...
-#> [2016-05-30T23:56:46 CEST] * Constructing dependency graph ...
-#> OK
-#> [2016-05-30T23:56:46 CEST] * Sorting 2 dependencies with 2 relations ...
-#> on 1 layer,
-#> OK
-#> [2016-05-30T23:56:46 CEST] * Evaluating new and outdated dependencies ...
-#> [2016-05-30T23:56:46 CEST] ** Evaluating #1/2 (layer #1/1): 'data/teachers' ...
-#> [2016-05-30T23:56:46 CEST] ** Evaluating #2/2 (layer #1/1): 'data/students' ...
-#> [2016-05-30T23:56:46 CEST] DONE ('bad_stat/student_teacher_ratio')
-```
-
-We say that the `%<=%` operator **makes** the module given on its 
-right-hand side. Obviously, there are three modules involved in this process, 
-namely `[data/student]` and `[data/teachers]` which are independent on a first 
-_layer_, and `[bad_stat/student_teacher_ratio]` which depends on them on a 
-second layer. Under the hood, the framework figures out the directed acyclic 
-graph (DAG) of the dependencies and computes a topological sort, grouped by 
-independent modules into layers. 
-
-
-
-
-```r
-plot_dependencies("bad_stat/student_teacher_ratio")
-```
+This is the dependency graph of a module which exposes tidy, exhaustive, statistics-ready, and daily HR data for the University of Lausanne, Switzerland. These modules have been developped and are maintained by a small team of Data Scientists. Although not shown here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in mission critical applications since March 2015.
 
 ![](README-fig1.png)
 
-All the modules are then evaluated in order and
-the final result is assigned to the variable on the left-hand side of the `%<=%` operator.
+## Related Approaches
 
-
-```r
-print(bad_ratio)
-#> [1] 1
-```
-
-## A Real-World Usage
-
-This is the dependency graph of a module which exposes daily HR data for
-the University of Lausanne, Switzerland. All modules have been developed by
-four data scientists in three months. Although not shown here, many of these modules are reused for other purposes.
-
-![](README-fig3.png)
+* Lev Kuznetsov's [injectoR](http://dfci-cccb.github.io/injectoR) package.
+* Konrad Rudolph's [modules](http://github.com/klmr/modules) package.
+* Rich FitzJohn's [remake](http://github.com/richfitz/remake) package.
 
 ## Code of Conduct
 
-This project adheres to the [Open Code of Conduct](http://todogroup.org/opencodeofconduct/#modulr/alain.clement-pavon@unil.ch). By participating, you are expected to honor this code.
+In order to have a more open and welcoming community, modulr adheres to a [Contributor Code of Conduct](CONDUCT.md). Please adhere to this code of conduct in any interactions you have in the modulr community. It is strictly enforced on all official modulr repositories, websites, and resources. If you encounter someone violating these terms, please let the maintainer know and he will address it as soon as possible.

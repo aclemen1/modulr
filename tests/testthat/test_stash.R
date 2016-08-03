@@ -7,7 +7,7 @@ test_that("stash() stashes internals to the modulr environment", {
   stash()
   expect_equal(length(.modulr_env$injector$stash), 1)
   stashed <- .modulr_env$injector$stash[[1]]
-  expect_equal(stashed$register, .modulr_env$injector$register)
+  expect_equal(stashed$registry, .modulr_env$injector$registry)
   expect_equal(stashed$.Last.name, .modulr_env$injector$.Last.name) # Exclude Linting
   expect_equal(stashed$config, .modulr_env$injector$config)
   expect_equal(stashed$verbosity, .modulr_env$injector$verbosity)

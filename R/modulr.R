@@ -27,6 +27,17 @@ NULL
 }
 
 .default_injector <- new.env(parent = emptyenv())
+.default_injector$get <- function(...) {
+  injector_ <- set_default_injector()
+  on.exit(set_injector(injector_))
+  make(...)
+}
+.default_injector$provider <- function(...) {
+  injector_ <- set_default_injector()
+  on.exit(set_injector(injector_))
+  define(...)
+}
+
 .set_injector(injector = .default_injector)
 
 #' @title Create, Set, and Get Injectors (Modulr Internal States).
@@ -94,11 +105,23 @@ new_injector <- function() {
 
   .set_injector(injector = injector)
 
-  if (!.is_defined("modulr")) .define_modulr()
+  if (!.is_defined("modulr")) define_modulr()
 
   root_config$set(DEFAULT_ROOT_CONFIG)
 
   .set_injector(injector = injector_)
+
+  injector$get <- function(...) {
+    injector_ <- set_injector(injector)
+    on.exit(set_injector(injector_))
+    make(...)
+  }
+
+  injector$provider <- function(...) {
+    injector_ <- set_injector(injector)
+    on.exit(set_injector(injector_))
+    define(...)
+  }
 
   injector
 }
@@ -120,6 +143,12 @@ set_injector <- function(injector = new_injector()) {
   .set_injector(injector = injector)
 
   injector_
+}
+
+#' @rdname injector
+#' @export
+set_default_injector <- function() {
+  set_injector(.default_injector)
 }
 
 #' @rdname injector

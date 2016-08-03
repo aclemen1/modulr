@@ -5,14 +5,14 @@
 
     loaded <- FALSE
 
-    register <- .modulr_env$injector$register
+    registry <- .modulr_env$injector$registry
     .Last.name <- .modulr_env$injector$.Last.name
     config <- .modulr_env$injector$config
     verbosity <- .modulr_env$injector$verbosity
     stash <- .modulr_env$injector$stash
 
     rollback <- function() {
-      .modulr_env$injector$register <- register
+      .modulr_env$injector$registry <- registry
       .modulr_env$injector$.Last.name <- .Last.name
       .modulr_env$injector$config <- config
       .modulr_env$injector$verbosity <- verbosity
@@ -60,13 +60,32 @@
 
     } else if (tolower(tools::file_ext(path)) %in% c("rmd", "rnw")) {
 
-      unnamed_chunk_label_opts <- knitr::opts_knit$get("unnamed.chunk.label")
+      opat <- knitr::knit_patterns$get()
+      oopts_knit <- knitr::opts_knit$get()
+      oopts_template <- knitr::opts_template$get()
+      oopts_hooks <- knitr::opts_hooks$get()
+      oopts_chunk <- knitr::opts_chunk$get()
+      oopts_current <- knitr::opts_current$get()
+
+      knitr::knit_patterns$restore()
+      on.exit(knitr::knit_patterns$set(opat), add = TRUE)
+      knitr::opts_knit$restore()
+      on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
+      knitr::opts_template$restore()
+      on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
+      knitr::opts_hooks$restore()
+      on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
+      knitr::opts_chunk$restore()
+      on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
+      knitr::opts_current$restore()
+      on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
 
       knitr::opts_knit$set("unnamed.chunk.label" =
-                             paste("modulr", name, sep = "/"))
+                           paste("modulr", path, sep = "-"))
 
-      script <- knitr::knit(text = readChar(path, file.info(path)$size),
-                            tangle = TRUE, quiet = TRUE)
+      script <-
+        knitr::knit(text = readChar(path, file.info(path)[["size"]]),
+                    tangle = TRUE, quiet = TRUE)
 
       tryCatch({
         local(eval(parse(text = script, keep.source = TRUE)))
@@ -78,12 +97,10 @@
         stop(e)
       })
 
-      knitr::opts_knit$set("unnamed.chunk.label" = unnamed_chunk_label_opts)
-
     }
 
     loaded_names <-
-      setdiff(names(.modulr_env$injector$register), names(register))
+      setdiff(names(.modulr_env$injector$registry), names(registry))
     if (loaded)
       loaded_names <- c(name, loaded_names)
     loaded_names <- unique(loaded_names)
@@ -101,9 +118,9 @@
     }
 
     Map(function(name_) {
-      .modulr_env$injector$register[[c(name_, "storage")]] <- "on-disk"
-      .modulr_env$injector$register[[c(name_, "filepath")]] <- path
-      .modulr_env$injector$register[[c(name_, "along")]] <-
+      .modulr_env$injector$registry[[c(name_, "storage")]] <- "on-disk"
+      .modulr_env$injector$registry[[c(name_, "filepath")]] <- path
+      .modulr_env$injector$registry[[c(name_, "along")]] <-
         ifelse(isTRUE(name_ != along), along, NA_character_)
     },
     loaded_names)
@@ -261,7 +278,7 @@ load_all_modules <- function(
 
       if (.is_defined(loaded_module)) {
         Map(function(dependency) iteration(dependency, name),
-          .modulr_env$injector$register[[c(loaded_module, "dependencies")]])
+          .modulr_env$injector$registry[[c(loaded_module, "dependencies")]])
       }
 
     }

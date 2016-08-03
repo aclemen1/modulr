@@ -14,7 +14,7 @@
 
     assert_that(.is_defined(name))
 
-    dependencies <- .modulr_env$injector$register[[c(name, "dependencies")]]
+    dependencies <- .modulr_env$injector$registry[[c(name, "dependencies")]]
     resolved_dependencies <-
       unname(named_dependencies[names_of_deps %in% dependencies])
 
@@ -110,7 +110,7 @@
     Reduce(rbind, Map(function(name) {
 
       deps <-
-        factor(unlist(.modulr_env$injector$register[[c(name, "dependencies")]]),
+        factor(unlist(.modulr_env$injector$registry[[c(name, "dependencies")]]),
                levels = group)
 
       data.frame(

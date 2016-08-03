@@ -121,7 +121,7 @@ do_run_async <- function(name = .Last.name, args = list(),
   }
 
   restitute_ <- function(result) {
-      if ("try-error" %in% class(result)) {
+      if (inherits(result, "try-error")) {
         stop(attr(result, "condition"))
       } else {
         return(result)

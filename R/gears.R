@@ -20,15 +20,15 @@
   } else if (identical(body(provider), body(options_provider_))) {
     provider_sugar <- "%provides_options%"
     provider_string <-
-      paste(deparse(parent.env(environment(provider))$args,
-                  width.cutoff = 78L),
+      paste(deparse(as.list(get("options", environment(provider))),
+                  width.cutoff = 78L, control = "useSource"),
             collapse = "\n")
   } else {
     provider_sugar <- "%provides%"
     provider_string <- .function_to_string(provider)
   }
 
-  dependencies <- .modulr_env$injector$register[[name]]$dependencies
+  dependencies <- .modulr_env$injector$registry[[name]]$dependencies
   if (isTRUE(length(dependencies) > 0)) {
     if (length(dependencies) == 1) {
       deps <-
@@ -61,7 +61,7 @@
 
   assert_that(.is_defined(name))
 
-  url <- .modulr_env$injector$register[[c(name, "url")]]
+  url <- .modulr_env$injector$registry[[c(name, "url")]]
 
   if (!is.null(url)) {
     sprintf(
@@ -74,7 +74,7 @@
         "#   \"%3$s\"",
         "", sep = "\n"),
       name,
-      .modulr_env$injector$register[[c(name, "digest")]],
+      .modulr_env$injector$registry[[c(name, "digest")]],
       url)
   }
 
@@ -174,7 +174,7 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
           "#   \"%3$s\"",
           sep = "\n"),
         name,
-        .modulr_env$injector$register[[c(name, "digest")]],
+        .modulr_env$injector$registry[[c(name, "digest")]],
         ifelse(is.null(url), "<URL>", url)),
       sprintf("```"), sep = "\n"),
     paste(

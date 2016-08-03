@@ -23,14 +23,14 @@ test_that("import_module imports modules", {
     expect_equal(import_module("module", "fake_url"), "remote")
   )})
 
-test_that("import_module stores url to the register", {
+test_that("import_module stores url to the registry", {
   reset()
   with_mock(
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module", NULL, function() NULL)\n"remote"',
     import_module("module", "fake_url"),
-    expect_equal(.modulr_env$injector$register[[c("module", "url")]],
+    expect_equal(.modulr_env$injector$registry[[c("module", "url")]],
                  "fake_url")
   )
 })

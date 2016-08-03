@@ -82,7 +82,7 @@
 }
 
 #' @title Configurations.
-#' @description Getters and setters for various configurations.
+#' @description Getters and setters for various injector configurations.
 #' @format A list of getters and setters for a configuration.
 #'  \preformatted{
 #'  unset()

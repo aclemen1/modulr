@@ -312,11 +312,11 @@
     filtered_attr <- lapply(filtered, attr, "storage")
     filtered_criterion <- paste(filtered_str, filtered_attr, sep = "$")
     ordering <- order(filtered_str, na.last = TRUE)
-    versions <-
+    filtered <-
       filtered[ordering][!duplicated(filtered_criterion)[ordering]]
   }
 
-  as.list(versions)
+  as.list(filtered)
 }
 
 # Transform a named list of versions with 'storage' attributes into a structured
@@ -443,12 +443,11 @@
     lapply(as.list(on_disk_versions), `attr<-`, "storage", "on-disk")
 
   # looking for in-memory candidates
-
   pattern <- paste0(
     "^", sprintf("(?:%s)", parsed_name[["namespace"]]),
     .version_hash_string_regex, "?$")
   mods <- grep(pattern,
-               names(.modulr_env$injector$register),
+               names(.modulr_env$injector$registry),
                value = TRUE)
   in_memory_versions <-
     do.call(c, lapply(Map(.parse_version, mods), `[[`, "version"))
@@ -501,6 +500,8 @@
 # Extract the name of a module definition in a file.
 .extract_name <- function(filepath, namespace = NULL, version = NA) {
 
+  # TODO BUG there is a problem here when called from a Rnw file!
+
   assert_that(file.exists(filepath))
   assert_that(is.null(namespace) || .is_namespace(namespace))
   assert_that(is.na(version) || .is_version(version))
@@ -531,12 +532,40 @@
   }
 
   if (tolower(tools::file_ext(filepath)) %in% c("rmd", "rnw")) {
+
+    opat <- knitr::knit_patterns$get()
+    oopts_knit <- knitr::opts_knit$get()
+    oopts_template <- knitr::opts_template$get()
+    oopts_hooks <- knitr::opts_hooks$get()
+    oopts_chunk <- knitr::opts_chunk$get()
+    oopts_current <- knitr::opts_current$get()
+
+    knitr::knit_patterns$restore()
+    on.exit(knitr::knit_patterns$set(opat), add = TRUE)
+    knitr::opts_knit$restore()
+    on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
+    knitr::opts_template$restore()
+    on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
+    knitr::opts_hooks$restore()
+    on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
+    knitr::opts_chunk$restore()
+    on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
+    knitr::opts_current$restore()
+    on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
+
+    knitr::opts_knit$set("unnamed.chunk.label" =
+                         paste("modulr", filepath, sep = "-"))
+
     script <-
       knitr::knit(text = readChar(filepath, file.info(filepath)[["size"]]),
                   tangle = TRUE, quiet = TRUE)
+
     args <- list(text = script)
+
   } else {
+
     args <- list(file = filepath)
+
   }
 
   # Usually, the module is defined in the first expressions, so we parse the

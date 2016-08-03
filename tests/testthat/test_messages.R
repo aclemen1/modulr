@@ -2,22 +2,22 @@ context("messages")
 
 test_that(".message_meta outputs non-NULL messages", {
   set_verbosity(+Inf)
-  expect_message(.message_meta("hello world", ok = F), regexp = "hello world")
-  expect_message(.message_meta("hello world", ok = T), regexp = "hello world")
-  expect_message(.message_meta("hello world", ok = T), regexp = "OK")
+  expect_output(.message_meta("hello world", ok = F), regexp = "hello world")
+  expect_output(.message_meta("hello world", ok = T), regexp = "hello world")
+  expect_output(.message_meta("hello world", ok = T), regexp = "OK")
   expect_null(.message_meta(NULL, ok = F))
   expect_null(.message_meta(NULL, ok = T))
 })
 
 test_that(".message_meta outputs messages according to verbosity", {
   set_verbosity(+Inf)
-  expect_message(.message_meta("hello world", verbosity = 1000),
+  expect_output(.message_meta("hello world", verbosity = 1000),
                  regexp = "hello world")
   set_verbosity(2)
-  expect_message(.message_meta("hello world", verbosity = 1),
+  expect_output(.message_meta("hello world", verbosity = 1),
                  regexp = "hello world")
   set_verbosity(1)
-  expect_message(.message_meta("hello world", verbosity = 1),
+  expect_output(.message_meta("hello world", verbosity = 1),
                  regexp = "hello world")
   set_verbosity(0)
   expect_null(.message_meta("hello world", verbosity = 1))
@@ -35,18 +35,18 @@ test_that(".message_meta evaluates expressions in the calling env", {
 })
 
 test_that(".message_meta increments and decrements level with nested calls", {
-  expect_message(.message_meta("level0"), regexp = "[^*]\\ level0" )
-  expect_message(.message_meta("level0", expr = {
-    expect_message(.message_meta("level1", expr = {
-      expect_message(.message_meta("level2"), regexp = "[^*]\\*\\*\\ level2")
-      expect_message(.message_meta("level2bis"),
+  expect_output(.message_meta("level0"), regexp = "[^*]\\ level0" )
+  expect_output(.message_meta("level0", expr = {
+    expect_output(.message_meta("level1", expr = {
+      expect_output(.message_meta("level2"), regexp = "[^*]\\*\\*\\ level2")
+      expect_output(.message_meta("level2bis"),
                      regexp = "[^*]\\*\\*\\ level2bis")
     }),
     regexp = "[^*]\\*\\ level1")
-    expect_message(.message_meta("level1bis"), regexp = "[^*]\\*\\ level1bis")
+    expect_output(.message_meta("level1bis"), regexp = "[^*]\\*\\ level1bis")
   }),
   regexp = "[^*]\\ level0")
-  expect_message(.message_meta("level0bis"), regexp = "[^*]\\ level0bis" )
+  expect_output(.message_meta("level0bis"), regexp = "[^*]\\ level0bis" )
 })
 
 test_that(".parse_message_args parse core args and other args", {

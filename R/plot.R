@@ -45,15 +45,15 @@ plot_dependencies <- function(group, reserved = TRUE) {
     assertthat::is.flag(reserved)
   )
 
-  universe <- .modulr_env$injector$register
+  universe <- .modulr_env$injector$registry
+  namespaces <-
+    unlist(lapply(lapply(names(universe), .parse_name), `[[`, "namespace"))
 
   if (!missing(group)) {
 
     sub <- .define_all_dependent_modules(group)
 
-    register <- .modulr_env$injector$register
-
-    universe <- register[names(register) %in% sub]
+    universe <- universe[namespaces %in% sub]
 
   }
 
@@ -62,7 +62,7 @@ plot_dependencies <- function(group, reserved = TRUE) {
     deps <- Reduce(rbind, Map(function(module) {
 
       deps <- intersect(unlist(module$dependencies),
-                        names(universe))
+                        namespaces)
 
       data.frame(module = deps, dependency = rep(module$name, length(deps)),
                  # MAYBE: adapt values for nicer output
@@ -75,9 +75,9 @@ plot_dependencies <- function(group, reserved = TRUE) {
 
     if (!reserved) {
 
-      deps <-
-        deps[!(deps$module %in% RESERVED_NAMES |
-                   deps$dependency %in% RESERVED_NAMES), ]
+      deps <- deps[
+        !vapply(deps$module, FUN = .is_regular, FUN.VALUE = TRUE) &
+          !vapply(deps$dependency, FUN = .is_regular, FUN.VALUE = TRUE), ]
 
     }
 

@@ -160,6 +160,78 @@ test_that(".resolve_name resolves a module", {
     )[names(resolved[[2]])]
   )
 
+  # Testing that an in-memory module if resolved correctly.
+  reset()
+  define("test#1.1.1", NULL, NULL)
+  expect_equal(
+    .resolve_name("test", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#1.1.1", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#1.1.0", all = FALSE)[["resolved"]],
+    list()
+  )
+  expect_equal(
+    .resolve_name("test#~1.1.0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#~1.1.2", all = FALSE)[["resolved"]],
+    list()
+  )
+  expect_equal(
+    .resolve_name("test#^1.1.0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#^1.0.0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#^1.2.0", all = FALSE)[["resolved"]],
+    list()
+  )
+  expect_equal(
+    .resolve_name("test#>=1.1.0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#>=1.1", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#>=1", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#>=1.0.0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#>=1.0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#>=0.0.0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#>=0.0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#>=0", all = FALSE)[["resolved"]][[1L]][["version"]],
+    numeric_version("1.1.1")
+  )
+  expect_equal(
+    .resolve_name("test#>=2.0.0", all = FALSE)[["resolved"]],
+    list()
+  )
+
   # Testing that if an in-memory module has a corresponding on-disk instance
   # with same version number, we keep the on-disk module only.
   reset()
@@ -1010,7 +1082,19 @@ test_that(".filter_versions filters versions", {
       ), na_version, NA),
     list(v100, na_version)
   )
+  expect_equal(
+    .filter_versions(list(v100), v100, NA),
+    list(v100)
+  )
   v101 <- numeric_version("1.0.1")
+  expect_equal(
+    .filter_versions(list(v100, v101), v100, NA),
+    list(v100)
+  )
+  expect_equal(
+    .filter_versions(list(v101), v100, NA),
+    list()
+  )
   v110 <- numeric_version("1.1.0")
   v111 <- numeric_version("1.1.1")
   v200 <- numeric_version("2.0.0")

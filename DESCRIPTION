@@ -1,7 +1,7 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9111
-Date: 2016-06-28
+Version: 0.1.7.9112
+Date: 2016-08-04
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
     programs into discrete, modular units that are loosely coupled,
@@ -32,6 +32,8 @@ Imports:
     httr
 Suggests:
     rstudioapi,
+    devtools,
+    future,
     base64enc,
     dplyr,
     htmltools,
@@ -42,7 +44,8 @@ Suggests:
     gistr,
     rmarkdown,
     memoise,
-    webshot
+    webshot,
+    withr
 License: MIT + file LICENSE
 Encoding: UTF-8
 Collate:
@@ -53,6 +56,7 @@ Collate:
     'config.R'
     'dag.R'
     'define.R'
+    'future.R'
     'gears.R'
     'import.R'
     'info.R'
@@ -65,6 +69,8 @@ Collate:
     'run.R'
     'special.R'
     'stash.R'
+    'with.R'
     'zzz.R'
 NeedsCompilation: no
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1

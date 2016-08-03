@@ -25,7 +25,7 @@
 
     out <- paste0(out, msg, ifelse(ok, " ... ", ""))
 
-    message(out, appendLF = !ok)
+    cat(out); if (!ok) cat("\n")
 
   }
 
@@ -33,7 +33,9 @@
 
   if (!is.null(expr)) eval(expr)
 
-  if (ok && verbose && !is.null(msg)) message("OK", appendLF = TRUE)
+  if (ok && verbose && !is.null(msg)) {
+    cat("OK\n")
+  }
 
 }
 

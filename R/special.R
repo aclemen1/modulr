@@ -69,7 +69,7 @@ RESERVED_NAMES <- c(MODULR_NAMESPACE)
 #'   message_info message_warn message_stop
 NULL
 
-.define_modulr <- function() {
+define_modulr <- function() {
 
   define(MODULR_NAME, list(), function() {
 
@@ -154,7 +154,7 @@ NULL
       # nocov start
       resolve_path = function(...) {
         .deprecated("$get_dirname', 'find_module' or 'find_path",
-                    old = "$resolve_path")
+                            old = "$resolve_path")
         eval(.deprecated_resolve_path(...), envir = parent.frame(1L))
       },
       # nocov end
@@ -251,33 +251,17 @@ NULL
 #' @export
 options_provider <- function(...) {
 
-  args <- substitute(as.list(c(...))) # Exclude Linting
-
-  environment(options_provider_) <- environment()
-
-  return(options_provider_)
+  enclos <- force(parent.frame())
+  env <- new.env(parent = enclos)
+  env$options <- substitute(as.list(c(...)))
+  environment(options_provider_) <- env
+  options_provider_
 
 }
 
 options_provider_ <- function() {
   #' Options module which exposes an R environment. See ?options_provider.
-
-  args <- eval(args, envir = environment())
-
-  assert_that(
-    length(args) == 0 || (
-      !is.null(names(args)) && all(names(args) != "")),
-    msg = "arguments are not all named.")
-
-  options <- new.env(parent = emptyenv())
-
-  vapply(names(args), function(name) {
-    options[[name]] <- args[[name]]
-    NA
-  },
-  FUN.VALUE = NA)
-
-  return(options)
+  as.environment(eval(get("options", inherits = TRUE)))
 }
 
 #' @export
