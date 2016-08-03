@@ -202,10 +202,25 @@ car$start(); car$drive("120 km/h", "the University of Lausanne"); car$stop()
 
 When modulr _makes_ a module, it asks the ambient injector to create the dependencies. The injector infers the names of the dependencies by examining the module declaration, constructs the related [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) and computes a [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) to produce a well ordered sequence of evaluations. This is all done behind the scenes.
 
-```{r}
+```{r fig1, echo=F}
+# Do not try to produce a snapshot on Travis CI or CRAN
+if (!identical(Sys.getenv("TRAVIS"), "true") &&
+      identical(Sys.getenv("NOT_CRAN"), "true")) {
+  plot_dependencies() %>%
+    html_print %>%
+    webshot(file = "README-fig2.png", selector = ".sankeyNetwork", delay = 2) %>%
+    resize("730x") %>%
+    shrink()
+}
+```
+
+```{r, echo=T, eval=FALSE}
 # Read from right to left to follow the dependencies.
 plot_dependencies()
 ```
+
+![](README-fig2.png)
+
 
 This is the best outcome. The application code simply declares the dependencies it needs, without having to deal with the injector. This setup does not break the Law of Demeter.
 
