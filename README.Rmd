@@ -326,9 +326,11 @@ This is the dependency graph of a module which exposes tidy, exhaustive, statist
 
 ## Related Approaches
 
+_In alphabetical order._
+
+* Rich FitzJohn's [remake](http://github.com/richfitz/remake) package.
 * Lev Kuznetsov's [injectoR](http://dfci-cccb.github.io/injectoR) package.
 * Konrad Rudolph's [modules](http://github.com/klmr/modules) package.
-* Rich FitzJohn's [remake](http://github.com/richfitz/remake) package.
 
 ## Code of Conduct
 

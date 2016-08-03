@@ -7,6 +7,9 @@
 #'   a future. If NULL, then the current strategy is returned.
 #' @param ... Further arguments passed to \link{get_provider}.
 #'
+#' @section Warning:
+#' This is an experimental feature subject to changes.
+#'
 #' @export
 futurize <- function(
   original_name, name = paste(original_name, "future", sep = "/"),

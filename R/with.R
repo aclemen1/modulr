@@ -274,6 +274,9 @@
 #' packages and packages passed to the \code{ignore} parameter are ignored in
 #' the process.
 #'
+#' @section Warning:
+#' This is an experimental feature subject to changes.
+#'
 #' @seealso \code{\link[withr]{withr}} for examples of 'with_' methods,
 #'   \code{\link{getOption}}, \code{\link{library}}, \code{\link{options}}, and
 #'   \code{\link{search}}.

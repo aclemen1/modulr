@@ -27,6 +27,10 @@ restored, the ordering of the packages on the search path is preserved. Base
 packages and packages passed to the \code{ignore} parameter are ignored in
 the process.
 }
+\section{Warning}{
+
+This is an experimental feature subject to changes.
+}
 \examples{
 with_no_packages({
   message("Look mum, no packages!")

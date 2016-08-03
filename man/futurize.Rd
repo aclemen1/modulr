@@ -22,4 +22,8 @@ a future. If NULL, then the current strategy is returned.}
 \description{
 Tweak a module to a future.
 }
+\section{Warning}{
+
+This is an experimental feature subject to changes.
+}
 
