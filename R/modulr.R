@@ -294,8 +294,9 @@ if (utils::packageVersion("assertthat") >= package_version("0.1.0.99")) {
 set_verbosity <- function(level = 2) {
 
   assertthat::assert_that(assertthat::is.scalar(level))
-
+  olevel <- get_verbosity()
   .modulr_env$injector$verbosity <- level
+  invisible(olevel)
 
 }
 
@@ -304,6 +305,44 @@ set_verbosity <- function(level = 2) {
 get_verbosity <- function() {
 
   .get_0("verbosity", envir = .modulr_env$injector, ifnotfound = 2)
+
+}
+
+#' With verbosity.
+#'
+#' Temporarily change the verbosity.
+#'
+#' @inheritParams set_verbosity
+#' @param code Any object. Code to execute in the temporary environment.
+#'
+#' @return The result of the evaluation of the \code{code} argument.
+#'
+#' @details
+#'
+#' Verbosity is temporarily changed.
+#'
+#' @seealso \code{\link[withr]{withr}} for examples of 'with_' methods,
+#'   \code{\link{get_verbosity}}, and \code{\link{set_verbosity}}.
+#'
+#' @examples
+#' define("foo", NULL, { "bar" })
+#' with_verbosity(-Inf, {
+#'   make("foo")
+#' })
+#'
+#' @export
+with_verbosity <- function(level, code) {
+
+  # nocov start
+  if (!requireNamespace("devtools", quietly = TRUE)) {
+    stop("devtools is needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  # nocov end
+
+  old <- set_verbosity(level = level)
+  on.exit(set_verbosity(old))
+  force(code)
 
 }
 

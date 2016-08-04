@@ -40,7 +40,7 @@
         },
         error = function(e) {
           rollback()
-          e$message <- sprintf("%s. Rolling back.", e$message)
+          e$message <- sprintf("%s Rolling back.", e$message)
           on.exit(try(stop(e), silent = TRUE))
           stop("Rolling back.", call. = FALSE)
         })
@@ -53,7 +53,7 @@
         },
         error = function(e) {
           rollback()
-          e$message <- sprintf("%s. Rolling back.", e$message)
+          e$message <- sprintf("%s Rolling back.", e$message)
           stop(e)
         })
       }
@@ -93,7 +93,7 @@
       },
       error = function(e) {
         rollback()
-        e$message <- sprintf("%s. Rolling back.", e$message)
+        e$message <- sprintf("%s Rolling back.", e$message)
         stop(e)
       })
 

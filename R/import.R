@@ -157,9 +157,11 @@ import_module <- function(name, url, digest = NULL,
       },
       error = function(e) {
         rollback()
-        e$message <- sprintf("%s. Rolling back.", e$message)
+        e$message <- sprintf("%s Rolling back.", e$message)
         stop(e)
       })
+
+    name <- .get_name(name, load = FALSE)
 
     if (.is_undefined(name)) {
       rollback()

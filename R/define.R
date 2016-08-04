@@ -62,15 +62,12 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 
   assert_that(assertthat::is.flag(load))
 
-  if (.is_undefined(name) & load) {
-
-    if (.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
       warning("get_provider is called from within a module.",
               call. = FALSE, immediate. = TRUE)
     }
 
-    load_module(name)
-  }
+  name <- .get_name(name, load)
 
   assert_that(.is_defined(name))
 
@@ -446,20 +443,49 @@ get_dependencies <- function(name = .Last.name, load = FALSE) {
 
   assert_that(assertthat::is.flag(load))
 
-  if (.is_undefined(name) && load) {
-
-    if (.is_called_from_within_module()) {
-      warning("get_dependencies is called from within a module.",
+  if (.is_called_from_within_module()) {
+      warning("get_provider is called from within a module.",
               call. = FALSE, immediate. = TRUE)
     }
 
-    load_module(name)
-  }
+  name <- .get_name(name, load)
 
   assert_that(.is_defined(name))
 
   .modulr_env$injector$registry[[c(name, "dependencies")]]
 
+}
+
+.get_name <- function(name, load) {
+
+  if (.is_undefined(name)) {
+
+    candidates <- .resolve_name(name)[["resolved"]]
+    in_memory <- Filter(function(candidate) {
+      candidate[["storage"]] == "in-memory"
+    },
+    candidates)
+
+    if (length(in_memory) > 0) {
+
+      name <- in_memory[[1]][["name"]]
+    } else if (load) {
+
+      on_disk <- Filter(function(candidate) {
+        candidate[["storage"]] == "on-disk"
+      },
+      candidates)
+
+      if (length(on_disk) > 0) {
+
+        name <- on_disk[[1]][["name"]]
+        load_module(name)
+
+      }
+    }
+  }
+
+  name
 }
 
 #' Get the Provider of a Module.
@@ -511,15 +537,12 @@ get_provider <- function(name = .Last.name, load = FALSE) {
 
   assert_that(assertthat::is.flag(load))
 
-  if (.is_undefined(name) && load) {
-
-    if (.is_called_from_within_module()) {
+  if (.is_called_from_within_module()) {
       warning("get_provider is called from within a module.",
               call. = FALSE, immediate. = TRUE)
     }
 
-    load_module(name)
-  }
+  name <- .get_name(name, load)
 
   assert_that(.is_defined(name))
 
@@ -642,6 +665,8 @@ undefine <- function(name = .Last.name) {
     warning("undefine is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
+
+  name <- .get_name(name, load = FALSE)
 
   assert_that(.is_defined_regular(name))
 

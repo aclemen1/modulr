@@ -5,7 +5,7 @@
 }
 
 assertthat::on_failure(.is_defined) <- function(call, env) {
-  paste0(deparse(eval(call$name, envir = env)), " is undefined.")
+  paste0(deparse(eval(call$name, envir = env)), " is not defined.")
 }
 
 # Test if a module is undefined.
@@ -132,7 +132,7 @@ assertthat::on_failure(.is_reserved) <- function(call, env) {
 assertthat::on_failure(.is_defined_regular) <- function(call, env) {
   paste0(
     deparse(eval(call$name, envir = env)),
-    " is undefined and/or reserved.")
+    " is not defined and/or reserved.")
 }
 
 # Test if a call is made from within a module

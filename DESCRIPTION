@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9113
+Version: 0.1.7.9114
 Date: 2016-08-04
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
@@ -64,12 +64,12 @@ Collate:
     'load.R'
     'make.R'
     'messages.R'
+    'pkgs.R'
     'plot.R'
     'routes.R'
     'run.R'
     'special.R'
     'stash.R'
-    'with.R'
     'zzz.R'
 NeedsCompilation: no
 VignetteBuilder: knitr

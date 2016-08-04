@@ -1,10 +1,15 @@
 ---
-title: "Introduction to modulr"
+title: "Modulr Guide"
 date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_vignette
+output:
+  knitr:::html_vignette:
+    toc: true
+    fig_caption: yes
+  pdf_document:
+    highlight: null
+    number_sections: yes
 vignette: >
-  %\VignetteIndexEntry{Modulr Introduction Guide}
+  %\VignetteIndexEntry{Modulr Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,6 +20,7 @@ library(htmltools)
 library(networkD3)
 require(webshot) # not on CRAN
 library(future)
+library(memoise)
 library(dplyr)
 `%<=%` <- modulr::`%<=%`
 Sys.setlocale("LC_TIME", "en_DK.UTF-8")
@@ -22,25 +28,22 @@ Sys.setenv(TZ = 'UTC')
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "introduction-"
+  fig.path = "guide-"
 )
 ```
 
-# What is modulr?
+# Introduction
 
-Technically, modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) (DI) framework for R. It allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share. 
+Modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) (DI) framework for R. It allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, reuse and share. See the [README file](https://github.com/aclemen1/modulr) for a short introduction.
 
-As every DI framework, modulr aims for a clear separation between code complication and complexity, highlighting the 
-core purpose and behavior of objects (application code), and hiding their construction and wiring (infrastructure code).
+## Anatomy of a module
 
-Less pompously, modulr deals with modules and their dependencies. 
+Modules are defined declaratively using `%requires%` and `%provides%` and have four main components:
 
-Modules are declaratively defined and have four main components:
-
-* A name, which uniquely identifies the module.
-* A list of required dependencies, if any.
-* A provider, which expresses the module's feature(s).
-* An optional docstring, intended to document the module.
+* A __name__, which uniquely identifies the module.
+* A list of required __dependencies__, if any.
+* A __provider__, which expresses the module's feature(s).
+* Optional __docstrings__, intended to document the internals of a module.
 
 A typical module looks like the following:
 
@@ -53,7 +56,7 @@ A typical module looks like the following:
 
 ) %provides% {
 
-  #' a docstring intended to document the module
+  #' a docstring intended to document the internals of the module
   
   # some code that uses the objects `dependency_1` and `dependency_2"
   # returned by the modules "name_of_dependency_1" and "name_of_dependency_2"
@@ -79,7 +82,7 @@ result %<=% "name_of_module"
 
 The result contains the object computed and exposed by the module. Under the hood, the dependencies have been sorted and also made, and their resulting objects injected where required.
 
-# A first, minimal example
+## A first, minimal example
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -96,24 +99,24 @@ Let us start by defining some modules and dependencies:
   f = "foo",
   b = "bar"
 ) %provides% {
-  #' Return a string containing "Hello World!".
+  #' Return a concatenated string.
   paste0(f, " ", b, "!")
 }
 ```
 
-To see a module's docstring, you can use `info`:
+Use `info` to output the docstrings:
 
 ```{r}
 info("foobar")
 ```
 
-To list all the defined modules, you can use `lsmod` (or `list_modules`):
+Use `lsmod` to list all modules and their properties:
 
 ```{r}
 lsmod(cols = c("name", "type", "dependencies", "childs", "size", "modified"))
 ```
 
-As you can see, `foobar` has two dependencies, and `foo` and `bar` both have one child. This can be viewed graphically:
+In this example, `foobar` has two dependencies, and `foo` and `bar` both have one child. Use `plot_dependencies` to see them graphically:
 
 ```{r, echo=F}
 # Do not try to produce a snapshot on Travis CI or CRAN
@@ -133,19 +136,32 @@ plot_dependencies()
 
 ![](introduction-foobar.png)
 
-Let us make the module `foobar` and see what it returns:
+Use `make` get the resulting object provided by the module:
 
 ```{r}
 make("foobar")
 ```
 
-Voilà! All the depencencies have been evaluated, injected and processed by `modulr` to return the expected `"Hello World!"`.
+Voilà! All the depencencies have been evaluated, injected and processed to return the expected `"Hello World!"`.
 
 ```{r}
 lsmod(cols = c("name", "type", "dependencies", "childs", "size", "modified"))
 ```
 
-# Modules are singletons
+## Workflow
+
+TODO: 
+
+- précédence disque -> registre, également pour %imports%
+
+# Types of modules
+
+TODO:
+
+- compiler::cmpfun pour compiler les factories
+
+
+## Modules are singletons
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -164,7 +180,7 @@ Successive make calls on the module will not imply its re-evaluation:
 
 ```{r}
 make("timestamp")
-suppressMessages(make("timestamp"))
+with_verbosity(0, make("timestamp")) # temporarily change the verbosity of make
 ```
 
 To force the re-evaluation of a module, you can use `touch`:
@@ -174,7 +190,7 @@ touch("timestamp")
 make("timestamp")
 ```
 
-Otherwise, modulr will detect any change in the module's definition and re-evaluate accordingly:
+Otherwise, modulr will detect any change in the module's definition (even docstrings) and re-evaluate accordingly:
 
 ```{r}
 "timestamp" %provides% {
@@ -185,7 +201,7 @@ Otherwise, modulr will detect any change in the module's definition and re-evalu
 make("timestamp")
 ```
 
-# Prototyped modules
+## Modules returning a function (prototypes)
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -203,12 +219,12 @@ This is a fact that all modules are singletons. Nonetheless, it is possible for 
 ```{r}
 make("timestamp")()
 
-suppressMessages(make("timestamp")())
+with_verbosity(0, make("timestamp")())
 ```
 
 It is important to emphasize that the module is still a singleton: the second make call doesn't re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called.
 
-# Memoised modules
+## Modules returning a memoised function
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -236,7 +252,7 @@ set_verbosity(1) # messages are shown only when changes occur
 make("foo")
 ```
 
-In this example, `timestamp` is evaluated even though it is not explicitely used by `foo`. It just computes a timestamp, but it could be virtually very time- and/or space-consuming at make-time.
+In this example, `timestamp` is evaluated even though it is not explicitely used by `foo`. It just computes a timestamp, but it could be virtually very resource-consuming at make-time.
 
 Let us re-define `timestamp` as a prototype:
 
@@ -252,7 +268,7 @@ Let us re-define `timestamp` as a prototype:
 make("foo")
 ```
 
-Here, the evaluation consists of defining a function that returns a timestamp, only when the function is explicitely called. Even if the computation encapsulated by the function is very time- and/or space-consuming, no evaluation of the returned function takes place at make-time.
+Here, the evaluation consists of defining a function that returns a timestamp, only when the function is explicitely called. Even if the computation encapsulated by the function is very resource-consuming, no evaluation of the returned function takes place at make-time.
 
 Finally, let us re-define `timestamp` as a memoised module:
 
@@ -304,7 +320,7 @@ touch("foo")
 make("foo")
 ```
 
-# Futurized modules
+## Modules returning a future
 
 Using [Henrik Bengtsson's future package](https://cran.r-project.org/web/packages/future), it is possible to evaluate modules asynchronously using various resources available to the user. For instance, evaluation of modules can be eager, lazy, and/or parallelized (on multiple cores and/or a cluster).
 
@@ -315,17 +331,17 @@ library(future)
 
 ```{r}
 # How many cores are available?
-future::availableCores()
+availableCores()
 
 "foo" %provides% {
-  future::future({
+  future({
     Sys.sleep(2L)
     "Hello"
   }) %plan% multicore
 }
 
 "bar" %provides% {
-  future::future({
+  future({
     Sys.sleep(2L)
     "World"
   }) %plan% multicore
@@ -335,7 +351,7 @@ future::availableCores()
   f = "foo",
   b = "bar"
 ) %provides% {
-  paste0(future::value(f), " ", future::value(b), "!")
+  paste0(value(f), " ", value(b), "!")
 }
 
 system.time(print(make("foobar")))
@@ -357,18 +373,18 @@ modulr::reset()
   paste0(f, " ", b, "!")
 }
 
-futurize("foo", strategy = future::multicore)
-futurize("bar", strategy = future::multicore)
+futurize("foo", strategy = multicore)
+futurize("bar", strategy = multicore)
 
 futurize(
   "foobar", 
   name = "foobar/eager", 
   dependencies = list(f = "foo/future", b = "bar/future"),
-  strategy = future::eager
+  strategy = eager
 )
 
 system.time(fb_eager <- make("foobar/eager"))
-system.time(print(future::value(fb_eager)))
+system.time(print(value(fb_eager)))
 ```
 
 ```{r}
@@ -378,15 +394,22 @@ futurize(
   "foobar", 
   name = "foobar/lazy", 
   dependencies = list(f = "foo/future", b = "bar/future"),
-  strategy = future::lazy
+  strategy = lazy
 )
 
 system.time(fb_lazy <- make("foobar/lazy"))
-system.time(print(future::value(fb_lazy)))
+system.time(print(value(fb_lazy)))
 ```
 
+## Modules returning an environment and option modules
 
-# Mixed modules
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+modulr::reset()
+```
+
+TODO
+
+## Modules returning a list
 
 It is also possible to define modules which simultaneously present the above properties:
 
@@ -403,7 +426,8 @@ modulr::reset()
   list(
     singleton = timestamp(),
     prototype = timestamp,
-    memorandum = memoise(timestamp)
+    memoised = memoise(timestamp),
+    future = future(timestamp()) %plan% multicore
   )
 }
 
@@ -412,21 +436,41 @@ timestamp %<=% "timestamp"
 timestamp$singleton
 timestamp$prototype()
 timestamp$prototype()
-timestamp$memorandum()
-timestamp$memorandum()
+timestamp$memoised()
+timestamp$memoised()
+value(timestamp$future)
 ```
 
 # Organizing modules
 
-# Debugging and testing modules
+## In-memory
+## On-disk
+
+TODO:
+
+- module defined along another module
+
+## Semantic versioning
+
+# Documenting, debugging and testing modules
+
+## Docstrings
+## Breadcrumbs
+
+TODO :
+
+- breakpoints dans RStudio
+
+## Mocks
 
 # Sharing modules
 
-# Frequently asked questions
+## Bundles
+## _Gears_
 
-## Is it possible to encrypt sensitive data within a module?
+# Advanced usage
 
-## How can I deal with various versions of a module?
+## Package isolation
+## Parallelization
 
-## Is it possible to define a module dynamically?
-
+# Scenarios

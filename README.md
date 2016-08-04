@@ -31,29 +31,29 @@ library(modulr)
 # This is our first module definition: 
 # "foo" provides the "Hello" character string.
 "foo" %provides% { "Hello" }
-#> [2016-08-03T23:29:52 UTC] Defining 'foo' ... OK
+#> [2016-08-04T13:20:37 UTC] Defining 'foo' ... OK
 
 # The module "bar" provides "World".
 "bar" %provides% { "World" }
-#> [2016-08-03T23:29:52 UTC] Defining 'bar' ... OK
+#> [2016-08-04T13:20:37 UTC] Defining 'bar' ... OK
 
 # And the module "foobar" requires "foo" and "bar", 
 # and provides a concatenated string.
 "foobar" %requires% list(f = "foo", b = "bar") %provides% {
   paste0(f, " ", b, "!")
 }
-#> [2016-08-03T23:29:52 UTC] Defining 'foobar' ... OK
+#> [2016-08-04T13:20:37 UTC] Defining 'foobar' ... OK
 
 # "foobar" is evaluated and its result bound to a variable.
 result <- make("foobar")
-#> [2016-08-03T23:29:52 UTC] Making 'foobar' ...
-#> [2016-08-03T23:29:52 UTC] * Visiting and defining dependencies ...
-#> [2016-08-03T23:29:52 UTC] * Constructing dependency graph ... OK
-#> [2016-08-03T23:29:52 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2016-08-03T23:29:52 UTC] * Evaluating new and outdated dependencies ...
-#> [2016-08-03T23:29:52 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
-#> [2016-08-03T23:29:52 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
-#> [2016-08-03T23:29:52 UTC] DONE ('foobar')
+#> [2016-08-04T13:20:37 UTC] Making 'foobar' ...
+#> [2016-08-04T13:20:37 UTC] * Visiting and defining dependencies ...
+#> [2016-08-04T13:20:37 UTC] * Constructing dependency graph ... OK
+#> [2016-08-04T13:20:37 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2016-08-04T13:20:37 UTC] * Evaluating new and outdated dependencies ...
+#> [2016-08-04T13:20:37 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
+#> [2016-08-04T13:20:37 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
+#> [2016-08-04T13:20:37 UTC] DONE ('foobar')
 
 cat(result)
 #> Hello World!
@@ -151,13 +151,13 @@ my_injector$provider(
   name = "car", 
   dependencies = list(engine = "engine", wheels = "wheels"), 
   provider = car_provider)
-#> [2016-08-03T23:29:53 UTC] Defining 'car' ... OK
+#> [2016-08-04T13:20:37 UTC] Defining 'car' ... OK
 
 my_injector$provider(name = "engine", provider = engine_provider)
-#> [2016-08-03T23:29:53 UTC] Defining 'engine' ... OK
+#> [2016-08-04T13:20:37 UTC] Defining 'engine' ... OK
 
 my_injector$provider(name = "wheels", provider = wheels_provider)
-#> [2016-08-03T23:29:53 UTC] Defining 'wheels' ... OK
+#> [2016-08-04T13:20:37 UTC] Defining 'wheels' ... OK
 ```
 
 Request our `car` module from the injector.
@@ -165,14 +165,14 @@ Request our `car` module from the injector.
 
 ```r
 car <- my_injector$get("car")
-#> [2016-08-03T23:29:53 UTC] Making 'car' ...
-#> [2016-08-03T23:29:53 UTC] * Visiting and defining dependencies ...
-#> [2016-08-03T23:29:53 UTC] * Constructing dependency graph ... OK
-#> [2016-08-03T23:29:53 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2016-08-03T23:29:53 UTC] * Evaluating new and outdated dependencies ...
-#> [2016-08-03T23:29:53 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
-#> [2016-08-03T23:29:53 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
-#> [2016-08-03T23:29:53 UTC] DONE ('car')
+#> [2016-08-04T13:20:37 UTC] Making 'car' ...
+#> [2016-08-04T13:20:37 UTC] * Visiting and defining dependencies ...
+#> [2016-08-04T13:20:37 UTC] * Constructing dependency graph ... OK
+#> [2016-08-04T13:20:37 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2016-08-04T13:20:37 UTC] * Evaluating new and outdated dependencies ...
+#> [2016-08-04T13:20:37 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2016-08-04T13:20:37 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
+#> [2016-08-04T13:20:37 UTC] DONE ('car')
 
 car$start(); car$drive("120 km/h", "the University of Lausanne"); car$stop()
 #> Car started.
@@ -197,16 +197,16 @@ my_injector$provider(
     )
   }
 )
-#> [2016-08-03T23:29:53 UTC] Re-defining 'wheels' ... OK
+#> [2016-08-04T13:20:37 UTC] Re-defining 'wheels' ... OK
 
 car <- my_injector$get("car")
-#> [2016-08-03T23:29:53 UTC] Making 'car' ...
-#> [2016-08-03T23:29:53 UTC] * Visiting and defining dependencies ...
-#> [2016-08-03T23:29:53 UTC] * Constructing dependency graph ... OK
-#> [2016-08-03T23:29:53 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2016-08-03T23:29:53 UTC] * Evaluating new and outdated dependencies ...
-#> [2016-08-03T23:29:53 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
-#> [2016-08-03T23:29:53 UTC] DONE ('car')
+#> [2016-08-04T13:20:38 UTC] Making 'car' ...
+#> [2016-08-04T13:20:38 UTC] * Visiting and defining dependencies ...
+#> [2016-08-04T13:20:38 UTC] * Constructing dependency graph ... OK
+#> [2016-08-04T13:20:38 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2016-08-04T13:20:38 UTC] * Evaluating new and outdated dependencies ...
+#> [2016-08-04T13:20:38 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2016-08-04T13:20:38 UTC] DONE ('car')
 
 car$start(); car$drive("150 km/h", "the University of Lausanne"); car$stop()
 #> Car started.
@@ -227,23 +227,23 @@ Asking for dependencies solves the issue of hard coding, but it also means that 
 
 ```r
 "car" %requires% list(engine = "engine", wheels = "wheels") %provides% car_provider
-#> [2016-08-03T23:29:53 UTC] Defining 'car' ... OK
+#> [2016-08-04T13:20:38 UTC] Defining 'car' ... OK
 
 "engine" %provides% engine_provider
-#> [2016-08-03T23:29:53 UTC] Defining 'engine' ... OK
+#> [2016-08-04T13:20:38 UTC] Defining 'engine' ... OK
 
 "wheels" %provides% wheels_provider
-#> [2016-08-03T23:29:53 UTC] Defining 'wheels' ... OK
+#> [2016-08-04T13:20:38 UTC] Defining 'wheels' ... OK
 
 car <- make("car")
-#> [2016-08-03T23:29:53 UTC] Making 'car' ...
-#> [2016-08-03T23:29:53 UTC] * Visiting and defining dependencies ...
-#> [2016-08-03T23:29:53 UTC] * Constructing dependency graph ... OK
-#> [2016-08-03T23:29:53 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2016-08-03T23:29:53 UTC] * Evaluating new and outdated dependencies ...
-#> [2016-08-03T23:29:53 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
-#> [2016-08-03T23:29:53 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
-#> [2016-08-03T23:29:53 UTC] DONE ('car')
+#> [2016-08-04T13:20:38 UTC] Making 'car' ...
+#> [2016-08-04T13:20:38 UTC] * Visiting and defining dependencies ...
+#> [2016-08-04T13:20:38 UTC] * Constructing dependency graph ... OK
+#> [2016-08-04T13:20:38 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2016-08-04T13:20:38 UTC] * Evaluating new and outdated dependencies ...
+#> [2016-08-04T13:20:38 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2016-08-04T13:20:38 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
+#> [2016-08-04T13:20:38 UTC] DONE ('car')
 
 car$start(); car$drive("120 km/h", "the University of Lausanne"); car$stop()
 #> Car started.
@@ -299,7 +299,7 @@ library(modulr)
     }
   )
 }
-#> [2016-08-03T23:29:56 UTC] Defining 'car' ... OK
+#> [2016-08-04T13:20:41 UTC] Defining 'car' ... OK
 
 "engine" %provides% {
   #' This module can start and stop an engine.
@@ -308,7 +308,7 @@ library(modulr)
     stop = function() message("Engine stopped.")
   )
 }
-#> [2016-08-03T23:29:56 UTC] Defining 'engine' ... OK
+#> [2016-08-04T13:20:41 UTC] Defining 'engine' ... OK
 
 "wheels" %provides% {
   #' This module can roll and brake wheels.
@@ -317,17 +317,17 @@ library(modulr)
     brake = function() message("Wheels braking."),
   )
 }
-#> [2016-08-03T23:29:56 UTC] Defining 'wheels' ... OK
+#> [2016-08-04T13:20:41 UTC] Defining 'wheels' ... OK
 
 info("car") ## `info()` outputs #'-comments (aka docstrings)
 #> This module can start, drive and stop a car.
 
 car %<=% "car" ## syntactic sugar for `<- make(`
-#> [2016-08-03T23:29:56 UTC] Making 'car' ...
-#> [2016-08-03T23:29:56 UTC] * Visiting and defining dependencies ...
-#> [2016-08-03T23:29:56 UTC] * Constructing dependency graph ... OK
-#> [2016-08-03T23:29:56 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...
-#> [2016-08-03T23:29:56 UTC] DONE ('car')
+#> [2016-08-04T13:20:41 UTC] Making 'car' ...
+#> [2016-08-04T13:20:41 UTC] * Visiting and defining dependencies ...
+#> [2016-08-04T13:20:41 UTC] * Constructing dependency graph ... OK
+#> [2016-08-04T13:20:41 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...
+#> [2016-08-04T13:20:41 UTC] DONE ('car')
 
 car$start(); car$drive("the speed of light", "the boundaries of the universe"); car$stop()
 #> Car started.
@@ -339,17 +339,18 @@ car$start(); car$drive("the speed of light", "the boundaries of the universe"); 
 #> Car stopped
 ```
 
-## Other Advantages
+## Other advantages
 
-* Modulr helps to circumvent an error occurring in a chain of nested dependent modules, showing __breadcrumbs__ that keep track of locations among dependencies.
-* Modulr understands [R Markdown](http://rmarkdown.rstudio.com/) and [Sweave](https://www.statistik.lmu.de/~leisch/Sweave/), thanks to Yihui Xie's [knitr](http://yihui.name/knitr/) package.
+* Modulr helps to circumvent errors occurring in a chain of nested dependent modules, showing [breadcrumbs](https://en.wikipedia.org/wiki/Breadcrumb_(navigation)).
+* Modulr is designed to ease production of mocks for testing purpose and is therefore well-suited for [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development).
 * Modulr offers [docstrings](https://en.wikipedia.org/wiki/Docstring)-like comments for documenting the internals of a module.
+* Modulr understands [R Markdown](http://rmarkdown.rstudio.com/) and [Sweave](https://www.statistik.lmu.de/~leisch/Sweave/), thanks to Yihui Xie's [knitr](http://yihui.name/knitr/) package.
 * Modulr takes advantage of [semantic versioning](http://semver.org/) to avoid _version lock_ and _version promiscuity_.
 * Modulr allows parallelization using [futures](https://en.wikipedia.org/wiki/Futures_and_promises), thanks to Henrik Bengtsson's [future](https://github.com/HenrikBengtsson/future) package.
-* Modulr can use [GitHub](http://github.com) (repositories and gists) to publish and share modules (so-called _gears_). See [`modulr/vault`](https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3) for an example.
 * Modulr implements __package isolation__ as an experimental feature: following the philosophy of Jim Hester's [withr](https://github.com/jimhester/withr) package, the 'with_' method `with_no_packages()` can be used to run code with temporarily no loaded or attached R packages.
+* Modulr can use [GitHub](http://github.com) (repositories and gists) to publish and share modules (so-called _gears_). See [`modulr/vault`](https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3) for an example.
 
-To get started, please read the introduction vignette: `vignette("introduction", package = "modulr")`.
+Please read the vignette to see examples in action: `vignette("guide", package = "modulr")`.
 
 ## Installation
 
@@ -379,13 +380,13 @@ devtools::install_github("aclemen1/modulr@devel")
 
 If you encounter a clear bug, please [file a minimal reproducible example](https://github.com/aclemen1/modulr/issues).
 
-## Real World Application
+## Real world application
 
-This is the dependency graph of a module which exposes tidy, exhaustive, statistics-ready, and daily HR data for the University of Lausanne, Switzerland. These modules have been developped and are maintained by a small team of Data Scientists. Although not shown here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in mission critical applications since March 2015.
+This is the dependency graph of a module which exposes tidy, exhaustive, statistics-ready, and daily HR data for the [University of Lausanne](http://www.unil.ch), Switzerland. These modules have been developped and are maintained by a small team of Data Scientists. Although not shown here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in [mission critical applications](http://www.unil.ch/statistiques) since March 2015.
 
 ![](README-fig1.png)
 
-## Related Approaches
+## Related approaches
 
 _In alphabetical order._
 
@@ -393,6 +394,6 @@ _In alphabetical order._
 * Lev Kuznetsov's [injectoR](http://dfci-cccb.github.io/injectoR) package.
 * Konrad Rudolph's [modules](http://github.com/klmr/modules) package.
 
-## Code of Conduct
+## Code of conduct
 
 In order to have a more open and welcoming community, modulr adheres to a [Contributor Code of Conduct](CONDUCT.md). Please adhere to this code of conduct in any interactions you have in the modulr community. It is strictly enforced on all official modulr repositories, websites, and resources. If you encounter someone violating these terms, please let the maintainer know and he will address it as soon as possible.
