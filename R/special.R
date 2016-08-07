@@ -14,6 +14,7 @@ RESERVED_NAMES <- c(MODULR_NAMESPACE)
 #' get_module_options()
 #' get_filename()
 #' get_dirname()
+#' post_evaluation_hook(expr, add = FALSE)
 #' message_info(...)
 #' message_warn(...)
 #' message_stop(...)}
@@ -30,6 +31,13 @@ RESERVED_NAMES <- c(MODULR_NAMESPACE)
 #' @section \code{get_dirname(absolute = TRUE)}:
 #' Returns a string (character vector of lenght one) containing the module
 #' (absolute) dirname.
+#' @section \code{post_evaluation_hook(expr, add = FALSE)}:
+#' Records the expression given as its argument as needing to be executed when
+#' the current module evaluation exits (either naturally or as the result of an
+#' error). If no expression is provided, i.e., the call is
+#' `post_evaluation_hook()`, then the current expression is removed. If `add` is
+#' `TRUE`, `expr` is added after any previously set expressions; otherwise (the
+#' default) `expr` will overwrite any previously set expressions.
 #' @section \code{message_info(...), message_warn(...), and message_stop(...)}:
 #' Outputs an informative, warning, or critical and stopping message, prefixed
 #' with a timestamp and the module name. Such messages are particularily useful
@@ -64,9 +72,26 @@ RESERVED_NAMES <- c(MODULR_NAMESPACE)
 #' unlink(tmp_dir, recursive = TRUE)
 #'
 #' \dontrun{foo$stop()}
+#'
+#' reset()
+#' "foo" %requires% list(modulr = "modulr") %provides% {
+#'   modulr$post_evaluation_hook(touch("foo"))
+#'   message("Hello, I am a ", sQuote("no-scoped"), " module.")
+#' }
+#' make("foo")
+#' make("foo")
+#'
+#' reset()
+#' "foo" %requires% list(modulr = "modulr") %provides% {
+#'   modulr$post_evaluation_hook(undefine("foo"))
+#'   message("Hello, I am an ", sQuote("ephemeral"), " module.")
+#' }
+#' make("foo")
+#' \dontrun{make("foo")}
+#'
 #' @name modulr-module
 #' @aliases get_module_name get_module_options get_filename get_dirname
-#'   message_info message_warn message_stop
+#'   post_evaluation_hook message_info message_warn message_stop
 NULL
 
 define_modulr <- function() {
@@ -104,6 +129,16 @@ define_modulr <- function() {
     #' Returns a string (character vector of lenght one) containing the module
     #' dirname.
     #'
+    #' ### `post_evaluation_hook(expr, add = FALSE)`
+    #'
+    #' Records the expression given as its argument as needing to be executed
+    #' when the current module evaluation exits (either naturally or as the
+    #' result of an error). If no expression is provided, i.e., the call is
+    #' `post_evaluation_hook()`, then the current expression is removed. If
+    #' `add` is `TRUE`, `expr` is added after any previously set expressions;
+    #' otherwise (the default) `expr` will overwrite any previously set
+    #' expressions.
+    #'
     #' ### `message_info(...)`, `message_warn(...)`, `message_stop(...)`
     #'
     #' Outputs an informative, warning, or critical and stopping message,
@@ -113,6 +148,13 @@ define_modulr <- function() {
     #'
 
     # End Exclude Linting
+
+    .get_special_env <- function(which = c("wrapper", "instanciator")) {
+      which <- match.arg(which)
+      for (frame in sys.frames()) {
+        if (exists(paste0(".__", which, "__"), where = frame)) return(frame)
+      }
+    }
 
     list(
 
@@ -147,6 +189,17 @@ define_modulr <- function() {
         file <- find_path(name, absolute = absolute)
         if (is.null(file)) return(NULL)
         dirname(file)
+      },
+
+      # post-evaluation hook
+      post_evaluation_hook = function(expr = NULL, add = FALSE) {
+        do.call(
+          "on.exit",
+          args = list(
+            substitute(expr),
+            add = add
+          ),
+          envir = .get_special_env(which = "instanciator"))
       },
 
       # returns find_path function

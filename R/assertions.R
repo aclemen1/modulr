@@ -137,8 +137,8 @@ assertthat::on_failure(.is_defined_regular) <- function(call, env) {
 
 # Test if a call is made from within a module
 .is_called_from_within_module <- function() {
-  isTRUE(exists(".__name__", inherits = TRUE,
-         mode = "character", envir = parent.frame(2L)))
+  isTRUE(exists(".__wrapper__", inherits = TRUE,
+         mode = "logical", envir = parent.frame(2L)))
 }
 
 # Test if a load is nested

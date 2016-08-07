@@ -208,7 +208,7 @@ if (!identical(Sys.getenv("TRAVIS"), "true") &&
       identical(Sys.getenv("NOT_CRAN"), "true")) {
   plot_dependencies() %>%
     html_print %>%
-    webshot(file = "README-fig2.png", selector = ".sankeyNetwork", delay = 2) %>%
+    webshot(file = "README-fig1.png", selector = ".sankeyNetwork", delay = 2) %>%
     resize("730x") %>%
     shrink()
 }
@@ -219,7 +219,7 @@ if (!identical(Sys.getenv("TRAVIS"), "true") &&
 plot_dependencies()
 ```
 
-![](README-fig2.png)
+![](README-fig1.png)
 
 
 This is the best outcome. The application code simply declares the dependencies it needs, without having to deal with the injector. This setup does not break the Law of Demeter.
@@ -323,7 +323,7 @@ If you encounter a clear bug, please [file a minimal reproducible example](https
 
 This is the dependency graph of a module which exposes tidy, exhaustive, statistics-ready, and daily HR data for the [University of Lausanne](http://www.unil.ch), Switzerland. These modules have been developped and are maintained by a small team of Data Scientists. Although not shown here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in [mission critical applications](http://www.unil.ch/statistiques) since March 2015.
 
-![](README-fig1.png)
+![](README-fig2.png)
 
 ## Related approaches
 

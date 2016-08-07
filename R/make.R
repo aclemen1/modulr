@@ -329,20 +329,24 @@ do_make <- function(name = .Last.name, args = list(),
                           .modulr_env$injector$registry[[
                             c(ordered_name, "provider")]]
 
-                        instance <- withVisible(do.call(
-                          provider, args = args_))
-
-                        .modulr_env$injector$registry[[
-                          c(ordered_name, "instance")]] <- instance
-                        .modulr_env$injector$registry[[
-                          c(ordered_name, "duration")]] <-
-                          as.numeric(Sys.time() - timestamp)
-                        .modulr_env$injector$registry[[
-                          c(ordered_name, "instanciated")]] <- TRUE
-                        .modulr_env$injector$registry[[
-                          c(ordered_name, "first_instance")]] <- FALSE
-                        .modulr_env$injector$registry[[
-                          c(ordered_name, "timestamp")]] <- Sys.time()
+                        instanciate <- function() {
+                          .__instanciator__ <- TRUE # Exclude Linting
+                          instance <- withVisible(do.call(
+                            provider, args = args_))
+                          assign("instance", instance, pos = parent.frame())
+                          .modulr_env$injector$registry[[
+                            c(ordered_name, "instance")]] <- instance
+                          .modulr_env$injector$registry[[
+                            c(ordered_name, "duration")]] <-
+                            as.numeric(Sys.time() - timestamp)
+                          .modulr_env$injector$registry[[
+                            c(ordered_name, "instanciated")]] <- TRUE
+                          .modulr_env$injector$registry[[
+                            c(ordered_name, "first_instance")]] <- FALSE
+                          .modulr_env$injector$registry[[
+                            c(ordered_name, "timestamp")]] <- Sys.time()
+                        }
+                        instanciate()
 
                       },
                   verbosity = 1)
@@ -355,7 +359,9 @@ do_make <- function(name = .Last.name, args = list(),
         },
       verbosity = 2)
 
-    instance <- .modulr_env$injector$registry[[c(name, "instance")]]
+    if (!exists("instance", inherits = FALSE)) {
+      instance <- .modulr_env$injector$registry[[c(name, "instance")]]
+    }
 
   },
   verbosity = 2)
@@ -602,7 +608,6 @@ touch <- function(name = .Last.name) {
         lapply(.modulr_env$injector$registry[[c(name, "aliases")]],
                .resolve_namespace, name),
         `[[`, "resolved"), unname)
-    .modulr_env$injector$registry[[c(name, "instance")]] <- NULL
     .modulr_env$injector$registry[[c(name, "instanciated")]] <- F
     .modulr_env$injector$registry[[c(name, "digest")]] <- NULL
     .modulr_env$injector$registry[[c(name, "timestamp")]] <- Sys.time()

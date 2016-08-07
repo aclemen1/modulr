@@ -334,6 +334,7 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
   # we add .__name__ string in a sandwich enclosing environment (we do not want
   # to pollute the enclosing environment itself)
   environment(provider) <- new.env(parent = environment(provider))
+  environment(provider)$.__wrapper__ <- TRUE
   environment(provider)$.__name__ <- name
 
   if (.is_undefined(name)) {

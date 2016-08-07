@@ -153,6 +153,8 @@ lsmod(cols = c("name", "type", "dependencies", "childs", "size", "modified"))
 TODO: 
 
 - précédence disque -> registre, également pour %imports%
+- injectors
+- stashing
 
 # Types of modules
 
@@ -470,6 +472,14 @@ TODO :
 
 # Advanced usage
 
+## Special module `modulr`
+
+TODO:
+
+- hook
+- toutes les autres méthodes exposées par le module "modulr"
+
+## Encryption
 ## Package isolation
 ## Parallelization
 

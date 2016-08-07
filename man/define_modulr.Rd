@@ -35,6 +35,16 @@ filename.
 Returns a string (character vector of lenght one) containing the module
 dirname.
 
+### `post_evaluation_hook(expr, add = FALSE)`
+
+Records the expression given as its argument as needing to be executed
+when the current module evaluation exits (either naturally or as the
+result of an error). If no expression is provided, i.e., the call is
+`post_evaluation_hook()`, then the current expression is removed. If
+`add` is `TRUE`, `expr` is added after any previously set expressions;
+otherwise (the default) `expr` will overwrite any previously set
+expressions.
+
 ### `message_info(...)`, `message_warn(...)`, `message_stop(...)`
 
 Outputs an informative, warning, or critical and stopping message,

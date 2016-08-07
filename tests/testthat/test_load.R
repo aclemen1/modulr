@@ -108,6 +108,7 @@ test_that("load_module rolls back on errors in .R files", {
 
   root_config$set(path)
   expect_error(load_module(name))
+
   expect_identical(registry, get("registry", pos = .modulr_env$injector))
 })
 

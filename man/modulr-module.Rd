@@ -9,6 +9,7 @@
 \alias{message_stop}
 \alias{message_warn}
 \alias{modulr-module}
+\alias{post_evaluation_hook}
 \title{Special Module \code{'modulr'}}
 \format{A list of functions.
 \preformatted{
@@ -16,6 +17,7 @@ get_module_name()
 get_module_options()
 get_filename()
 get_dirname()
+post_evaluation_hook(expr, add = FALSE)
 message_info(...)
 message_warn(...)
 message_stop(...)}}
@@ -52,6 +54,16 @@ Returns a string (character vector of lenght one) containing the module
 (absolute) dirname.
 }
 
+\section{\code{post_evaluation_hook(expr, add = FALSE)}}{
+
+Records the expression given as its argument as needing to be executed when
+the current module evaluation exits (either naturally or as the result of an
+error). If no expression is provided, i.e., the call is
+`post_evaluation_hook()`, then the current expression is removed. If `add` is
+`TRUE`, `expr` is added after any previously set expressions; otherwise (the
+default) `expr` will overwrite any previously set expressions.
+}
+
 \section{\code{message_info(...), message_warn(...), and message_stop(...)}}{
 
 Outputs an informative, warning, or critical and stopping message, prefixed
@@ -86,6 +98,23 @@ make("foo")
 unlink(tmp_dir, recursive = TRUE)
 
 \dontrun{foo$stop()}
+
+reset()
+"foo" \%requires\% list(modulr = "modulr") \%provides\% {
+  modulr$post_evaluation_hook(touch("foo"))
+  message("Hello, I am a ", sQuote("no-scoped"), " module.")
+}
+make("foo")
+make("foo")
+
+reset()
+"foo" \%requires\% list(modulr = "modulr") \%provides\% {
+  modulr$post_evaluation_hook(undefine("foo"))
+  message("Hello, I am an ", sQuote("ephemeral"), " module.")
+}
+make("foo")
+\dontrun{make("foo")}
+
 }
 \seealso{
 \code{\link{define}}, \code{\link{module_options}}, and

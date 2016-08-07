@@ -165,7 +165,8 @@ get_default_injector <- function() {
 
 # the base::get0 function exsists only since R 3.2
 .get_0 <- function(var, ..., ifnotfound = NULL) {
-  if (exists(var, ...)) get(var, ...) else ifnotfound
+  .get_0_ <- function() if (exists(var, ...)) get(var, ...) else ifnotfound
+  do.call(.get_0_, args = list(), envir = parent.frame(2L))
 }
 
 .dir_exists <- function(file) {
