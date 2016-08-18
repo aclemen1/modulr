@@ -270,7 +270,18 @@ load_all_modules <- function(
 
     if (!(name %in% visited_dependencies)) {
 
-      loaded_module <- stats::setNames(names(load_module(name)), name)
+      module_name <- NULL
+
+      if (name %in% group) {
+        module_name <-
+          .resolve_name(name, all = FALSE)[["resolved"]][[1]][["name"]]
+      }
+
+      if (is.null(module_name) || !.is_defined(module_name)) {
+        module_name <- names(load_module(name))
+      }
+
+      loaded_module <- stats::setNames(module_name, name)
 
       visited_dependencies <<- c(visited_dependencies, loaded_module)
 

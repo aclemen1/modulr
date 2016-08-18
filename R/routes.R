@@ -244,7 +244,7 @@
 }
 
 # Filter versions relative to a base version and a version symbol.
-.filter_versions <- function(versions, version, symbol) {
+.filter_versions <- function(versions, version, symbol, include_NAs = FALSE) {
 
   assert_that(
     is.list(versions),
@@ -255,7 +255,11 @@
 
   filter_ <- function(versions, version, symbol) {
     candidates <- Filter(function(v) {
-      !isTRUE(v < version)
+      if (include_NAs) {
+        !isTRUE(v < version)
+      } else {
+        isTRUE(v >= version)
+      }
     },
     versions)
     keep <- FALSE
@@ -463,7 +467,8 @@
 
   versions <- .filter_versions(
     versions = versions,
-    version = parsed_name[["version"]], symbol = parsed_name[["symbol"]])
+    version = parsed_name[["version"]], symbol = parsed_name[["symbol"]],
+    include_NAs = TRUE)
 
   resolution <- .unflatten_versions(versions)
 
@@ -499,8 +504,6 @@
 
 # Extract the name of a module definition in a file.
 .extract_name <- function(filepath, namespace = NULL, version = NA) {
-
-  # TODO BUG there is a problem here when called from a Rnw file!
 
   assert_that(file.exists(filepath))
   assert_that(is.null(namespace) || .is_namespace(namespace))

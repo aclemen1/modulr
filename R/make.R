@@ -624,3 +624,91 @@ touch <- function(name = .Last.name) {
   invisible()
 
 }
+
+#' Interactively Find, Make and Bind a Module.
+#'
+#' Interactively find, make, and bind a module.
+#'
+#' @inheritParams define
+#'
+#' @details
+#'
+#' See \code{\link{make}} and \code{\link{module_options}}.
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{make}}.
+#'
+#' @examples
+#' "foobar" %provides% "Hello World"
+#' "foo" %provides% "Hello"
+#' hit("foo")
+#' hit(foo)
+#' @export
+hit <- function(name) {
+  make_unique_ <- function(name, ls = ls(parent.frame(), all.names = TRUE)) {
+    tail(make.unique(c(ls, name)), 1L)
+  }
+  name_string <- as.character(substitute(name))
+  roots <- as.vector(na.omit(vapply(root_config$get_all()[[1]], function(path) {
+    if (.dir_exists(path)) normalizePath(path) else NA_character_
+  }, FUN.VALUE = "character")))
+  candidates <-
+    list.files(
+      path = roots,
+      pattern = sprintf(".*(?:%s).*\\.[rR](?:(?:md)|(?:nw))?$", name_string),
+      ignore.case = TRUE, recursive = TRUE, full.names = TRUE)
+  modules <- unique(c(
+    list_modules(sprintf("/?[^/]*(?:%s)[^/]*$", name_string),
+                 wide = FALSE, cols = "name"),
+    grep(
+      sprintf("/?[^/]*(?:%s)[^/]*$", name_string),
+      as.vector(na.omit(vapply(candidates, function(candidate) {
+        name <- .extract_name(candidate)
+        if (is.null(name)) NA_character_ else name
+      },
+      FUN.VALUE = "character"))), value = TRUE)))
+  modules <-
+    Filter(function(module) try(isTRUE(!is.null(find_module(module))),
+                                silent = TRUE), modules)
+  len <- length(modules)
+  if (len == 0) {
+    message("No module found.")
+    return(invisible(NULL))
+  } else {
+    if (is.symbol(substitute(name))) {
+      bindings <- rep(name_string, len)
+    } else {
+      bindings <-
+        sub(.version_hash_string_regex, "",
+            unlist(lapply(strsplit(modules, "/", fixed = TRUE), tail, 1L)))
+    }
+    ls_ <- ls(parent.frame(), all.names = TRUE)
+    bindings <-
+      vapply(bindings, function(name) make_unique_(name, ls = ls_),
+             FUN.VALUE = "character")
+    cmds <- sprintf("%s %%<=%% \"%s\"", bindings, modules)
+    cat(sprintf("[%d] %s", seq_along(cmds), cmds), sep = "\n")
+  }
+  if (interactive()) {
+    repeat {
+      ans <- gsub("^\\s+|\\s+$", "",
+                  readline("Apply? (default 1, ESC to abort) "))
+      ans <- ifelse(ans == "", "1", ans)
+      ans <- suppressWarnings(as.integer(ans))
+      if (ans %in% seq_along(bindings)) {
+        assign(
+          bindings[ans],
+          do.call(make, list(name = modules[ans])),
+          pos = parent.frame())
+        message("Module evaluation result bound to ",
+                sQuote(bindings[ans]), ".")
+        break;
+      }
+    }
+  }
+  invisible(modules)
+}

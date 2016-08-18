@@ -443,6 +443,10 @@ timestamp$memoised()
 value(timestamp$future)
 ```
 
+## Modules with post evaluation hook: no-scoped and ephemeral
+
+TODO
+
 # Organizing modules
 
 ## In-memory
