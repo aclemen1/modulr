@@ -273,8 +273,10 @@ load_all_modules <- function(
       module_name <- NULL
 
       if (name %in% group) {
-        module_name <-
-          .resolve_name(name, all = FALSE)[["resolved"]][[1]][["name"]]
+        resolved <- .resolve_name(name, all = FALSE)[["resolved"]]
+        if (length(resolved) > 0) {
+          module_name <- resolved[[1]][["name"]]
+        }
       }
 
       if (is.null(module_name) || !.is_defined(module_name)) {

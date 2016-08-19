@@ -35,6 +35,11 @@ Returns a string (character vector of lenght one) containing the module name.
 See \code{\link{define}}.
 }
 
+\section{\code{get_module_version()}}{
+
+Returns numeric version of the module.
+}
+
 \section{\code{get_module_options()}}{
 
 Returns a list containing the module options. See

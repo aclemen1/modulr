@@ -1,5 +1,5 @@
 # parse the docstring of a function
-.docstring <- function(fun, line_numbers = F, sep = "\n") {
+.docstring <- function(fun, line_numbers = FALSE, sep = "\n") {
 
   assert_that(
     is.function(fun),
@@ -122,6 +122,11 @@ print_info <- function(name = .Last.name,
     assertthat::is.string(sep),
     assertthat::is.flag(load)
   )
+
+  if (.is_reserved(name)) {
+    line_numbers <- FALSE
+    sep <- "\n"
+  }
 
   if (load) {
 

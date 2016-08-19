@@ -20,6 +20,10 @@ useful helper functions related to the module into which it is injected.
 Returns a string (character vector of lenght one) containing the module
 name.
 
+### `get_module_version()`
+
+Returns the numeric version of the module.
+
 ### `get_module_options()`
 
 Returns a list containing the module options. Deprecated and kept for

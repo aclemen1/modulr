@@ -1,6 +1,8 @@
 ## Test environments
 * RHEL7 (local), R 3.2.1
-* ubuntu 12.04 (on travis-ci), R 3.2.2
+* ubuntu 12.04 (on travis-ci), R 3.2.5
+* ubuntu 12.04 (on travis-ci), R 3.3.1
+* ubuntu 12.04 (on travis-ci), R Under development (unstable) (2016-08-18 r71115)
 * win-builder (devel and release)
 
 ## R CMD check results

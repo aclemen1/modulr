@@ -21,6 +21,8 @@ RESERVED_NAMES <- c(MODULR_NAMESPACE)
 #' @section \code{get_module_name()}:
 #' Returns a string (character vector of lenght one) containing the module name.
 #' See \code{\link{define}}.
+#' @section \code{get_module_version()}:
+#' Returns numeric version of the module.
 #' @section \code{get_module_options()}:
 #' Returns a list containing the module options. See
 #' \code{\link{module_options}}. \bold{Deprecated and kept for backward
@@ -114,6 +116,10 @@ define_modulr <- function() {
     #' Returns a string (character vector of lenght one) containing the module
     #' name.
     #'
+    #' ### `get_module_version()`
+    #'
+    #' Returns the numeric version of the module.
+    #'
     #' ### `get_module_options()`
     #'
     #' Returns a list containing the module options. Deprecated and kept for
@@ -161,6 +167,11 @@ define_modulr <- function() {
       # returns module name
       get_module_name = function() {
         get(".__name__", pos = parent.frame())
+      },
+
+      # returns module version
+      get_module_version = function() {
+        .parse_name(get(".__name__", pos = parent.frame()))$version
       },
 
       # returns module options
