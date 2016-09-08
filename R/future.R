@@ -5,7 +5,7 @@
 #' @param dependencies A list of dependencies.
 #' @param strategy The evaluation function (or name of it) to use for resolving
 #'   a future. If NULL, then the current strategy is returned.
-#' @param ... Further arguments passed to \link{get_provider}.
+#' @param ... Further arguments passed to \code{\link{get_provider}}.
 #'
 #' @section Warning:
 #' This is an experimental feature subject to changes.

@@ -399,6 +399,10 @@
   versions
 }
 
+# TODO test that
+.cumpaste <- function(x, sep = " ")
+  Reduce(function(x1, x2) paste(x1, x2, sep = sep), x, accumulate = TRUE)
+
 # Find all in-memory and on-disk candidates for a given module name.
 .resolve_candidates <- function(name, scope_name = NULL, absolute = TRUE,
                                 extensions = c(".R", ".r",
@@ -430,12 +434,17 @@
   for (root in roots) {
     path <- .remove_trailing_filesep(
       file.path(root, .name_to_path(parsed_name[["initials"]])))
-    files_ <-
-      ifelse(absolute, normalizePath,
-             Vectorize(.remove_duplicate_filesep, "path"))(
-               list.files(path = path, pattern = pattern,
-                          full.names = TRUE, include.dirs = include.dirs))
-    files <- c(files, files_)
+    walks <- c("", .cumpaste(
+      strsplit(path, split = .Platform$file.sep, fixed = TRUE)[[1]],
+      sep = .Platform$file.sep))
+    if (!any(file.exists(file.path(walks, "__IGNORE__")))) {
+      files_ <-
+        ifelse(absolute, normalizePath,
+               Vectorize(.remove_duplicate_filesep, "path"))(
+                 list.files(path = path, pattern = pattern,
+                            full.names = TRUE, include.dirs = include.dirs))
+      files <- c(files, files_)
+    }
   }
 
   on_disk_versions <- do.call(c, Map(function(file) {

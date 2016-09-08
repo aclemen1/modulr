@@ -191,15 +191,29 @@ define_modulr <- function() {
       # returns module filename
       get_filename = function(absolute = TRUE) {
         name <- get(".__name__", pos = parent.frame())
-        find_path(name, absolute = absolute)
+        file <- if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
+          .modulr_env$injector$registry[[c(name, "filepath")]]
+        } else {
+          trace <- na.omit(names(.source_trace()))
+          if (length(trace) > 0L)
+            tail(trace, 1L)
+        }
+        if (!is.null(file)) stats::setNames(
+          ifelse(absolute, normalizePath, identity)(file), name)
       },
 
       # returns module directory
       get_dirname = function(absolute = TRUE) {
         name <- get(".__name__", pos = parent.frame())
-        file <- find_path(name, absolute = absolute)
-        if (is.null(file)) return(NULL)
-        dirname(file)
+        file <- if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
+          .modulr_env$injector$registry[[c(name, "filepath")]]
+        } else {
+          trace <- na.omit(names(.source_trace()))
+          if (length(trace) > 0L)
+            tail(trace, 1L)
+        }
+        if (!is.null(file)) dirname(
+          ifelse(absolute, normalizePath, identity)(file))
       },
 
       # post-evaluation hook
@@ -340,3 +354,4 @@ options_provider_ <- function() {
     `%provides%`(lhs, options_provider(options))),
     envir = parent.frame(1L))
 }
+

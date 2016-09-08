@@ -24,7 +24,7 @@ Other actions on modules do not alter the value of \code{.Last.name}.
 \section{Warning}{
 
 Do not assign to \code{.Last.name} in the workspace, because this will always
-mask the object of the same name in package:modulr.
+mask the object of the same name in \code{package:modulr}.
 }
 \examples{
 define("foo", NULL, function() NULL)

@@ -22,6 +22,15 @@
     },
     env = as.environment("package:modulr"))
 
+  makeActiveBinding(
+    as.symbol(".__name__"),
+    function() {
+      .get_0(".__name__", envir = .modulr_env$injector, ifnotfound = "__main__")
+    },
+    env = as.environment("package:modulr"))
+  # TODO: same functions than those for modules (.__file__, ...) at __main__ level
+
+
   if (utils::packageVersion("assertthat") < package_version("0.1.0.99")) {
     packageStartupMessage(
       paste0("Please update package 'assertthat' from Github at ",

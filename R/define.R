@@ -331,11 +331,33 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
 
   timestamp <- Sys.time()
 
-  # we add .__name__ string in a sandwich enclosing environment (we do not want
-  # to pollute the enclosing environment itself)
+  # we add metadata in a sandwich enclosing environment (we do not want to
+  # pollute the enclosing environment itself)
   environment(provider) <- new.env(parent = environment(provider))
   environment(provider)$.__wrapper__ <- TRUE
   environment(provider)$.__name__ <- name
+  makeActiveBinding(
+    as.symbol(".__file__"),
+    function() {
+      file <-
+        if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
+          normalizePath(.modulr_env$injector$registry[[c(name, "filepath")]])
+        } else {
+          trace <- na.omit(names(.source_trace()))
+          if (length(trace) > 0L)
+            tail(trace, 1L)
+        }
+      if (!is.null(file)) stats::setNames(file, name)
+    },
+    env = environment(provider))
+  makeActiveBinding(
+    as.symbol(".__path__"),
+    function() {
+      file <- environment(provider)$.__file__
+      if (!is.null(file)) dirname(file)
+    },
+    env = environment(provider))
+  # TODO: .__root__, .__namespace__, ... copier les méthodes du module "modulr"
 
   if (.is_undefined(name)) {
 
@@ -470,6 +492,7 @@ get_dependencies <- function(name = .Last.name, load = FALSE) {
     if (length(in_memory) > 0) {
 
       name <- in_memory[[1]][["name"]]
+
     } else if (load) {
 
       on_disk <- Filter(function(candidate) {

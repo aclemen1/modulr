@@ -3,6 +3,9 @@
 
   if (!is.null(path)) {
 
+    .modulr_env$injector$.__name__ <- name
+    on.exit(rm(list = ".__name__", pos = .modulr_env$injector))
+
     loaded <- FALSE
 
     registry <- .modulr_env$injector$registry
@@ -270,29 +273,12 @@ load_all_modules <- function(
 
     if (!(name %in% visited_dependencies)) {
 
-      module_name <- NULL
-
-      if (name %in% group) {
-        resolved <- .resolve_name(name, all = FALSE)[["resolved"]]
-        if (length(resolved) > 0) {
-          module_name <- resolved[[1]][["name"]]
-        }
-      }
-
-      if (is.null(module_name) || !.is_defined(module_name)) {
-        module_name <- names(load_module(name))
-      }
-
-      loaded_module <- stats::setNames(module_name, name)
+      loaded_module <- stats::setNames(names(load_module(name)), name)
 
       visited_dependencies <<- c(visited_dependencies, loaded_module)
 
-      assert_that(.is_defined(loaded_module))
-
-      if (.is_defined(loaded_module)) {
-        Map(function(dependency) iteration(dependency, name),
+      Map(function(dependency) iteration(dependency, name),
           .modulr_env$injector$registry[[c(loaded_module, "dependencies")]])
-      }
 
     }
 

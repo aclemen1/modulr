@@ -35,15 +35,15 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
 
   assert_that(assertthat::is.flag(verbose))
 
-  bc <- unique(
+  bc <- unique(c("__main__", unique(
     unlist(
       Filter(function(x) !is.na(x) & !(x %in% c("modulr")),
              lapply(sys.frames(), function(frame) {
                .get_0(".__name__", envir = frame,
                     ifnotfound = NA, inherits = TRUE)
-             }))))
+             }))))[-1]))
 
-  if (length(bc) > 0 && verbose)
+  if (length(bc) > 1 && verbose)
     message(sprintf("modulr breadcrumbs: %s",
                     paste(sprintf("'%s'", bc), collapse = " > ")))
 
@@ -55,7 +55,7 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
 
   assert_that(is.language(handler) || is.null(handler))
 
-  if (is.null(handler)) return(F)
+  if (is.null(handler)) return(FALSE)
 
   any(grepl("modulr\\:\\:get\\_breadcrumbs\\(\"installed\"\\)",
             format(handler)))

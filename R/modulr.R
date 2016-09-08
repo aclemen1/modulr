@@ -180,7 +180,7 @@ get_default_injector <- function() {
   msg <- if (missing(msg)) {
     msg <- c()
     bc <- get_breadcrumbs(verbose = FALSE)
-    if (!is.null(bc))
+    if (length(bc) > 1)
       msg <- gettextf("modulr breadcrumbs: %s\n",
                       paste(gettextf("'%s'", bc), collapse = " > "))
     msg <- c(msg, gettextf("'%s' is deprecated.\n", old))
@@ -217,7 +217,7 @@ get_default_injector <- function() {
 #' Other actions on modules do not alter the value of \code{.Last.name}.
 #' @section Warning:
 #' Do not assign to \code{.Last.name} in the workspace, because this will always
-#' mask the object of the same name in package:modulr.
+#' mask the object of the same name in \code{package:modulr}.
 #' @return The name of the last used module.
 #' @seealso \code{\link{define}}.
 #' @examples
@@ -227,7 +227,36 @@ get_default_injector <- function() {
 #' .Last.name
 #' make("bar/test")
 #' .Last.name
-globalVariables(c(".Last.name"))
+NULL
+
+#' @name .__name__
+#' @aliases .__name__
+#' @rdname module_name
+#' @title Name of Current Module Scope.
+#' @description The name of the current module scope.
+#' @usage .__name__
+#' @details When modulr loads a module file, it assigns the module's name to
+#'   \code{.__name__}. A module file can discover whether or not it is running
+#'   in the main scope by checking if \code{.__name__} has value
+#'   \code{"__main__"}. This allows a common idiom for conditionally executing
+#'   code in a module file when it is run as a script (see example). It is
+#'   mainly useful when one wants to write a module file which can be executed
+#'   directly as a script and alternatively declared as a dependency and used by
+#'   other modules.
+#' @section Warning: Do not assign to \code{.__name__} in the workspace, because
+#'   this will always mask the object of the same name in \code{package:modulr}.
+#' @return The name of the current module scope.
+#' @seealso \code{\link{define}} and \code{\link{make}}.
+#' @examples
+#' # script.R
+#' "script" %provides% { cat("Hello World\n"); print(.__name__) }
+#' if (.__name__ == "main") make()
+#' # EOF
+#' \dontrun{source("script.R")}
+#' make("script")
+NULL
+
+globalVariables(c(".Last.name", ".__name__", ".__file__"))
 
 if (utils::packageVersion("assertthat") >= package_version("0.1.0.99")) {
   assert_that <- assertthat::assert_that
