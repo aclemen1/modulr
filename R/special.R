@@ -194,9 +194,9 @@ define_modulr <- function() {
         file <- if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
           .modulr_env$injector$registry[[c(name, "filepath")]]
         } else {
-          trace <- na.omit(names(.source_trace()))
+          trace <- stats::na.omit(names(.source_trace()))
           if (length(trace) > 0L)
-            tail(trace, 1L)
+            utils::tail(trace, 1L)
         }
         if (!is.null(file)) stats::setNames(
           ifelse(absolute, normalizePath, identity)(file), name)
@@ -208,9 +208,9 @@ define_modulr <- function() {
         file <- if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
           .modulr_env$injector$registry[[c(name, "filepath")]]
         } else {
-          trace <- na.omit(names(.source_trace()))
+          trace <- stats::na.omit(names(.source_trace()))
           if (length(trace) > 0L)
-            tail(trace, 1L)
+            utils::tail(trace, 1L)
         }
         if (!is.null(file)) dirname(
           ifelse(absolute, normalizePath, identity)(file))

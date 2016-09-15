@@ -5,8 +5,7 @@
 #' organize programs into discrete, modular, and loosely coupled units. By
 #' nature, such modules are easy to develop, debug, test, reuse, share and
 #' maintain in a wide range of common situations. This package may also allow
-#' for higher compliance with best practices in software engineering, provably
-#' within small- to mid-sized teams of developers and R users.
+#' for higher compliance with best practices in software engineering.
 #'
 #' @details
 #' To learn more about modulr, start with the vignettes and use
@@ -229,11 +228,12 @@ get_default_injector <- function() {
 #' .Last.name
 NULL
 
-#' @name .__name__
-#' @aliases .__name__
-#' @rdname module_name
-#' @title Name of Current Module Scope.
-#' @description The name of the current module scope.
+#' @name module_metadata
+#' @aliases .__name__ .__file__ .__version__ .__namespace__ .__initials__
+#'   .__final__
+#' @rdname module_metadata
+#' @title Module Metadata.
+#' @description Access module metadata.
 #' @usage .__name__
 #' @details When modulr loads a module file, it assigns the module's name to
 #'   \code{.__name__}. A module file can discover whether or not it is running
@@ -243,7 +243,7 @@ NULL
 #'   mainly useful when one wants to write a module file which can be executed
 #'   directly as a script and alternatively declared as a dependency and used by
 #'   other modules.
-#' @section Warning: Do not assign to \code{.__name__} in the workspace, because
+#' @section Warning: Do not assign to any metadata in the workspace, because
 #'   this will always mask the object of the same name in \code{package:modulr}.
 #' @return The name of the current module scope.
 #' @seealso \code{\link{define}} and \code{\link{make}}.
@@ -256,7 +256,37 @@ NULL
 #' make("script")
 NULL
 
-globalVariables(c(".Last.name", ".__name__", ".__file__"))
+#' @name .__version__
+#' @rdname module_metadata
+#' @usage .__version__
+NULL
+
+#' @name .__namespace__
+#' @rdname module_metadata
+#' @usage .__namespace__
+NULL
+
+#' @name .__initials__
+#' @rdname module_metadata
+#' @usage .__initials__
+NULL
+
+#' @name .__final__
+#' @rdname module_metadata
+#' @usage .__final__
+NULL
+
+#' @name .__file__
+#' @rdname module_metadata
+#' @usage .__file__
+NULL
+
+#' @name .__path__
+#' @rdname module_metadata
+#' @usage .__path__
+NULL
+
+globalVariables(c(".Last.name", ".__name__"))
 
 if (utils::packageVersion("assertthat") >= package_version("0.1.0.99")) {
   assert_that <- assertthat::assert_that

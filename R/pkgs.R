@@ -450,9 +450,9 @@ with_module_packages <- function(code, ...) {
     if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
       normalizePath(.modulr_env$injector$registry[[c(name, "filepath")]])
     } else {
-      trace <- na.omit(names(.source_trace()))
+      trace <- stats::na.omit(names(.source_trace()))
       if (length(trace) > 0L)
-        normalizePath(tail(trace, 1L))
+        normalizePath(utils::tail(trace, 1L))
     }
   if (!is.null(file)) {
     parsed_name <- .parse_name(name)
@@ -496,9 +496,9 @@ with_namespace_packages <- function(namespace, code, ...) {
     if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
       normalizePath(.modulr_env$injector$registry[[c(name, "filepath")]])
     } else {
-      trace <- na.omit(names(.source_trace()))
+      trace <- stats::na.omit(names(.source_trace()))
       if (length(trace) > 0L)
-        normalizePath(tail(trace, 1L))
+        normalizePath(utils::tail(trace, 1L))
     }
   if (!is.null(file)) {
     lib_path <- .namespace_to_lib_path(name, path, namespace)

@@ -10,8 +10,7 @@ This package contains a Dependency Injection framework for R. It allows to
 organize programs into discrete, modular, and loosely coupled units. By
 nature, such modules are easy to develop, debug, test, reuse, share and
 maintain in a wide range of common situations. This package may also allow
-for higher compliance with best practices in software engineering, provably
-within small- to mid-sized teams of developers and R users.
+for higher compliance with best practices in software engineering.
 }
 \details{
 To learn more about modulr, start with the vignettes and use

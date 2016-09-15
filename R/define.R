@@ -336,6 +336,20 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
   environment(provider) <- new.env(parent = environment(provider))
   environment(provider)$.__wrapper__ <- TRUE
   environment(provider)$.__name__ <- name
+  lapply(list(
+    list(symbol = ".__version__", element = "version"),
+    list(symbol = ".__namespace__", element = "namespace"),
+    list(symbol = ".__initials__", element = "initials"),
+    list(symbol = ".__final__", element = "final")
+  ),
+  function(binding) {
+    makeActiveBinding(
+      as.symbol(binding[["symbol"]]),
+      function() {
+        .parse_name(environment(provider)$.__name__)[[binding[["element"]]]]
+      },
+      env = environment(provider))
+  })
   makeActiveBinding(
     as.symbol(".__file__"),
     function() {
@@ -343,9 +357,9 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
         if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
           normalizePath(.modulr_env$injector$registry[[c(name, "filepath")]])
         } else {
-          trace <- na.omit(names(.source_trace()))
+          trace <- stats::na.omit(names(.source_trace()))
           if (length(trace) > 0L)
-            tail(trace, 1L)
+            utils::tail(trace, 1L)
         }
       if (!is.null(file)) stats::setNames(file, name)
     },
@@ -357,7 +371,6 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
       if (!is.null(file)) dirname(file)
     },
     env = environment(provider))
-  # TODO: .__root__, .__namespace__, ... copier les méthodes du module "modulr"
 
   if (.is_undefined(name)) {
 

@@ -650,12 +650,13 @@ touch <- function(name = .Last.name) {
 #' @export
 hit <- function(name) {
   make_unique_ <- function(name, ls = ls(parent.frame(), all.names = TRUE)) {
-    tail(make.unique(c(ls, name)), 1L)
+    utils::tail(make.unique(c(ls, name)), 1L)
   }
   name_string <- as.character(substitute(name))
-  roots <- as.vector(na.omit(vapply(root_config$get_all()[[1]], function(path) {
-    if (.dir_exists(path)) normalizePath(path) else NA_character_
-  }, FUN.VALUE = "character")))
+  roots <-
+    as.vector(stats::na.omit(vapply(root_config$get_all()[[1]], function(path) {
+      if (.dir_exists(path)) normalizePath(path) else NA_character_
+    }, FUN.VALUE = "character")))
   candidates <-
     list.files(
       path = roots,
@@ -666,7 +667,7 @@ hit <- function(name) {
                  wide = FALSE, cols = "name"),
     grep(
       sprintf("/?[^/]*(?:%s)[^/]*$", name_string),
-      as.vector(na.omit(vapply(candidates, function(candidate) {
+      as.vector(stats::na.omit(vapply(candidates, function(candidate) {
         name <- .extract_name(candidate)
         if (is.null(name)) NA_character_ else name
       },
@@ -683,8 +684,9 @@ hit <- function(name) {
       bindings <- rep(name_string, len)
     } else {
       bindings <-
-        sub(.version_hash_string_regex, "",
-            unlist(lapply(strsplit(modules, "/", fixed = TRUE), tail, 1L)))
+        sub(
+          .version_hash_string_regex, "",
+          unlist(lapply(strsplit(modules, "/", fixed = TRUE), utils::tail, 1L)))
     }
     ls_ <- ls(parent.frame(), all.names = TRUE)
     bindings <-

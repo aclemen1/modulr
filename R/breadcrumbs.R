@@ -37,7 +37,7 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
 
   bc <- unique(c("__main__", unique(
     unlist(
-      Filter(function(x) !is.na(x) & !(x %in% c("modulr")),
+      Filter(function(x) !is.na(x),
              lapply(sys.frames(), function(frame) {
                .get_0(".__name__", envir = frame,
                     ifnotfound = NA, inherits = TRUE)
