@@ -15,3 +15,4 @@ vignettes/*.R
 README.html
 README_files
 .modulr_profile.R
+/.github/*.html
