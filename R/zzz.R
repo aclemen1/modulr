@@ -30,6 +30,14 @@
     },
     env = as.environment("package:modulr"))
 
+  if (requireNamespace("rstudioapi", quietly = TRUE)) {
+    if (utils::packageVersion("rstudioapi") < package_version("0.5")) {
+      packageStartupMessage(
+        paste0("Please update RStudio or package 'rstudioapi' ",
+               "for a better user experience regarding add-ins."))
+    }
+  }
+
   if (utils::packageVersion("assertthat") < package_version("0.1.0.99")) {
     packageStartupMessage(
       paste0("Please update package 'assertthat' from Github at ",

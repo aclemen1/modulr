@@ -630,6 +630,8 @@ touch <- function(name = .Last.name) {
 #' Interactively find, make, and bind a module.
 #'
 #' @inheritParams define
+#' @param replace A flag. Should existing bindings be replaced?
+#' @param execute A flag. Should binding be automatically made?
 #'
 #' @details
 #'
@@ -648,7 +650,7 @@ touch <- function(name = .Last.name) {
 #' hit("foo")
 #' hit(foo)
 #' @export
-hit <- function(name) {
+hit <- function(name, replace = TRUE, execute = FALSE) {
   make_unique_ <- function(name, ls = ls(parent.frame(), all.names = TRUE)) {
     utils::tail(make.unique(c(ls, name)), 1L)
   }
@@ -690,24 +692,36 @@ hit <- function(name) {
     }
     ls_ <- ls(parent.frame(), all.names = TRUE)
     bindings <-
-      vapply(bindings, function(name) make_unique_(name, ls = ls_),
-             FUN.VALUE = "character")
+      vapply(bindings, function(name) {
+        if (replace) name else make_unique_(name, ls = ls_)
+      },
+      FUN.VALUE = "character")
     cmds <- sprintf("%s %%<=%% \"%s\"", bindings, modules)
-    cat(sprintf("[%d] %s", seq_along(cmds), cmds), sep = "\n")
+    if (length(bindings) > 1) {
+      cat(sprintf("[%d] %s", seq_along(cmds), cmds), sep = "\n")
+    }
   }
   if (interactive()) {
     repeat {
-      ans <- gsub("^\\s+|\\s+$", "",
-                  readline("Apply? (default 1, ESC to abort) "))
-      ans <- ifelse(ans == "", "1", ans)
-      ans <- suppressWarnings(as.integer(ans))
+      if (length(bindings) > 1) {
+        ans <- gsub("^\\s+|\\s+$", "",
+                    readline("Apply? (default 1, ESC to abort) "))
+        ans <- ifelse(ans == "", "1", ans)
+        ans <- suppressWarnings(as.integer(ans))
+      } else ans <- 1
       if (ans %in% seq_along(bindings)) {
-        assign(
-          bindings[ans],
-          do.call(make, list(name = modules[ans])),
-          pos = parent.frame())
-        message("Module evaluation result bound to ",
-                sQuote(bindings[ans]), ".")
+        if (requireNamespace("rstudioapi", quietly = TRUE)) {
+          rstudioapi::sendToConsole(cmds[ans], execute = execute)
+        } else if (execute) {
+          assign(
+            bindings[ans],
+            do.call(make, list(name = modules[ans])),
+            pos = parent.frame())
+          message("Module evaluation result bound to ",
+                  sQuote(bindings[ans]), ".")
+        } else {
+          print(cmds[ans])
+        }
         break;
       }
     }

@@ -1,0 +1,14 @@
+Name: insert %requires%
+Description: Inserts `%requires%` statements at the cursor position.
+Binding: insertRequiresAddin
+Interactive: false
+
+Name: insert %provides%
+Description: Inserts `%provides%` statement at the cursor position.
+Binding: insertProvidesAddin
+Interactive: false
+
+Name: insert %<=%
+Description: Inserts `%<=%` statement at the cursor position.
+Binding: insertMakeSugarAddin
+Interactive: false

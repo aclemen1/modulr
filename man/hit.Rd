@@ -4,7 +4,7 @@
 \alias{hit}
 \title{Interactively Find, Make and Bind a Module.}
 \usage{
-hit(name)
+hit(name, replace = TRUE, execute = FALSE)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -19,6 +19,10 @@ hit(name)
 
   The name "modulr" corresponds to a special module and is therefore
   reserved.}
+
+\item{replace}{A flag. Should existing bindings be replaced?}
+
+\item{execute}{A flag. Should binding be made?}
 }
 \description{
 Interactively find, make, and bind a module.
