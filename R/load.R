@@ -22,10 +22,10 @@
       .modulr_env$injector$stash <- stash
     }
 
-    if (tolower(tools::file_ext(path)) == "r") {
+    wrapper_env <- new.env()
+    wrapper_env$.__name__ <- if (is.null(name)) "__noname__" else name
 
-      wrapper_env <- new.env()
-      wrapper_env$.__name__ <- name
+    if (tolower(tools::file_ext(path)) == "r") {
 
       if (interactive() && requireNamespace("rstudioapi", quietly = TRUE) &&
             rstudioapi::isAvailable()) {
