@@ -45,17 +45,15 @@ plot_dependencies <- function(group, reserved = TRUE) {
     assertthat::is.flag(reserved)
   )
 
-  universe <- .modulr_env$injector$registry
-  namespaces <-
-    unlist(lapply(lapply(names(universe), .parse_name), `[[`, "namespace"))
-
-  if (!missing(group)) {
-
+  if (missing(group)) {
+    universe <- .modulr_env$injector$registry
+  } else {
     sub <- .define_all_dependent_modules(group)
-
-    universe <- universe[namespaces %in% sub]
-
+    universe <-
+      .modulr_env$injector$registry[
+        names(.modulr_env$injector$registry) %in% sub]
   }
+  namespaces <- names(universe)
 
   if (length(universe) > 0) {
 
