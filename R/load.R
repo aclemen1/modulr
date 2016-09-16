@@ -24,6 +24,9 @@
 
     if (tolower(tools::file_ext(path)) == "r") {
 
+      wrapper_env <- new.env()
+      wrapper_env$.__name__ <- name
+
       if (interactive() && requireNamespace("rstudioapi", quietly = TRUE) &&
             rstudioapi::isAvailable()) {
 
@@ -33,7 +36,8 @@
           # RStudio's debugSource call (version 0.98.1103).
           try(stop("fake error", call. = FALSE), silent = TRUE)
           last_error <- geterrmessage()
-          local(do.call("debugSource", args = list(path, echo = FALSE))) # nocov
+          local(do.call("debugSource", args = list(path, echo = FALSE)),
+                envir = wrapper_env) # nocov
           if (last_error != geterrmessage()) {
             stop(sub("\n$", "", geterrmessage()), call. = FALSE)
           } else {
@@ -51,7 +55,8 @@
 
       } else {
         tryCatch({
-          source(path, local = TRUE, echo = FALSE, keep.source = TRUE)
+          local(source(path, local = TRUE, echo = FALSE, keep.source = TRUE),
+                envir = wrapper_env)
           loaded <- TRUE
         },
         error = function(e) {
@@ -91,7 +96,8 @@
                     tangle = TRUE, quiet = TRUE)
 
       tryCatch({
-        local(eval(parse(text = script, keep.source = TRUE)))
+        local(eval(parse(text = script, keep.source = TRUE)),
+              envir = wrapper_env)
         loaded <- TRUE
       },
       error = function(e) {
