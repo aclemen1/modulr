@@ -65,6 +65,10 @@
           },
           FUN.VALUE = "", USE.NAMES = F)
 
+      if (grepl("\\b(?:@noRd)\\b", utils::tail(docstring_lines, 1L))) {
+        docstring_lines <- utils::head(docstring_lines, -1L)
+      }
+
       docstring <- paste(c(docstring, docstring_lines), collapse = "\n")
 
     }

@@ -13,52 +13,23 @@
 \title{Special Module \code{'modulr'}}
 \format{A list of functions.
 \preformatted{
-get_module_name()
-get_module_options()
-get_filename()
-get_dirname()
 post_evaluation_hook(expr, add = FALSE)
 message_info(...)
 message_warn(...)
-message_stop(...)}}
+message_stop(...)
+
+## Deprecated ##
+get_module_name()
+get_module_options()
+get_filename()
+get_dirname()}}
 \description{
-Access module metadata and helper functions.
+Access module helper functions.
 }
 \details{
 The purpose of the special module \code{'modulr'} is to give access
-to metadata and useful helper functions related to the module into which it
-is injected.
+to useful helper functions related to the module into which it is injected.
 }
-\section{\code{get_module_name()}}{
-
-Returns a string (character vector of lenght one) containing the module name.
-See \code{\link{define}}.
-}
-
-\section{\code{get_module_version()}}{
-
-Returns numeric version of the module.
-}
-
-\section{\code{get_module_options()}}{
-
-Returns a list containing the module options. See
-\code{\link{module_options}}. \bold{Deprecated and kept for backward
-compatibility.}
-}
-
-\section{\code{get_filename(absolute = TRUE)}}{
-
-Returns a string (character vector of lenght one) containing the module
-(absolute) filename.
-}
-
-\section{\code{get_dirname(absolute = TRUE)}}{
-
-Returns a string (character vector of lenght one) containing the module
-(absolute) dirname.
-}
-
 \section{\code{post_evaluation_hook(expr, add = FALSE)}}{
 
 Records the expression given as its argument as needing to be executed when
@@ -75,14 +46,47 @@ Outputs an informative, warning, or critical and stopping message, prefixed
 with a timestamp and the module name. Such messages are particularily useful
 in modules involved in long chains of dependencies and workflows.
 }
+
+\section{\code{get_module_name()}}{
+
+Returns a string (character vector of lenght one) containing the module name.
+See \code{\link{define}}. \bold{Deprecated and kept for backward
+compatibility.}
+}
+
+\section{\code{get_module_version()}}{
+
+Returns numeric version of the module. \bold{Deprecated and kept for backward
+compatibility.}
+}
+
+\section{\code{get_module_options()}}{
+
+Returns a list containing the module options. See
+\code{\link{module_options}}. \bold{Deprecated and kept for backward
+compatibility.}
+}
+
+\section{\code{get_filename(absolute = TRUE)}}{
+
+Returns a string (character vector of lenght one) containing the module
+(absolute) filename. \bold{Deprecated and kept for backward
+compatibility.}
+}
+
+\section{\code{get_dirname(absolute = TRUE)}}{
+
+Returns a string (character vector of lenght one) containing the module
+(absolute) dirname. \bold{Deprecated and kept for backward
+compatibility.}
+}
 \examples{
 reset()
 define("foo", list(modulr = "modulr"), function(modulr) {
-  module_name <- modulr$get_module_name()
   list(
-    info = function() modulr$message_info("Module name: ", module_name),
-    warn = function() modulr$message_warn("Module name: ", module_name),
-    stop = function() modulr$message_stop("Module name: ", module_name)
+    info = function() modulr$message_info("Module name: ", .__name__),
+    warn = function() modulr$message_warn("Module name: ", .__name__),
+    stop = function() modulr$message_stop("Module name: ", .__name__)
   )
 })
 foo <- make()
@@ -95,8 +99,8 @@ dir.create(tmp_dir)
 tmp_file <- file.path(tmp_dir, "foo.R")
 cat(
 'define("foo", list(modulr = "modulr"), function(modulr) {
-  modulr$message_info("Module filename: ", modulr$get_filename())
-  modulr$message_info("Module dirname: ", modulr$get_dirname())
+  modulr$message_info("Module file name: ", .__file__)
+  modulr$message_info("Module file path: ", .__path__)
 })', sep = "\\n", file = tmp_file)
 root_config$set(tmp_dir)
 make("foo")

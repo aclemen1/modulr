@@ -4,35 +4,21 @@ MODULR_NAME <-
 RESERVED_NAMES <- c(MODULR_NAMESPACE)
 
 #' @title Special Module \code{'modulr'}
-#' @description Access module metadata and helper functions.
+#' @description Access module helper functions.
 #' @details The purpose of the special module \code{'modulr'} is to give access
-#' to metadata and useful helper functions related to the module into which it
-#' is injected.
+#' to useful helper functions related to the module into which it is injected.
 #' @format A list of functions.
 #' \preformatted{
-#' get_module_name()
-#' get_module_options()
-#' get_filename()
-#' get_dirname()
 #' post_evaluation_hook(expr, add = FALSE)
 #' message_info(...)
 #' message_warn(...)
-#' message_stop(...)}
-#' @section \code{get_module_name()}:
-#' Returns a string (character vector of lenght one) containing the module name.
-#' See \code{\link{define}}.
-#' @section \code{get_module_version()}:
-#' Returns numeric version of the module.
-#' @section \code{get_module_options()}:
-#' Returns a list containing the module options. See
-#' \code{\link{module_options}}. \bold{Deprecated and kept for backward
-#' compatibility.}
-#' @section \code{get_filename(absolute = TRUE)}:
-#' Returns a string (character vector of lenght one) containing the module
-#' (absolute) filename.
-#' @section \code{get_dirname(absolute = TRUE)}:
-#' Returns a string (character vector of lenght one) containing the module
-#' (absolute) dirname.
+#' message_stop(...)
+#'
+#' ## Deprecated ##
+#' get_module_name()
+#' get_module_options()
+#' get_filename()
+#' get_dirname()}
 #' @section \code{post_evaluation_hook(expr, add = FALSE)}:
 #' Records the expression given as its argument as needing to be executed when
 #' the current module evaluation exits (either naturally or as the result of an
@@ -44,16 +30,34 @@ RESERVED_NAMES <- c(MODULR_NAMESPACE)
 #' Outputs an informative, warning, or critical and stopping message, prefixed
 #' with a timestamp and the module name. Such messages are particularily useful
 #' in modules involved in long chains of dependencies and workflows.
+#' @section \code{get_module_name()}:
+#' Returns a string (character vector of lenght one) containing the module name.
+#' See \code{\link{define}}. \bold{Deprecated and kept for backward
+#' compatibility.}
+#' @section \code{get_module_version()}:
+#' Returns numeric version of the module. \bold{Deprecated and kept for backward
+#' compatibility.}
+#' @section \code{get_module_options()}:
+#' Returns a list containing the module options. See
+#' \code{\link{module_options}}. \bold{Deprecated and kept for backward
+#' compatibility.}
+#' @section \code{get_filename(absolute = TRUE)}:
+#' Returns a string (character vector of lenght one) containing the module
+#' (absolute) filename. \bold{Deprecated and kept for backward
+#' compatibility.}
+#' @section \code{get_dirname(absolute = TRUE)}:
+#' Returns a string (character vector of lenght one) containing the module
+#' (absolute) dirname. \bold{Deprecated and kept for backward
+#' compatibility.}
 #' @seealso \code{\link{define}}, \code{\link{module_options}}, and
 #'   \code{\link{reset}}.
 #' @examples
 #' reset()
 #' define("foo", list(modulr = "modulr"), function(modulr) {
-#'   module_name <- modulr$get_module_name()
 #'   list(
-#'     info = function() modulr$message_info("Module name: ", module_name),
-#'     warn = function() modulr$message_warn("Module name: ", module_name),
-#'     stop = function() modulr$message_stop("Module name: ", module_name)
+#'     info = function() modulr$message_info("Module name: ", .__name__),
+#'     warn = function() modulr$message_warn("Module name: ", .__name__),
+#'     stop = function() modulr$message_stop("Module name: ", .__name__)
 #'   )
 #' })
 #' foo <- make()
@@ -66,8 +70,8 @@ RESERVED_NAMES <- c(MODULR_NAMESPACE)
 #' tmp_file <- file.path(tmp_dir, "foo.R")
 #' cat(
 #' 'define("foo", list(modulr = "modulr"), function(modulr) {
-#'   modulr$message_info("Module filename: ", modulr$get_filename())
-#'   modulr$message_info("Module dirname: ", modulr$get_dirname())
+#'   modulr$message_info("Module file name: ", .__file__)
+#'   modulr$message_info("Module file path: ", .__path__)
 #' })', sep = "\n", file = tmp_file)
 #' root_config$set(tmp_dir)
 #' make("foo")
@@ -92,8 +96,8 @@ RESERVED_NAMES <- c(MODULR_NAMESPACE)
 #' \dontrun{make("foo")}
 #'
 #' @name modulr-module
-#' @aliases get_module_name get_module_options get_filename get_dirname
-#'   post_evaluation_hook message_info message_warn message_stop
+#' @aliases post_evaluation_hook message_info message_warn message_stop
+#'  get_module_name get_module_options get_filename get_dirname
 NULL
 
 define_modulr <- function() {
@@ -104,36 +108,12 @@ define_modulr <- function() {
 
     #' # `modulr`
     #'
-    #' Access module metadata and helper functions.
+    #' Access module helper functions.
     #'
-    #' The purpose of this special module is to give access to metadata and
-    #' useful helper functions related to the module into which it is injected.
+    #' The purpose of this special module is to give access to useful helper
+    #' functions related to the module into which it is injected.
     #'
     #' ## Methods
-    #'
-    #' ### `get_module_name()`
-    #'
-    #' Returns a string (character vector of lenght one) containing the module
-    #' name.
-    #'
-    #' ### `get_module_version()`
-    #'
-    #' Returns the numeric version of the module.
-    #'
-    #' ### `get_module_options()`
-    #'
-    #' Returns a list containing the module options. Deprecated and kept for
-    #' backward compatibility.
-    #'
-    #' ### `get_filename()`
-    #'
-    #' Returns a string (character vector of lenght one) containing the module
-    #' filename.
-    #'
-    #' ### `get_dirname()`
-    #'
-    #' Returns a string (character vector of lenght one) containing the module
-    #' dirname.
     #'
     #' ### `post_evaluation_hook(expr, add = FALSE)`
     #'
@@ -152,6 +132,34 @@ define_modulr <- function() {
     #' particularily useful in modules involved in long chains of dependencies
     #' and workflows.
     #'
+    #' ## Deprecated methods
+    #'
+    #' ### `get_module_name()`
+    #'
+    #' Returns a string (character vector of lenght one) containing the module
+    #' name. Deprecated and kept for backward compatibility.
+    #'
+    #' ### `get_module_version()`
+    #'
+    #' Returns the numeric version of the module. Deprecated and kept for
+    #' backward compatibility.
+    #'
+    #' ### `get_module_options()`
+    #'
+    #' Returns a list containing the module options. Deprecated and kept for
+    #' backward compatibility.
+    #'
+    #' ### `get_filename()`
+    #'
+    #' Returns a string (character vector of lenght one) containing the module
+    #' filename. Deprecated and kept for backward compatibility.
+    #'
+    #' ### `get_dirname()`
+    #'
+    #' Returns a string (character vector of lenght one) containing the module
+    #' dirname. Deprecated and kept for backward compatibility.
+    #'
+    #' @noRd
 
     # End Exclude Linting
 
@@ -165,17 +173,26 @@ define_modulr <- function() {
     list(
 
       # returns module name
+      # Deprecated and kept for backward compatibility.
+      # nocov start
       get_module_name = function() {
+        .deprecated(".__name__", old = "$get_module_name")
         get(".__name__", pos = parent.frame())
       },
+      # nocov end
 
       # returns module version
+      # Deprecated and kept for backward compatibility.
+      # nocov start
       get_module_version = function() {
+        .deprecated(".__version__", old = "$get_module_version")
         .parse_name(get(".__name__", pos = parent.frame()))$version
       },
+      # nocov end
 
       # returns module options
       # Deprecated and kept for backward compatibility.
+      # nocov start
       get_module_options = function() {
 
         suppressWarnings(.deprecated(msg = paste0(
@@ -187,9 +204,13 @@ define_modulr <- function() {
         name <- get(".__name__", pos = parent.frame())
         module_options(name)$get_all()
       },
+      # nocov end
 
       # returns module filename
+      # Deprecated and kept for backward compatibility.
+      # nocov start
       get_filename = function(absolute = TRUE) {
+        .deprecated(".__file__", old = "$get_filename")
         name <- get(".__name__", pos = parent.frame())
         file <- if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
           .modulr_env$injector$registry[[c(name, "filepath")]]
@@ -201,9 +222,13 @@ define_modulr <- function() {
         if (!is.null(file)) stats::setNames(
           ifelse(absolute, normalizePath, identity)(file), name)
       },
+      # nocov end
 
       # returns module directory
+      # Deprecated and kept for backward compatibility.
+      # nocov start
       get_dirname = function(absolute = TRUE) {
+        .deprecated(".__path__", old = "$get_dirname")
         name <- get(".__name__", pos = parent.frame())
         file <- if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
           .modulr_env$injector$registry[[c(name, "filepath")]]
@@ -215,6 +240,7 @@ define_modulr <- function() {
         if (!is.null(file)) dirname(
           ifelse(absolute, normalizePath, identity)(file))
       },
+      # nocov end
 
       # post-evaluation hook
       post_evaluation_hook = function(expr = NULL, add = FALSE) {

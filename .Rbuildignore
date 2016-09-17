@@ -15,3 +15,4 @@ man-roxygen
 tmp/
 data/
 ^\.modulr_profile
+^\.github

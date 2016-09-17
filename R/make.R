@@ -710,6 +710,7 @@ hit <- function(name, replace = TRUE, execute = FALSE) {
         ans <- suppressWarnings(as.integer(ans))
       } else ans <- 1
       if (ans %in% seq_along(bindings)) {
+        # nocov start
         if (requireNamespace("rstudioapi", quietly = TRUE)) {
           rstudioapi::sendToConsole(cmds[ans], execute = execute)
         } else if (execute) {
@@ -722,6 +723,7 @@ hit <- function(name, replace = TRUE, execute = FALSE) {
         } else {
           print(cmds[ans])
         }
+        # nocov end
         break;
       }
     }

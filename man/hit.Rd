@@ -22,7 +22,7 @@ hit(name, replace = TRUE, execute = FALSE)
 
 \item{replace}{A flag. Should existing bindings be replaced?}
 
-\item{execute}{A flag. Should binding be made?}
+\item{execute}{A flag. Should binding be automatically made?}
 }
 \description{
 Interactively find, make, and bind a module.
