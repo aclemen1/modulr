@@ -87,11 +87,11 @@ plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
       deps <- deps[
         vapply(
           deps$module,
-          FUN = function (name) grepl(regexp, name, ...),
+          FUN = function (name) grepl(regexp, name, ...) || name %in% group,
           FUN.VALUE = TRUE) &
           vapply(
             deps$dependency,
-            FUN = function (name) grepl(regexp, name, ...),
+            FUN = function (name) grepl(regexp, name, ...) || name %in% group,
             FUN.VALUE = TRUE), ]
 
     }
