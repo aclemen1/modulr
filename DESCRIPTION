@@ -1,7 +1,7 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9125
-Date: 2016-09-17
+Version: 0.1.7.9126
+Date: 2016-09-20
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
     programs into discrete, modular units that are loosely coupled,

@@ -5,6 +5,8 @@
 #' @inheritParams make
 #' @param group A character vector of module names (cf. \code{\link{define}}) to
 #'   include as a subset of the graph nodes.
+#' @param regexp A regular expression. If not missing, the regular expression
+#'  is used to filter the names of the modules to be plotted.
 #'
 #' @seealso \code{\link{define}} and \code{\link{reset}}.
 #'
@@ -23,7 +25,7 @@
 #'
 #' @aliases graph_dependencies
 #' @export
-plot_dependencies <- function(group, reserved = TRUE) {
+plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
 
   .message_meta("Entering plot_dependencies() ...",
                 verbosity = +Inf)
@@ -42,6 +44,7 @@ plot_dependencies <- function(group, reserved = TRUE) {
 
   assert_that(
     missing(group) || is.character(group),
+    missing(regexp) || assertthat::is.string(regexp),
     assertthat::is.flag(reserved)
   )
 
@@ -76,6 +79,20 @@ plot_dependencies <- function(group, reserved = TRUE) {
       deps <- deps[
         !vapply(deps$module, FUN = .is_regular, FUN.VALUE = TRUE) &
           !vapply(deps$dependency, FUN = .is_regular, FUN.VALUE = TRUE), ]
+
+    }
+
+    if (!missing(regexp)) {
+
+      deps <- deps[
+        vapply(
+          deps$module,
+          FUN = function (name) grepl(regexp, name, ...),
+          FUN.VALUE = TRUE) &
+          vapply(
+            deps$dependency,
+            FUN = function (name) grepl(regexp, name, ...),
+            FUN.VALUE = TRUE), ]
 
     }
 

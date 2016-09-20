@@ -5,14 +5,21 @@
 \alias{plot_dependencies}
 \title{Plot Dependencies.}
 \usage{
-plot_dependencies(group, reserved = TRUE)
+plot_dependencies(group, regexp, reserved = TRUE, ...)
 }
 \arguments{
 \item{group}{A character vector of module names (cf. \code{\link{define}}) to
 include as a subset of the graph nodes.}
 
+\item{regexp}{A regular expression. If not missing, the regular expression
+is used to filter the names of the modules to be plotted.}
+
 \item{reserved}{A flag. Should special modules with a reserved name be
 considered?}
+
+\item{...}{For \code{make}, further arguments to be passed for evaluation to
+the resulting function, if any. For \code{make_all_tests}, further
+arguments to be passed to \code{\link{load_all_modules}}.}
 }
 \description{
 Plot the directed acyclic graph (DAG) of modules and dependencies.
