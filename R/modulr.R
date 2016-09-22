@@ -176,6 +176,7 @@ get_default_injector <- function() {
   new, package = NULL, msg,
   old = as.character(sys.call(sys.parent()))[1L],
   immediate. = F) {
+  if (isTRUE(getOption("modulr.ignore_deprecated"))) return()
   msg <- if (missing(msg)) {
     msg <- c()
     bc <- get_breadcrumbs(verbose = FALSE)
