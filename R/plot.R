@@ -84,15 +84,44 @@ plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
 
     if (!missing(regexp)) {
 
-      deps <- deps[
-        vapply(
-          deps$module,
-          FUN = function (name) grepl(regexp, name, ...) || name %in% group,
-          FUN.VALUE = TRUE) &
-          vapply(
-            deps$dependency,
-            FUN = function (name) grepl(regexp, name, ...) || name %in% group,
-            FUN.VALUE = TRUE), ]
+      keep_mods <-
+        grepl(regexp, deps$module, ...) | deps$module %in% group
+      keep_deps <-
+        grepl(regexp, deps$dependency, ...) | deps$dependency %in% group
+      to_collapse <- unique(c(deps$module[!keep_mods],
+                              deps$dependency[!keep_deps]))
+
+      deps$value <- NULL
+      inc <- table(deps[[1]][row(deps[-1])], unlist(deps[-1]))
+      cols_not_in_rows <- setdiff(dimnames(inc)[[2]], dimnames(inc)[[1]])
+      row_to_add <- array(0, dim = c(length(cols_not_in_rows), ncol(inc)),
+                          dimnames = list(cols_not_in_rows, dimnames(inc)[[2]]))
+      inc <- rbind(inc, row_to_add)
+      rows_not_in_cols <- setdiff(dimnames(inc)[[1]], dimnames(inc)[[2]])
+      col_to_add <- array(0, dim = c(nrow(inc), length(rows_not_in_cols)),
+                          dimnames = list(dimnames(inc)[[1]], rows_not_in_cols))
+      inc <- cbind(inc, col_to_add)
+
+      for (module in to_collapse) {
+        li <- unname(inc[module, ])
+        col <- unname(inc[, module])
+        if (any(col == 1)) {
+          inc[col == 1, ] <-
+          pmax(inc[col == 1, , drop = FALSE],
+               t(array(li, rev(dim(inc[col == 1, , drop = FALSE])))))
+        }
+        inc <- inc[dimnames(inc)[[1]] != module, dimnames(inc)[[2]] != module]
+      }
+
+      inc <- as.table(inc)
+
+      if (length(dim(inc)) != 2) {
+        deps <- deps[F, ]
+      } else {
+        deps <- as.data.frame(as.table(inc))
+        names(deps) <- c("module", "dependency", "value")
+        deps <- deps[deps$value == 1, ]
+      }
 
     }
 
