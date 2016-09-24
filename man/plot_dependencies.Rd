@@ -5,14 +5,17 @@
 \alias{plot_dependencies}
 \title{Plot Dependencies.}
 \usage{
-plot_dependencies(group, regexp, reserved = TRUE, ...)
+plot_dependencies(group, regexp, include_group = TRUE, reserved = TRUE, ...)
 }
 \arguments{
 \item{group}{A character vector of module names (cf. \code{\link{define}}) to
 include as a subset of the graph nodes.}
 
-\item{regexp}{A regular expression. If not missing, the regular expression
-is used to filter the names of the modules to be plotted.}
+\item{regexp}{A regular expression. If not missing, the regular expression is
+used to filter the names of the modules to be plotted.}
+
+\item{include_group}{A flag. Should the group of modules be included to the
+plot?}
 
 \item{reserved}{A flag. Should special modules with a reserved name be
 considered?}

@@ -5,8 +5,10 @@
 #' @inheritParams make
 #' @param group A character vector of module names (cf. \code{\link{define}}) to
 #'   include as a subset of the graph nodes.
-#' @param regexp A regular expression. If not missing, the regular expression
-#'  is used to filter the names of the modules to be plotted.
+#' @param regexp A regular expression. If not missing, the regular expression is
+#'   used to filter the names of the modules to be plotted.
+#' @param include_group A flag. Should the group of modules be included to the
+#'   plot?
 #'
 #' @seealso \code{\link{define}} and \code{\link{reset}}.
 #'
@@ -25,7 +27,9 @@
 #'
 #' @aliases graph_dependencies
 #' @export
-plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
+plot_dependencies <- function(group, regexp,
+                              include_group = TRUE, reserved = TRUE,
+                              ...) {
 
   .message_meta("Entering plot_dependencies() ...",
                 verbosity = +Inf)
@@ -45,6 +49,7 @@ plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
   assert_that(
     missing(group) || is.character(group),
     missing(regexp) || assertthat::is.string(regexp),
+    assertthat::is.flag(include_group),
     assertthat::is.flag(reserved)
   )
 
@@ -85,9 +90,11 @@ plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
     if (!missing(regexp)) {
 
       keep_mods <-
-        grepl(regexp, deps$module, ...) | deps$module %in% group
+        grepl(regexp, deps$module, ...) |
+        deps$module %in% group[include_group]
       keep_deps <-
-        grepl(regexp, deps$dependency, ...) | deps$dependency %in% group
+        grepl(regexp, deps$dependency, ...) |
+        deps$dependency %in% group[include_group]
       to_collapse <- unique(c(deps$module[!keep_mods],
                               deps$dependency[!keep_deps]))
 
