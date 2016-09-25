@@ -66,34 +66,45 @@ plot_dependencies <- function(group, regexp, reserved = TRUE,
 
     deps <- Reduce(rbind, Map(function(module) {
 
-      deps <- intersect(unlist(module$dependencies),
-                        namespaces)
+      deps <- intersect(
+        unlist(lapply(
+          module$dependencies,
+          function(alias) find_module(alias)[["name"]])),
+        namespaces)
 
-      data.frame(module = deps, dependency = rep(module$name, length(deps)),
-                 # MAYBE: adapt values for nicer output
-                 value = rep(1, length(deps)),
-                 stringsAsFactors = FALSE)
+      data.frame(
+        module = deps,
+        dependency = rep(find_module(module$name)[["name"]], length(deps)),
+        # MAYBE: adapt values for nicer output
+        value = rep(1, length(deps)),
+        stringsAsFactors = FALSE)
 
     },
 
     universe))
 
+    keep_mods <- TRUE
+    keep_deps <- TRUE
+
     if (!reserved) {
-
-      deps <- deps[
-        !vapply(deps$module, FUN = .is_regular, FUN.VALUE = TRUE) &
-          !vapply(deps$dependency, FUN = .is_regular, FUN.VALUE = TRUE), ]
-
+      keep_mods <-
+        keep_mods & vapply(deps$module, FUN = .is_regular, FUN.VALUE = TRUE)
+      keep_deps <-
+        keep_deps & vapply(deps$dependency, FUN = .is_regular, FUN.VALUE = TRUE)
     }
 
     if (!missing(regexp)) {
 
-      keep_mods <-
+      keep_mods <- keep_mods &
         grepl(regexp, deps$module) | deps$module %in% group
-      keep_deps <-
+      keep_deps <- keep_deps &
         grepl(regexp, deps$dependency) | deps$dependency %in% group
-      to_collapse <- unique(c(deps$module[!keep_mods],
-                              deps$dependency[!keep_deps]))
+    }
+
+    to_collapse <- unique(c(deps$module[!keep_mods],
+                            deps$dependency[!keep_deps]))
+
+    if (length(to_collapse) > 0L) {
 
       deps$value <- NULL
       inc <- table(deps[[1]][row(deps[-1])], unlist(deps[-1]))
