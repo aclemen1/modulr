@@ -3,10 +3,13 @@
 #' Plot the directed acyclic graph (DAG) of modules and dependencies.
 #'
 #' @inheritParams make
+#' @inheritParams networkD3::sankeyNetwork
 #' @param group A character vector of module names (cf. \code{\link{define}}) to
 #'   include as a subset of the graph nodes.
-#' @param regexp A regular expression. If not missing, the regular expression
-#'  is used to filter the names of the modules to be plotted.
+#' @param regexp A regular expression. If not missing, the regular expression is
+#'   used to filter the names of the modules to be plotted.
+#' @param ... Further arguments to be passed to
+#'   \code{networkD3::\link[networkD3]{sankeyNetwork}}.
 #'
 #' @seealso \code{\link{define}} and \code{\link{reset}}.
 #'
@@ -25,7 +28,8 @@
 #'
 #' @aliases graph_dependencies
 #' @export
-plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
+plot_dependencies <- function(group, regexp, reserved = TRUE,
+                              fontSize = 13, ...) {
 
   .message_meta("Entering plot_dependencies() ...",
                 verbosity = +Inf)
@@ -85,9 +89,9 @@ plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
     if (!missing(regexp)) {
 
       keep_mods <-
-        grepl(regexp, deps$module, ...) | deps$module %in% group
+        grepl(regexp, deps$module) | deps$module %in% group
       keep_deps <-
-        grepl(regexp, deps$dependency, ...) | deps$dependency %in% group
+        grepl(regexp, deps$dependency) | deps$dependency %in% group
       to_collapse <- unique(c(deps$module[!keep_mods],
                               deps$dependency[!keep_deps]))
 
@@ -141,7 +145,8 @@ plot_dependencies <- function(group, regexp, reserved = TRUE, ...) {
         Target = "target",
         NodeID = "node",
         Value = "value",
-        fontSize = 10))
+        fontSize = fontSize,
+        ...))
     }
 
   }
