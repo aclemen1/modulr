@@ -4,7 +4,8 @@
 \alias{hit}
 \title{Interactively Find, Make and Bind a Module.}
 \usage{
-hit(name, replace = TRUE, execute = FALSE)
+hit(name, suffix = getOption("modulr.hit_suffix", default = "_"),
+  replace = TRUE, execute = FALSE)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -19,6 +20,9 @@ hit(name, replace = TRUE, execute = FALSE)
 
   The name "modulr" corresponds to a special module and is therefore
   reserved.}
+
+\item{suffix}{A string (character vector of lenght one).
+Suffix added to variable names.}
 
 \item{replace}{A flag. Should existing bindings be replaced?}
 

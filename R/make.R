@@ -630,6 +630,8 @@ touch <- function(name = .Last.name) {
 #' Interactively find, make, and bind a module.
 #'
 #' @inheritParams define
+#' @param suffix A string (character vector of lenght one).
+#'  Suffix added to variable names.
 #' @param replace A flag. Should existing bindings be replaced?
 #' @param execute A flag. Should binding be automatically made?
 #'
@@ -650,7 +652,13 @@ touch <- function(name = .Last.name) {
 #' hit("foo")
 #' hit(foo)
 #' @export
-hit <- function(name, replace = TRUE, execute = FALSE) {
+hit <- function(name, suffix = getOption("modulr.hit_suffix", default = "_"),
+                replace = TRUE, execute = FALSE) {
+  assert_that(
+    assertthat::is.string(suffix),
+    assertthat::is.flag(replace),
+    assertthat::is.flag(execute)
+  )
   make_unique_ <- function(name, ls = ls(parent.frame(), all.names = TRUE)) {
     utils::tail(make.unique(c(ls, name)), 1L)
   }
@@ -683,12 +691,14 @@ hit <- function(name, replace = TRUE, execute = FALSE) {
     return(invisible(NULL))
   } else {
     if (is.symbol(substitute(name))) {
-      bindings <- rep(name_string, len)
-    } else {
       bindings <-
-        sub(
-          .version_hash_string_regex, "",
-          unlist(lapply(strsplit(modules, "/", fixed = TRUE), utils::tail, 1L)))
+        paste0(
+          sub(.version_hash_string_regex, "", unlist(
+            lapply(strsplit(modules, "/", fixed = TRUE),
+                   utils::tail, 1L))
+          ), suffix)
+    } else {
+      bindings <- rep(name_string, len)
     }
     ls_ <- ls(parent.frame(), all.names = TRUE)
     bindings <-
