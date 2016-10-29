@@ -124,7 +124,7 @@ if (!identical(Sys.getenv("TRAVIS"), "true") &&
       identical(Sys.getenv("NOT_CRAN"), "true")) {
   plot_dependencies() %>%
     html_print %>%
-    webshot(file = "introduction-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
+    webshot(file = "guide-foobar.png", selector = ".sankeyNetwork", delay = 2) %>%
     resize("730x") %>%
     shrink()
 }
@@ -134,7 +134,7 @@ if (!identical(Sys.getenv("TRAVIS"), "true") &&
 plot_dependencies()
 ```
 
-![](introduction-foobar.png)
+![](guide-foobar.png)
 
 Use `make` get the resulting object provided by the module:
 
