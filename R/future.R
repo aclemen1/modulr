@@ -30,7 +30,7 @@ futurize <- function(
 
   if (is.null(strategy)) strategy <- future::plan()
 
-  provider <- eval(
+  provider <- eval(parse(text = deparse(
     substitute(
       function() {
         future::future({
@@ -54,7 +54,7 @@ futurize <- function(
                      keep.source = TRUE))
         )
       )
-    )
+    ), keep.source = TRUE))
 
   define(name, dependencies, provider)
 }
