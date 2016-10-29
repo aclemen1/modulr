@@ -1,7 +1,7 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9134
-Date: 2016-10-05
+Version: 0.1.7.9135
+Date: 2016-10-29
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
     programs into discrete, modular units that are loosely coupled,
@@ -9,16 +9,7 @@ Description: A Dependency Injection Framework to break down sequential
 Authors@R: c(
   person(
     given = "Alain", family = "Clément-Pavon",
-    email = "alain.clement-pavon@unil.ch", role = c("aut", "cre", "cph")),
-  person(
-    given = "Raphaël", family = "Conradin",
-    email = "raphael.conradin@unil.ch", role = "ctb"),
-  person(
-    given = "Jean-Moïse", family = "Rochat",
-    email = "jean-moise.rochat@unil.ch", role = "ctb"),
-  person(
-    given = "Anne-Laure", family = "Aeby",
-    email = "anne-laure.aeby@unil.ch", role = "ctb")
+    email = "alain.clement-pavon@unil.ch", role = c("aut", "cre", "cph"))
   )
 URL: https://github.com/aclemen1/modulr
 BugReports: https://github.com/aclemen1/modulr/issues

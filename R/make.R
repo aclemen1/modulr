@@ -5,6 +5,10 @@
   selected_bc <- bc[names(bc) %in% ab]
   aligned_ab <- selected_ab[order(selected_ab)]
   aligned_bc <- selected_bc[order(names(selected_bc))]
+  assert_that(
+    assertthat::are_equal(length(aligned_bc), length(aligned_ab)),
+    isTRUE(!any(duplicated(names(aligned_ab)))),
+           msg = "dependencies must occur only once.")
   stats::setNames(aligned_bc, names(aligned_ab))
 }
 
