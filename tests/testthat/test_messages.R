@@ -75,6 +75,18 @@ test_that(".message accepts multiple message arguments and concatenates", {
                  regexp = "hello world")
 })
 
+test_that(".message accepts appendLF as parameter", {
+  expect_message(
+    .message("hello", " ", "world", fun = message),
+    regexp = "hello world\n$")
+  expect_message(
+    .message("hello", " ", "world", fun = message, appendLF = T),
+    regexp = "hello world\n$")
+  expect_message(
+    .message("hello", " ", "world", fun = message, appendLF = F),
+    regexp = "hello world$")
+})
+
 test_that(".message follows levels", {
   expect_message(.message("level0", fun = message), regexp = "[^*]\\ level0" )
   .message_meta("level0", expr = {

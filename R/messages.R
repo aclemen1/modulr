@@ -81,7 +81,13 @@
 
     out <- paste0(out, paste0(kwargs[["core"]], collapse = ""))
 
-    kwargs[["fun"]](out, appendLF = TRUE) # Exclude Linting
+    if ("appendLF" %in% names(kwargs)) {
+      appendLF <- kwargs[["appendLF"]]
+    } else {
+      appendLF <- TRUE
+    }
+
+    kwargs[["fun"]](out, appendLF = appendLF) # Exclude Linting
 
   }
 
