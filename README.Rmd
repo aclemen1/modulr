@@ -39,9 +39,9 @@ Sys.setenv(TZ = 'UTC')
 
 ## Description
 
-Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share.
+Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share. 
 
-It is widely inspired from Google's [AngularJS](https://angularjs.org/) developpment framework for web applications in Javascript and from Google's [Guice](https://github.com/google/guice) developpment framework for Java. It is also slightly inspired from [GNU Make](https://www.gnu.org/software/make).
+Modulr is widely inspired from Google's [AngularJS](https://angularjs.org/) developpment framework for web applications in Javascript and from Google's [Guice](https://github.com/google/guice) developpment framework for Java. It is also inspired from [GNU Make](https://www.gnu.org/software/make).
 
 ## Hello World!
 

@@ -18,42 +18,47 @@
 
 ## Description
 
-Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share.
+Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share. 
 
-It is widely inspired from Google's [AngularJS](https://angularjs.org/) developpment framework for web applications in Javascript and from Google's [Guice](https://github.com/google/guice) developpment framework for Java. It is also slightly inspired from [GNU Make](https://www.gnu.org/software/make).
+Modulr is widely inspired from Google's [AngularJS](https://angularjs.org/) developpment framework for web applications in Javascript and from Google's [Guice](https://github.com/google/guice) developpment framework for Java. It is also inspired from [GNU Make](https://www.gnu.org/software/make).
 
 ## Hello World!
 
 
 ```r
 library(modulr)
+#> 
+#> Attaching package: 'modulr'
+#> The following object is masked from 'package:base':
+#> 
+#>     browser
 
 # This is our first module definition: 
 # "foo" provides the "Hello" character string.
 "foo" %provides% { "Hello" }
-#> [2016-10-29T19:49:47 UTC] Defining 'foo' ... OK
+#> [2017-03-18T20:46:26 UTC] Defining 'foo' ... OK
 
 # The module "bar" provides "World".
 "bar" %provides% { "World" }
-#> [2016-10-29T19:49:47 UTC] Defining 'bar' ... OK
+#> [2017-03-18T20:46:26 UTC] Defining 'bar' ... OK
 
 # And the module "foobar" requires "foo" and "bar", 
 # and provides a concatenated string.
 "foobar" %requires% list(f = "foo", b = "bar") %provides% {
   paste0(f, " ", b, "!")
 }
-#> [2016-10-29T19:49:47 UTC] Defining 'foobar' ... OK
+#> [2017-03-18T20:46:26 UTC] Defining 'foobar' ... OK
 
 # "foobar" is evaluated and its result bound to a variable.
 result <- make("foobar")
-#> [2016-10-29T19:49:47 UTC] Making 'foobar' ...
-#> [2016-10-29T19:49:47 UTC] * Visiting and defining dependencies ...
-#> [2016-10-29T19:49:47 UTC] * Constructing dependency graph ... OK
-#> [2016-10-29T19:49:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2016-10-29T19:49:47 UTC] * Evaluating new and outdated dependencies ...
-#> [2016-10-29T19:49:47 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
-#> [2016-10-29T19:49:47 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
-#> [2016-10-29T19:49:47 UTC] DONE ('foobar')
+#> [2017-03-18T20:46:26 UTC] Making 'foobar' ...
+#> [2017-03-18T20:46:26 UTC] * Visiting and defining dependencies ...
+#> [2017-03-18T20:46:26 UTC] * Constructing dependency graph ... OK
+#> [2017-03-18T20:46:26 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2017-03-18T20:46:26 UTC] * Evaluating new and outdated dependencies ...
+#> [2017-03-18T20:46:26 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
+#> [2017-03-18T20:46:26 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
+#> [2017-03-18T20:46:26 UTC] DONE ('foobar')
 
 cat(result)
 #> Hello World!
@@ -151,13 +156,13 @@ my_injector$provider(
   name = "car", 
   dependencies = list(engine = "engine", wheels = "wheels"), 
   provider = car_provider)
-#> [2016-10-29T19:49:47 UTC] Defining 'car' ... OK
+#> [2017-03-18T20:46:26 UTC] Defining 'car' ... OK
 
 my_injector$provider(name = "engine", provider = engine_provider)
-#> [2016-10-29T19:49:47 UTC] Defining 'engine' ... OK
+#> [2017-03-18T20:46:26 UTC] Defining 'engine' ... OK
 
 my_injector$provider(name = "wheels", provider = wheels_provider)
-#> [2016-10-29T19:49:47 UTC] Defining 'wheels' ... OK
+#> [2017-03-18T20:46:27 UTC] Defining 'wheels' ... OK
 ```
 
 Request our `car` module from the injector.
@@ -165,14 +170,14 @@ Request our `car` module from the injector.
 
 ```r
 car <- my_injector$get("car")
-#> [2016-10-29T19:49:47 UTC] Making 'car' ...
-#> [2016-10-29T19:49:47 UTC] * Visiting and defining dependencies ...
-#> [2016-10-29T19:49:47 UTC] * Constructing dependency graph ... OK
-#> [2016-10-29T19:49:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2016-10-29T19:49:47 UTC] * Evaluating new and outdated dependencies ...
-#> [2016-10-29T19:49:47 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
-#> [2016-10-29T19:49:47 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
-#> [2016-10-29T19:49:47 UTC] DONE ('car')
+#> [2017-03-18T20:46:27 UTC] Making 'car' ...
+#> [2017-03-18T20:46:27 UTC] * Visiting and defining dependencies ...
+#> [2017-03-18T20:46:27 UTC] * Constructing dependency graph ... OK
+#> [2017-03-18T20:46:27 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2017-03-18T20:46:27 UTC] * Evaluating new and outdated dependencies ...
+#> [2017-03-18T20:46:27 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2017-03-18T20:46:27 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
+#> [2017-03-18T20:46:27 UTC] DONE ('car')
 
 car$start(); car$drive("120 km/h", "the University of Lausanne"); car$stop()
 #> Car started.
@@ -197,16 +202,16 @@ my_injector$provider(
     )
   }
 )
-#> [2016-10-29T19:49:47 UTC] Re-defining 'wheels' ... OK
+#> [2017-03-18T20:46:27 UTC] Re-defining 'wheels' ... OK
 
 car <- my_injector$get("car")
-#> [2016-10-29T19:49:47 UTC] Making 'car' ...
-#> [2016-10-29T19:49:47 UTC] * Visiting and defining dependencies ...
-#> [2016-10-29T19:49:47 UTC] * Constructing dependency graph ... OK
-#> [2016-10-29T19:49:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2016-10-29T19:49:47 UTC] * Evaluating new and outdated dependencies ...
-#> [2016-10-29T19:49:47 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
-#> [2016-10-29T19:49:47 UTC] DONE ('car')
+#> [2017-03-18T20:46:27 UTC] Making 'car' ...
+#> [2017-03-18T20:46:27 UTC] * Visiting and defining dependencies ...
+#> [2017-03-18T20:46:27 UTC] * Constructing dependency graph ... OK
+#> [2017-03-18T20:46:27 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2017-03-18T20:46:27 UTC] * Evaluating new and outdated dependencies ...
+#> [2017-03-18T20:46:27 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2017-03-18T20:46:27 UTC] DONE ('car')
 
 car$start(); car$drive("150 km/h", "the University of Lausanne"); car$stop()
 #> Car started.
@@ -227,23 +232,23 @@ Asking for dependencies solves the issue of hard coding, but it also means that 
 
 ```r
 "car" %requires% list(engine = "engine", wheels = "wheels") %provides% car_provider
-#> [2016-10-29T19:49:47 UTC] Defining 'car' ... OK
+#> [2017-03-18T20:46:27 UTC] Defining 'car' ... OK
 
 "engine" %provides% engine_provider
-#> [2016-10-29T19:49:47 UTC] Defining 'engine' ... OK
+#> [2017-03-18T20:46:27 UTC] Defining 'engine' ... OK
 
 "wheels" %provides% wheels_provider
-#> [2016-10-29T19:49:47 UTC] Defining 'wheels' ... OK
+#> [2017-03-18T20:46:27 UTC] Defining 'wheels' ... OK
 
 car <- make("car")
-#> [2016-10-29T19:49:47 UTC] Making 'car' ...
-#> [2016-10-29T19:49:47 UTC] * Visiting and defining dependencies ...
-#> [2016-10-29T19:49:47 UTC] * Constructing dependency graph ... OK
-#> [2016-10-29T19:49:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2016-10-29T19:49:47 UTC] * Evaluating new and outdated dependencies ...
-#> [2016-10-29T19:49:47 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
-#> [2016-10-29T19:49:47 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
-#> [2016-10-29T19:49:47 UTC] DONE ('car')
+#> [2017-03-18T20:46:27 UTC] Making 'car' ...
+#> [2017-03-18T20:46:27 UTC] * Visiting and defining dependencies ...
+#> [2017-03-18T20:46:27 UTC] * Constructing dependency graph ... OK
+#> [2017-03-18T20:46:27 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2017-03-18T20:46:27 UTC] * Evaluating new and outdated dependencies ...
+#> [2017-03-18T20:46:27 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...
+#> [2017-03-18T20:46:27 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...
+#> [2017-03-18T20:46:27 UTC] DONE ('car')
 
 car$start(); car$drive("120 km/h", "the University of Lausanne"); car$stop()
 #> Car started.
@@ -299,7 +304,7 @@ library(modulr)
     }
   )
 }
-#> [2016-10-29T19:49:50 UTC] Defining 'car' ... OK
+#> [2017-03-18T20:46:30 UTC] Defining 'car' ... OK
 
 "engine" %provides% {
   #' This module can start and stop an engine.
@@ -308,7 +313,7 @@ library(modulr)
     stop = function() message("Engine stopped.")
   )
 }
-#> [2016-10-29T19:49:50 UTC] Defining 'engine' ... OK
+#> [2017-03-18T20:46:30 UTC] Defining 'engine' ... OK
 
 "wheels" %provides% {
   #' This module can roll and brake wheels.
@@ -317,17 +322,17 @@ library(modulr)
     brake = function() message("Wheels braking."),
   )
 }
-#> [2016-10-29T19:49:50 UTC] Defining 'wheels' ... OK
+#> [2017-03-18T20:46:30 UTC] Defining 'wheels' ... OK
 
 info("car") ## `info()` outputs #'-comments (aka docstrings)
 #> This module can start, drive and stop a car.
 
 car %<=% "car" ## syntactic sugar for `<- make(`
-#> [2016-10-29T19:49:50 UTC] Making 'car' ...
-#> [2016-10-29T19:49:50 UTC] * Visiting and defining dependencies ...
-#> [2016-10-29T19:49:50 UTC] * Constructing dependency graph ... OK
-#> [2016-10-29T19:49:50 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...
-#> [2016-10-29T19:49:50 UTC] DONE ('car')
+#> [2017-03-18T20:46:30 UTC] Making 'car' ...
+#> [2017-03-18T20:46:30 UTC] * Visiting and defining dependencies ...
+#> [2017-03-18T20:46:30 UTC] * Constructing dependency graph ... OK
+#> [2017-03-18T20:46:30 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...
+#> [2017-03-18T20:46:30 UTC] DONE ('car')
 
 car$start(); car$drive("the speed of light", "the boundaries of the universe"); car$stop()
 #> Car started.

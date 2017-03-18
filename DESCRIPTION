@@ -1,7 +1,7 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9139
-Date: 2017-01-05
+Version: 0.1.7.9140
+Date: 2017-03-18
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
     programs into discrete, modular units that are loosely coupled,
@@ -26,6 +26,7 @@ Suggests:
     devtools,
     future,
     base64enc,
+    magrittr,
     dplyr,
     htmltools,
     lintr (>= 1.0.0),
@@ -43,6 +44,7 @@ Collate:
     'addins.R'
     'assertions.R'
     'breadcrumbs.R'
+    'browser.R'
     'bundle.R'
     'modulr.R'
     'config.R'
