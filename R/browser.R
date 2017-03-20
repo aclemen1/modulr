@@ -68,10 +68,10 @@ browser <- function(...) {
       args <- increment_skipCalls_(list(...), 3L)
       do.call(
         function(...) {
-          do.call(base::browser, args = list(...), envir = parent.frame(4L))
+          do.call(base::browser, args = list(...), envir = parent.frame(1L))
           return(args[[1L]])
         },
-        args = utils::tail(args, -1L), envir = parent.frame(4L))
+        args = utils::tail(args, -1L), envir = parent.frame(1L))
     } else {
       args <- increment_skipCalls_(list(...), 2L)
       do.call(base::browser, args = args, envir = parent.frame(1L))
