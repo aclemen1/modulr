@@ -51,14 +51,11 @@ browser <- function(...) {
   } else {
     if (exists(".__name__", where = parent.frame(1L))) {
       module_name <- get(".__name__", pos = parent.frame(1L))
-      if (module_name != "__main__") {
-        message("Browsing in module ", sQuote(module_name), ".")
-      }
+      if (module_name != "__main__") get_breadcrumbs(NULL, verbose = TRUE)
     }
     if (exists("function_list", where = parent.frame(2L))) {
       message(
-        "Browsing in pipe. Get ", sQuote("."), " to catch the left-hand side ",
-        "value which is piped forward.")
+        "Use ", sQuote("."), " to get the left-hand side value of the pipe.")
       function_list_ <- get("function_list", pos = parent.frame(2L))
       i_ <- get("i", pos = parent.frame(2L))
       k_ <- get("k", pos = parent.frame(2L))
