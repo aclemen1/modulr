@@ -35,13 +35,16 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
 
   assert_that(assertthat::is.flag(verbose))
 
-  bc <- unique(c("__main__", unique(
-    unlist(
-      Filter(function(x) !is.na(x),
-             lapply(sys.frames(), function(frame) {
-               .get_0(".__name__", envir = frame,
-                    ifnotfound = NA, inherits = TRUE)
-             }))))[-1]))
+  bc <- unique(c(
+    "__main__",
+    unique(
+      unlist(
+        Filter(function(x) !is.na(x),
+               lapply(evalq(sys.frames(), envir = parent.frame(2L)),
+                      function(frame) {
+                        .get_0(".__name__", envir = frame,
+                               ifnotfound = NA, inherits = TRUE)
+                      }))))))
 
   if (length(bc) > 1 && verbose)
     message(sprintf("modulr breadcrumbs: %s",
