@@ -5,8 +5,12 @@
     is.null(named_dependencies) ||
       (is.character(named_dependencies) && !is.null(names(named_dependencies))))
 
+  if (is.null(named_dependencies)) return(data.frame())
+
   dependency <- c()
   module <- c()
+
+  named_dependencies <- unique(as.array(named_dependencies))
 
   names_of_deps <- names(named_dependencies)
 
@@ -16,16 +20,9 @@
 
     dependencies <- .modulr_env$injector$registry[[c(name, "dependencies")]]
     resolved_dependencies <-
-      unname(named_dependencies[names_of_deps %in% dependencies])
+      unique(unname(named_dependencies[names_of_deps %in% dependencies]))
 
     if (isTRUE(length(resolved_dependencies) > 0)) {
-
-#       array <-
-#         rbind(unlist(
-#           lapply(
-#             lapply(dependencies, .resolve_mapping, name),
-#             `[[`, "resolved")),
-#           name, deparse.level = 0)
 
       array <-
         rbind(resolved_dependencies,

@@ -214,7 +214,7 @@ do_make <- function(name = .Last.name, args = list(),
         .define_all_dependent_modules(name)
 
     },
-    verbosity = 2)
+    verbosity = 2L)
 
     name <- all_dependencies[1L]
 
@@ -222,23 +222,23 @@ do_make <- function(name = .Last.name, args = list(),
       .modulr_env$injector$.Last.name <- name
 
     .modulr_env$injector$registry[[c(name, "calls")]] <-
-      .modulr_env$injector$registry[[c(name, "calls")]] + 1
+      .modulr_env$injector$registry[[c(name, "calls")]] + 1L
 
     .message_meta("Constructing dependency graph", {
 
       dependency_graph <- .build_dependency_graph(all_dependencies)
 
     },
-    ok = TRUE, verbosity = 2)
+    ok = TRUE, verbosity = 2L)
 
     if (nrow(dependency_graph) == 0) {
       deps_count <- 0
       layers <- list(name)
-      layers_count <- 1
+      layers_count <- 1L
     } else {
-      deps_count <- length(unique(unlist(dependency_graph))) - 1
+      deps_count <- length(unique(unlist(dependency_graph))) - 1L
       .message_meta(
-        if (deps_count > 1)
+        if (deps_count > 1L)
           sprintf(
             "Sorting %d dependencies with %d relations",
             deps_count,
@@ -248,22 +248,22 @@ do_make <- function(name = .Last.name, args = list(),
 
               layers_count <- length(layers)
 
-              if (deps_count > 1 && layers_count > 1 &&
-                    2 <= verbosity_level) {
+              if (deps_count > 1L && layers_count > 1L &&
+                    2L <= verbosity_level) {
                 cat(
-                  if (layers_count == 2) {
+                  if (layers_count == 2L) {
                     "on 1 layer, "
                   } else {
-                    sprintf("on %d layers, ", layers_count - 1)
+                    sprintf("on %d layers, ", layers_count - 1L)
                   }
                 )
               }
             },
-        ok = TRUE, verbosity = 2)
+        ok = TRUE, verbosity = 2L)
     }
 
     .message_meta(
-      if (deps_count > 1)
+      if (deps_count > 1L)
         "Evaluating new and outdated dependencies ...", {
 
           digest <- get_digest(name)
@@ -271,13 +271,13 @@ do_make <- function(name = .Last.name, args = list(),
           nodes_count <- length(nodes)
           eval_counter <- 0
 
-          for (layer_idx in c(1:layers_count)) {
+          for (layer_idx in c(1L:layers_count)) {
 
             ordered_names <- layers[[layer_idx]]
 
             for (ordered_name_idx in seq_len(length(ordered_names))) {
 
-              eval_counter <- eval_counter + 1
+              eval_counter <- eval_counter + 1L
 
               ordered_name <- ordered_names[ordered_name_idx]
 
@@ -304,8 +304,8 @@ do_make <- function(name = .Last.name, args = list(),
                   if (eval_counter != nodes_count)
                     sprintf(
                       "Evaluating #%d/%d (layer #%d/%d): '%s' ...",
-                      eval_counter, nodes_count - 1,
-                      layer_idx, layers_count - 1,
+                      eval_counter, nodes_count - 1L,
+                      layer_idx, layers_count - 1L,
                       ordered_name), {
 
                         timestamp <- Sys.time()
@@ -353,7 +353,7 @@ do_make <- function(name = .Last.name, args = list(),
                         instanciate()
 
                       },
-                  verbosity = 1)
+                  verbosity = 1L)
 
               }
 
@@ -361,14 +361,14 @@ do_make <- function(name = .Last.name, args = list(),
           }
 
         },
-      verbosity = 2)
+      verbosity = 2L)
 
     if (!exists("instance", inherits = FALSE)) {
       instance <- .modulr_env$injector$registry[[c(name, "instance")]]
     }
 
   },
-  verbosity = 2)
+  verbosity = 2L)
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
@@ -382,7 +382,7 @@ do_make <- function(name = .Last.name, args = list(),
     }
 
   },
-  verbosity = 2)
+  verbosity = 2L)
 
 }
 
@@ -471,8 +471,8 @@ make_tests <- function() {
 
   if (!all(unlist(rs))) stop("FAILED.", call. = FALSE)
 
-  if (sample(5, 1) == 1) {
-    message("PASSED. ", sample(PRAISE, 1), ".") # nocov
+  if (sample(5L, 1L) == 1L) {
+    message("PASSED. ", sample(PRAISE, 1L), ".") # nocov
   } else {
     message("PASSED.") # nocov
   }
@@ -623,7 +623,7 @@ touch <- function(name = .Last.name) {
     suppressWarnings(module_options(name)$unset())
 
   },
-  ok = TRUE, verbosity = 2)
+  ok = TRUE, verbosity = 2L)
 
   invisible()
 
@@ -668,7 +668,7 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix", default = "_"),
   }
   name_string <- as.character(substitute(name))
   roots <-
-    as.vector(stats::na.omit(vapply(root_config$get_all()[[1]], function(path) {
+    as.vector(stats::na.omit(vapply(root_config$get_all()[[1L]], function(path) {
       if (.dir_exists(path)) normalizePath(path) else NA_character_
     }, FUN.VALUE = "character")))
   candidates <-
@@ -711,18 +711,18 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix", default = "_"),
       },
       FUN.VALUE = "character")
     cmds <- sprintf("%s %%<=%% \"%s\"", bindings, modules)
-    if (length(bindings) > 1) {
+    if (length(bindings) > 1L) {
       cat(sprintf("[%d] %s", seq_along(cmds), cmds), sep = "\n")
     }
   }
   if (interactive()) {
     repeat {
-      if (length(bindings) > 1) {
+      if (length(bindings) > 1L) {
         ans <- gsub("^\\s+|\\s+$", "",
                     readline("Apply? (default 1, ESC to abort) "))
         ans <- ifelse(ans == "", "1", ans)
         ans <- suppressWarnings(as.integer(ans))
-      } else ans <- 1
+      } else ans <- 1L
       if (ans %in% seq_along(bindings)) {
         # nocov start
         if (requireNamespace("rstudioapi", quietly = TRUE)) {
