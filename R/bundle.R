@@ -86,7 +86,7 @@ do_bundle <- function(name = .Last.name, args = list(),
       .modulr_env$injector$.Last.name <- name
 
     .modulr_env$injector$registry[[c(name, "calls")]] <-
-      .modulr_env$injector$registry[[c(name, "calls")]] + 1
+      .modulr_env$injector$registry[[c(name, "calls")]] + 1L
 
     .message_meta("Constructing dependency graph", {
 

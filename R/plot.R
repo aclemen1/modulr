@@ -146,9 +146,9 @@ plot_dependencies <- function(group, regexp, reserved = TRUE,
       nodes <- unique(unlist(deps[, names(deps) != "value"]))
 
       deps$source <-
-        as.integer(factor(deps$module, levels = nodes)) - 1
+        as.integer(factor(deps$module, levels = nodes)) - 1L
       deps$target <-
-        as.integer(factor(deps$dependency, levels = nodes)) - 1
+        as.integer(factor(deps$dependency, levels = nodes)) - 1L
 
       return(networkD3::sankeyNetwork(
         Links = deps,

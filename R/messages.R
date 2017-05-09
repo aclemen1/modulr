@@ -29,7 +29,8 @@
 
   }
 
-  if (verbose && !is.null(msg)) .modulr_env$injector$.message_level <- level + 1
+  if (verbose && !is.null(msg))
+    .modulr_env$injector$.message_level <- level + 1L
 
   if (!is.null(expr)) eval(expr)
 

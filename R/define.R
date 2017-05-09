@@ -15,6 +15,14 @@
 
 }
 
+.get_symbols <- function(e) {
+  if (is.name(e)) {
+    return(as.character(e))
+  } else if (is.call(e) || is.pairlist(e)) {
+    return(unique(unlist(lapply(e, .get_symbols))))
+  }
+}
+
 #' Get the Digest of a Module.
 #'
 #' Get the digest (a SHA-256 hash of the dependencies and provider) of a module.
@@ -431,6 +439,24 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
   if (.is_regular_core(name))
     .modulr_env$injector$.Last.name <- name
 
+  missing_formals <-
+    setdiff(
+      names(formals(provider)),
+      .get_symbols(body(provider)))
+
+  if (length(missing_formals) == 1L) {
+    .message_warn(
+      sprintf("There is an unused dependency: %s.", sQuote(missing_formals)),
+      ok = FALSE, verbosity = 1L)
+  } else if (length(missing_formals) >= 2L) {
+    .message_warn(
+      sprintf(
+        "There are %d unused dependencies: %s.",
+        length(missing_formals),
+        paste(sQuote(missing_formals), collapse = ", " )),
+      ok = FALSE, verbosity = 1L)
+  }
+
   invisible(function(...) make(name, ...))
 
 }
@@ -655,7 +681,7 @@ reset <- function(all = FALSE, .verbose = TRUE) {
 
       .modulr_env$injector$registry <- list()
       .modulr_env$injector$config <- list(modules = list())
-      .modulr_env$injector$verbosity <- 2
+      .modulr_env$injector$verbosity <- 2L
       .modulr_env$injector$.Last.name <- NULL
       if (all)
         .modulr_env$injector$stash <- list()

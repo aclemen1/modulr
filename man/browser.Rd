@@ -33,7 +33,7 @@ reset()
 define("foobar", NULL, function() {
   library(magrittr)
   "foobar" \%>\%
-    browser() \%>\%
+    browser \%>\%
     print
 })
 \dontrun{make()}

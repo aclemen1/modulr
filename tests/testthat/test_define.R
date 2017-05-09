@@ -713,3 +713,12 @@ test_that("touch assigns the last regular module name to .Last.name", {
   touch("module_1/test/a/dependency")
   expect_equal(.Last.name, "module_1/test/a/dependency") # Exclude Linting
 })
+
+test_that("define detects unused dependencies", {
+  reset()
+  expect_warning(define("module_1", NULL, function() NULL), regexp = NA)
+  expect_warning(define("module_1", list(foo = "foo"), function() NULL))
+  expect_warning(
+    define("module_1", list(foo = "foo"), function() foo),
+    regexp = NA)
+})

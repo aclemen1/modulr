@@ -199,7 +199,7 @@
 
   candidates <- Filter(
     function(candidate) {
-      candidate[["start"]] == 1
+      candidate[["start"]] == 1L
     },
     candidates)
 
@@ -524,7 +524,7 @@
       if (x == as.name("define") ||
             x == as.name("%requires%") ||
             x == as.name("%provides%")) {
-        idx[length(idx)] <- idx[length(idx)] + 1
+        idx[length(idx)] <- idx[length(idx)] + 1L
         item <- all[[idx]]
         if (is.character(item)) {
           if (is.null(namespace)) return(item)

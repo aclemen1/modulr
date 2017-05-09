@@ -212,13 +212,14 @@ define_modulr <- function() {
       get_filename = function(absolute = TRUE) {
         .deprecated(".__file__", old = "$get_filename")
         name <- get(".__name__", pos = parent.frame())
-        file <- if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
-          .modulr_env$injector$registry[[c(name, "filepath")]]
-        } else {
-          trace <- stats::na.omit(names(.source_trace()))
-          if (length(trace) > 0L)
-            utils::tail(trace, 1L)
-        }
+        file <-
+          if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
+            .modulr_env$injector$registry[[c(name, "filepath")]]
+          } else {
+            trace <- stats::na.omit(names(.source_trace()))
+            if (length(trace) > 0L)
+              utils::tail(trace, 1L)
+          }
         if (!is.null(file)) stats::setNames(
           ifelse(absolute, normalizePath, identity)(file), name)
       },
@@ -230,13 +231,14 @@ define_modulr <- function() {
       get_dirname = function(absolute = TRUE) {
         .deprecated(".__path__", old = "$get_dirname")
         name <- get(".__name__", pos = parent.frame())
-        file <- if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
-          .modulr_env$injector$registry[[c(name, "filepath")]]
-        } else {
-          trace <- stats::na.omit(names(.source_trace()))
-          if (length(trace) > 0L)
-            utils::tail(trace, 1L)
-        }
+        file <-
+          if (!is.null(.modulr_env$injector$registry[[c(name, "filepath")]])) {
+            .modulr_env$injector$registry[[c(name, "filepath")]]
+          } else {
+            trace <- stats::na.omit(names(.source_trace()))
+            if (length(trace) > 0L)
+              utils::tail(trace, 1L)
+          }
         if (!is.null(file)) dirname(
           ifelse(absolute, normalizePath, identity)(file))
       },
