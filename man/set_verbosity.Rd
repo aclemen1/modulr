@@ -5,7 +5,7 @@
 \alias{set_verbosity}
 \title{Set and Get Verbosity Level.}
 \usage{
-set_verbosity(level = 2)
+set_verbosity(level = 2L)
 
 get_verbosity()
 }
@@ -44,7 +44,7 @@ touch("foo")
 make("bar")
 
 reset()
-set_verbosity(1)
+set_verbosity(1L)
 define("foo", NULL, function() "Hello World")
 define("bar", list(f = "foo"), function(f) sprintf("*\%s*", f))
 make()
@@ -52,7 +52,7 @@ touch("foo")
 make("bar")
 
 reset()
-set_verbosity(0)
+set_verbosity(0L)
 define("foo", NULL, function() "Hello World")
 define("bar", list(f = "foo"), function(f) sprintf("*\%s*", f))
 make()

@@ -44,7 +44,7 @@
 #' @examples
 #' reset()
 #' list_modules()
-#' define("foo", NULL, function() Sys.sleep(1))
+#' define("foo", NULL, function() Sys.sleep(1L))
 #' list_modules()
 #' list_modules(reserved = TRUE)
 #' list_modules(reserved = TRUE, wide = FALSE)
@@ -54,10 +54,10 @@
 #'   reserved = TRUE,
 #'   formatted = FALSE,
 #'   cols = c("weight", "size", "modified", "created"))
-#' define("bar", NULL, function() Sys.sleep(1))
+#' define("bar", NULL, function() Sys.sleep(1L))
 #' define("foobar", list(f = "foo", b = "bar"), function(f, b) NULL)
 #' invisible(make("foobar"))
-#' Sys.sleep(1)
+#' Sys.sleep(1L)
 #' touch("foo")
 #' list_modules(".oo.*", cols = c("weight", "size", "modified", "created"))
 #'
@@ -166,11 +166,11 @@ list_modules <-
         Map(function(name)
           deparse(.modulr_env$injector$registry[[c(name, "provider")]]), flat)
 
-      lines <- vapply(deparsed_factories, length, FUN.VALUE = 0)
+      lines <- vapply(deparsed_factories, length, FUN.VALUE = 0L)
 
       chars <- vapply(deparsed_factories,
                       function(provider) sum(nchar(provider)),
-                      FUN.VALUE = 0)
+                      FUN.VALUE = 0L)
 
       durations <-
         do.call(c, Map(function(name)

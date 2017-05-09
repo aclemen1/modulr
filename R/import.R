@@ -100,7 +100,7 @@ import_module <- function(name, url, digest = NULL,
         ifelse(!is.null(digest),
                sprintf("with digest '%s' ", digest),
                ""),
-        url), verbosity = 2)
+        url), verbosity = 2L)
 
     result <- httr::GET(url, ...)
 

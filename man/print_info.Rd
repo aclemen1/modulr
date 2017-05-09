@@ -55,7 +55,7 @@ print_info("foo")
 tmp <- tempfile(fileext = ".html")
 cat((knitr::knit2html(text = info("foo"))), file = tmp)
 if(interactive()) rstudio::viewer(tmp)
-Sys.sleep(1); unlink(tmp)}
+Sys.sleep(1L); unlink(tmp)}
 }
 \seealso{
 \code{\link{define}}, \code{\link{prepare_gear}}, and

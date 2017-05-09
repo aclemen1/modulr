@@ -80,7 +80,7 @@ do_bundle <- function(name = .Last.name, args = list(),
         .define_all_dependent_modules(name)
 
     },
-    verbosity = 2)
+    verbosity = 2L)
 
     if (.is_regular(name))
       .modulr_env$injector$.Last.name <- name
@@ -93,16 +93,16 @@ do_bundle <- function(name = .Last.name, args = list(),
       dependency_graph <- .build_dependency_graph(all_dependencies)
 
     },
-    ok = TRUE, verbosity = 2)
+    ok = TRUE, verbosity = 2L)
 
-    if (nrow(dependency_graph) == 0) {
-      deps_count <- 0
+    if (nrow(dependency_graph) == 0L) {
+      deps_count <- 0L
       layers <- list(name)
-      layers_count <- 1
+      layers_count <- 1L
     } else {
-      deps_count <- length(unique(unlist(dependency_graph))) - 1
+      deps_count <- length(unique(unlist(dependency_graph))) - 1L
       .message_meta(
-        if (deps_count > 1)
+        if (deps_count > 1L)
           sprintf(
             "Sorting %d dependencies with %d relations",
             deps_count,
@@ -112,20 +112,20 @@ do_bundle <- function(name = .Last.name, args = list(),
 
               layers_count <- length(layers)
 
-              if (deps_count > 1 && layers_count > 1)
-                cat(sprintf("%d layers, ", layers_count - 1))
+              if (deps_count > 1L && layers_count > 1L)
+                cat(sprintf("%d layers, ", layers_count - 1L))
 
             },
-        ok = TRUE, verbosity = 2)
+        ok = TRUE, verbosity = 2L)
     }
 
     .message_meta(
-      if (deps_count > 0)
+      if (deps_count > 0L)
         "Appending dependencies ...", {
 
-          batch <- character(0)
+          batch <- character(0L)
 
-          for (layer_idx in c(1:layers_count)) {
+          for (layer_idx in c(1L:layers_count)) {
 
             ordered_names <- layers[[layer_idx]]
 
@@ -152,7 +152,7 @@ do_bundle <- function(name = .Last.name, args = list(),
         })
 
   },
-  verbosity = 2)
+  verbosity = 2L)
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
@@ -172,7 +172,7 @@ do_bundle <- function(name = .Last.name, args = list(),
       sprintf("on.exit(modulr::unstash(id = stash_id), add = TRUE)", name),
       sprintf("modulr::reset(all = FALSE)"),
       sprintf("modulr::root_config$set(%s)",
-              deparse(root_config$get_all()[[1]])),
+              deparse(root_config$get_all()[[1L]])),
       if (!is.null(pre_hook)) {
         paste(
           sprintf(""),
@@ -218,7 +218,7 @@ do_bundle <- function(name = .Last.name, args = list(),
     return(invisible(bundle))
 
   },
-  verbosity = 2)
+  verbosity = 2L)
 
 }
 

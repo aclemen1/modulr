@@ -297,16 +297,16 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
         srcref(
           src_file,
           c(
-            attr(provider_subst, which = "srcref")[[1]],
+            attr(provider_subst, which = "srcref")[[1L]],
             attr(provider_subst, which = "wholeSrcref")
-          )[c(1, 2, 11, 12, 5, 14, 7, 16)])
+          )[c(1L, 2L, 11L, 12L, 5L, 14L, 7L, 16L)])
     }
   } else if (!is.function(provider) && .is_constant(provider)) {
     provider <- eval(call("function", NULL, provider))
     environment(provider) <- enclos
   }
 
-  if (length(formals(provider)) == 0 && length(dependencies) > 0 &&
+  if (length(formals(provider)) == 0L && length(dependencies) > 0L &&
         all(names(dependencies) != "")) {
     attrs <- attributes(provider)
     formals(provider) <- as.pairlist(dependencies)
@@ -384,7 +384,7 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
           "provider" = provider,
           "digest" = .digest(dependencies, provider),
           "instanciated" = F,
-          "calls" = 0,
+          "calls" = 0L,
           "duration" = NA_integer_,
           "first_instance" = T,
           "storage" = "in-memory",
@@ -394,7 +394,7 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
           )
 
     },
-    ok = TRUE, verbosity = ifelse(.is_regular(name), 2, 3))
+    ok = TRUE, verbosity = ifelse(.is_regular(name), 2L, 3L))
 
   } else if (.is_regular(name)) {
 
@@ -412,7 +412,7 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
         .modulr_env$injector$registry[[c(name, "digest")]] <- digest
         .modulr_env$injector$registry[[c(name, "instance")]] <- NULL
         .modulr_env$injector$registry[[c(name, "instanciated")]] <- F
-        .modulr_env$injector$registry[[c(name, "calls")]] <- 0
+        .modulr_env$injector$registry[[c(name, "calls")]] <- 0L
         .modulr_env$injector$registry[[c(name, "duration")]] <- NA_integer_
         .modulr_env$injector$registry[[c(name, "first_instance")]] <- F
         .modulr_env$injector$registry[[c(name, "url")]] <- NULL
@@ -421,7 +421,7 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
         .modulr_env$injector$registry[[c(name, "along")]] <- NA_character_
 
       },
-      ok = TRUE, verbosity = 1)
+      ok = TRUE, verbosity = 1L)
     }
 
   } else {
@@ -502,9 +502,9 @@ get_dependencies <- function(name = .Last.name, load = FALSE) {
     },
     candidates)
 
-    if (length(in_memory) > 0) {
+    if (length(in_memory) > 0L) {
 
-      name <- in_memory[[1]][["name"]]
+      name <- in_memory[[1L]][["name"]]
 
     } else if (load) {
 
@@ -513,9 +513,9 @@ get_dependencies <- function(name = .Last.name, load = FALSE) {
       },
       candidates)
 
-      if (length(on_disk) > 0) {
+      if (length(on_disk) > 0L) {
 
-        name <- on_disk[[1]][["name"]]
+        name <- on_disk[[1L]][["name"]]
         load_module(name)
 
       }
@@ -665,7 +665,7 @@ reset <- function(all = FALSE, .verbose = TRUE) {
       root_config$set(DEFAULT_ROOT_CONFIG)
 
     },
-    ok = TRUE, verbosity = 2)
+    ok = TRUE, verbosity = 2L)
 
   invisible()
 
@@ -712,7 +712,7 @@ undefine <- function(name = .Last.name) {
     .modulr_env$injector$registry[[name]] <- NULL
 
   },
-  ok = TRUE, verbosity = 2)
+  ok = TRUE, verbosity = 2L)
 
   invisible()
 

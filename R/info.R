@@ -45,7 +45,7 @@
           function(x) x >= 0L,
           vapply(docstring_raw,
                  function(x)
-                   attr(gregexpr("^[ \t]*", x)[[1]], "match.length"),
+                   attr(gregexpr("^[ \t]*", x)[[1L]], "match.length"),
                  FUN.VALUE = 0L)))
 
       docstring_lines <-
@@ -113,7 +113,7 @@
 #' tmp <- tempfile(fileext = ".html")
 #' cat((knitr::knit2html(text = info("foo"))), file = tmp)
 #' if(interactive()) rstudio::viewer(tmp)
-#' Sys.sleep(1); unlink(tmp)}
+#' Sys.sleep(1L); unlink(tmp)}
 #' @aliases docstring info
 #' @export
 print_info <- function(name = .Last.name,

@@ -33,28 +33,28 @@
   base_ns_locs <- loaded_ns_locs[.is_base_pkg(names(loaded_ns_locs))]
 
   pkgs <- rbind(
-    if (length(base_pkgs_locs) == 0) .empty_manifest_pkgs else data.frame(
+    if (length(base_pkgs_locs) == 0L) .empty_manifest_pkgs else data.frame(
       pkg = names(base_pkgs_locs),
       loc = unname(base_pkgs_locs),
       base = TRUE,
       attached = TRUE,
       stringsAsFactors = FALSE
     ),
-    if (length(other_pkgs_locs) == 0) .empty_manifest_pkgs else data.frame(
+    if (length(other_pkgs_locs) == 0L) .empty_manifest_pkgs else data.frame(
       pkg = names(other_pkgs_locs),
       loc = unname(other_pkgs_locs),
       base = FALSE,
       attached = TRUE,
       stringsAsFactors = FALSE
     ),
-    if (length(base_ns_locs) == 0) .empty_manifest_pkgs else data.frame(
+    if (length(base_ns_locs) == 0L) .empty_manifest_pkgs else data.frame(
       pkg = names(base_ns_locs),
       loc = unname(base_ns_locs),
       base = TRUE,
       attached = FALSE,
       stringsAsFactors = FALSE
     ),
-    if (length(other_ns_locs) == 0) .empty_manifest_pkgs else data.frame(
+    if (length(other_ns_locs) == 0L) .empty_manifest_pkgs else data.frame(
       pkg = names(other_ns_locs),
       loc = unname(other_ns_locs),
       base = FALSE,
@@ -83,7 +83,7 @@
   for (id in pkg_ids) {
     from_info <- from[id == from[["ids"]], ]
     to_info <- to[id == to[["ids"]], ]
-    if (nrow(from_info) > 0 & nrow(to_info) > 0) {
+    if (nrow(from_info) > 0L & nrow(to_info) > 0L) {
       if (from_info[["attached"]] & to_info[["attached"]]) {
         op <- "sort"
       } else if (from_info[["attached"]] & !to_info[["attached"]]) {
@@ -93,13 +93,13 @@
       } else {
         op <- "noop"
       }
-    } else if (nrow(from_info) > 0 & nrow(to_info) == 0) {
+    } else if (nrow(from_info) > 0L & nrow(to_info) == 0L) {
       if (from_info[["attached"]]) {
         op <- "forget"
       } else {
         op <- "unload"
       }
-    } else if (nrow(from_info) == 0 & nrow(to_info) > 0) {
+    } else if (nrow(from_info) == 0L & nrow(to_info) > 0L) {
       if (to_info[["attached"]]) {
         op <- "require"
       } else {
@@ -165,7 +165,7 @@
 
 .sort <- function(ops, domain) {
 
-  if (nrow(ops) > 0) {
+  if (nrow(ops) > 0L) {
     search_ <- search()
 
     pkgs <- paste("package", ops[["pkg"]], sep = ":")

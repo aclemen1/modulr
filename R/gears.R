@@ -29,8 +29,8 @@
   }
 
   dependencies <- .modulr_env$injector$registry[[name]]$dependencies
-  if (isTRUE(length(dependencies) > 0)) {
-    if (length(dependencies) == 1) {
+  if (isTRUE(length(dependencies) > 0L)) {
+    if (length(dependencies) == 1L) {
       deps <-
         sprintf("list(%s = \"%s\")",
                 names(dependencies),
@@ -152,7 +152,7 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
            .module_to_string, FUN.VALUE = "")
 
   gear <- paste(
-    if (isTRUE(nchar(docstring) > 0)) {
+    if (isTRUE(nchar(docstring) > 0L)) {
       format(docstring)
     } else {
       sprintf("# `%s` (Modulr Gear)", name)
@@ -179,21 +179,21 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
       sprintf("```"), sep = "\n"),
     paste(
       sprintf("## Definition"),
-      if (length(imports) > 0) paste(
+      if (length(imports) > 0L) paste(
         sprintf("```{r imports}"),
         sprintf("%s", paste(imports, collapse = "\n")),
         sprintf("```"), sep = "\n"),
       sprintf("```{r definition}"),
       sprintf("%s", module),
       sprintf("```"), sep = "\n"),
-    if (length(tests) + length(mocks) > 0) paste(
+    if (length(tests) + length(mocks) > 0L) paste(
       sprintf("## Testing"),
-      if (length(mocks) > 0) paste(
+      if (length(mocks) > 0L) paste(
         sprintf("### Mocks"),
         sprintf("```{r mocks}"),
         sprintf("%s", paste(mocks, collapse = "\n")),
         sprintf("```"), sep = "\n"),
-      if (length(tests) > 0) paste(
+      if (length(tests) > 0L) paste(
         sprintf("### Tests"),
         sprintf("```{r tests}"),
         sprintf("%s", paste(tests, collapse = "\n")),
@@ -202,7 +202,7 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
       sprintf("# Not run"),
       sprintf("make_all(regexp = \"%s/test\")", name),
       sprintf("```"), sep = "\n"),
-    if (length(examples) > 0) paste(
+    if (length(examples) > 0L) paste(
       sprintf("## Examples"),
       sprintf("```{r examples}"),
       sprintf("%s", paste(examples, collapse = "\n")),
@@ -273,10 +273,10 @@ gist_gear <- function(name = .Last.name, load = TRUE, browse = TRUE) {
 
   rates <- gistr::rate_limit()
   assert_that(
-    rates[[c("rate", "remaining")]] >= 2,
+    rates[[c("rate", "remaining")]] >= 2L,
     msg = sprintf(
       "the resource limit is exceeded on Github. Wait until %s and try again.",
-      format(as.POSIXct(rates[[c("rate", "reset")]] / 1e6,
+      format(as.POSIXct(rates[[c("rate", "reset")]] / 1e6L,
                         origin = Sys.time()), format = "%c")))
 
   file <- gsub("/", "-", name)
@@ -298,17 +298,17 @@ gist_gear <- function(name = .Last.name, load = TRUE, browse = TRUE) {
 
   rates <- gistr::rate_limit()
   assert_that(
-    rates[[c("rate", "remaining")]] >= 1,
+    rates[[c("rate", "remaining")]] >= 1L,
     msg = sprintf(
       paste0(
         "the resource limit is exceeded on Github and ",
         "there is a dangling Gist to clean up here: %s. ",
         " Wait until %s and try again."),
       g[["html_url"]],
-      format(as.POSIXct(rates[[c("rate", "reset")]] / 1e6,
+      format(as.POSIXct(rates[[c("rate", "reset")]] / 1e6L,
                         origin = Sys.time()), format = "%c")))
 
-  gear_url <- gsub("(?:raw/)[^/]*", "raw", g[["files"]][[1]][["raw_url"]])
+  gear_url <- gsub("(?:raw/)[^/]*", "raw", g[["files"]][[1L]][["raw_url"]])
 
   gear_string <- prepare_gear(name, url = gear_url)
 

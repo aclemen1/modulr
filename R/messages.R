@@ -1,4 +1,4 @@
-.message_meta <- function(msg, expr = NULL, ok = FALSE, verbosity = 0) {
+.message_meta <- function(msg, expr = NULL, ok = FALSE, verbosity = 0L) {
 
   assert_that(
     assertthat::is.string(msg) || is.null(msg),
@@ -8,7 +8,7 @@
   verbose <- verbosity <= get_verbosity()
 
   level <-
-    .get_0(".message_level", envir = .modulr_env$injector, ifnotfound = 0)
+    .get_0(".message_level", envir = .modulr_env$injector, ifnotfound = 0L)
   on.exit(.modulr_env$injector$.message_level <- level)
 
   if (verbose && !is.null(msg)) {
@@ -17,7 +17,7 @@
       "[%s] ",
       format(Sys.time(), format = "%c"))
 
-    if (level > 0) {
+    if (level > 0L) {
       out <- paste0(out, sprintf(
         "%s ",
         paste(rep("*", level), collapse = "")))
@@ -43,7 +43,7 @@
 
   kwargs <- list(...)
 
-  if (length(kwargs) == 0) {
+  if (length(kwargs) == 0L) {
     return(list(core = c()))
   }
 
@@ -51,9 +51,9 @@
     return(list(core = unlist(kwargs)))
   }
 
-  core <- unlist(kwargs[nchar(names(kwargs)) == 0], use.names = FALSE)
+  core <- unlist(kwargs[nchar(names(kwargs)) == 0L], use.names = FALSE)
 
-  others <- kwargs[nchar(names(kwargs)) != 0]
+  others <- kwargs[nchar(names(kwargs)) != 0L]
 
   return(c(list(core = core), others))
 
@@ -72,9 +72,9 @@
                    } else "")
 
     level <-
-      .get_0(".message_level", envir = .modulr_env$injector, ifnotfound = 0)
+      .get_0(".message_level", envir = .modulr_env$injector, ifnotfound = 0L)
 
-    if (level > 0) {
+    if (level > 0L) {
       out <- paste0(out, sprintf(
         "%s ", paste(rep("*", level), collapse = "")))
     }

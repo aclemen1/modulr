@@ -5,7 +5,7 @@
 \alias{plot_dependencies}
 \title{Plot Dependencies.}
 \usage{
-plot_dependencies(group, regexp, reserved = TRUE, fontSize = 13, ...)
+plot_dependencies(group, regexp, reserved = TRUE, fontSize = 13L, ...)
 }
 \arguments{
 \item{group}{A character vector of module names (cf. \code{\link{define}}) to

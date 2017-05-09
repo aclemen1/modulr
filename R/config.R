@@ -19,11 +19,11 @@
     options_list <- list(...)
 
     if (is.null(names(options_list))
-       & length(options_list) == 1)
-      if (is.list(options_list[[1]]))
-        options_list <- options_list[[1]]
+       & length(options_list) == 1L)
+      if (is.list(options_list[[1L]]))
+        options_list <- options_list[[1L]]
 
-    if (length(options_list) == 0) return(invisible())
+    if (length(options_list) == 0L) return(invisible())
 
     if (is.null(.modulr_env$injector$config[[scope]])) {
 
@@ -53,11 +53,11 @@
 
     if (is.na(scope[2])) {
 
-      .modulr_env$injector$config[[scope[1]]]
+      .modulr_env$injector$config[[scope[1L]]]
 
     } else {
 
-      .modulr_env$injector$config[[scope[1:2]]]
+      .modulr_env$injector$config[[scope[1L:2L]]]
 
     }
 

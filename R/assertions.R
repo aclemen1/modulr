@@ -152,7 +152,7 @@ assertthat::on_failure(.is_defined_regular) <- function(call, env) {
 
 # Test if object is a braced expression
 .is_braced_expression <- function(object) {
-  is.call(object) && object[[1]] == as.name("{")
+  is.call(object) && object[[1L]] == as.name("{")
 }
 
 # Test if object is a constant

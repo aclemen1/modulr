@@ -169,7 +169,7 @@ get_default_injector <- function() {
 }
 
 .dir_exists <- function(file) {
-  isTRUE(file.info(file)[1, "isdir"])
+  isTRUE(file.info(file)[1L, "isdir"])
 }
 
 .deprecated <- function(
@@ -180,7 +180,7 @@ get_default_injector <- function() {
   msg <- if (missing(msg)) {
     msg <- c()
     bc <- get_breadcrumbs(verbose = FALSE)
-    if (length(bc) > 1)
+    if (length(bc) > 1L)
       msg <- gettextf("modulr breadcrumbs: %s\n",
                       paste(gettextf("'%s'", bc), collapse = " > "))
     msg <- c(msg, gettextf("'%s' is deprecated.\n", old))
@@ -336,7 +336,7 @@ if (utils::packageVersion("assertthat") >= package_version("0.1.0.99")) {
 #' make("bar")
 #'
 #' reset()
-#' set_verbosity(1)
+#' set_verbosity(1L)
 #' define("foo", NULL, function() "Hello World")
 #' define("bar", list(f = "foo"), function(f) sprintf("*%s*", f))
 #' make()
@@ -344,7 +344,7 @@ if (utils::packageVersion("assertthat") >= package_version("0.1.0.99")) {
 #' make("bar")
 #'
 #' reset()
-#' set_verbosity(0)
+#' set_verbosity(0L)
 #' define("foo", NULL, function() "Hello World")
 #' define("bar", list(f = "foo"), function(f) sprintf("*%s*", f))
 #' make()
@@ -352,7 +352,7 @@ if (utils::packageVersion("assertthat") >= package_version("0.1.0.99")) {
 #' make("bar")
 #'
 #' @export
-set_verbosity <- function(level = 2) {
+set_verbosity <- function(level = 2L) {
 
   assertthat::assert_that(assertthat::is.scalar(level))
   olevel <- get_verbosity()
@@ -365,7 +365,7 @@ set_verbosity <- function(level = 2) {
 #' @export
 get_verbosity <- function() {
 
-  .get_0("verbosity", envir = .modulr_env$injector, ifnotfound = 2)
+  .get_0("verbosity", envir = .modulr_env$injector, ifnotfound = 2L)
 
 }
 

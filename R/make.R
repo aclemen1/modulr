@@ -111,10 +111,10 @@
 #' foo() # only once
 #'
 #' reset()
-#' define("foo", NULL, function() function(a) a + 1)
-#' foo <- make("foo"); foo(1)
-#' make("foo", 1)
-#' do_make("foo", args = list(a = 1))
+#' define("foo", NULL, function() function(a) a + 1L)
+#' foo <- make("foo"); foo(1L)
+#' make("foo", 1L)
+#' do_make("foo", args = list(a = 1L))
 #'
 #' reset()
 #' define("A", NULL, function() "(A)")
@@ -231,8 +231,8 @@ do_make <- function(name = .Last.name, args = list(),
     },
     ok = TRUE, verbosity = 2L)
 
-    if (nrow(dependency_graph) == 0) {
-      deps_count <- 0
+    if (nrow(dependency_graph) == 0L) {
+      deps_count <- 0L
       layers <- list(name)
       layers_count <- 1L
     } else {
@@ -269,7 +269,7 @@ do_make <- function(name = .Last.name, args = list(),
           digest <- get_digest(name)
           nodes <- unlist(layers, use.names = FALSE)
           nodes_count <- length(nodes)
-          eval_counter <- 0
+          eval_counter <- 0L
 
           for (layer_idx in c(1L:layers_count)) {
 
@@ -372,7 +372,7 @@ do_make <- function(name = .Last.name, args = list(),
 
   .message_meta(sprintf("DONE ('%s')", name), {
 
-    if (length(args) > 0 && is.function(instance[["value"]])) {
+    if (length(args) > 0L && is.function(instance[["value"]])) {
       return(do.call(instance[["value"]], args = args,
                      quote = quote, envir = envir))
     } else {
@@ -690,7 +690,7 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix", default = "_"),
     Filter(function(module) try(isTRUE(!is.null(find_module(module))),
                                 silent = TRUE), modules)
   len <- length(modules)
-  if (len == 0) {
+  if (len == 0L) {
     message("No module found.")
     return(invisible(NULL))
   } else {

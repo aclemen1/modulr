@@ -67,7 +67,7 @@ takes place.}
 \examples{
 reset()
 list_modules()
-define("foo", NULL, function() Sys.sleep(1))
+define("foo", NULL, function() Sys.sleep(1L))
 list_modules()
 list_modules(reserved = TRUE)
 list_modules(reserved = TRUE, wide = FALSE)
@@ -77,10 +77,10 @@ list_modules(
   reserved = TRUE,
   formatted = FALSE,
   cols = c("weight", "size", "modified", "created"))
-define("bar", NULL, function() Sys.sleep(1))
+define("bar", NULL, function() Sys.sleep(1L))
 define("foobar", list(f = "foo", b = "bar"), function(f, b) NULL)
 invisible(make("foobar"))
-Sys.sleep(1)
+Sys.sleep(1L)
 touch("foo")
 list_modules(".oo.*", cols = c("weight", "size", "modified", "created"))
 

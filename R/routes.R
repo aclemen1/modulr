@@ -2,12 +2,12 @@
 .parse_version <- function(string) {
   assert_that(assertthat::is.string(string))
   matches <-
-    regmatches(string, regexec(.version_hash_string_regex, string))[[1]]
-  assert_that(.is_version_string(matches[3]))
+    regmatches(string, regexec(.version_hash_string_regex, string))[[1L]]
+  assert_that(.is_version_string(matches[3L]))
   list(
-    symbol = as.character(ifelse(matches[2] == "", NA, matches[2])),
+    symbol = as.character(ifelse(matches[2L] == "", NA, matches[2L])),
     version = numeric_version(
-      matches[3],
+      matches[3L],
       strict = FALSE)
   )
 }
@@ -15,7 +15,7 @@
 # Parse a module name.
 .parse_name <- function(name) {
   assert_that(.is_conform(name))
-  matches <- regmatches(name, regexec(.conform_regex, name))[[1]]
+  matches <- regmatches(name, regexec(.conform_regex, name))[[1L]]
   matches <-
     stats::setNames(as.list(matches),
                     c("name", "namespace", "symbol", "version", "suffix"))
@@ -23,7 +23,7 @@
   matches[c("symbol", "version")] <-
     .parse_version(paste0("#", matches[["symbol"]], matches[["version"]]))[
       c("symbol", "version")]
-  components <- strsplit(matches[["namespace"]], "/", fixed = TRUE)[[1]]
+  components <- strsplit(matches[["namespace"]], "/", fixed = TRUE)[[1L]]
   matches[["initials"]] <- paste(utils::head(components, -1L), collapse = "/")
   matches[["final"]] <- utils::tail(components, 1L)
   matches[c(
@@ -57,17 +57,17 @@
       list(
         map = map,
         start = as.integer(reg),
-        end = as.integer(reg) + attr(reg, "match.length") - 1)
+        end = as.integer(reg) + attr(reg, "match.length") - 1L)
 
     },
     names(mappings))
 
   candidates <- Filter(function(candidate) {
-    candidate[["start"]] == 1
+    candidate[["start"]] == 1L
   },
   candidates)
 
-  if (length(candidates) == 0) return(name)
+  if (length(candidates) == 0L) return(name)
 
   maximum_length <- max(unlist(Map(
     function(candidate) {
@@ -81,12 +81,12 @@
     },
     candidates)
 
-  if (length(candidates) > 1) warning(
+  if (length(candidates) > 1L) warning(
     "More than one matching mapping. ",
     "Considering only the first occurence.",
     call. = FALSE, immediate. = TRUE)
 
-  matching_map <- candidates[[1]][["map"]]
+  matching_map <- candidates[[1L]][["map"]]
 
   list(
     name = name,
@@ -97,7 +97,7 @@
 }
 
 .remove_duplicate_filesep <- function(path) {
-  gsub(paste(c(rep(.Platform$file.sep, 2), "+"), collapse = ""),
+  gsub(paste(c(rep(.Platform$file.sep, 2L), "+"), collapse = ""),
        .Platform$file.sep, path)
 }
 
@@ -122,7 +122,7 @@
   path <- dirname(filename_shifted) # "foo/" has to be seen as a path
 
   base_name <- basename(
-    ifelse(is_path, substr(filename, nchar(filename), nchar(filename) - 1),
+    ifelse(is_path, substr(filename, nchar(filename), nchar(filename) - 1L),
            filename))
 
   extension <- tools::file_ext(filename)
@@ -159,14 +159,14 @@
 # Transform a module name to a path (with file separators replacing '/''s).
 .name_to_path <- function(name) {
   assert_that(.is_conform(name))
-  paste(strsplit(name, "/", fixed = TRUE)[[1]], collapse = .Platform$file.sep)
+  paste(strsplit(name, "/", fixed = TRUE)[[1L]], collapse = .Platform$file.sep)
 }
 
 # Transform a path into a module name (with '/'s replacing file separators).
 .path_to_name <- function(path) {
   name <-
     paste(strsplit(.remove_trailing_filesep(.remove_duplicate_filesep(path)),
-                   .Platform$file.sep, fixed = TRUE)[[1]], collapse = "/")
+                   .Platform$file.sep, fixed = TRUE)[[1L]], collapse = "/")
   assert_that(.is_conform(name))
   name
 }
@@ -192,7 +192,7 @@
       list(
         namespace = namespace_,
         start = as.integer(reg),
-        end = as.integer(reg) + attr(reg, "match.length") - 1)
+        end = as.integer(reg) + attr(reg, "match.length") - 1L)
 
     },
     names(paths_config$get_all()))
@@ -203,7 +203,7 @@
     },
     candidates)
 
-  if (length(candidates) == 0) {
+  if (length(candidates) == 0L) {
 
     candidate <- mapping[["resolved"]]
 
@@ -221,11 +221,11 @@
       },
       candidates)
 
-    if (length(candidates) > 1) warning(
+    if (length(candidates) > 1L) warning(
       "More than one matching namespace. ",
       "Considering only the first occurence.")
 
-    matching_namespace <- candidates[[1]][["namespace"]]
+    matching_namespace <- candidates[[1L]][["namespace"]]
 
     candidate <- sub(
       matching_namespace,
@@ -263,7 +263,7 @@
     },
     versions)
     keep <- FALSE
-    if (length(candidates) > 0) {
+    if (length(candidates) > 0L) {
       keep <- if (is.na(symbol)) {
         unlist(Vectorize(identical)(
           lapply(candidates, as.character),
@@ -272,11 +272,12 @@
         if (symbol == ">=") {
           TRUE
         } else if (symbol == "^") {
-          !Vectorize(isTRUE)(do.call(c, lapply(candidates, `[`, 1, 1)) >
-                               version[1, 1])
+          !Vectorize(isTRUE)(do.call(c, lapply(candidates, `[`, 1L, 1L)) >
+                               version[1L, 1L])
         } else if (symbol == "~") {
-          !Vectorize(isTRUE)(do.call(c, lapply(candidates, `[`, 1, c(1, 2))) >
-                               version[1, c(1, 2)])
+          !Vectorize(isTRUE)(
+            do.call(c, lapply(candidates, `[`, 1L, c(1L, 2L))) >
+              version[1L, c(1L, 2L)])
         }
       }
     }
@@ -289,7 +290,7 @@
     filtered <- list()
     for (l in seq_len(l_max)) {
       filtered <- c(
-        filter_(versions, version[1, c(1:l)], ifelse(l == l_max, symbol, NA)),
+        filter_(versions, version[1L, c(1L:l)], ifelse(l == l_max, symbol, NA)),
         filtered) # has to be in second position in the vector!
     }
     filtered <- Filter(length, filtered)
@@ -435,7 +436,7 @@
     path <- .remove_trailing_filesep(
       file.path(root, .name_to_path(parsed_name[["initials"]])))
     walks <- c("", .cumpaste(
-      strsplit(path, split = .Platform$file.sep, fixed = TRUE)[[1]],
+      strsplit(path, split = .Platform$file.sep, fixed = TRUE)[[1L]],
       sep = .Platform$file.sep))
     if (!any(file.exists(file.path(walks, "__IGNORE__")))) {
       files_ <-
@@ -499,8 +500,8 @@
 
   if (is.na(version)) return(TRUE)
 
-  version <- unclass(version)[[1]]
-  sub_version <- unclass(sub_version)[[1]]
+  version <- unclass(version)[[1L]]
+  sub_version <- unclass(sub_version)[[1L]]
   level <- length(version)
   if (level > length(sub_version)) return(FALSE)
 
@@ -676,7 +677,7 @@
   })
 
   if (length(resolution) > 0L && !all) {
-    version <- as.character(utils::tail(resolution, 1L)[[1]][["version"]])
+    version <- as.character(utils::tail(resolution, 1L)[[1L]][["version"]])
     resolution <- Filter(function(node) {
       !isTRUE(as.character(node[["version"]]) != version)
     },
@@ -771,7 +772,7 @@ find_module <- function(name, scope_name = NULL, absolute = TRUE,
     extensions = extensions)[["resolved"]]
 
   if (length(resolved) > 0L) {
-    resolved[[1]][c("name", "version", "storage", "filepath")]
+    resolved[[1L]][c("name", "version", "storage", "filepath")]
   }
 
 }
@@ -843,7 +844,7 @@ find_path <- function(name, scope_name = NULL, ...) {
   resolved <- (if (length(resolved_name[["resolved"]]) > 0L)
     resolved_name else resolved_name[["candidates"]])[["resolved"]]
   if (length(resolved) > 0L) {
-    resolved <- resolved[[1]]
+    resolved <- resolved[[1L]]
     if (resolved[["storage"]] == "on-disk") {
       return(resolved[["filepath"]])
     } else {

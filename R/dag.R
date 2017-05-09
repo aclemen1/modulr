@@ -22,14 +22,14 @@
     resolved_dependencies <-
       unique(unname(named_dependencies[names_of_deps %in% dependencies]))
 
-    if (isTRUE(length(resolved_dependencies) > 0)) {
+    if (isTRUE(length(resolved_dependencies) > 0L)) {
 
       array <-
         rbind(resolved_dependencies,
-              name, deparse.level = 0)
+              name, deparse.level = 0L)
 
-      dependency <- c(dependency, array[1, ])
-      module <- c(module, array[2, ])
+      dependency <- c(dependency, array[1L, ])
+      module <- c(module, array[2L, ])
 
     }
 
@@ -47,10 +47,10 @@
 
   assert_that(
     is.data.frame(graph),
-    nrow(graph) == 0 || setequal(names(graph), c("module", "dependency"))
+    nrow(graph) == 0L || setequal(names(graph), c("module", "dependency"))
   )
 
-  if (nrow(graph) > 0) {
+  if (nrow(graph) > 0L) {
 
     pooh::tsort(graph$dependency, graph$module)
 
@@ -62,31 +62,31 @@
 
   assert_that(
     is.data.frame(graph),
-    nrow(graph) == 0 || setequal(names(graph), c("module", "dependency"))
+    nrow(graph) == 0L || setequal(names(graph), c("module", "dependency"))
   )
 
-  if (nrow(graph) > 0) {
+  if (nrow(graph) > 0L) {
 
     ordered_names <- .topological_sort(graph)
 
     deps <- Map(
       function(name) {
         deps_ <- graph[graph[["module"]] == name, ][["dependency"]]
-        if (length(deps_) == 0) return(NULL)
+        if (length(deps_) == 0L) return(NULL)
         deps_
       },
       ordered_names)
 
     layers <- list()
 
-    while (length(deps) > 0) {
+    while (length(deps) > 0L) {
 
       idx <- vapply(
         seq_len(length(deps)),
-        FUN = function(n) any(deps[[n]] %in% names(deps)[1:n]),
+        FUN = function(n) any(deps[[n]] %in% names(deps)[1L:n]),
         FUN.VALUE = TRUE)
 
-      layers[[length(layers) + 1]] <- names(deps)[!idx]
+      layers[[length(layers) + 1L]] <- names(deps)[!idx]
 
       deps <- deps[idx]
 

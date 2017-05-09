@@ -154,10 +154,10 @@ foo() # timestamp evaluated at *run-time*, but ...
 foo() # only once
 
 reset()
-define("foo", NULL, function() function(a) a + 1)
-foo <- make("foo"); foo(1)
-make("foo", 1)
-do_make("foo", args = list(a = 1))
+define("foo", NULL, function() function(a) a + 1L)
+foo <- make("foo"); foo(1L)
+make("foo", 1L)
+do_make("foo", args = list(a = 1L))
 
 reset()
 define("A", NULL, function() "(A)")

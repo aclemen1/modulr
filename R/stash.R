@@ -47,7 +47,7 @@ stash <- function(comment = NA_character_) {
 
   timestamp <- Sys.time()
 
-  len_plus_1 <- length(.modulr_env$injector$stash) + 1
+  len_plus_1 <- length(.modulr_env$injector$stash) + 1L
 
   .message_meta(
     sprintf("Stashing modulr state, stash #%s", len_plus_1), {
@@ -60,7 +60,7 @@ stash <- function(comment = NA_character_) {
         comment = comment
       )
     },
-    ok = TRUE, verbosity = 2)
+    ok = TRUE, verbosity = 2L)
 
   return(invisible(len_plus_1))
 
@@ -75,7 +75,7 @@ unstash <- function(id = length(.modulr_env$injector$stash)) {
 
   len <- length(.modulr_env$injector$stash)
 
-  assert_that(len > 0, msg = "nothing to unstash.")
+  assert_that(len > 0L, msg = "nothing to unstash.")
   assert_that(assertthat::is.count(id))
   assert_that(id <= len, msg = "id is out of bounds.")
 
@@ -91,7 +91,7 @@ unstash <- function(id = length(.modulr_env$injector$stash)) {
       .modulr_env$injector$verbosity <- stash[["verbosity"]]
 
     },
-    ok = TRUE, verbosity = 2)
+    ok = TRUE, verbosity = 2L)
 
   invisible()
 
@@ -104,7 +104,7 @@ list_stashes <- function() {
   .message_meta("Entering list_stashes() ...",
                 verbosity = +Inf)
 
-  if (length(.modulr_env$injector$stash) == 0) {
+  if (length(.modulr_env$injector$stash) == 0L) {
     message("No stash found.")
     return(invisible())
   }
@@ -151,7 +151,7 @@ remove_stash <- function(id, all) {
       .modulr_env$injector$stash <- list()
 
     },
-    ok = TRUE, verbosity = 2)
+    ok = TRUE, verbosity = 2L)
 
   }
 
@@ -169,7 +169,7 @@ remove_stash <- function(id, all) {
         .modulr_env$injector$stash[[id]] <- NULL
 
       },
-      ok = TRUE, verbosity = 2)
+      ok = TRUE, verbosity = 2L)
 
   }
 

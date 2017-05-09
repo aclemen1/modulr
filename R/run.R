@@ -132,7 +132,7 @@ do_run_async <- function(name = .Last.name, args = list(),
 
     is_running <- !is.null(job) &&
       system(sprintf("ps -p %d", as.integer(job$pid)),
-             ignore.stdout = TRUE, ignore.stderr = TRUE) == 0
+             ignore.stdout = TRUE, ignore.stderr = TRUE) == 0L
 
     if (done) {
       if (is_running) {
@@ -206,7 +206,7 @@ do.run_async <- do_run_async
 #     "parallel:::.slaveR",
 #     system("ps -o pid,cmd", intern = TRUE),
 #     value = T)
-#   if(length(jobs) > 0) {
+#   if(length(jobs) > 0L) {
 #     if (!intern) {
 #       cat(jobs, collapse = "\n")
 #       return(invisible(paste(jobs, collapse = "\n")))
@@ -219,8 +219,8 @@ do.run_async <- do_run_async
 # terminate_async_jobs <- function() {
 #   pids <- as.integer(unlist(
 #     lapply(strsplit(list_async_jobs(intern = TRUE)," ", fixed = T),
-#            function(x) x[1])))
-#   if(length(pids) > 0)
+#            function(x) x[1L])))
+#   if(length(pids) > 0L)
 #     tools::pskill(pids)
 # }
 # End Exclude Linting

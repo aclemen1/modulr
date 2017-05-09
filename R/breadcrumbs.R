@@ -46,7 +46,7 @@ get_breadcrumbs <- function(void, verbose = TRUE) {
                                ifnotfound = NA, inherits = TRUE)
                       }))))))
 
-  if (length(bc) > 1 && verbose)
+  if (length(bc) > 1L && verbose)
     message(sprintf("modulr breadcrumbs: %s",
                     paste(sprintf("'%s'", bc), collapse = " > ")))
 
