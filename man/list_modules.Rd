@@ -7,12 +7,12 @@
 \usage{
 list_modules(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
   formatted = TRUE, absolute = FALSE, cols = c("name", "version",
-  "storage", "along", "type", "weight", "calls", "dependencies", "childs",
+  "storage", "along", "type", "weight", "calls", "dependencies", "children",
   "size", "lines", "modified"))
 
 lsmod(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
   formatted = TRUE, absolute = FALSE, cols = c("name", "version",
-  "storage", "along", "type", "weight", "calls", "dependencies", "childs",
+  "storage", "along", "type", "weight", "calls", "dependencies", "children",
   "size", "lines", "modified"))
 }
 \arguments{
@@ -54,7 +54,7 @@ takes place.}
 \item{\code{weight}}{memory size of the object.}
 \item{\code{calls}}{number of explicit make calls.}
 \item{\code{dependencies}}{number of direct dependencies (parents).}
-\item{\code{childs}}{number of modules requiring the module (childs).}
+\item{\code{children}}{number of modules requiring the module (children).}
 \item{\code{size}}{memory size occupied by the definition.}
 \item{\code{lines}}{number of lines of the provider.}
 \item{\code{chars}}{number of characters of the provider.}

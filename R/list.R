@@ -28,7 +28,7 @@
 #' \item{\code{weight}}{memory size of the object.}
 #' \item{\code{calls}}{number of explicit make calls.}
 #' \item{\code{dependencies}}{number of direct dependencies (parents).}
-#' \item{\code{childs}}{number of modules requiring the module (childs).}
+#' \item{\code{children}}{number of modules requiring the module (children).}
 #' \item{\code{size}}{memory size occupied by the definition.}
 #' \item{\code{lines}}{number of lines of the provider.}
 #' \item{\code{chars}}{number of characters of the provider.}
@@ -76,7 +76,7 @@ list_modules <-
              "weight",
              "calls",
              "dependencies",
-             "childs",
+             "children",
              "size",
              "lines",
              "modified")) {
@@ -103,7 +103,7 @@ list_modules <-
         "weight",
         "calls",
         "dependencies",
-        "childs",
+        "children",
         "size",
         "lines",
         "chars",
@@ -201,7 +201,7 @@ list_modules <-
 
       adj <- .compute_adjacency_matrix(flat)
       deps <- diag(adj %*% t(adj))
-      childs <- diag(t(adj) %*% adj)
+      children <- diag(t(adj) %*% adj)
 
       calls <- do.call(c, Map(function(name)
         .modulr_env$injector$registry[[c(name, "calls")]], flat))
@@ -216,7 +216,7 @@ list_modules <-
         weight = weights,
         calls = calls,
         dependencies = deps,
-        childs = childs,
+        children = children,
         size = sizes,
         lines = lines,
         chars = chars,
