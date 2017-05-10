@@ -7,6 +7,10 @@ increment_skipCalls_ <- function(args, increment = 1L) {
   args
 }
 
+prompt_ <- function(fun) {
+  paste(paste(">", deparse(body(fun), width.cutoff = 78L)), collapse = "\n")
+}
+
 #' Environment, Module, and Pipe Browser.
 #'
 #' Interrupt the execution of an expression or a pipe and allow the inspection
@@ -52,8 +56,24 @@ browser <- function(...) {
     if (exists("function_list", where = parent.frame(2L))) {
       message(
         "Use ", sQuote("."), " to get the left-hand side value of the pipe.")
+      function_list_ <- get("function_list", pos = parent.frame(2L))
+      i_ <- get("i", pos = parent.frame(2L))
+      k_ <- get("k", pos = parent.frame(2L))
+      message(paste(unlist(c(
+        if (i_ %in% 1L:2L) list("> .") else if (i_ > 2L) list("> ..."),
+        lapply(function_list_[max(1L, i_ - 1L):min(i_ + 1L, k_)], prompt_),
+        if (i_ < k_ - 1L) list("> ...")
+      )),
+      collapse = " %>% \n"))
       args <- increment_skipCalls_(list(...), 8L)
-      on.exit(return(args[[1L]]))
+      deparse.max.lines.bak <-
+        options(deparse.max.lines =
+                  max(getOption("modulr.deparse.max.lines.in.pipes"),
+                      getOption("deparse.max.lines")))
+      on.exit({
+        options(deparse.max.lines.bak)
+        return(args[[1L]])
+      })
       do.call(base::browser, args = tail(args, -1L), envir = parent.frame(1L))
     } else {
       args <- increment_skipCalls_(list(...), 2L)
