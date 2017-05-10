@@ -52,14 +52,10 @@ browser <- function(...) {
     if (exists("function_list", where = parent.frame(2L))) {
       message(
         "Use ", sQuote("."), " to get the left-hand side value of the pipe.")
-      # args <- list(...)
-      # args[["skipCalls"]] <- 8L
       args <- increment_skipCalls_(list(...), 8L)
       on.exit(return(args[[1L]]))
       do.call(base::browser, args = tail(args, -1L), envir = parent.frame(1L))
     } else {
-      # args <- list(...)
-      # args[["skipCalls"]] <- 2L
       args <- increment_skipCalls_(list(...), 2L)
       do.call(base::browser, args = args, envir = parent.frame(1L))
     }

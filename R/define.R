@@ -16,10 +16,19 @@
 }
 
 .get_symbols <- function(e) {
-  if (is.name(e)) {
+  if (is.atomic(e)) {
+    return(character(0L))
+  } else if (is.name(e)) {
     return(as.character(e))
-  } else if (is.call(e) || is.pairlist(e)) {
-    return(unique(unlist(lapply(e, .get_symbols))))
+  } else if (is.call(e)) {
+    return(unlist(lapply(e, .get_symbols), use.names = FALSE))
+  } else if (is.pairlist(e)) {
+    return(c(
+      names(e), unlist(lapply(unlist(e, use.names = FALSE), .get_symbols),
+                       use.names = FALSE)))
+  } else {
+    stop("Don't know how to handle type ", typeof(e),
+         call. = FALSE)
   }
 }
 
@@ -380,6 +389,8 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
     },
     env = environment(provider))
 
+  check_missing_formals <- FALSE
+
   if (.is_undefined(name)) {
 
     .message_meta(
@@ -400,6 +411,8 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
           "timestamp" = timestamp,
           "created" = timestamp
           )
+
+        check_missing_formals <- TRUE
 
     },
     ok = TRUE, verbosity = ifelse(.is_regular(name), 2L, 3L))
@@ -428,6 +441,8 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
         .modulr_env$injector$registry[[c(name, "storage")]] <- "in-memory"
         .modulr_env$injector$registry[[c(name, "along")]] <- NA_character_
 
+        check_missing_formals <- TRUE
+
       },
       ok = TRUE, verbosity = 1L)
     }
@@ -436,26 +451,32 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
     assert_that(.is_regular(name))
   }
 
+  if (check_missing_formals) {
+
+    missing_formals <-
+      base::setdiff(
+        names(dependencies),
+        unique(.get_symbols(body(provider))))
+
+    if (length(missing_formals) == 1L) {
+      .message_warn(
+        sprintf(
+          "There is a required dependency which seems unused: %s.",
+          sQuote(missing_formals)),
+        ok = FALSE, verbosity = 1L)
+    } else if (length(missing_formals) >= 2L) {
+      .message_warn(
+        sprintf(
+          "There are %d required dependencies that seem unused: %s.",
+          length(missing_formals),
+          paste(sQuote(missing_formals), collapse = ", " )),
+        ok = FALSE, verbosity = 1L)
+    }
+
+  }
+
   if (.is_regular_core(name))
     .modulr_env$injector$.Last.name <- name
-
-  missing_formals <-
-    setdiff(
-      names(formals(provider)),
-      .get_symbols(body(provider)))
-
-  if (length(missing_formals) == 1L) {
-    .message_warn(
-      sprintf("There is an unused dependency: %s.", sQuote(missing_formals)),
-      ok = FALSE, verbosity = 1L)
-  } else if (length(missing_formals) >= 2L) {
-    .message_warn(
-      sprintf(
-        "There are %d unused dependencies: %s.",
-        length(missing_formals),
-        paste(sQuote(missing_formals), collapse = ", " )),
-      ok = FALSE, verbosity = 1L)
-  }
 
   invisible(function(...) make(name, ...))
 
