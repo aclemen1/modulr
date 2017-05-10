@@ -656,7 +656,7 @@ touch <- function(name = .Last.name) {
 #' hit("foo")
 #' hit(foo)
 #' @export
-hit <- function(name, suffix = getOption("modulr.hit_suffix", default = "_"),
+hit <- function(name, suffix = getOption("modulr.hit_suffix"),
                 replace = TRUE, execute = FALSE) {
   assert_that(
     assertthat::is.string(suffix),
@@ -668,14 +668,16 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix", default = "_"),
   }
   name_string <- as.character(substitute(name))
   roots <-
-    as.vector(stats::na.omit(vapply(root_config$get_all()[[1L]], function(path) {
-      if (.dir_exists(path)) normalizePath(path) else NA_character_
-    }, FUN.VALUE = "character")))
+    as.vector(stats::na.omit(vapply(
+      root_config$get_all()[[1L]],
+      function(path) {
+        if (.dir_exists(path)) normalizePath(path) else NA_character_
+      }, FUN.VALUE = "character")))
   candidates <-
-    list.files(
+    unique(list.files(
       path = roots,
       pattern = sprintf(".*(?:%s).*\\.[rR](?:(?:md)|(?:nw))?$", name_string),
-      ignore.case = TRUE, recursive = TRUE, full.names = TRUE)
+      ignore.case = TRUE, recursive = TRUE, full.names = TRUE))
   modules <- unique(c(
     list_modules(sprintf("/?[^/]*(?:%s)[^/]*$", name_string),
                  wide = FALSE, cols = "name"),
@@ -685,7 +687,7 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix", default = "_"),
         name <- .extract_name(candidate)
         if (is.null(name)) NA_character_ else name
       },
-      FUN.VALUE = "character"))), value = TRUE)))
+      FUN.VALUE = "character"))), ignore.case = TRUE, value = TRUE)))
   modules <-
     Filter(function(module) try(isTRUE(!is.null(find_module(module))),
                                 silent = TRUE), modules)
@@ -744,3 +746,5 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix", default = "_"),
   }
   invisible(modules)
 }
+
+DEFAULT_HIT_SUFFIX <- "_"

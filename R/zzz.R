@@ -3,11 +3,18 @@
 
   .modulr_env$old_modulr_options <- options(
     modulr.ignore_packages =
-      getOption("modulr.ignore_packages", DEFAULT_IGNORE_PACKAGES),
+      getOption(
+        "modulr.ignore_packages",
+        DEFAULT_IGNORE_PACKAGES),
     modulr.deparse.max.lines.in.pipes =
       getOption(
         "modulr.deparse.max.lines.in.pipes",
-        DEFAULT_DEPARSE_MAX_LINES_IN_PIPES))
+        DEFAULT_DEPARSE_MAX_LINES_IN_PIPES),
+    modulr.hit_suffix =
+      getOption(
+        "modulr.hit_suffix",
+        default = DEFAULT_HIT_SUFFIX)
+  )
 
   reset(all = TRUE, .verbose = FALSE)
 

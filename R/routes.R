@@ -520,6 +520,7 @@
   assert_that(is.na(version) || .is_version(version))
 
   extract_ <- function(x, all = x, idx = c()) {
+    rs <- c()
     if (is.name(x)) {
       if (x == as.name("define") ||
             x == as.name("%requires%") ||
@@ -538,9 +539,10 @@
     }
     if (is.expression(x) || (is.language(x) && !is.name(x))) {
       for (i in seq_len(length(x))) {
-        rs <- extract_(x[[i]], all, c(idx, i))
-        if (!is.null(rs)) return(rs)
+        rs <- c(rs, extract_(x[[i]], all, c(idx, i)))
+        #if (!is.null(rs)) return(rs)
       }
+      return(rs)
     }
   }
 
@@ -590,8 +592,14 @@
       stop(e)
     },
     silent = TRUE)
+
   name <- extract_(parsed)
-  if (!is.null(name)) return(name)
+
+  finals <-
+    vapply(name, function(x) .parse_name(x)[["final"]], FUN.VALUE = "")
+
+  if (.parse_filepath(filepath)[["name"]] %in% finals)
+    return(names(which.max(finals == .parse_filepath(filepath)[["name"]])))
 
   # If no name has been found in the first expression, we then parse the whole
   # file.
@@ -602,8 +610,16 @@
       stop(e)
     },
     silent = TRUE)
-  return(extract_(parsed))
 
+  name <- extract_(parsed)
+
+  finals <-
+    vapply(name, function(x) .parse_name(x)[["final"]], FUN.VALUE = "")
+
+  if (.parse_filepath(filepath)[["name"]] %in% finals)
+    return(names(which.max(finals == .parse_filepath(filepath)[["name"]])))
+
+  return(names(finals[1L]))
 }
 
 # Parse all candidates for a module name to find the best fitting version.
