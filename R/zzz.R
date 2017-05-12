@@ -63,6 +63,9 @@
       break
     }
 
+  packageStartupMessage(sprintf(
+    "This is modulr version %s", utils::packageVersion("modulr")))
+
   invisible(NULL)
 
 }
