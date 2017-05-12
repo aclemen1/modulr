@@ -446,7 +446,11 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
         identity,
         !Vectorize(grepl, vectorize.args = "pattern")(
           names(dependencies),
-          paste(deparse(body(provider), width.cutoff = 500L), collapse = "\n"),
+          paste(c(
+            deparse(body(provider), width.cutoff = 500L),
+            deparse(.get_0("options", envir = parent.env(environment(provider)),
+                           inherits = FALSE))),
+            collapse = "\n"),
           fixed = TRUE)))
 
     if (length(missing_formals) == 1L) {
