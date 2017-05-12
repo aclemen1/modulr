@@ -7,13 +7,13 @@
 \usage{
 list_modules(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
   formatted = TRUE, absolute = FALSE, cols = c("name", "version",
-  "storage", "along", "type", "weight", "calls", "dependencies", "children",
-  "size", "lines", "modified"))
+  "storage", "along", "type", "weight", "calls", "dependencies", "uses", "size",
+  "lines", "modified"))
 
 lsmod(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
   formatted = TRUE, absolute = FALSE, cols = c("name", "version",
-  "storage", "along", "type", "weight", "calls", "dependencies", "children",
-  "size", "lines", "modified"))
+  "storage", "along", "type", "weight", "calls", "dependencies", "uses", "size",
+  "lines", "modified"))
 }
 \arguments{
 \item{regexp}{A regular expression. If not missing, the regular expression
@@ -53,8 +53,8 @@ takes place.}
 \item{\code{type}}{type of the object returned.}
 \item{\code{weight}}{memory size of the object.}
 \item{\code{calls}}{number of explicit make calls.}
-\item{\code{dependencies}}{number of direct dependencies (parents).}
-\item{\code{children}}{number of modules requiring the module (children).}
+\item{\code{dependencies}}{number of direct dependencies.}
+\item{\code{uses}}{number of modules requiring the module.}
 \item{\code{size}}{memory size occupied by the definition.}
 \item{\code{lines}}{number of lines of the provider.}
 \item{\code{chars}}{number of characters of the provider.}

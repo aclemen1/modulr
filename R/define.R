@@ -15,23 +15,6 @@
 
 }
 
-.get_symbols <- function(e) {
-  if (is.atomic(e)) {
-    return(character(0L))
-  } else if (is.name(e)) {
-    return(as.character(e))
-  } else if (is.call(e)) {
-    return(unlist(lapply(e, .get_symbols), use.names = FALSE))
-  } else if (is.pairlist(e)) {
-    return(c(
-      names(e), unlist(lapply(unlist(e, use.names = FALSE), .get_symbols),
-                       use.names = FALSE)))
-  } else {
-    stop("Don't know how to handle type ", typeof(e),
-         call. = FALSE)
-  }
-}
-
 #' Get the Digest of a Module.
 #'
 #' Get the digest (a SHA-256 hash of the dependencies and provider) of a module.
@@ -94,6 +77,31 @@ get_digest <- function(name = .Last.name, load = FALSE) {
   )
 
 }
+
+
+# Leads to unexpected R (3.2.5) crashes, see remark in function definition of
+# `define` below. Kept for future reference.
+.get_symbols <- function(e) {
+  if (is.atomic(e)) {
+    character(0L)
+  } else if (is.name(e)) {
+    as.character(e)
+  } else if (is.call(e)) {
+    if (identical(e[[1L]], quote(`<-`))  && is.name(e[[2]]) ||
+        identical(e[[1L]], quote(`<<-`)) && is.name(e[[2]])) {
+      unlist(lapply(e[[3L]], .get_symbols), use.names = FALSE)
+    } else {
+      unlist(lapply(e, .get_symbols), use.names = FALSE)
+    }
+  } else if (is.pairlist(e)) {
+    unlist(lapply(Filter(function(x) !is.symbol(x), e), .get_symbols),
+           use.names = FALSE)
+  } else {
+    stop("Don't know how to handle type ", typeof(e),
+         call. = FALSE)
+  }
+}
+
 
 #' Define a Module.
 #'
@@ -453,21 +461,28 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
 
   if (check_missing_formals) {
 
+    # This is certainly not the right way to detect missing formals, but
+    # inspecting the AST to identify them leads to unexpected R (3.2.5) crashes.
+    # Same kind of crashes are recorded with lazyeval::ast, pryr::ast, and
+    # codetools::checkUsage, for instance.
     missing_formals <-
-      base::setdiff(
-        names(dependencies),
-        unique(.get_symbols(body(provider))))
+      names(Filter(
+        identity,
+        !Vectorize(grepl, vectorize.args = "pattern")(
+          names(dependencies),
+          paste(deparse(body(provider), width.cutoff = 500L), collapse = "\n"),
+          fixed = TRUE)))
 
     if (length(missing_formals) == 1L) {
       .message_warn(
         sprintf(
-          "There is a required dependency which seems unused: %s.",
+          "Possibly unused dependency: %s.",
           sQuote(missing_formals)),
         ok = FALSE, verbosity = 1L)
     } else if (length(missing_formals) >= 2L) {
       .message_warn(
         sprintf(
-          "There are %d required dependencies that seem unused: %s.",
+          "Possibly %d unused dependencies: %s.",
           length(missing_formals),
           paste(sQuote(missing_formals), collapse = ", " )),
         ok = FALSE, verbosity = 1L)
@@ -824,3 +839,4 @@ undefine <- function(name = .Last.name) {
     envir = parent.frame())
 
 }
+

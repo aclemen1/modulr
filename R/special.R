@@ -137,12 +137,13 @@ define_modulr <- function() {
     #' ### `get_module_name()`
     #'
     #' Returns a string (character vector of lenght one) containing the module
-    #' name. Deprecated and kept for backward compatibility.
+    #' name. Deprecated and kept for backward compatibility. Use `.__name__`
+    #' instead.
     #'
     #' ### `get_module_version()`
     #'
     #' Returns the numeric version of the module. Deprecated and kept for
-    #' backward compatibility.
+    #' backward compatibility. Use `.__version__` instead.
     #'
     #' ### `get_module_options()`
     #'
@@ -152,12 +153,14 @@ define_modulr <- function() {
     #' ### `get_filename()`
     #'
     #' Returns a string (character vector of lenght one) containing the module
-    #' filename. Deprecated and kept for backward compatibility.
+    #' filename. Deprecated and kept for backward compatibility. Use `.__path__`
+    #' and/or `.__file__` instead.
     #'
     #' ### `get_dirname()`
     #'
     #' Returns a string (character vector of lenght one) containing the module
-    #' dirname. Deprecated and kept for backward compatibility.
+    #' dirname. Deprecated and kept for backward compatibility. Use `.__path__`
+    #' and/or `.__file__` instead.
     #'
     #' @noRd
 

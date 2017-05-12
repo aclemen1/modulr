@@ -113,7 +113,7 @@ info("foobar")
 Use `lsmod` to list all modules and their properties:
 
 ```{r}
-lsmod(cols = c("name", "type", "dependencies", "children", "size", "modified"))
+lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified"))
 ```
 
 In this example, `foobar` has two dependencies, and `foo` and `bar` both have one child. Use `plot_dependencies` to see them graphically:
@@ -145,7 +145,7 @@ make("foobar")
 Voilà! All the depencencies have been evaluated, injected and processed to return the expected `"Hello World!"`.
 
 ```{r}
-lsmod(cols = c("name", "type", "dependencies", "children", "size", "modified"))
+lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified"))
 ```
 
 ## Workflow
