@@ -513,37 +513,60 @@
 }
 
 # Extract the name of a module definition in a file.
-.extract_name <- function(filepath, namespace = NULL, version = NA) {
+.extract_name <- function(filepath, namespace = NULL, version = NA,
+                          strict = FALSE) {
 
   assert_that(file.exists(filepath))
   assert_that(is.null(namespace) || .is_namespace(namespace))
   assert_that(is.na(version) || .is_version(version))
 
-  extract_ <- function(x, all = x, idx = c()) {
-    rs <- c()
-    if (is.name(x)) {
-      if (x == as.name("define") ||
-            x == as.name("%requires%") ||
-            x == as.name("%provides%")) {
-        idx[length(idx)] <- idx[length(idx)] + 1L
-        item <- all[[idx]]
-        if (is.character(item)) {
-          if (is.null(namespace)) return(item)
-          parsed_name <- .parse_name(item)
-          if (parsed_name[["namespace"]] == namespace &&
-                .is_sub_version(version, parsed_name[["version"]])) {
-            return(item)
-          }
+  extract_ <- function(x, all = x, idx = c(), strict = TRUE) {
+
+    loop_ <- function(e) {
+      if (is.expression(e)) {
+        unlist(lapply(e, loop_))
+      } else if (is.language(e)) {
+        if (
+          identical(e[[1L]], quote(`%provides%`)) ||
+          identical(e[[1L]], quote(`%provides_options%`)) ||
+          identical(e[[1L]], quote(`%requires%`)) ||
+          identical(e[[1L]], quote(`%clones%`)) ||
+          identical(e[[1L]], quote(define)) ||
+          identical(e[[1L]], quote(clone))) {
+          if (is.character(e[[2L]])) e[[2L]] else loop_(e[[2L]])
         }
       }
     }
-    if (is.expression(x) || (is.language(x) && !is.name(x))) {
-      for (i in seq_len(length(x))) {
-        rs <- c(rs, extract_(x[[i]], all, c(idx, i)))
-        #if (!is.null(rs)) return(rs)
+
+    items <- loop_(x)
+
+    if (length(items) > 0L) {
+      parsed_names <- Map(.parse_name, items)
+      finals <- Map(`[[`, parsed_names, "final")
+      namespaces <- Map(`[[`, parsed_names, "namespace")
+      versions <- Map(`[[`, parsed_names, "version")
+      is_sub_version <-
+        Vectorize(.is_sub_version, vectorize.args = "sub_version")(
+          version, do.call(c, versions))
+      if (any(is_sub_version)) {
+        if (!is.null(namespace)) {
+          # must be strict
+          idx <- which(
+            is_sub_version &
+              namespaces == namespace &
+              (!strict | finals ==
+                 .parse_name(.parse_filepath(filepath)[["name"]])[["final"]]))
+          if (length(idx) >= 1L) names(idx)
+        } else {
+          names(which.max(
+            is_sub_version &
+              (!strict | finals ==
+                 .parse_name(.parse_filepath(filepath)[["name"]])[["final"]]))
+            )
+        }
       }
-      return(rs)
     }
+
   }
 
   if (tolower(tools::file_ext(filepath)) %in% c("rmd", "rnw")) {
@@ -586,20 +609,18 @@
   # Usually, the module is defined in the first expressions, so we parse the
   # beginning of the file only.
   parsed <- tryCatch(
-    do.call(parse, args = c(args, list(n = 3L, keep.source = FALSE))),
+    do.call(parse, args = c(args, list(n = 2L, keep.source = FALSE))),
     error = function(e) {
       e[["call"]] <- NULL
       stop(e)
     },
     silent = TRUE)
+  name <- extract_(parsed, strict = FALSE)
+  if (
+    !is.null(name) &&
+    name == .parse_name(.parse_filepath(filepath)[["name"]])[["final"]])
+    return(name)
 
-  name <- extract_(parsed)
-
-  finals <-
-    vapply(name, function(x) .parse_name(x)[["final"]], FUN.VALUE = "")
-
-  if (.parse_filepath(filepath)[["name"]] %in% finals)
-    return(names(which.max(finals == .parse_filepath(filepath)[["name"]])))
 
   # If no name has been found in the first expression, we then parse the whole
   # file.
@@ -611,15 +632,8 @@
     },
     silent = TRUE)
 
-  name <- extract_(parsed)
+  return(extract_(parsed, strict = strict))
 
-  finals <-
-    vapply(name, function(x) .parse_name(x)[["final"]], FUN.VALUE = "")
-
-  if (.parse_filepath(filepath)[["name"]] %in% finals)
-    return(names(which.max(finals == .parse_filepath(filepath)[["name"]])))
-
-  return(names(finals[1L]))
 }
 
 # Parse all candidates for a module name to find the best fitting version.

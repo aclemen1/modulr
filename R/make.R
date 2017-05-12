@@ -684,7 +684,7 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix"),
     grep(
       sprintf("/?[^/]*(?:%s)[^/]*$", name_string),
       as.vector(stats::na.omit(vapply(candidates, function(candidate) {
-        name <- .extract_name(candidate)
+        name <- .extract_name(candidate, strict = TRUE)
         if (is.null(name)) NA_character_ else name
       },
       FUN.VALUE = "character"))), ignore.case = TRUE, value = TRUE)))

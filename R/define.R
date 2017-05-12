@@ -79,30 +79,6 @@ get_digest <- function(name = .Last.name, load = FALSE) {
 }
 
 
-# Leads to unexpected R (3.2.5) crashes, see remark in function definition of
-# `define` below. Kept for future reference.
-.get_symbols <- function(e) {
-  if (is.atomic(e)) {
-    character(0L)
-  } else if (is.name(e)) {
-    as.character(e)
-  } else if (is.call(e)) {
-    if (identical(e[[1L]], quote(`<-`))  && is.name(e[[2]]) ||
-        identical(e[[1L]], quote(`<<-`)) && is.name(e[[2]])) {
-      unlist(lapply(e[[3L]], .get_symbols), use.names = FALSE)
-    } else {
-      unlist(lapply(e, .get_symbols), use.names = FALSE)
-    }
-  } else if (is.pairlist(e)) {
-    unlist(lapply(Filter(function(x) !is.symbol(x), e), .get_symbols),
-           use.names = FALSE)
-  } else {
-    stop("Don't know how to handle type ", typeof(e),
-         call. = FALSE)
-  }
-}
-
-
 #' Define a Module.
 #'
 #' Define or redefine a module by name, dependencies, and provider.
