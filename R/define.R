@@ -840,3 +840,85 @@ undefine <- function(name = .Last.name) {
 
 }
 
+#' Clone a Module.
+#'
+#' Clone a module.
+#'
+#' @inheritParams define
+#' @inheritParams get_digest
+#' @param from_name Name of module to clone.
+#' @param deep A flag. Should the entire register entry be cloned?
+#'
+#' @return A wrapper function around a make call for the defined module.
+#'
+#' @details
+#'
+#'  For versioning purposes, it is often useful to clone modules.
+#'
+#' @section Warning:
+#'  It is considered a very bad practice to define, touch, undefine, load, make,
+#'  reset, or perform any other operation from within a module definition that
+#'  may alterate the internal state of modulr.
+#'
+#' @seealso \code{\link{define}}, \code{\link{make}}, \code{\link{reset}},
+#'   and \code{\link{root_config}}.
+#'
+#' @examples
+#' reset()
+#' define("foo", NULL, function() "foo")
+#' clone("bar", "foo")
+#' make("bar")
+#'
+#' @aliases %clones%
+#' @export
+clone <- function(name, from_name, deep = FALSE) {
+
+  .message_meta(sprintf("Entering clone() for '%s' and '%s' ...",
+                        name, from_name),
+                verbosity = +Inf)
+
+  assert_that(assertthat::is.flag(deep))
+
+  if (.is_called_from_within_module()) {
+    warning("clone is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  from_name <- find_module(from_name)[["name"]]
+
+  assert_that(.is_defined(from_name))
+
+  if (deep) {
+    .modulr_env$injector$registry[[name]] <-
+      .modulr_env$injector$registry[[from_name]]
+    return(invisible(function(...) make(name, ...)))
+  } else {
+    return(define(
+      name,
+      .modulr_env$injector$registry[[c(from_name, "aliases")]],
+      .modulr_env$injector$registry[[c(from_name, "provider")]]))
+  }
+
+}
+
+#' @export
+`%clones%` <- function(lhs, rhs) {
+
+  if (.is_called_from_within_module()) {
+    warning("`%clones%` is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
+  assert_that(
+    assertthat::is.string(lhs) && assertthat::is.string(rhs),
+    msg = paste0("left- or right-hand side of `%clones%` ",
+                 "is not a module name.")
+  )
+
+  do.call(
+    clone,
+    args =
+      list(name = lhs, from_name = rhs),
+    envir = parent.frame())
+
+}
