@@ -1,7 +1,7 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9157
-Date: 2017-05-12
+Version: 0.1.7.9158
+Date: 2017-05-16
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
     programs into discrete, modular units that are loosely coupled,
@@ -37,7 +37,10 @@ Suggests:
     rmarkdown,
     memoise,
     webshot,
-    withr
+    withr,
+    cranlogs,
+    ggplot2,
+    proto
 License: MIT + file LICENSE
 Encoding: UTF-8
 Collate:

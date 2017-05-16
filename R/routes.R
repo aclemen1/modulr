@@ -525,7 +525,7 @@
     loop_ <- function(e) {
       if (is.expression(e)) {
         unlist(lapply(e, loop_))
-      } else if (is.language(e)) {
+      } else if (is.language(e) && is.recursive(e)) {
         if (
           identical(e[[1L]], quote(`%provides%`)) ||
           identical(e[[1L]], quote(`%provides_options%`)) ||
