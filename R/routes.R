@@ -23,6 +23,9 @@
   matches[c("symbol", "version")] <-
     .parse_version(paste0("#", matches[["symbol"]], matches[["version"]]))[
       c("symbol", "version")]
+  if (nchar(matches[["suffix"]]) > 0L) {
+    matches[["namespace"]] <- matches[["name"]]
+  }
   components <- strsplit(matches[["namespace"]], "/", fixed = TRUE)[[1L]]
   matches[["initials"]] <- paste(utils::head(components, -1L), collapse = "/")
   matches[["final"]] <- utils::tail(components, 1L)
@@ -591,8 +594,10 @@
     knitr::opts_current$restore()
     on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
 
-    knitr::opts_knit$set("unnamed.chunk.label" =
-                         paste("modulr", filepath, sep = "-"))
+    knitr::opts_knit$set(
+      "unnamed.chunk.label" =
+        paste("modulr", filepath, sep = "-"),
+      "tidy" = FALSE)
 
     script <-
       knitr::knit(text = readChar(filepath, file.info(filepath)[["size"]]),

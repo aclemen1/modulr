@@ -409,7 +409,7 @@ with_verbosity <- function(level, code) {
 
 DEFAULT_DEPARSE_MAX_LINES_IN_PIPES <- 2L
 
-DEFAULT_ROOT_CONFIG <- c("module", "modules", "lib", "libs", ".")
+DEFAULT_ROOT_CONFIG <- c("modules", "module", "libs", "lib", ".")
 
 PRAISE <- c(
   "Outstanding",

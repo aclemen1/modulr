@@ -1381,9 +1381,9 @@ test_that(".parse_name returns a list of informations", {
     "version",
     "suffix"), ignore.order = TRUE)
   expect_equal(n[["name"]], "foo/bar/foobar#^1.0.0/test")
-  expect_equal(n[["namespace"]], "foo/bar/foobar")
-  expect_equal(n[["initials"]], "foo/bar")
-  expect_equal(n[["final"]], "foobar")
+  expect_equal(n[["namespace"]], "foo/bar/foobar#^1.0.0/test")
+  expect_equal(n[["initials"]], "foo/bar/foobar#^1.0.0")
+  expect_equal(n[["final"]], "test")
   expect_equal(n[["symbol"]], "^")
   expect_equal(n[["version"]], numeric_version("1.0.0"))
   expect_equal(n[["suffix"]], "test")

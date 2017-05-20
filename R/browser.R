@@ -74,7 +74,9 @@ browser <- function(...) {
         options(deparse.max.lines.bak)
         return(args[[1L]])
       })
-      do.call(base::browser, args = tail(args, -1L), envir = parent.frame(1L))
+      do.call(
+        base::browser, args = utils::tail(args, -1L),
+        envir = parent.frame(1L))
     } else {
       args <- increment_skipCalls_(list(...), 2L)
       do.call(base::browser, args = args, envir = parent.frame(1L))
