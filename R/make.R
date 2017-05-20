@@ -603,6 +603,8 @@ touch <- function(name = .Last.name) {
             call. = FALSE, immediate. = TRUE)
   }
 
+  name <- .get_name(name, load = FALSE)
+
   assert_that(.is_defined_regular(name))
 
   .message_meta(sprintf("Touching '%s'", name), {

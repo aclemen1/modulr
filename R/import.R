@@ -43,18 +43,18 @@
 #' reset()
 #' # https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3
 #' "modulr/vault" %imports%
-#'   paste0("https://gist.githubusercontent.com/aclemen1/",
-#'     "3fcc508cb40ddac6c1e3/raw/modulr-vault.Rmd")
+#'   "https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3"
 #' list_modules()
+#' reset()
+#' # equivalently
+#' "modulr/vault" %imports% "3fcc508cb40ddac6c1e3"
 #' make("modulr/vault/example")
 #' make_tests()}
 #'
 #' \dontrun{
 #' reset()
 #' # https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3
-#' "modulr/vault_with_a_typo" %imports%
-#'   paste0("https://gist.githubusercontent.com/aclemen1/",
-#'     "3fcc508cb40ddac6c1e3/raw/modulr-vault.Rmd")
+#' "modulr/vault_with_a_typo" %imports% "3fcc508cb40ddac6c1e3"
 #' list_modules()}
 #'
 #' \dontrun{
@@ -62,8 +62,7 @@
 #' # https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3
 #' "modulr/vault" %digests%
 #'   "with a wrong digest" %imports%
-#'   paste0("https://gist.githubusercontent.com/aclemen1/",
-#'     "3fcc508cb40ddac6c1e3/raw/modulr-vault.Rmd")
+#'   "3fcc508cb40ddac6c1e3"
 #' list_modules()}
 #'
 #' @aliases %digests% %imports%
@@ -88,100 +87,196 @@ import_module <- function(name, url, digest = NULL,
 
   try(load_module(name), silent = TRUE)
 
+  name <- .get_name(name, load = FALSE)
+
   if (force && .is_defined(name))
     undefine(name)
 
   if (.is_undefined(name)) {
 
+    gist_url_match <- "((^https://)|^)gist.github.com/([^/]+/)?([0-9a-f]+)$"
+
+    gist_id <- NULL
+
+    if (grepl(gist_url_match, url, ignore.case = FALSE)) {
+      gist_id <- regmatches(url, regexec(gist_url_match, url))[[1]][5]
+    } else if (grepl("^[0-9a-f]+$", url)) {
+      gist_id <- as.character(url)
+    }
+
     .message_meta(
-      sprintf(
-        "Importing '%s' %sfrom '%s' ...",
-        name,
-        ifelse(!is.null(digest),
-               sprintf("with digest '%s' ", digest),
-               ""),
-        url), verbosity = 2L)
+      if (!is.null(gist_id)) {
+        sprintf(
+          "Importing '%s' %sfrom gist ID '%s' ...",
+          name,
+          ifelse(!is.null(digest),
+                 sprintf("with digest '%s' ", digest),
+                 ""),
+          gist_id)
+      } else {
+        sprintf(
+          "Importing '%s' %sfrom '%s' ...",
+          name,
+          ifelse(!is.null(digest),
+                 sprintf("with digest '%s' ", digest),
+                 ""),
+          url)
+      }, {
+        if (!is.null(gist_id)) {
 
-    result <- httr::GET(url, ...)
+          gist_req <-
+            httr::GET(sprintf("https://api.github.com/gists/%s", gist_id))
 
-    script <- httr::content(result, as = "text")
+          if (gist_req[["status_code"]] >= 400) {
+            stop(sprintf("Gist ID '%s' not found.", gist_id), call. = FALSE)
+          }
 
-    registry <- .modulr_env$injector$registry
-    .Last.name <- .modulr_env$injector$.Last.name
-    config <- .modulr_env$injector$config
-    verbosity <- .modulr_env$injector$verbosity
-    stash <- .modulr_env$injector$stash
+          gist_content <-
+            httr::content(gist_req, as = "text", encoding = "UTF-8")
 
-    rollback <- function() {
-      .modulr_env$injector$registry <- registry
-      .modulr_env$injector$.Last.name <- .Last.name
-      .modulr_env$injector$config <- config
-      .modulr_env$injector$verbosity <- verbosity
-      .modulr_env$injector$stash <- stash
-    }
+          gist_result <-
+            jsonlite::fromJSON(gist_content, simplifyVector = FALSE)
 
-    if (grepl("```\\s*\\{\\s*[rR]", script) ||
-         grepl("<<[^>]*>>=[^@]*@", script)) {
-      # Rmd import
+          gist_files <- gist_result[["files"]]
 
-      opat <- knitr::knit_patterns$get()
-      oopts_knit <- knitr::opts_knit$get()
-      oopts_template <- knitr::opts_template$get()
-      oopts_hooks <- knitr::opts_hooks$get()
-      oopts_chunk <- knitr::opts_chunk$get()
-      oopts_current <- knitr::opts_current$get()
+          gist_R_files <- gist_files[
+            grepl("\\.(?:R)|\\.(?:Rmd)|\\.(?:Rnw)$",
+                  names(gist_files), ignore.case = TRUE)]
 
-      knitr::knit_patterns$restore()
-      on.exit(knitr::knit_patterns$set(opat), add = TRUE)
-      knitr::opts_knit$restore()
-      on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
-      knitr::opts_template$restore()
-      on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
-      knitr::opts_hooks$restore()
-      on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
-      knitr::opts_chunk$restore()
-      on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
-      knitr::opts_current$restore()
-      on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
+          .message_meta(
+            sprintf(
+              "Found %d file(s) with R flavour at %s.",
+              length(gist_R_files),
+              gist_result[["html_url"]]
+            ), verbosity = 2L)
 
-      knitr::opts_knit$set("unnamed.chunk.label" =
-                           paste("modulr", url, sep = "-"))
+          if (length(gist_R_files) == 0L) {
+            stop(
+              sprintf("No file with R flavour found in gist ID '%s'.", gist_id),
+              call. = FALSE)
+          }
 
-      script <-
-        knitr::knit(text = script, tangle = TRUE, quiet = TRUE)
+          scripts <- lapply(gist_R_files, `[[`, "content")
 
-    }
+        } else {
 
-    tryCatch({
-      ev <- local(eval(parse(text = script, keep.source = TRUE)))
+          parsed_url <- httr::parse_url(url)
+
+          if (isTRUE(parsed_url[["scheme"]] %in% c("http", "https"))) {
+
+            tryCatch({
+              result <- httr::GET(url, ...)
+            }, error = function(e) {
+              stop(e$message, call. = FALSE)
+            })
+
+            if (isTRUE(result[["status_code"]] >= 400)) {
+              stop(sprintf("URL '%s' not found.", url), call. = FALSE)
+            }
+
+            scripts <- list(url = httr::content(result, as = "text"))
+
+          } else {
+
+            stop("Only HTTP(S) protocol is supported.", call. = FALSE)
+
+          }
+
+        }
+
+        registry <- .modulr_env$injector$registry
+        .Last.name <- .modulr_env$injector$.Last.name
+        config <- .modulr_env$injector$config
+        verbosity <- .modulr_env$injector$verbosity
+        stash <- .modulr_env$injector$stash
+
+        rollback <- function() {
+          .modulr_env$injector$registry <- registry
+          .modulr_env$injector$.Last.name <- .Last.name
+          .modulr_env$injector$config <- config
+          .modulr_env$injector$verbosity <- verbosity
+          .modulr_env$injector$stash <- stash
+        }
+
+        for (script in scripts) {
+
+          if (grepl("```\\s*\\{\\s*[rR]", script) ||
+              grepl("<<[^>]*>>=[^@]*@", script)) {
+            # Rmd import
+
+            opat <- knitr::knit_patterns$get()
+            oopts_knit <- knitr::opts_knit$get()
+            oopts_template <- knitr::opts_template$get()
+            oopts_hooks <- knitr::opts_hooks$get()
+            oopts_chunk <- knitr::opts_chunk$get()
+            oopts_current <- knitr::opts_current$get()
+
+            knitr::knit_patterns$restore()
+            on.exit(knitr::knit_patterns$set(opat), add = TRUE)
+            knitr::opts_knit$restore()
+            on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
+            knitr::opts_template$restore()
+            on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
+            knitr::opts_hooks$restore()
+            on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
+            knitr::opts_chunk$restore()
+            on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
+            knitr::opts_current$restore()
+            on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
+
+            knitr::opts_knit$set("unnamed.chunk.label" =
+                                   paste("modulr", url, sep = "-"))
+
+            script <-
+              knitr::knit(text = script, tangle = TRUE, quiet = TRUE)
+
+          }
+
+          tryCatch({
+            ev <- local(eval(parse(text = script, keep.source = TRUE)))
+          },
+          error = function(e) {
+            rollback()
+            stop(sprintf("%s Rolling back.", e$message), call. = FALSE)
+          })
+
+        }
+
+        name <- .get_name(name, load = FALSE)
+
+        if (.is_undefined(name)) {
+          rollback()
+          stop(sprintf("module '%s' cannot be found. Rolling back.", name),
+               call. = FALSE)
+        }
+
+        import_digest <- get_digest(name)
+
+        .message_meta(
+          sprintf(
+            "Digest of '%s' is '%s'.",
+            name,
+            import_digest
+          ), verbosity = 2L)
+
+        if (!is.null(digest) && isTRUE(import_digest != digest)) {
+          rollback()
+          stop(sprintf("digests do not match. Rolling back.", name),
+               call. = FALSE)
+        }
+
+        .modulr_env$injector$registry[[c(name, "url")]] <- url
+
       },
-      error = function(e) {
-        rollback()
-        e$message <- sprintf("%s Rolling back.", e$message)
-        stop(e)
-      })
+      verbosity = 2L)
 
-    name <- .get_name(name, load = FALSE)
-
-    if (.is_undefined(name)) {
-      rollback()
-      stop(sprintf("module '%s' cannot be found. Rolling back.", name),
-           call. = FALSE)
-    }
-
-    if (!is.null(digest) && isTRUE(get_digest(name) != digest)) {
-      rollback()
-      stop(sprintf("digests do not match. Rolling back.", name),
-           call. = FALSE)
-    }
-
-    .modulr_env$injector$registry[[c(name, "url")]] <- url
-
-    return(invisible(ev))
+    .message_meta(sprintf("DONE ('%s')", name), {
+      return(invisible(ev))
+    }, verbosity = 2L)
 
   }
 
-  invisible()
+  invisible(NULL)
 
 }
 

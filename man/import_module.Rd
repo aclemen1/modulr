@@ -67,18 +67,18 @@ in turn evaluated.
 reset()
 # https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3
 "modulr/vault" \%imports\%
-  paste0("https://gist.githubusercontent.com/aclemen1/",
-    "3fcc508cb40ddac6c1e3/raw/modulr-vault.Rmd")
+  "https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3"
 list_modules()
+reset()
+# equivalently
+"modulr/vault" \%imports\% "3fcc508cb40ddac6c1e3"
 make("modulr/vault/example")
 make_tests()}
 
 \dontrun{
 reset()
 # https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3
-"modulr/vault_with_a_typo" \%imports\%
-  paste0("https://gist.githubusercontent.com/aclemen1/",
-    "3fcc508cb40ddac6c1e3/raw/modulr-vault.Rmd")
+"modulr/vault_with_a_typo" \%imports\% "3fcc508cb40ddac6c1e3"
 list_modules()}
 
 \dontrun{
@@ -86,8 +86,7 @@ reset()
 # https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3
 "modulr/vault" \%digests\%
   "with a wrong digest" \%imports\%
-  paste0("https://gist.githubusercontent.com/aclemen1/",
-    "3fcc508cb40ddac6c1e3/raw/modulr-vault.Rmd")
+  "3fcc508cb40ddac6c1e3"
 list_modules()}
 
 }

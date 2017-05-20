@@ -3,6 +3,7 @@ context("import")
 test_that("import_module imports modules", {
   reset()
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module", NULL, function() NULL)\n"remote"',
@@ -10,6 +11,7 @@ test_that("import_module imports modules", {
   )
   reset()
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       '```{r}\ndefine("module", NULL, function() NULL)\n"remote"\n```',
@@ -17,6 +19,7 @@ test_that("import_module imports modules", {
   )
   reset()
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       '<<>>=\ndefine("module", NULL, function() NULL)\n"remote"\n@',
@@ -26,6 +29,7 @@ test_that("import_module imports modules", {
 test_that("import_module stores url to the registry", {
   reset()
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module", NULL, function() NULL)\n"remote"',
@@ -39,12 +43,14 @@ test_that("import_module doesn't import defined modules, unless forced", {
   reset()
   define("module1", NULL, function() NULL)
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module1", NULL, function() NULL)\nTRUE',
     expect_null(import_module("module1", "fake_url"))
   )
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module1", NULL, function() NULL)\nTRUE',
@@ -65,6 +71,7 @@ test_that("import_module loads local modules if they exist", {
 test_that("import_module fails on non-existing modules", {
   reset()
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) stop(),
     `httr::content` = function(...) NULL,
     expect_error(import_module("module1", "fake_url"))
@@ -74,6 +81,7 @@ test_that("import_module fails on non-existing modules", {
 test_that("import_module fails on existing modules with different name", {
   reset()
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module_not_1", NULL, function() NULL)\nreturn(TRUE)',
@@ -84,6 +92,7 @@ test_that("import_module fails on existing modules with different name", {
   reset()
   pre_list <- list_modules(wide = F)
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module_not_1", NULL, function() NULL)\nreturn(TRUE)',
@@ -98,6 +107,7 @@ test_that("import_module fails on existing modules with different digest", {
 
   define("module1_local", NULL, function() NULL)
   with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module1", NULL, function() NULL)\nreturn(TRUE)',
@@ -157,6 +167,7 @@ test_that("import_module calls are warned from within a module", {
 test_that("%imports% is a syntactic sugar for `import_module`", {
   reset()
   m1 <- with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module1", NULL, function() NULL)\n"foo"',
@@ -164,6 +175,7 @@ test_that("%imports% is a syntactic sugar for `import_module`", {
   )
   reset()
   m2 <- with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module1", NULL, function() NULL)\n"foo"',
@@ -177,6 +189,7 @@ test_that("%digests% %imports% are syntactic sugars for `import_module`", {
   reset()
   define("module", NULL, function() NULL)
   m1 <- with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module1", NULL, function() NULL)\n"foo"',
@@ -185,6 +198,7 @@ test_that("%digests% %imports% are syntactic sugars for `import_module`", {
   reset()
   define("module", NULL, function() NULL)
   m2 <- with_mock(
+    `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
       'define("module1", NULL, function() NULL)\n"foo"',
