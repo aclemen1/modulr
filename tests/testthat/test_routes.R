@@ -919,9 +919,11 @@ test_that(".extract_name extracts the module name of a module definition", {
   write(module_text, file)
   on.exit(unlink(file), add = TRUE)
   expect_equal(.extract_name(file), "modulr_test_1")
-  expect_equal(.extract_name(file, "modulr_test_1"), "modulr_test_1")
-  expect_equal(.extract_name(file, "modulr_test_2"), "modulr_test_2")
-  expect_null(.extract_name(file, "modulr_test_foo"))
+  expect_equal(.extract_name(file, namespace = "modulr_test_1"),
+               "modulr_test_1")
+  expect_equal(.extract_name(file, namespace = "modulr_test_2"),
+               "modulr_test_2")
+  expect_null(.extract_name(file, namespace = "modulr_test_foo"))
 
 })
 

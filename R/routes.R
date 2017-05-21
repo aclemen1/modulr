@@ -259,9 +259,9 @@
   filter_ <- function(versions, version, symbol) {
     candidates <- Filter(function(v) {
       if (include_NAs) {
-        !isTRUE(v < version)
+        !isTRUE(unname(v) < version)
       } else {
-        isTRUE(v >= version)
+        isTRUE(unname(v) >= version)
       }
     },
     versions)
@@ -516,12 +516,14 @@
 }
 
 # Extract the name of a module definition in a file.
-.extract_name <- function(filepath, namespace = NULL, version = NA,
-                          strict = FALSE) {
+.extract_name <- function(filepath = NULL, text = NULL, namespace = NULL,
+                          version = NA, strict = FALSE) {
 
-  assert_that(file.exists(filepath))
+  assert_that((!is.null(text) && assertthat::is.string(text)) ||
+                (!is.null(filepath) && file.exists(filepath)))
   assert_that(is.null(namespace) || .is_namespace(namespace))
   assert_that(is.na(version) || .is_version(version))
+  assert_that(assertthat::is.flag(strict))
 
   extract_ <- function(x, all = x, idx = c(), strict = TRUE) {
 
@@ -557,87 +559,113 @@
           idx <- which(
             is_sub_version &
               namespaces == namespace &
-              (!strict | finals ==
-                 .parse_name(.parse_filepath(filepath)[["name"]])[["final"]]))
+              (!strict |
+                 ifelse(
+                   is.null(filepath), TRUE,
+                   finals ==
+                     .parse_name(
+                       .parse_filepath(filepath)[["name"]])[["final"]])))
           if (length(idx) >= 1L) names(idx)
         } else {
           names(which.max(
             is_sub_version &
-              (!strict | finals ==
-                 .parse_name(.parse_filepath(filepath)[["name"]])[["final"]]))
-            )
+              (!strict |
+                 ifelse(
+                   is.null(filepath), TRUE,
+                   finals ==
+                     .parse_name(
+                       .parse_filepath(filepath)[["name"]])[["final"]])))
+          )
         }
       }
     }
 
   }
 
-  if (tolower(tools::file_ext(filepath)) %in% c("rmd", "rnw")) {
+  if (is.null(text)) {
 
-    opat <- knitr::knit_patterns$get()
-    oopts_knit <- knitr::opts_knit$get()
-    oopts_template <- knitr::opts_template$get()
-    oopts_hooks <- knitr::opts_hooks$get()
-    oopts_chunk <- knitr::opts_chunk$get()
-    oopts_current <- knitr::opts_current$get()
+    if (tolower(tools::file_ext(filepath)) %in% c("rmd", "rnw")) {
 
-    knitr::knit_patterns$restore()
-    on.exit(knitr::knit_patterns$set(opat), add = TRUE)
-    knitr::opts_knit$restore()
-    on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
-    knitr::opts_template$restore()
-    on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
-    knitr::opts_hooks$restore()
-    on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
-    knitr::opts_chunk$restore()
-    on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
-    knitr::opts_current$restore()
-    on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
+      opat <- knitr::knit_patterns$get()
+      oopts_knit <- knitr::opts_knit$get()
+      oopts_template <- knitr::opts_template$get()
+      oopts_hooks <- knitr::opts_hooks$get()
+      oopts_chunk <- knitr::opts_chunk$get()
+      oopts_current <- knitr::opts_current$get()
 
-    knitr::opts_knit$set(
-      "unnamed.chunk.label" =
-        paste("modulr", filepath, sep = "-"),
-      "tidy" = FALSE)
+      knitr::knit_patterns$restore()
+      on.exit(knitr::knit_patterns$set(opat), add = TRUE)
+      knitr::opts_knit$restore()
+      on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
+      knitr::opts_template$restore()
+      on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
+      knitr::opts_hooks$restore()
+      on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
+      knitr::opts_chunk$restore()
+      on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
+      knitr::opts_current$restore()
+      on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
 
-    script <-
-      knitr::knit(text = readChar(filepath, file.info(filepath)[["size"]]),
-                  tangle = TRUE, quiet = TRUE)
+      knitr::opts_knit$set(
+        "unnamed.chunk.label" =
+          paste("modulr", filepath, sep = "-"),
+        "tidy" = FALSE)
 
-    args <- list(text = script)
+      script <-
+        knitr::knit(text = readChar(filepath, file.info(filepath)[["size"]]),
+                    tangle = TRUE, quiet = TRUE)
+
+      args <- list(text = script)
+
+    } else {
+
+      args <- list(file = filepath)
+
+    }
+
+    # Usually, the module is defined in the first expressions, so we parse the
+    # beginning of the file only.
+    parsed <- tryCatch(
+      do.call(parse, args = c(args, list(n = 2L, keep.source = FALSE))),
+      error = function(e) {
+        e[["call"]] <- NULL
+        stop(e)
+      },
+      silent = TRUE)
+    name <- extract_(parsed, strict = FALSE)
+    if (
+      !is.null(name) &&
+      name == .parse_name(.parse_filepath(filepath)[["name"]])[["final"]])
+      return(name)
+
+
+    # If no name has been found in the first expression, we then parse the whole
+    # file.
+    parsed <- tryCatch(
+      do.call(parse, args = c(args, list(keep.source = FALSE))),
+      error = function(e) {
+        e[["call"]] <- NULL
+        stop(e)
+      },
+      silent = TRUE)
+
+    return(extract_(parsed, strict = strict))
 
   } else {
 
-    args <- list(file = filepath)
+    args <- list(text = text)
+    parsed <- tryCatch(
+      do.call(parse, args = c(args, list(keep.source = FALSE))),
+      error = function(e) {
+        e[["call"]] <- NULL
+        stop(e)
+      },
+      silent = TRUE)
+
+    return(extract_(parsed, strict = strict))
 
   }
 
-  # Usually, the module is defined in the first expressions, so we parse the
-  # beginning of the file only.
-  parsed <- tryCatch(
-    do.call(parse, args = c(args, list(n = 2L, keep.source = FALSE))),
-    error = function(e) {
-      e[["call"]] <- NULL
-      stop(e)
-    },
-    silent = TRUE)
-  name <- extract_(parsed, strict = FALSE)
-  if (
-    !is.null(name) &&
-    name == .parse_name(.parse_filepath(filepath)[["name"]])[["final"]])
-    return(name)
-
-
-  # If no name has been found in the first expression, we then parse the whole
-  # file.
-  parsed <- tryCatch(
-    do.call(parse, args = c(args, list(keep.source = FALSE))),
-    error = function(e) {
-      e[["call"]] <- NULL
-      stop(e)
-    },
-    silent = TRUE)
-
-  return(extract_(parsed, strict = strict))
 
 }
 
@@ -677,7 +705,7 @@
     filepath <- on_disk_candidates[[idx]][["filepath"]]
     version <- on_disk_candidates[[idx]][["version"]]
     extracted_name <- .extract_name(
-      filepath, parsed_name[["namespace"]], version)
+      filepath, namespace = parsed_name[["namespace"]], version = version)
     if (!is.null(extracted_name)) {
       parsed_extracted_name <- .parse_name(extracted_name)
       node <- on_disk_candidates[[idx]]

@@ -20,7 +20,11 @@
     if (level > 0L) {
       out <- paste0(out, sprintf(
         "%s ",
-        paste(rep("*", level), collapse = "")))
+        paste(
+          if (level <= 6L)
+            rep("*", level) else
+              sprintf("**...* (%d)", level),
+          collapse = "")))
     }
 
     out <- paste0(out, msg, ifelse(ok, " ... ", ""))
@@ -77,7 +81,11 @@
 
     if (level > 0L) {
       out <- paste0(out, sprintf(
-        "%s ", paste(rep("*", level), collapse = "")))
+        "%s ", paste(
+          if (level <= 6L)
+            rep("*", level) else
+              sprintf("**...* (%d)", level),
+          collapse = "")))
     }
 
     out <- paste0(out, paste0(kwargs[["core"]], collapse = ""))

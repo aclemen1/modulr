@@ -534,11 +534,11 @@ get_dependencies <- function(name = .Last.name, load = FALSE) {
 
 }
 
-.get_name <- function(name, load) {
+.get_name <- function(name, load, all = TRUE) {
 
   if (.is_undefined(name)) {
 
-    candidates <- .resolve_name(name)[["resolved"]]
+    candidates <- .resolve_name(name, all = all)[["resolved"]]
     in_memory <- Filter(function(candidate) {
       candidate[["storage"]] == "in-memory"
     },
@@ -565,6 +565,7 @@ get_dependencies <- function(name = .Last.name, load = FALSE) {
   }
 
   name
+
 }
 
 #' Get the Provider of a Module.

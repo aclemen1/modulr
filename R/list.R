@@ -98,6 +98,7 @@ list_modules <-
         "version",
         "storage",
         "filepath",
+        "url",
         "along",
         "type",
         "weight",
@@ -191,6 +192,12 @@ list_modules <-
         },
         flat))
 
+      urls <-
+        do.call(c, Map(function(name) {
+          url <- .modulr_env$injector$registry[[c(name, "url")]]
+          if (is.null(url)) NA_character_ else url
+        }, flat))
+
       versions <-
         do.call(c, Map(function(name)
           .parse_version(name)[["version"]], flat))
@@ -211,6 +218,7 @@ list_modules <-
         version = versions,
         storage = storages,
         filepath = filepaths,
+        url = urls,
         along = alongs,
         type = types,
         weight = weights,
