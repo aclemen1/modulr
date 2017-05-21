@@ -1,8 +1,8 @@
 context("define")
 
-test_that(".hash computes a SHA-1 digest", {
-  expect_equal(.hash(NULL), "8d9c05ec7ae28b219c4c56edbce6a721bd68af82")
-  expect_equal(.hash("modulr"), "f478fe41ce85ad889b473813494b08c88989da19")
+test_that(".hash computes a xxHash64 digest", {
+  expect_equal(.hash(NULL), "c85d88fc56f4e042")
+  expect_equal(.hash("modulr"), "fdd28ac880bc00b7")
 })
 
 test_that(".digest computes a module digest", {
@@ -14,7 +14,7 @@ test_that(".digest computes a module digest", {
   }
   expect_equal(
     .digest(dependencies, provider),
-    "536c8d1cabcc167884f75e11a6fb82f918025ea8")
+    "19d11fdf666db03b")
 
   # without formals, it's safer if the digest reflects the change
   provider <- function() {
@@ -23,7 +23,7 @@ test_that(".digest computes a module digest", {
   }
   expect_equal(
     .digest(dependencies, provider),
-    "a3389ff336408acc1b653190134e35578e5548c3")
+    "c9f5edbdf6348b2b")
 
   provider <- function(foo) {
     # HELLO WORLD
@@ -31,7 +31,7 @@ test_that(".digest computes a module digest", {
   }
   expect_equal(
     .digest(dependencies, provider),
-    "8a819ba8310f9bd5b00e161b44271af2dcb6c794")
+    "d947400f86c24b52")
 })
 
 test_that("get_digest detects changes", {

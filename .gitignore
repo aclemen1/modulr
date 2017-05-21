@@ -7,6 +7,7 @@ src/*.o-*
 .RData
 .Rprofile
 tmp/
+gears/
 /lib/
 inst/doc
 *.Rds

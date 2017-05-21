@@ -1,0 +1,14 @@
+<!--- File: modules/vendor/tool/multitool.Rmd -->
+
+# Module `vendor/tool/multitool`
+
+```{r}
+library(modulr)
+
+"vendor/tool/multitool" %provides% {
+  list(
+    pliers = "Pliers",
+    keychain = "Keychain"
+  )
+}
+```

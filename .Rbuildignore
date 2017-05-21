@@ -13,6 +13,7 @@ man-roxygen
 ^README_files/
 ^lib/
 tmp/
+gears/
 data/
 ^\.modulr_profile
 ^\.github

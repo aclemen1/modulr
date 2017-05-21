@@ -1,7 +1,7 @@
 # Compute a SHA-1 digest of an R object
 .hash <- function(object) {
 
-  digest::digest(object, "sha1")
+  digest::digest(object, algo = "xxhash64")
 
 }
 
@@ -17,7 +17,8 @@
 
 #' Get the Digest of a Module.
 #'
-#' Get the digest (a SHA-256 hash of the dependencies and provider) of a module.
+#' Get the digest (a xxHash64 hash of the dependencies and provider)
+#' of a module.
 #'
 #' @inheritParams define
 #' @param load A flag. Should an undefined module be implicitely loaded?

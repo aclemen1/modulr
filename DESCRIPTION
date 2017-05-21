@@ -1,7 +1,7 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9161
-Date: 2017-05-21
+Version: 0.1.7.9162
+Date: 2017-05-22
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
     programs into discrete, modular units that are loosely coupled,
@@ -19,9 +19,10 @@ Imports:
     knitr (>= 1.11),
     pooh,
     assertthat,
-    digest,
+    digest (>= 0.6.5),
     httr,
-    jsonlite
+    jsonlite,
+    memoise (>= 1.1.0)
 Suggests:
     rstudioapi (>= 0.5),
     devtools,
@@ -37,7 +38,6 @@ Suggests:
     networkD3,
     gistr,
     rmarkdown,
-    memoise,
     webshot,
     withr,
     cranlogs,

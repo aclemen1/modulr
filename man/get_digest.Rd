@@ -26,7 +26,8 @@ get_digest(name = .Last.name, load = FALSE)
 A string containing the digest of the module.
 }
 \description{
-Get the digest (a SHA-256 hash of the dependencies and provider) of a module.
+Get the digest (a xxHash64 hash of the dependencies and provider)
+of a module.
 }
 \details{
 A digest is useful for comparing two modules. For instance, in order to know

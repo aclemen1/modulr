@@ -13,7 +13,11 @@
     modulr.hit_suffix =
       getOption(
         "modulr.hit_suffix",
-        default = DEFAULT_HIT_SUFFIX)
+        default = DEFAULT_HIT_SUFFIX),
+    modulr.gears_path =
+      getOption(
+        "modulr.gears_path",
+        default = DEFAULT_GEARS_PATH)
   )
 
   reset(all = TRUE, .verbose = FALSE)

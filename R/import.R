@@ -1,3 +1,90 @@
+DEFAULT_GEARS_PATH <- "gears"
+
+memoise_get_key_ <- function(f, ...) {
+  body <- body(f)
+  body[[length(body) + 1L]] <- quote(return(hash))
+  body(f) <- body
+  f
+}
+
+import_gist_ <- memoise::memoise(function(path) {
+
+  import_gist_ <- function(gist_id, ...) {
+
+    gist_req <-
+      httr::GET(sprintf("https://api.github.com/gists/%s", gist_id))
+
+    if (gist_req[["status_code"]] >= 400) {
+      stop(sprintf("gist ID '%s' not found.", gist_id), call. = FALSE)
+    }
+
+    gist_content <-
+      httr::content(gist_req, as = "text", encoding = "UTF-8")
+
+    gist_result <-
+      jsonlite::fromJSON(gist_content, simplifyVector = FALSE)
+
+    gist_files <- gist_result[["files"]]
+
+    gist_R_files <- gist_files[
+      grepl("\\.(?:R)|\\.(?:Rmd)|\\.(?:Rnw)$",
+            names(gist_files), ignore.case = TRUE)]
+
+    .message_meta(
+      sprintf(
+        "Found %d file(s) with R flavour at %s.",
+        length(gist_R_files),
+        gist_result[["html_url"]]
+      ), verbosity = 2L)
+
+    if (length(gist_R_files) == 0L) {
+      stop(
+        sprintf("no file with R flavour found in gist ID '%s'.", gist_id),
+        call. = FALSE)
+    }
+
+    lapply(gist_R_files, `[[`, "content")
+  }
+
+  memoise::memoise(
+    import_gist_,
+    cache = memoise::cache_filesystem(path = path))
+
+})
+
+
+import_url_ <- memoise::memoise(function(path) {
+
+  import_url_ <- function(url, ...) {
+    parsed_url <- httr::parse_url(url)
+
+    if (isTRUE(parsed_url[["scheme"]] %in% c("http", "https"))) {
+
+      tryCatch({
+        result <- httr::GET(url, ...)
+      }, error = function(e) {
+        stop(e$message, call. = FALSE)
+      })
+
+      if (isTRUE(result[["status_code"]] >= 400)) {
+        stop(sprintf("URL '%s' not found.", url), call. = FALSE)
+      }
+
+      list(httr::content(result, as = "text"))
+
+    } else {
+
+      stop("only HTTP(S) protocol is supported.", call. = FALSE)
+
+    }
+  }
+
+  memoise::memoise(
+    import_url_,
+    cache = memoise::cache_filesystem(path = path))
+
+})
+
 #' Import a Module.
 #'
 #' Import or re-import a module which is defined in an R, R Markdown or R Sweave
@@ -124,215 +211,182 @@ import_module <- function(name, url, digest = NULL,
                  ""),
           url)
       }, {
+
+        path <- file.path(
+          getOption("modulr.gears_path"),
+          .parse_name(name)[["namespace"]])
+
+        if (!dir.exists(path)) {
+          dir.create(path, recursive = TRUE, showWarnings = FALSE)
+        }
+
         if (!is.null(gist_id)) {
-
-          gist_req <-
-            httr::GET(sprintf("https://api.github.com/gists/%s", gist_id))
-
-          if (gist_req[["status_code"]] >= 400) {
-            stop(sprintf("gist ID '%s' not found.", gist_id), call. = FALSE)
-          }
-
-          gist_content <-
-            httr::content(gist_req, as = "text", encoding = "UTF-8")
-
-          gist_result <-
-            jsonlite::fromJSON(gist_content, simplifyVector = FALSE)
-
-          gist_files <- gist_result[["files"]]
-
-          gist_R_files <- gist_files[
-            grepl("\\.(?:R)|\\.(?:Rmd)|\\.(?:Rnw)$",
-                  names(gist_files), ignore.case = TRUE)]
-
-          .message_meta(
-            sprintf(
-              "Found %d file(s) with R flavour at %s.",
-              length(gist_R_files),
-              gist_result[["html_url"]]
-            ), verbosity = 2L)
-
-          if (length(gist_R_files) == 0L) {
-            stop(
-              sprintf("no file with R flavour found in gist ID '%s'.", gist_id),
-              call. = FALSE)
-          }
-
-          scripts <- lapply(gist_R_files, `[[`, "content")
-
+          importer_ <-
+            import_gist_(path)
+          uri <- gist_id
         } else {
-
-          parsed_url <- httr::parse_url(url)
-
-          if (isTRUE(parsed_url[["scheme"]] %in% c("http", "https"))) {
-
-            tryCatch({
-              result <- httr::GET(url, ...)
-            }, error = function(e) {
-              stop(e$message, call. = FALSE)
-            })
-
-            if (isTRUE(result[["status_code"]] >= 400)) {
-              stop(sprintf("URL '%s' not found.", url), call. = FALSE)
-            }
-
-            scripts <- list(httr::content(result, as = "text"))
-
-          } else {
-
-            stop("only HTTP(S) protocol is supported.", call. = FALSE)
-
-          }
-
+          importer_ <-
+            import_url_(path)
+          uri <- url
         }
-
-        registry <- .modulr_env$injector$registry
-        .Last.name <- .modulr_env$injector$.Last.name
-        config <- .modulr_env$injector$config
-        verbosity <- .modulr_env$injector$verbosity
-        stash <- .modulr_env$injector$stash
-
-        rollback <- function() {
-          .modulr_env$injector$registry <- registry
-          .modulr_env$injector$.Last.name <- .Last.name
-          .modulr_env$injector$config <- config
-          .modulr_env$injector$verbosity <- verbosity
-          .modulr_env$injector$stash <- stash
-        }
-
-        # Tangle scripts.
-        for (idx in seq_along(scripts)) {
-
-          script <- scripts[[idx]]
-
-          if (grepl("```\\s*\\{\\s*[rR]", script) ||
-              grepl("<<[^>]*>>=[^@]*@", script)) {
-            # Rmd import
-
-            opat <- knitr::knit_patterns$get()
-            oopts_knit <- knitr::opts_knit$get()
-            oopts_template <- knitr::opts_template$get()
-            oopts_hooks <- knitr::opts_hooks$get()
-            oopts_chunk <- knitr::opts_chunk$get()
-            oopts_current <- knitr::opts_current$get()
-
-            knitr::knit_patterns$restore()
-            on.exit(knitr::knit_patterns$set(opat), add = TRUE)
-            knitr::opts_knit$restore()
-            on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
-            knitr::opts_template$restore()
-            on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
-            knitr::opts_hooks$restore()
-            on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
-            knitr::opts_chunk$restore()
-            on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
-            knitr::opts_current$restore()
-            on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
-
-            knitr::opts_knit$set("unnamed.chunk.label" =
-                                   paste("modulr", url, sep = "-"))
-
-            scripts[[idx]] <-
-              knitr::knit(text = script, tangle = TRUE, quiet = TRUE)
-
-          }
-
-        }
-
-        nonames <- sprintf(".__no_filename_%d__", seq_along(scripts))
-        if (is.null(names(scripts))) {
-          scripts <- stats::setNames(scripts, nonames)
+        if (memoise::has_cache(importer_)(uri)) {
+          key <- memoise_get_key_(importer_)(uri)
+          .message_meta(sprintf("Using installed gear at '%s/%s'.",
+                                path, key))
+          scripts <- importer_(uri, ...)
         } else {
-          names(scripts[names(scripts) == ""]) <-
-            nonames[names(scripts) == ""]
-        }
-
-        # Identify candidates among scripts.
-        versions <- Map(function(script) {
-          module_names <- .extract_name(
-            text = script,
-            namespace = .parse_name(name)[["namespace"]])
-          versions <-
-            Map(function(name) .parse_name(name)[["version"]], module_names)
-          utils::tail(.filter_versions(
-            versions,
-            parsed_version[["version"]],
-            parsed_version[["symbol"]]), 1L)
-        }, scripts)
-
-        script_name <-
-          names(utils::tail(.filter_versions(
-            unlist(lapply(versions, unname), recursive = FALSE),
-            parsed_version[["version"]],
-            parsed_version[["symbol"]]
-          ), 1L))
-
-        if (is.null(script_name)) {
-          stop(sprintf("module '%s' not found.", name), call. = FALSE)
-        }
-
-        local_name <- names(versions[[script_name]])
-
-        script <- scripts[[script_name]]
-        path <-
-          if (grepl("^\\.__no_filename_\\d+__$", script_name))
-            NA_character_ else script_name
-
-        registry_names <- names(.modulr_env$injector$registry)
-
-        tryCatch({
-          ev <- local(eval(parse(text = script, keep.source = TRUE)))
-        },
-        error = function(e) {
-          rollback()
-          stop(sprintf("%s Rolling back.", e$message), call. = FALSE)
-        })
-
-        loaded_names <-
-          setdiff(names(.modulr_env$injector$registry),
-                  registry_names)
-
-        Map(function(name_) {
-          if (is.null(.modulr_env$injector$registry[[c(name_, "url")]]) ||
-              is.na(.modulr_env$injector$registry[[c(name_, "url")]])) {
-            .modulr_env$injector$registry[[c(name_, "along")]] <-
-              if (isTRUE(name_ != local_name)) local_name else NA_character_
-            .modulr_env$injector$registry[[c(name_, "url")]] <- url
-            .modulr_env$injector$registry[[c(name_, "filepath")]] <- path
-          }
-        },
-        loaded_names)
-
-        name <-
-          .get_name(name, load = FALSE, all = FALSE)
-
-        if (.is_undefined(name)) {
-          rollback()
-          stop(sprintf("module '%s' cannot be found. Rolling back.", name),
-               call. = FALSE)
-        }
-
-        import_digest <- get_digest(name)
-
-        .message_meta(
-          sprintf(
-            "Digest of '%s' is '%s'.",
-            name,
-            import_digest
-          ), verbosity = 2L)
-
-        if (!is.null(digest) && isTRUE(import_digest != digest)) {
-          rollback()
-          stop(sprintf("digests do not match. Rolling back."),
-               call. = FALSE)
+          scripts <- importer_(uri, ...)
+          key <- memoise_get_key_(importer_)(uri)
+          .message_meta(sprintf("Installing gear at '%s/%s'.", path, key))
         }
 
       },
       verbosity = 2L)
 
-    .message_meta(sprintf("DONE ('%s')", name), {
-      return(invisible(ev))
-    }, verbosity = 2L)
+    .message_meta(sprintf("DONE ('%s')", name), verbosity = 2L)
+
+    registry <- .modulr_env$injector$registry
+    .Last.name <- .modulr_env$injector$.Last.name
+    config <- .modulr_env$injector$config
+    verbosity <- .modulr_env$injector$verbosity
+    stash <- .modulr_env$injector$stash
+
+    rollback <- function() {
+      .modulr_env$injector$registry <- registry
+      .modulr_env$injector$.Last.name <- .Last.name
+      .modulr_env$injector$config <- config
+      .modulr_env$injector$verbosity <- verbosity
+      .modulr_env$injector$stash <- stash
+    }
+
+    # Tangle scripts.
+    for (idx in seq_along(scripts)) {
+
+      script <- scripts[[idx]]
+
+      if (grepl("```\\s*\\{\\s*[rR]", script) ||
+          grepl("<<[^>]*>>=[^@]*@", script)) {
+        # Rmd import
+
+        opat <- knitr::knit_patterns$get()
+        oopts_knit <- knitr::opts_knit$get()
+        oopts_template <- knitr::opts_template$get()
+        oopts_hooks <- knitr::opts_hooks$get()
+        oopts_chunk <- knitr::opts_chunk$get()
+        oopts_current <- knitr::opts_current$get()
+
+        knitr::knit_patterns$restore()
+        on.exit(knitr::knit_patterns$set(opat), add = TRUE)
+        knitr::opts_knit$restore()
+        on.exit(knitr::opts_knit$set(oopts_knit), add = TRUE)
+        knitr::opts_template$restore()
+        on.exit(knitr::opts_template$set(oopts_template), add = TRUE)
+        knitr::opts_hooks$restore()
+        on.exit(knitr::opts_hooks$set(oopts_hooks), add = TRUE)
+        knitr::opts_chunk$restore()
+        on.exit(knitr::opts_chunk$set(oopts_chunk), add = TRUE)
+        knitr::opts_current$restore()
+        on.exit(knitr::opts_current$set(oopts_current), add = TRUE)
+
+        knitr::opts_knit$set("unnamed.chunk.label" =
+                               paste("modulr", url, sep = "-"))
+
+        scripts[[idx]] <-
+          knitr::knit(text = script, tangle = TRUE, quiet = TRUE)
+
+      }
+
+    }
+
+    nonames <- sprintf(".__no_filename_%d__", seq_along(scripts))
+    if (is.null(names(scripts))) {
+      scripts <- stats::setNames(scripts, nonames)
+    } else {
+      names(scripts[names(scripts) == ""]) <-
+        nonames[names(scripts) == ""]
+    }
+
+    # Identify candidates among scripts.
+    versions <- Map(function(script) {
+      module_names <- .extract_name(
+        text = script,
+        namespace = .parse_name(name)[["namespace"]])
+      versions <-
+        Map(function(name) .parse_name(name)[["version"]], module_names)
+      utils::tail(.filter_versions(
+        versions,
+        parsed_version[["version"]],
+        parsed_version[["symbol"]]), 1L)
+    }, scripts)
+
+    script_name <-
+      names(utils::tail(.filter_versions(
+        unlist(lapply(versions, unname), recursive = FALSE),
+        parsed_version[["version"]],
+        parsed_version[["symbol"]]
+      ), 1L))
+
+    if (is.null(script_name)) {
+      stop(sprintf("module '%s' not found.", name), call. = FALSE)
+    }
+
+    local_name <- names(versions[[script_name]])
+
+    script <- scripts[[script_name]]
+    path <-
+      if (grepl("^\\.__no_filename_\\d+__$", script_name))
+        NA_character_ else script_name
+
+    registry_names <- names(.modulr_env$injector$registry)
+
+    tryCatch({
+      ev <- local(eval(parse(text = script, keep.source = TRUE)))
+    },
+    error = function(e) {
+      rollback()
+      stop(sprintf("%s Rolling back.", e$message), call. = FALSE)
+    })
+
+    loaded_names <-
+      setdiff(names(.modulr_env$injector$registry),
+              registry_names)
+
+    Map(function(name_) {
+      if (is.null(.modulr_env$injector$registry[[c(name_, "url")]]) ||
+          is.na(.modulr_env$injector$registry[[c(name_, "url")]])) {
+        .modulr_env$injector$registry[[c(name_, "along")]] <-
+          if (isTRUE(name_ != local_name)) local_name else NA_character_
+        .modulr_env$injector$registry[[c(name_, "url")]] <- url
+        .modulr_env$injector$registry[[c(name_, "filepath")]] <- path
+      }
+    },
+    loaded_names)
+
+    name <-
+      .get_name(name, load = FALSE, all = FALSE)
+
+    if (.is_undefined(name)) {
+      rollback()
+      stop(sprintf("module '%s' cannot be found. Rolling back.", name),
+           call. = FALSE)
+    }
+
+    import_digest <- get_digest(name)
+
+    .message_meta(
+      sprintf(
+        "Digest of '%s' is '%s'.",
+        name,
+        import_digest
+      ), verbosity = 2L)
+
+    if (!is.null(digest) && isTRUE(import_digest != digest)) {
+      rollback()
+      stop(sprintf("digests do not match. Rolling back."),
+           call. = FALSE)
+    }
+
+    return(invisible(ev))
 
   }
 

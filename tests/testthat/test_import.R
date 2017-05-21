@@ -2,6 +2,7 @@ context("import")
 
 test_that("import_module imports modules", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
@@ -10,6 +11,7 @@ test_that("import_module imports modules", {
     expect_equal(import_module("module", "fake_url"), "remote")
   )
   reset()
+#  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
@@ -18,6 +20,7 @@ test_that("import_module imports modules", {
     expect_equal(import_module("module", "fake_url"), "remote")
   )
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
@@ -28,6 +31,7 @@ test_that("import_module imports modules", {
 
 test_that("import_module stores url to the registry", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
@@ -41,6 +45,7 @@ test_that("import_module stores url to the registry", {
 
 test_that("import_module doesn't import defined modules, unless forced", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   define("module1", NULL, function() NULL)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
@@ -60,6 +65,7 @@ test_that("import_module doesn't import defined modules, unless forced", {
 
 test_that("import_module loads local modules if they exist", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
@@ -70,6 +76,7 @@ test_that("import_module loads local modules if they exist", {
 
 test_that("import_module fails on non-existing modules", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) stop(),
@@ -80,6 +87,7 @@ test_that("import_module fails on non-existing modules", {
 
 test_that("import_module fails on existing modules with different name", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
@@ -90,6 +98,7 @@ test_that("import_module fails on existing modules with different name", {
   )
 
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   pre_list <- list_modules(wide = F)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
@@ -104,6 +113,7 @@ test_that("import_module fails on existing modules with different name", {
 
 test_that("import_module fails on existing modules with different digest", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
 
   define("module1_local", NULL, function() NULL)
   with_mock(
@@ -118,6 +128,7 @@ test_that("import_module fails on existing modules with different digest", {
   )
 
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   pre_list <- list_modules(wide = F)
   with_mock(
     `httr::GET` = function(...) NULL,
@@ -132,6 +143,7 @@ test_that("import_module fails on existing modules with different digest", {
 
 test_that("import_module fails on modules with errors", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::GET` = function(...) NULL,
     `httr::content` = function(...)
@@ -140,6 +152,7 @@ test_that("import_module fails on modules with errors", {
   )
 
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   pre_list <- list_modules(wide = F)
   with_mock(
     `httr::GET` = function(...) NULL,
@@ -153,11 +166,13 @@ test_that("import_module fails on modules with errors", {
 
 test_that("import_module calls are warned from within a module", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   define("module", NULL, function() {
     import_module("module_1", "fake_url")
   })
   expect_warning(make("module"))
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   define("module", NULL, function() {
     "module_1" %imports% "fake_url"
   })
@@ -166,6 +181,7 @@ test_that("import_module calls are warned from within a module", {
 
 test_that("%imports% is a syntactic sugar for `import_module`", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   m1 <- with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
@@ -174,6 +190,7 @@ test_that("%imports% is a syntactic sugar for `import_module`", {
     import_module("module1", "fake_url")
   )
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   m2 <- with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
@@ -187,6 +204,7 @@ test_that("%imports% is a syntactic sugar for `import_module`", {
 
 test_that("%digests% %imports% are syntactic sugars for `import_module`", {
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   define("module", NULL, function() NULL)
   m1 <- with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
@@ -196,6 +214,7 @@ test_that("%digests% %imports% are syntactic sugars for `import_module`", {
     import_module("module1", "fake_url", digest = get_digest("module"))
   )
   reset()
+  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   define("module", NULL, function() NULL)
   m2 <- with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
