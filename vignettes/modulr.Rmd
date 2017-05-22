@@ -2,7 +2,7 @@
 title: 
   "Introduction to modulr" 
 output: 
-  knitr:::html_vignette:
+  rmarkdown::html_vignette:
     toc: true
 vignette: > 
   %\VignetteIndexEntry{Introduction to modulr} 
@@ -12,21 +12,26 @@ vignette: >
 
 ```{r, echo = FALSE, message = FALSE, results = 'hide'} 
 library(modulr) 
-library(htmltools) 
 library(networkD3) 
-require(webshot) # not on CRAN 
 library(future) 
 library(memoise) 
 library(dplyr) 
+options(knitr.duplicate.label = 'allow')
 `%<=%` <- modulr::`%<=%` 
 Sys.setlocale("LC_TIME", "en_DK.UTF-8") 
 Sys.setenv(TZ = 'UTC') 
 knitr::opts_chunk$set(
   collapse = TRUE, 
   comment = "#>", 
-  fig.path = "modulr-"
+  fig.path = "./figures/modulr-",
+  fig.width = 6.0, 
+  fig.height = 4.0, 
+  out.width = "90%", 
+  fig.align = "center"
 ) 
 set.seed(1234L) 
+.__not_travis_nor_cran__ <- !identical(Sys.getenv("TRAVIS"), "true") && 
+    identical(Sys.getenv("NOT_CRAN"), "true")
 ```
 
 # Introduction
@@ -130,26 +135,9 @@ lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified"))
 In this example, `foobar` relies on two dependencies, and `foo` and `bar` are both injected once. 
 Use `plot_dependencies` to see the tree of dependencies and injections:
 
-```{r, echo=F} 
-# Do not try to produce a snapshot on Travis CI or CRAN 
-if (!identical(Sys.getenv("TRAVIS"), "true") && 
-    identical(Sys.getenv("NOT_CRAN"), "true")) { 
-  plot_dependencies() %>% 
-    html_print %>% 
-    webshot(
-      file = "modulr-foobar.png", 
-      selector = ".sankeyNetwork", 
-      delay = 2L) %>% 
-    resize("730x") %>% 
-    shrink() 
-} 
-```
-
-```{r, echo=T, eval=F} 
+```{r plot-foobar-deps} 
 plot_dependencies() 
 ```
-
-![](modulr-foobar.png)
 
 Use `make` get the resulting object provided by the module:
 
@@ -848,7 +836,7 @@ modulr::reset()
 
 The following module uses Hadley Wickham's [ggplot2](https://github.com/tidyverse/ggplot2) package to plot the list of top downloaded packages.
 
-```{r}
+```{r plot-top-downloads}
 "plot_top_downloads" %requires% list(
   get_top_downloads = "get_top_downloads"
 ) %provides% {
@@ -987,6 +975,7 @@ functions related to the module into which it is injected.
 ```{r}
 info("modulr")
 ```
+
 ### Messages
 
 TODO

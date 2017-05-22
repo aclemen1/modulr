@@ -11,7 +11,8 @@ gears/
 /lib/
 inst/doc
 *.Rds
-vignettes/*.R
+/vignettes/*.R
+/vignettes/figures
 *_SECRET_*
 README.html
 README_files

@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9162
+Version: 0.1.7.9163
 Date: 2017-05-22
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
@@ -27,6 +27,7 @@ Suggests:
     rstudioapi (>= 0.5),
     devtools,
     future,
+    PKI,
     base64enc,
     magrittr,
     dplyr,

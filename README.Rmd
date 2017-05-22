@@ -289,7 +289,7 @@ car$start(); car$drive("the speed of light", "the boundaries of the universe"); 
 * Modulr implements __package isolation__ as an experimental feature: following the philosophy of Jim Hester's [withr](https://github.com/jimhester/withr) package, the 'with_' method `with_no_packages()` can be used to run code with temporarily no loaded or attached R packages.
 * Modulr can use [GitHub](http://github.com) (repositories and gists) to publish and share modules (so-called _gears_). See [`modulr/vault`](https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3) for an example.
 
-Please read the vignette to see examples in action: `vignette("guide", package = "modulr")`.
+Please read the vignette to see examples in action: `vignette("modulr")`.
 
 ## Installation
 
@@ -311,7 +311,7 @@ devtools::install_github("aclemen1/modulr")
 
 * the latest _bleeding edge_ development version from Github with
 -->
-``` r
+```r
 install.packages("devtools")
 devtools::install_github("hadley/devtools")
 devtools::install_github("aclemen1/modulr@devel")
