@@ -1,6 +1,6 @@
 DEFAULT_GEARS_PATH <- "gears"
 
-memoise_get_key_ <- function(f, ...) {
+get_memoisation_key_ <- function(f, ...) {
   body <- body(f)
   body[[length(body) + 1L]] <- quote(return(hash))
   body(f) <- body
@@ -9,7 +9,7 @@ memoise_get_key_ <- function(f, ...) {
 
 import_gist_ <- memoise::memoise(function(path) {
 
-  import_gist_ <- function(gist_id, ...) {
+  memoise::memoise(function(gist_id, ...) {
 
     gist_req <-
       httr::GET(sprintf("https://api.github.com/gists/%s", gist_id))
@@ -44,18 +44,13 @@ import_gist_ <- memoise::memoise(function(path) {
     }
 
     lapply(gist_R_files, `[[`, "content")
-  }
-
-  memoise::memoise(
-    import_gist_,
-    cache = memoise::cache_filesystem(path = path))
+  }, cache = memoise::cache_filesystem(path = path))
 
 })
 
-
 import_url_ <- memoise::memoise(function(path) {
 
-  import_url_ <- function(url, ...) {
+  memoise::memoise(function(url, ...) {
     parsed_url <- httr::parse_url(url)
 
     if (isTRUE(parsed_url[["scheme"]] %in% c("http", "https"))) {
@@ -77,11 +72,7 @@ import_url_ <- memoise::memoise(function(path) {
       stop("only HTTP(S) protocol is supported.", call. = FALSE)
 
     }
-  }
-
-  memoise::memoise(
-    import_url_,
-    cache = memoise::cache_filesystem(path = path))
+  }, cache = memoise::cache_filesystem(path = path))
 
 })
 
@@ -230,13 +221,13 @@ import_module <- function(name, url, digest = NULL,
           uri <- url
         }
         if (memoise::has_cache(importer_)(uri)) {
-          key <- memoise_get_key_(importer_)(uri)
+          key <- get_memoisation_key_(importer_)(uri)
           .message_meta(sprintf("Using installed gear at '%s/%s'.",
                                 path, key))
           scripts <- importer_(uri, ...)
         } else {
           scripts <- importer_(uri, ...)
-          key <- memoise_get_key_(importer_)(uri)
+          key <- get_memoisation_key_(importer_)(uri)
           .message_meta(sprintf("Installing gear at '%s/%s'.", path, key))
         }
 

@@ -56,19 +56,20 @@ A typical module looks like the following:
 ```r
 "name_of_module" %requires% list(
 
-  # a list of dependencies 
+  # A list of dependencies.
   dependency_1 = "name_of_dependency_1", 
   dependency_2 = "name_of_dependency_1"
 
 ) %provides% {
 
-  #' a recommended docstring intended to document the internals of the module
+  #' A recommended docstring intended to document the internals of the module.
 
-  # some code that uses the objects `dependency_1` and `dependency_2" 
-  # returned by the modules "name_of_dependency_1" and "name_of_dependency_2" 
+  # Some code that uses the objects `dependency_1` and `dependency_2" 
+  # returned by the modules "name_of_dependency_1" and "name_of_dependency_2".
   object <- { ... }
 
-  # a resulting object, exposed by the module 
+  # A resulting object, which can be directly consumed or in turn injected as a 
+  # dependency.
   return(object)
 
 } 
@@ -126,7 +127,7 @@ Use `info` to output the docstrings:
 info("foobar") 
 ```
 
-Use `lsmod` to list all defined modules and their properties:
+Use `lsmod` to list all defined modules and their properties in a data frame:
 
 ```{r} 
 lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified")) 
@@ -145,8 +146,7 @@ Use `make` get the resulting object provided by the module:
 make("foobar")
 ```
 
-Voilà! All the depencencies have been evaluated, injected and processed to
-return the expected `"Hello World!"`.
+Voilà! All the depencencies have been evaluated, injected and processed to return the expected `"Hello World!"`. As a matter of fact, the dependencies form a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) which is topologically sorted in order to determine a well ordering for their evaluation before injection.
 
 ```{r} 
 lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified")) 
@@ -662,7 +662,7 @@ load_module("vendor/tool/multitool") # load only, do not make
 lsmod(cols = c("name", "storage", "along", "filepath", "url"))
 ```
 
-### Along another module
+Along a principal module, it is possible to define other related modules, for instance mock-ups and testing modules (cf. infra).
 
 ### Remote (_modulr gears_)
 
