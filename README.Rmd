@@ -24,8 +24,8 @@ Sys.setenv(TZ = 'UTC')
 
 ```
 
-[![Build status](https://travis-ci.org/aclemen1/modulr.svg)](https://travis-ci.org/aclemen1/modulr)
-[![Coverage status](https://codecov.io/github/aclemen1/modulr/coverage.svg)](http://codecov.io/github/aclemen1/modulr)
+[![Build Status](https://travis-ci.org/aclemen1/modulr.svg?branch=master)](https://travis-ci.org/aclemen1/modulr)
+[![Coverage status](https://codecov.io/github/aclemen1/modulr/coverage.svg?branch=master)](http://codecov.io/github/aclemen1/modulr)
 [![Pending pull-requests](https://githubbadges.herokuapp.com/aclemen1/modulr/pulls.svg?style=flat)](https://github.com/aclemen1/modulr/pulls)
 [![GitHub issues](http://img.shields.io/github/issues-raw/aclemen1/modulr.svg)](http://waffle.io/aclemen1/modulr)
 [![GitHub stars](http://img.shields.io/github/stars/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/stargazers)
