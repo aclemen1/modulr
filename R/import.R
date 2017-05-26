@@ -1,5 +1,7 @@
 DEFAULT_GEARS_PATH <- "gears"
 
+GH_ENDPOINT <- "https://api.github.com"
+
 get_memoisation_key_ <- function(f, ...) {
   body <- body(f)
   body[[length(body) + 1L]] <- quote(return(hash))
@@ -9,10 +11,10 @@ get_memoisation_key_ <- function(f, ...) {
 
 import_gist_ <- memoise::memoise(function(path) {
 
-  memoise::memoise(function(gist_id, ...) {
+  memoise::memoise(function(gist_id, ..., endpoint = GH_ENDPOINT) {
 
     gist_req <-
-      httr::GET(sprintf("https://api.github.com/gists/%s", gist_id))
+      httr::GET(sprintf("%s/gists/%s", endpoint, gist_id), ...)
 
     if (gist_req[["status_code"]] >= 400) {
       stop(sprintf("gist ID '%s' not found.", gist_id), call. = FALSE)
@@ -145,8 +147,8 @@ import_url_ <- memoise::memoise(function(path) {
 #'
 #' @aliases %digests% %imports%
 #' @export
-import_module <- function(name, url, digest = NULL,
-                          force = FALSE, ...) {
+import_module <- function(name, url, ..., digest = NULL,
+                          force = FALSE) {
 
   .message_meta(sprintf("Entering import_module() for '%s' ...", name),
                 verbosity = +Inf)
@@ -174,25 +176,49 @@ import_module <- function(name, url, digest = NULL,
 
     parsed_version <- .parse_version(name)
 
-    gist_url_match <- "((^https://)|^)gist.github.com/([^/]+/)?([0-9a-f]+)$"
+    gist_url_match_1 <-
+      "(?:(?:^https://)|^)(?:gist.github.com)(?:(?:/[^/]+)+)/([0-9a-f]+)$"
+
+    gist_url_match_2 <-
+      "((?:(?:^https://)|^)[^/]+(?:(?:/[^/]+)+))(?:/gists/)([0-9a-f]+)$"
 
     gist_id <- NULL
 
-    if (grepl(gist_url_match, url, ignore.case = FALSE)) {
-      gist_id <- regmatches(url, regexec(gist_url_match, url))[[1]][5]
+    if (grepl(gist_url_match_1, url, ignore.case = FALSE)) {
+      matched_url <- regmatches(url, regexec(gist_url_match_1, url))[[1L]]
+      gist_endpoint <- GH_ENDPOINT
+      gist_id <- matched_url[2L]
+    } else if (grepl(gist_url_match_2, url, ignore.case = FALSE)) {
+      matched_url <- regmatches(url, regexec(gist_url_match_2, url))[[1L]]
+      gist_endpoint <- matched_url[2L]
+      gist_id <- matched_url[3L]
     } else if (grepl("^[0-9a-f]+$", url)) {
+      gist_endpoint <- GH_ENDPOINT
       gist_id <- as.character(url)
     }
 
     .message_meta(
       if (!is.null(gist_id)) {
-        sprintf(
-          "Importing '%s' %sfrom gist ID '%s' ...",
-          name,
-          ifelse(!is.null(digest),
-                 sprintf("with digest '%s' ", digest),
-                 ""),
-          gist_id)
+
+        if (gist_endpoint != GH_ENDPOINT) {
+          sprintf(
+            "Importing '%s' %sfrom gist ID '%s' (endpoint '%s') ...",
+            name,
+            ifelse(!is.null(digest),
+                   sprintf("with digest '%s' ", digest),
+                   ""),
+            gist_id, gist_endpoint
+          )
+        } else {
+          sprintf(
+            "Importing '%s' %sfrom gist ID '%s' ...",
+            name,
+            ifelse(!is.null(digest),
+                   sprintf("with digest '%s' ", digest),
+                   ""),
+            gist_id
+          )
+        }
       } else {
         sprintf(
           "Importing '%s' %sfrom '%s' ...",
@@ -214,20 +240,25 @@ import_module <- function(name, url, digest = NULL,
         if (!is.null(gist_id)) {
           importer_ <-
             import_gist_(path)
-          uri <- gist_id
+          args <- c(list(
+            gist_id = gist_id,
+            endpoint = gist_endpoint),
+            list(...))
         } else {
           importer_ <-
             import_url_(path)
-          uri <- url
+          args <- c(
+            list(url = url),
+            list(...))
         }
-        if (memoise::has_cache(importer_)(uri)) {
-          key <- get_memoisation_key_(importer_)(uri)
+        if (do.call(memoise::has_cache(importer_), args = args)) {
+          key <- do.call(get_memoisation_key_(importer_), args = args)
           .message_meta(sprintf("Using installed gear at '%s/%s'.",
                                 path, key))
-          scripts <- importer_(uri, ...)
+          scripts <- do.call(importer_, args = args)
         } else {
-          scripts <- importer_(uri, ...)
-          key <- get_memoisation_key_(importer_)(uri)
+          scripts <- do.call(importer_, args = args)
+          key <- do.call(get_memoisation_key_(importer_), args = args)
           .message_meta(sprintf("Installing gear at '%s/%s'.", path, key))
         }
 

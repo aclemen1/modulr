@@ -706,6 +706,18 @@ Notice that sharing a module is as easy as sending this one-liner code snippet:
 library(modulr); "modulr/vault#^0.1.0" %imports% "3fcc508cb40ddac6c1e3"
 ```
 
+Finally, [GitHub Enterprise](https://enterprise.github.com) users are also covered. For instance:
+
+```r
+import_module(
+  "test_module", 
+  "https://github.unil.ch/api/v3/gists/e1d41efefa623c9a8c117bdf95633a9a", 
+  authenticate(
+    user = "aclemen1", 
+    password = "PASSWORD OR PERSONAL ACCESS TOKEN (PAT)"
+  )
+)
+```
 
 ## Testing
 

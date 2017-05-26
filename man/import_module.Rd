@@ -6,7 +6,7 @@
 \alias{import_module}
 \title{Import a Module.}
 \usage{
-import_module(name, url, digest = NULL, force = FALSE, ...)
+import_module(name, url, ..., digest = NULL, force = FALSE)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).
@@ -25,12 +25,12 @@ import_module(name, url, digest = NULL, force = FALSE, ...)
 \item{url}{A string (character vector of length one). The URL must use the
 HTTP(S) protocol.}
 
+\item{...}{Further arguments passed to \code{httr::\link[httr]{GET}}.}
+
 \item{digest}{A string (character vector of length one). See
 \code{\link{get_digest}}.}
 
 \item{force}{A flag. Should an already defined module be re-imported?}
-
-\item{...}{Further arguments passed to \code{httr::\link[httr]{GET}}.}
 }
 \value{
 The result of the evaluation of the imported script.
