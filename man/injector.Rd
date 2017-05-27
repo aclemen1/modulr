@@ -72,7 +72,7 @@ make("foo")
 
 }
 \seealso{
-\code{\link{define}}, \code{\link{list_modules}},
-  \code{\link{make}}, and \code{\link{reset}}.
+\code{\link{.SharedEnv}}, \code{\link{define}},
+  \code{\link{list_modules}}, \code{\link{make}}, and \code{\link{reset}}.
 }
 

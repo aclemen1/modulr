@@ -21,11 +21,18 @@ NULL
 
 .modulr_env <- new.env(parent = emptyenv())
 
+.initialize_injector <- function() {
+  injector <- new.env(parent = emptyenv())
+  injector$shared_env <- new.env(parent = emptyenv())
+  injector
+}
+
 .set_injector <- function(injector) {
   .modulr_env$injector <- injector
 }
 
-.default_injector <- new.env(parent = emptyenv())
+.default_injector <- .initialize_injector()
+
 .default_injector$get <- function(...) {
   injector_ <- set_default_injector()
   on.exit(set_injector(injector_))
@@ -61,8 +68,8 @@ NULL
 #' @section Warning: Setting an injector from within a module is not allowed and
 #'   results in an error.
 #'
-#' @seealso \code{\link{define}}, \code{\link{list_modules}},
-#'   \code{\link{make}}, and \code{\link{reset}}.
+#' @seealso \code{\link{.SharedEnv}}, \code{\link{define}},
+#'   \code{\link{list_modules}}, \code{\link{make}}, and \code{\link{reset}}.
 #'
 #' @examples
 #' reset()
@@ -98,7 +105,7 @@ NULL
 #' @export
 new_injector <- function() {
 
-  injector <- new.env(parent = emptyenv())
+  injector <- .initialize_injector()
 
   injector_ <- get_injector()
 
@@ -201,6 +208,28 @@ get_default_injector <- function() {
     immediate. = immediate.)
 }
 
+#' @name .SharedEnv
+#' @rdname shared_env
+#' @aliases .SharedEnv sharedenv
+#' @title Shared Environment.
+#' @description A shared environment between modules.
+#' @usage
+#' .SharedEnv
+#' @details
+#' The shared environment is bound to the injector being used.
+#' @section Warning:
+#' Do not assign to \code{.SharedEnv} in the workspace, because this will always
+#' mask the object of the same name in \code{package:modulr}.
+#' @return The shared environment.
+#' @seealso \code{\link{injector}}.
+#' @examples
+#' .SharedEnv$foo <- "foo"
+#' "foobar" %provides% { function() print(.SharedEnv$foo) }
+#' make()()
+#' .SharedEnv$foo <- "bar"
+#' make()()
+NULL
+
 #' @name .Last.name
 #' @aliases .Last.name
 #' @rdname last_name
@@ -287,7 +316,13 @@ NULL
 #' @usage .__path__
 NULL
 
-globalVariables(c(".Last.name", ".__name__"))
+#' @rdname shared_env
+#' @export
+sharedenv <- function() {
+  .modulr_env$injector$shared_env
+}
+
+globalVariables(c(".Last.name", ".SharedEnv", ".__name__"))
 
 if (utils::packageVersion("assertthat") >= package_version("0.1.0.99")) {
   assert_that <- assertthat::assert_that

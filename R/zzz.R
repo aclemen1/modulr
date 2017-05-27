@@ -38,6 +38,11 @@
     env = as.environment("package:modulr"))
 
   makeActiveBinding(
+    as.symbol(".SharedEnv"),
+    sharedenv,
+    env = as.environment("package:modulr"))
+
+  makeActiveBinding(
     as.symbol(".__name__"),
     function() {
       .get_0(".__name__", envir = .modulr_env$injector,
