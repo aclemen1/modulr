@@ -5,7 +5,7 @@ test_that("new_injector returns a new injector", {
   expect_true(is.environment(injector))
   expect_named(
     injector,
-    c("registry", ".message_level", "config", "get", "provider"),
+    c("registry", ".message_level", "config", "get", "provider", "shared_env"),
     ignore.order = TRUE)
   expect_named(injector$registry, c(MODULR_NAME), ignore.order = TRUE)
   expect_equal(injector$config[[".__root__"]][[1]], DEFAULT_ROOT_CONFIG)
