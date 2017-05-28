@@ -330,6 +330,7 @@ This is the dependency graph of a module which exposes tidy, exhaustive, statist
 _In alphabetical order._
 
 * Rich FitzJohn's [remake](http://github.com/richfitz/remake) package.
+* Robert Krzyzanowski's [director](https://github.com/syberia/director) package.
 * Lev Kuznetsov's [injectoR](http://dfci-cccb.github.io/injectoR) package.
 * Will Landau's [drake](https://github.com/wlandau-lilly/drake) package.
 * Konrad Rudolph's [modules](http://github.com/klmr/modules) package.

@@ -6,6 +6,7 @@ src/*.o-*
 .Rhistory
 .RData
 .Rprofile
+.Renviron
 tmp/
 gears/
 /lib/

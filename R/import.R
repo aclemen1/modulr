@@ -13,11 +13,17 @@ import_gist_ <- memoise::memoise(function(path) {
 
   memoise::memoise(function(gist_id, ..., endpoint = GH_ENDPOINT) {
 
-    gist_req <-
-      httr::GET(sprintf("%s/gists/%s", endpoint, gist_id), ...)
+    gist_url <-
+      sprintf("%s/gists/%s", endpoint, gist_id)
 
-    if (gist_req[["status_code"]] >= 400) {
-      stop(sprintf("gist ID '%s' not found.", gist_id), call. = FALSE)
+    gist_req <-
+      httr::GET(
+        gist_url,
+        httr::user_agent("https://github.com/aclemen1/modulr"),
+        ...)
+
+    if (httr::http_type(gist_req) != "application/json") {
+      stop("GitHub API did not return json.", call. = FALSE)
     }
 
     gist_content <-
@@ -25,6 +31,18 @@ import_gist_ <- memoise::memoise(function(path) {
 
     gist_result <-
       jsonlite::fromJSON(gist_content, simplifyVector = FALSE)
+
+    if (httr::http_error(gist_req)) {
+      stop(
+        sprintf(
+          "GitHub API request failed [%s]\n%s\n<%s>",
+          httr::status_code(gist_req),
+          gist_result$message,
+          gist_result$documentation_url
+        ),
+        call. = FALSE
+      )
+    }
 
     gist_files <- gist_result[["files"]]
 
@@ -34,7 +52,7 @@ import_gist_ <- memoise::memoise(function(path) {
 
     .message_meta(
       sprintf(
-        "Found %d file(s) with R flavour at %s.",
+        "Found %d file(s) with R flavour (see %s).",
         length(gist_R_files),
         gist_result[["html_url"]]
       ), verbosity = 2L)
