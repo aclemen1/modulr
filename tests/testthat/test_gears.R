@@ -6,9 +6,9 @@ test_that(".function_to_string returns a string", {
 })
 
 test_that(".function_to_string returns a correct string", {
-  expect_equal(.function_to_string(function() NULL), "function() NULL")
+  expect_equal(.function_to_string(function() NULL), "NULL")
   expect_equal(.function_to_string(function() "Hello World"),
-               "function() \"Hello World\"")
+               "\"Hello World\"")
   expect_equal(.function_to_string(
 # Keep indentation like this!
 # Begin Exclude Linting
@@ -18,7 +18,7 @@ function() {
 }
 # End Exclude Linting
   ),
-  "function() {\n  # This is a comment\n  \"Hello World\"\n}")
+  "{\n  # This is a comment\n  \"Hello World\"\n}")
 })
 
 test_that(".function_to_string trims last line for closures", {
@@ -28,7 +28,7 @@ test_that(".function_to_string trims last line for closures", {
     f <<- function() foo
   })()
   expect_true(grepl("environment", paste(capture.output(f), collapse = "\n")))
-  expect_equal(.function_to_string(f), "function() foo")
+  expect_equal(.function_to_string(f), "foo")
 })
 
 test_that(".module_to_string returns a string", {
@@ -97,7 +97,6 @@ test_that(".module_to_string shows dependencies", {
 test_that(".module_to_string shows provider", {
   reset()
   define("module", list(other = "other_module"), function(other) "foobar")
-  expect_match(.module_to_string("module"), "function\\(other")
   expect_match(.module_to_string("module"), "foobar")
   expect_match(.module_to_string("module"), "%provides%")
 })
@@ -121,7 +120,7 @@ test_that("prepare_gear calls are warned from within a module", {
 
 test_that("prepare_gear loads modules", {
   reset()
-  expect_is(prepare_gear("module_1", load = TRUE), "character")
+  expect_is(prepare_gear("module_1", load = TRUE), "modulr_gear")
   reset()
   expect_error(prepare_gear("module_1", load = FALSE))
 })
@@ -204,143 +203,66 @@ test_that("prepare_gear shows example section", {
   expect_match(prepare_gear("module"), "```\\{r examples\\}")
 })
 
-test_that("gist_gear calls are warned from within a module", {
-  reset()
-  with_mock(
-    `base::dir.create` = function(...) NULL,
-    `base::unlink` = function(...) NULL,
-    `base::cat` = function(...) NULL,
-    `gistr::gist_auth` = function(...) NULL,
-    `gistr::rate_limit` = function(...)
-      list(rate = list(reset = 60 * 1e6, remaining = 5000)),
-    `gistr::gist_create` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::update_files` = function(...) NULL,
-    `gistr::update` = function(...) NULL,
-    `gistr::browse` = function(...) NULL,
-    define("outer_module", NULL, function() NULL),
-    define("module", NULL, function() {
-      gist_gear("outer_module")
-    }),
-    expect_warning(make("module"))
-  )
-})
-
-test_that("gist_gear loads modules", {
-  reset()
-  with_mock(
-    `base::dir.create` = function(...) NULL,
-    `base::unlink` = function(...) NULL,
-    `base::cat` = function(...) NULL,
-    `gistr::gist_auth` = function(...) NULL,
-    `gistr::rate_limit` = function(...)
-      list(rate = list(reset = 60 * 1e6, remaining = 5000)),
-    `gistr::gist_create` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::update_files` = function(...) NULL,
-    `gistr::update` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::browse` = function(...) NULL,
-    expect_error(gist_gear("module_1", load = FALSE)),
-    expect_is(gist_gear("module_1", load = TRUE), "list")
-  )
-})
-
-test_that("gist_gear tests rate limits", {
-  reset()
-  with_mock(
-    `base::dir.create` = function(...) NULL,
-    `base::unlink` = function(...) NULL,
-    `base::cat` = function(...) NULL,
-    `gistr::gist_auth` = function(...) NULL,
-    `gistr::rate_limit` = function(...)
-      list(rate = list(reset = 60 * 1e6, remaining = 5000)),
-    `gistr::gist_create` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::update_files` = function(...) NULL,
-    `gistr::update` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::browse` = function(...) NULL,
-    define("module", NULL, function() NULL),
-    expect_is(gist_gear("module"), "list")
-  )
-  reset()
-  with_mock(
-    `base::dir.create` = function(...) NULL,
-    `base::unlink` = function(...) NULL,
-    `base::cat` = function(...) NULL,
-    `gistr::gist_auth` = function(...) NULL,
-    `gistr::rate_limit` = function(...)
-      list(rate = list(reset = 60 * 1e6, remaining = 1)),
-    `gistr::gist_create` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::update_files` = function(...) NULL,
-    `gistr::update` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::browse` = function(...) NULL,
-    define("module", NULL, function() NULL),
-    expect_error(gist_gear("module"))
-  )
-  reset()
-  remaining <- function() 2
-  with_mock(
-    `base::dir.create` = function(...) NULL,
-    `base::unlink` = function(...) NULL,
-    `base::cat` = function(...) NULL,
-    `gistr::gist_auth` = function(...) NULL,
-    `gistr::rate_limit` = function(...)
-      list(rate = list(reset = 60 * 1e6, remaining = remaining())),
-    `gistr::gist_create` = function(...) {
-      remaining <<- function() 1
-      list(html_url = "fake_url", files = list(list(raw_url = "fake_url")))
-    },
-    `gistr::update_files` = function(...) NULL,
-    `gistr::update` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::browse` = function(...) NULL,
-    define("module", NULL, function() NULL),
-    expect_is(gist_gear("module"), "list")
-  )
-  reset()
-  remaining <- function() 2
-  with_mock(
-    `base::dir.create` = function(...) NULL,
-    `base::unlink` = function(...) NULL,
-    `base::cat` = function(...) NULL,
-    `gistr::gist_auth` = function(...) NULL,
-    `gistr::rate_limit` = function(...)
-      list(rate = list(reset = 60 * 1e6, remaining = remaining())),
-    `gistr::gist_create` = function(...) {
-      remaining <<- function() 0
-      list(html_url = "fake_url", files = list(list(raw_url = "fake_url")))
-      },
-    `gistr::update_files` = function(...) NULL,
-    `gistr::update` = function(...)
-      list(files = list(list(raw_url = "fake_url"))),
-    `gistr::browse` = function(...) NULL,
-    define("module", NULL, function() NULL),
-    expect_error(gist_gear("module"), regexp = "dangling")
-  )
-})
-
-test_that("gist_gear publishes a gist", {
-  reset()
-  with_mock(
-    `gistr::gist_auth` = function(...) NULL,
-    `gistr::rate_limit` = function(...)
-      list(rate = list(reset = 60 * 1e6, remaining = 5000)),
-    `gistr::gist_create` = function(...)
-      list(files = list(list(raw_url = "fake_url/hash/raw/module.Rmd"))),
-    `gistr::update_files` = function(g, filename) {
-      con <- file(filename, "r", blocking = FALSE)
-      on.exit(close(con))
-      paste(
-        readLines(con = con, n = -1L, ok = TRUE, warn = FALSE),
-        collapse = "\n")
-    },
-    `gistr::update` = identity,
-    `gistr::browse` = function(...) NULL,
-    define("module", NULL, function() NULL),
-    expect_match(gist_gear("module"), "# `module`")
-  )
-})
+# test_that("release_gear_as_gist calls are warned from within a module", {
+#   reset()
+#   with_mock(
+#     `base::dir.create` = function(...) NULL,
+#     `base::unlink` = function(...) NULL,
+#     `base::cat` = function(...) NULL,
+#     `gistr::gist_auth` = function(...) NULL,
+#     `gistr::rate_limit` = function(...)
+#       list(rate = list(reset = 60 * 1e6, remaining = 5000)),
+#     `gistr::gist_create` = function(...)
+#       list(files = list(list(raw_url = "fake_url"))),
+#     `gistr::update_files` = function(...) NULL,
+#     `gistr::update` = function(...) NULL,
+#     `gistr::browse` = function(...) NULL,
+#     define("outer_module", NULL, function() NULL),
+#     define("module", NULL, function() {
+#       release_gear_as_gist("outer_module")
+#     }),
+#     expect_warning(make("module"))
+#   )
+# })
+#
+# test_that("release_gear_as_gist loads modules", {
+#   reset()
+#   with_mock(
+#     `base::dir.create` = function(...) NULL,
+#     `base::unlink` = function(...) NULL,
+#     `base::cat` = function(...) NULL,
+#     `gistr::gist_auth` = function(...) NULL,
+#     `gistr::rate_limit` = function(...)
+#       list(rate = list(reset = 60 * 1e6, remaining = 5000)),
+#     `gistr::gist_create` = function(...)
+#       list(files = list(list(raw_url = "fake_url"))),
+#     `gistr::update_files` = function(...) NULL,
+#     `gistr::update` = function(...)
+#       list(files = list(list(raw_url = "fake_url"))),
+#     `gistr::browse` = function(...) NULL,
+#     expect_error(release_gear_as_gist("module_1", load = FALSE)),
+#     expect_is(release_gear_as_gist("module_1", load = TRUE), "list")
+#   )
+# })
+#
+# test_that("release_gear_as_gist publishes a gist", {
+#   reset()
+#   with_mock(
+#     `gistr::gist_auth` = function(...) NULL,
+#     `gistr::rate_limit` = function(...)
+#       list(rate = list(reset = 60 * 1e6, remaining = 5000)),
+#     `gistr::gist_create` = function(...)
+#       list(files = list(list(raw_url = "fake_url/hash/raw/module.Rmd"))),
+#     `gistr::update_files` = function(g, filename) {
+#       con <- file(filename, "r", blocking = FALSE)
+#       on.exit(close(con))
+#       paste(
+#         readLines(con = con, n = -1L, ok = TRUE, warn = FALSE),
+#         collapse = "\n")
+#     },
+#     `gistr::update` = identity,
+#     `gistr::browse` = function(...) NULL,
+#     define("module", NULL, function() NULL),
+#     expect_match(release_gear_as_gist("module"), "# `module`")
+#   )
+# })

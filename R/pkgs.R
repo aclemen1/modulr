@@ -345,8 +345,7 @@
 #'
 #' @aliases without_packages
 #' @export
-with_no_packages <- function(code,
-                             ignore = getOption("modulr.ignore_packages")) {
+with_no_packages <- function(code, ignore = NULL) {
 
   # nocov start
   if (!requireNamespace("devtools", quietly = TRUE)) {
@@ -355,6 +354,8 @@ with_no_packages <- function(code,
          call. = FALSE)
   }
   # nocov end
+
+  ignore <- unique(c(ignore, getOption("modulr.ignore_packages")))
 
   old_pkgs <- .set_pkgs(
     from = .get_pkgs_manifest(ignore),
@@ -462,7 +463,12 @@ with_module_packages <- function(code, ...) {
       file_name <- paste(file_name, as.character(parsed_name[["version"]]),
                          sep = "#")
     lib_path <-
-      file.path(dirname(file), file_name, "lib")
+      file.path(
+        dirname(file), file_name, "lib",
+        sprintf("%s-library", R.version$platform),
+        sprintf("%s.%s",
+                R.version$major,
+                strsplit(R.version$minor, ".", fixed = TRUE)[[1]][1]))
     with_packages(lib_path = lib_path, code = code, ...)
   } else {
     stop(paste("Module packages are not available for in-memory modules",
@@ -502,7 +508,13 @@ with_namespace_packages <- function(namespace, code, ...) {
         normalizePath(utils::tail(trace, 1L))
     }
   if (!is.null(file)) {
-    lib_path <- .namespace_to_lib_path(name, path, namespace)
+    lib_path <-
+      file.path(
+        .namespace_to_lib_path(name, path, namespace),
+        sprintf("%s-library", R.version$platform),
+        sprintf("%s.%s",
+                R.version$major,
+                strsplit(R.version$minor, ".", fixed = TRUE)[[1]][1]))
     with_packages(new = lib_path, code = code, ...)
   } else {
     stop(paste("Namespace packages are not available for in-memory modules",

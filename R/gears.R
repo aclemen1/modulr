@@ -2,7 +2,9 @@
 
   assert_that(is.function(fun))
 
-  paste(deparse(body(fun), control = "useSource"), collapse = "\n")
+  deparsed <- deparse(fun, control = "useSource")
+  deparsed[1L] <- sub("function() ", "", deparsed[1L], fixed = TRUE)
+  paste(deparsed, collapse = "\n")
 
 }
 
@@ -264,6 +266,11 @@ release_gear_as_gist <- function(name = .Last.name, load = TRUE,
   .message_meta("Entering release_gear_as_gist() ...",
                 verbosity = +Inf)
 
+  if (.is_called_from_within_module()) {
+    warning("release_gear_as_gist is called from within a module.",
+            call. = FALSE, immediate. = TRUE)
+  }
+
   # nocov start
   if (!requireNamespace("gistr", quietly = TRUE) ||
       !requireNamespace("testthat", quietly = TRUE)) {
@@ -273,11 +280,6 @@ release_gear_as_gist <- function(name = .Last.name, load = TRUE,
       call. = FALSE)
   }
   # nocov end
-
-  if (.is_called_from_within_module()) {
-    warning("release_gear_as_gist is called from within a module.",
-            call. = FALSE, immediate. = TRUE)
-  }
 
   assert_that(
     .is_regular(name),

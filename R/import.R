@@ -9,10 +9,10 @@ get_memoisation_key_ <- function(f, ...) {
   f
 }
 
-import_gist_ <- memoise::memoise(function(path) {
+import_gist__ <- function(path) {
 
-  memoise::memoise(function(gist_id, ..., endpoint = GH_ENDPOINT,
-                            pat = Sys.getenv("GITHUB_PAT")) {
+  import_gist_fun_ <- function(gist_id, ..., endpoint = GH_ENDPOINT,
+                               pat = Sys.getenv("GITHUB_PAT")) {
 
     gist_url <-
       sprintf("%s/gists/%s", endpoint, gist_id)
@@ -72,13 +72,19 @@ import_gist_ <- memoise::memoise(function(path) {
     }
 
     lapply(gist_R_files, `[[`, "content")
-  }, cache = memoise::cache_filesystem(path = path))
+  }
 
-})
+  memoise::memoise(
+    import_gist_fun_,
+    cache = memoise::cache_filesystem(path = path))
 
-import_url_ <- memoise::memoise(function(path) {
+}
 
-  memoise::memoise(function(url, ...) {
+import_gist_ <- memoise::memoise(import_gist__)
+
+import_url__ <- function(path) {
+
+  import_url_fun_ <- function(url, ...) {
     parsed_url <- httr::parse_url(url)
 
     if (isTRUE(parsed_url[["scheme"]] %in% c("http", "https"))) {
@@ -100,9 +106,15 @@ import_url_ <- memoise::memoise(function(path) {
       stop("only HTTP(S) protocol is supported.", call. = FALSE)
 
     }
-  }, cache = memoise::cache_filesystem(path = path))
+  }
 
-})
+  memoise::memoise(
+    import_url_fun_,
+    cache = memoise::cache_filesystem(path = path))
+
+}
+
+import_url_ <- memoise::memoise(import_url__)
 
 #' Import a Module.
 #'

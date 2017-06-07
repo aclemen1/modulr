@@ -8,9 +8,9 @@
 \alias{without_packages}
 \title{With (...) Packages.}
 \usage{
-with_no_packages(code, ignore = getOption("modulr.ignore_packages"))
+with_no_packages(code, ignore = NULL)
 
-without_packages(code, ignore = getOption("modulr.ignore_packages"))
+without_packages(code, ignore = NULL)
 
 with_packages(lib_path, code, ...)
 
