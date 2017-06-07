@@ -60,7 +60,7 @@
 
   if (utils::packageVersion("assertthat") < package_version("0.1.0.99")) {
     packageStartupMessage(
-      paste0("Please update package 'assertthat' from Github at ",
+      paste0("Please update package 'assertthat' from GitHub at ",
              "https://github.com/hadley/assertthat ",
              "for a better user experience regarding error messages."))
   }

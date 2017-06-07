@@ -18,7 +18,8 @@ futurize <- function(
 
   # nocov start
   if (!requireNamespace("future", quietly = TRUE)) {
-    stop("future is needed for this function to work. Please install it.",
+    stop("package 'future' is needed for this function to work. ",
+         "Please install it.",
          call. = FALSE)
   }
   # nocov end

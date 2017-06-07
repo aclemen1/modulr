@@ -36,7 +36,8 @@ plot_dependencies <- function(group, regexp, reserved = TRUE,
 
   # nocov start
   if (!requireNamespace("networkD3", quietly = TRUE)) {
-    stop("networkD3 is needed for this function to work. Please install it.",
+    stop("package 'networkD3' is needed for this function to work. ",
+         "Please install it.",
          call. = FALSE)
   }
   # nocov end

@@ -128,7 +128,7 @@ testing module.
 HTTP(S) protocol. The module is thus served at a given URL and has to be
 imported (see \code{\link{import_module}}) in order to be defined and used.
 Like files, it is possible to store several related definitions at one URL.
-Public and private Gists, files on Github, and any HTTP server can be used to
+Public and private gists, files on GitHub, and any HTTP server can be used to
 share so called \emph{modulr gears}. } }
 }
 \section{Syntactic Sugars}{

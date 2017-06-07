@@ -26,15 +26,15 @@ HTTP(S) protocol.}
 \item{load}{A flag. Should an undefined module be implicitely loaded?}
 }
 \value{
-A string (character vector of length one) containing a Modulr Gear R
+A string (character vector of length one) containing a modulr gear R
   Markdown script.
 }
 \description{
 Prepare a module (including mocks, tests and examples) for publication as a
-Modulr Gear.
+modulr gear.
 }
 \details{
-A Modulr Gear is an R Markdown script containing a module, its
+A modulr gear is an R Markdown script containing a module, its
 \link{docstring} info, and its special modules definitions, like mocks,
 tests, and examples, for instance. \code{prepare_gear} prepares such a Modulr
 Gear. If an \code{url} is given, the script will be completed accordingly
@@ -52,7 +52,7 @@ cat(prepare_gear("foo", url = "https://example.org/gears/foo"), sep = "\\n")
 
 }
 \seealso{
-\code{\link{define}}, \code{\link{gist_gear}}, \code{\link{info}},
+\code{\link{define}}, \code{\link{release_gear_as_gist}}, \code{\link{info}},
   and \code{\link{reset}}.
 }
 

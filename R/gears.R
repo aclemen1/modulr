@@ -2,7 +2,7 @@
 
   assert_that(is.function(fun))
 
-  paste(deparse(fun, control = "useSource"), collapse = "\n")
+  paste(deparse(body(fun), control = "useSource"), collapse = "\n")
 
 }
 
@@ -43,16 +43,15 @@
                   names(dependencies),
                   unlist(dependencies)),
           collapse = ",\n    "),
-        ")")
+        "\n)")
     }
-    module <- sprintf(paste0(
-      "\"%s\" %%requires%%\n",
-      "  %s %s\n",
-      "  %s\n"), name, deps, provider_sugar, provider_string)
+    module <- sprintf(
+      "\"%s\" %%requires%% %s %s %s\n",
+      name, deps, provider_sugar, provider_string)
   } else {
-    module <- sprintf(paste0(
-      "\"%s\" %s\n",
-      "  %s\n"), name, provider_sugar, provider_string)
+    module <- sprintf(
+      "\"%s\" %s %s\n",
+      name, provider_sugar, provider_string)
   }
   module
 }
@@ -66,12 +65,9 @@
   if (!is.null(url)) {
     sprintf(
       paste(
-        "\"%1$s\" %%imports%%",
-        "  \"%3$s\"",
+        "\"%1$s\" %%imports%% \"%3$s\"",
         "",
-        "# \"%1$s\" %%digests%%",
-        "#   \"%2$s\" %%imports%%",
-        "#   \"%3$s\"",
+        "# \"%1$s\" %%digests%% \"%2$s\" %%imports%% \"%3$s\"",
         "", sep = "\n"),
       name,
       .modulr_env$injector$registry[[c(name, "digest")]],
@@ -83,7 +79,7 @@
 #' Prepare Modulr Gear.
 #'
 #' Prepare a module (including mocks, tests and examples) for publication as a
-#' Modulr Gear.
+#' modulr gear.
 #'
 #' @inheritParams define
 #' @inheritParams import_module
@@ -91,16 +87,16 @@
 #'
 #' @details
 #'
-#' A Modulr Gear is an R Markdown script containing a module, its
+#' A modulr gear is an R Markdown script containing a module, its
 #' \link{docstring} info, and its special modules definitions, like mocks,
 #' tests, and examples, for instance. \code{prepare_gear} prepares such a Modulr
 #' Gear. If an \code{url} is given, the script will be completed accordingly
 #' (see example).
 #'
-#' @return A string (character vector of length one) containing a Modulr Gear R
+#' @return A string (character vector of length one) containing a modulr gear R
 #'   Markdown script.
 #'
-#' @seealso \code{\link{define}}, \code{\link{gist_gear}}, \code{\link{info}},
+#' @seealso \code{\link{define}}, \code{\link{release_gear_as_gist}}, \code{\link{info}},
 #'   and \code{\link{reset}}.
 #'
 #' @examples
@@ -131,6 +127,8 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
 
   if (load) load_module(name)
 
+  name <- find_module(name)[["name"]]
+
   assert_that(.is_defined_regular(name))
 
   imports <- Filter(function(x) !is.null(x), lapply(
@@ -155,7 +153,7 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
     if (isTRUE(nchar(docstring) > 0L)) {
       format(docstring)
     } else {
-      sprintf("# `%s` (Modulr Gear)", name)
+      sprintf("# `%s`", name)
     },
     paste(
       sprintf("## Installation"),
@@ -166,12 +164,9 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
       sprintf("# Not run"),
       sprintf(
         paste(
-          "\"%1$s\" %%imports%%",
-          "  \"%3$s\"",
+          "\"%1$s\" %%imports%% \"%3$s\"",
           "",
-          "# \"%1$s\" %%digests%%",
-          "#   \"%2$s\" %%imports%%",
-          "#   \"%3$s\"",
+          "# \"%1$s\" %%digests%% \"%2$s\" %%imports%% \"%3$s\"",
           sep = "\n"),
         name,
         .modulr_env$injector$registry[[c(name, "digest")]],
@@ -212,23 +207,40 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
       sprintf("make_all(regexp = \"%s/example\")", name),
       sprintf("```"), sep = "\n"),
     sprintf("---"),
-    sprintf(paste0("_Gear prepared with the R package ",
-                   "[_modulr_](https://github.com/aclemen1/modulr) (v%s) ",
-                   "on %s._"), utils::packageVersion("modulr"), Sys.time()),
+    sprintf(paste0("Gear prepared with the R package ",
+                   "[modulr](https://github.com/aclemen1/modulr) (v%s)."),
+            utils::packageVersion("modulr")),
     sep = "\n")
 
-  gear
+  structure(
+    gear,
+    class = "modulr_gear")
 
 }
 
-#' Prepare and Publish a Modulr Gear as a Gist on Github.
+print.modulr_gear <- function(x, ...) {
+  cat(x)
+  invisible(x)
+}
+
+#' Prepare and Release a Modulr Gear as a Gist on GitHub.
 #'
-#' Prepare and publish a Modulr Gear as a Gist on Github.
+#' Prepare and release a modulr gear as a gist on GitHub.
 #'
 #' @inheritParams define
 #' @inheritParams get_digest
-#' @param browse A flag. Should the created gist be opened in the default
-#'   browser?
+#' @param update A flag or a string (character vector of length one). Should an
+#'   existing gist be updated (flag)? Or gist ID to update (string).
+#' @param update_first_found A flag. Should the first corresponding module
+#'   name be updated?
+#' @param per_page A scalar (integer vector of length one). Number of gists
+#'   per page requested.
+#' @param max_pages A scalar (integer vector of length one). Upper bound for
+#'   the number of pages requested.
+#' @param endpoint A string (character vector of length one). GitHub API
+#'   Endpoint URL.
+#' @param browse A flag. Should the created or updated gist be opened in the
+#'   default browser?
 #'
 #' @seealso \code{\link{define}}, \code{\link{prepare_gear}}, and
 #'   \code{\link{reset}}.
@@ -240,90 +252,182 @@ prepare_gear <- function(name = .Last.name, url = NULL, load = TRUE) {
 #' define("foo", NULL, function() NULL)
 #' Sys.setenv("GITHUB_PAT" = "your Personal Access Token here")
 #' gist_auth(reauth = TRUE)
-#' gist_gear("foo")}
+#' release_gear_as_gist("foo")}
 #'
 #' @export
-gist_gear <- function(name = .Last.name, load = TRUE, browse = TRUE) {
+release_gear_as_gist <- function(name = .Last.name, load = TRUE,
+                                 update = TRUE, update_first_found = TRUE,
+                                 per_page = 100L, max_pages = 10L,
+                                 endpoint = "https://api.github.com",
+                                 browse = TRUE) {
 
-  .message_meta("Entering publish_gear() ...",
+  .message_meta("Entering release_gear_as_gist() ...",
                 verbosity = +Inf)
 
   # nocov start
-  if (!requireNamespace("gistr", quietly = TRUE)) {
-    stop("gistr is needed for this function to work. Please install it.",
-         call. = FALSE)
+  if (!requireNamespace("gistr", quietly = TRUE) ||
+      !requireNamespace("testthat", quietly = TRUE)) {
+    stop(
+      "packages 'gistr' and 'testthat' are needed for this function to work. ",
+      "Please install them.",
+      call. = FALSE)
   }
   # nocov end
 
   if (.is_called_from_within_module()) {
-    warning("publish_gear is called from within a module.",
+    warning("release_gear_as_gist is called from within a module.",
             call. = FALSE, immediate. = TRUE)
   }
 
   assert_that(
     .is_regular(name),
     assertthat::is.flag(load),
+    assertthat::is.flag(update) || assertthat::is.string(update),
+    assertthat::is.flag(update_first_found),
+    assertthat::is.count(per_page),
+    assertthat::is.count(max_pages),
+    assertthat::is.string(endpoint),
     assertthat::is.flag(browse))
 
   if (load) load_module(name)
 
+  name <- find_module(name)[["name"]]
+
   assert_that(.is_defined_regular(name))
 
-  auth <- gistr::gist_auth()
+  g <- testthat::with_mock(
+    `gistr:::ghbase` = function() endpoint, {
 
-  rates <- gistr::rate_limit()
-  assert_that(
-    rates[[c("rate", "remaining")]] >= 2L,
-    msg = sprintf(
-      "the resource limit is exceeded on Github. Wait until %s and try again.",
-      format(as.POSIXct(rates[[c("rate", "reset")]] / 1e6L,
-                        origin = Sys.time()), format = "%c")))
+      auth <- gistr::gist_auth()
 
-  file <- gsub("/", "-", name)
+      file <- gsub("/", "-", name)
 
-  filename <- sprintf("%s.Rmd", file)
+      filename <- sprintf("%s.Rmd", file)
 
-  # nocov start
-  g <- gistr::gist_create(
-    code = {
-      '"First commit."'
-      },
-    description = sprintf("'%s' (modulr gear)", name),
-    filename = filename, browse = FALSE)
-  # nocov end
+      # nocov start
+      if (isTRUE(update)) {
 
-  # nocov start
-  if (!is.null(auth)) Sys.sleep(3)
-  # nocov end
+        candidates <- list()
+        page <- 1L
+        repeat {
 
-  rates <- gistr::rate_limit()
-  assert_that(
-    rates[[c("rate", "remaining")]] >= 1L,
-    msg = sprintf(
-      paste0(
-        "the resource limit is exceeded on Github and ",
-        "there is a dangling Gist to clean up here: %s. ",
-        " Wait until %s and try again."),
-      g[["html_url"]],
-      format(as.POSIXct(rates[[c("rate", "reset")]] / 1e6L,
-                        origin = Sys.time()), format = "%c")))
+          if (page > max_pages) break
 
-  gear_url <- gsub("(?:raw/)[^/]*", "raw", g[["files"]][[1L]][["raw_url"]])
+          gs <-
+            gistr::gists(what = "minepublic", per_page = per_page, page = page)
 
-  gear_string <- prepare_gear(name, url = gear_url)
+          if (length(gs) == 0L) break
 
-  tmp_dir <- tempfile("modulr_")
-  dir.create(tmp_dir)
-  on.exit(unlink(tmp_dir, recursive = TRUE))
+          candidates <- c(
+            candidates,
+            Filter(
+              function(g)
+                any(filename == lapply(g[["files"]], `[[`, "filename")),
+              gs))
 
-  tmp_filename <- file.path(tmp_dir, filename)
+          if (update_first_found && length(candidates) > 0L) break
 
-  cat(gear_string, file = tmp_filename)
+          page <- page + 1L
 
-  g <- gistr::update(gistr::update_files(g, tmp_filename))
+        }
 
-  if (browse) gistr::browse(g)
+        if (length(candidates) == 1L) {
 
-  return(g)
+          g <- candidates[[1L]]
+
+          if (length(gs) == 0L || page == 1L && length(gs) < per_page) {
+
+            .message_info(
+              sprintf("Updating '%s' in gist ID '%s'.",
+                      filename, g[["id"]]))
+
+          } else {
+
+            .message_info(
+              sprintf("Updating '%s' in gist ID '%s' (first candidate found).",
+                      filename, g[["id"]]))
+
+          }
+
+          g <- gistr::gist(g[["id"]])
+
+        } else if (length(candidates) > 1L) {
+
+          .message_stop(
+            sprintf("Found '%s' in too many (%d) gists.",
+                    filename, length(candidates))
+          )
+
+        } else {
+
+          g <- gistr::gist_create(
+            code = {
+              '# First commit.'
+            },
+            description = sprintf("'%s' (modulr gear)", name),
+            filename = filename, browse = FALSE)
+
+          Sys.sleep(3L)
+
+        }
+
+      } else if (identical(update, FALSE)) {
+
+        g <- gistr::gist_create(
+          code = {
+            '# First commit.'
+          },
+          description = sprintf("'%s' (modulr gear)", name),
+          filename = filename, browse = FALSE)
+
+        Sys.sleep(3L)
+
+      } else if (is.character(update)) {
+
+        g <- gistr::gist(update)
+
+        if (any(filename == lapply(g[["files"]], `[[`, "filename"))) {
+          .message_info(
+            sprintf("Updating '%s' in gist ID '%s'.",
+                    filename, g[["id"]]))
+        } else {
+          .message_info(
+            sprintf("Creating '%s' in gist ID '%s'.",
+                    filename, g[["id"]]))
+        }
+      }
+      # nocov end
+
+      gear_id <- g[["id"]]
+
+      gear_string <- prepare_gear(name, url = gear_id)
+
+      if (identical(g[[c("files", filename, "content")]],
+                    unclass(gear_string))) {
+
+        .message_info(sprintf("No changes found for '%s' in gist ID '%s'.",
+                              filename, g[["id"]]))
+
+      } else {
+
+        tmp_dir <- tempfile("modulr_")
+        dir.create(tmp_dir)
+        on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+        tmp_filename <- file.path(tmp_dir, filename)
+
+        cat(gear_string, file = tmp_filename)
+
+        g <- gistr::update(gistr::update_files(g, tmp_filename))
+
+      }
+
+      if (browse) gistr::browse(g)
+
+      return(g)
+
+    })
+
+  invisible(g)
 
 }

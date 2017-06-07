@@ -431,7 +431,8 @@ with_verbosity <- function(level, code) {
 
   # nocov start
   if (!requireNamespace("devtools", quietly = TRUE)) {
-    stop("devtools is needed for this function to work. Please install it.",
+    stop("package 'devtools' is needed for this function to work. ",
+         "Please install it.",
          call. = FALSE)
   }
   # nocov end

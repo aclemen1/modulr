@@ -350,7 +350,8 @@ with_no_packages <- function(code,
 
   # nocov start
   if (!requireNamespace("devtools", quietly = TRUE)) {
-    stop("devtools is needed for this function to work. Please install it.",
+    stop("package 'devtools' is needed for this function to work. ",
+         "Please install it.",
          call. = FALSE)
   }
   # nocov end
@@ -462,7 +463,7 @@ with_module_packages <- function(code, ...) {
                          sep = "#")
     lib_path <-
       file.path(dirname(file), file_name, "lib")
-    with_packages(new = lib_path, code = code, ...)
+    with_packages(lib_path = lib_path, code = code, ...)
   } else {
     stop(paste("Module packages are not available for in-memory modules",
                "which are not sourced from a file."))

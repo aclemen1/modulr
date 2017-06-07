@@ -11,15 +11,23 @@ get_memoisation_key_ <- function(f, ...) {
 
 import_gist_ <- memoise::memoise(function(path) {
 
-  memoise::memoise(function(gist_id, ..., endpoint = GH_ENDPOINT) {
+  memoise::memoise(function(gist_id, ..., endpoint = GH_ENDPOINT,
+                            pat = Sys.getenv("GITHUB_PAT")) {
 
     gist_url <-
       sprintf("%s/gists/%s", endpoint, gist_id)
+
+    auth_config <- NULL
+    if (isTRUE(nzchar(pat))) {
+      auth_config <-
+        httr::add_headers("Authorization" = sprintf("token %s", pat))
+    }
 
     gist_req <-
       httr::GET(
         gist_url,
         httr::user_agent("https://github.com/aclemen1/modulr"),
+        auth_config,
         ...)
 
     if (httr::http_type(gist_req) != "application/json") {

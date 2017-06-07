@@ -33,6 +33,7 @@ set.seed(1234L)
 .__not_travis_nor_cran__ <- !identical(Sys.getenv("TRAVIS"), "true") && 
     identical(Sys.getenv("NOT_CRAN"), "true")
 knitr::opts_chunk$set(purl = .__not_travis_nor_cran__)
+unlink("gears", recursive = TRUE)
 ```
 
 # Introduction
@@ -417,88 +418,6 @@ widget_A$switch_color()
 config$color
 ```
 
-### Futures
-
-Using [Henrik Bengtsson's future package](https://cran.r-project.org/web/packages/future), it is possible to evaluate modules asynchronously using various resources available to the user. For instance, evaluation of modules can be eager, lazy, and/or parallelized (on multiple cores and/or on a cluster of machines).
-
-```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
-library(future)
-```
-
-```{r}
-# How many cores are available?
-availableCores()
-
-"foo" %provides% {
-  future({
-    Sys.sleep(1L)
-    "Hello"
-  }) %plan% multicore
-}
-
-"bar" %provides% {
-  future({
-    Sys.sleep(1L)
-    "World"
-  }) %plan% multicore
-}
-
-"foobar" %requires% list(
-  f = "foo",
-  b = "bar"
-) %provides% {
-  paste0(value(f), " ", value(b), "!")
-}
-
-system.time(print(make("foobar")))
-```
-
-It is often interesting to parallelize an already existing module. `modulr` comes with the handy `futurize` function for this purpose. The following two examples illustrate the difference between eager and lazy orchestrations of parallelized modules.
-
-```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
-```
-
-```{r}
-"foo" %provides% { Sys.sleep(1L); "Hello" }
-"bar" %provides% { Sys.sleep(1L); "World" }
-"foobar" %requires% list(
-  f = "foo", 
-  b = "bar"
-) %provides% {
-  paste0(f, " ", b, "!")
-}
-
-futurize("foo", strategy = multicore)
-futurize("bar", strategy = multicore)
-
-futurize(
-  "foobar", 
-  name = "foobar/eager", 
-  dependencies = list(f = "foo/future", b = "bar/future"),
-  strategy = eager
-)
-
-system.time(fb_eager <- make("foobar/eager"))
-system.time(print(value(fb_eager)))
-```
-
-```{r}
-touch("foo/future")
-touch("bar/future")
-futurize(
-  "foobar", 
-  name = "foobar/lazy", 
-  dependencies = list(f = "foo/future", b = "bar/future"),
-  strategy = lazy
-)
-
-system.time(fb_lazy <- make("foobar/lazy"))
-Sys.sleep(0.5)
-system.time(print(value(fb_lazy)))
-```
-
 ## Semantic Versioning (SemVer)
 
 The modulr package offers [Semantic Versioning](http://semver.org) capabilities: 
@@ -707,19 +626,47 @@ Notice that sharing a module is as easy as sending this one-liner code snippet:
 library(modulr); "modulr/vault#^0.1.0" %imports% "3fcc508cb40ddac6c1e3"
 ```
 
-Finally, [GitHub Enterprise](https://enterprise.github.com) users are also covered. For instance:
+Finally, private Gists and [GitHub Enterprise](https://enterprise.github.com) users are also covered, thanks to GitHub's [Personal Access Tokens](https://github.com/blog/1509-personal-api-tokens) (PAT). For instance, with the GitHub Enterprise instance of the University of Lausanne:
 
-```{r, eval=.__not_travis_nor_cran__}
-httr::with_config(
-  
-  # As usual, set 'GITHUB_PAT' in your '.Renviron' file.
-  httr::authenticate(user = "aclemen1", password = Sys.getenv("GITHUB_PAT")), 
-  
-  "test_module" %imports% 
-    "https://github.unil.ch/api/v3/gists/e1d41efefa623c9a8c117bdf95633a9a"
-    
-)
+```r
+# Set 'GITHUB_PAT' in your '.Renviron' file or right here:
+# Sys.setenv(GITHUB_PAT = "Your Personal Access Token here")
+
+"modulr/private_GitHubEnterprise_module" %imports% 
+  "https://github.unil.ch/api/v3/gists/1afa4770670975d70806c2153aac50a9"
 ```
+
+```{r, eval=.__not_travis_nor_cran__, echo=FALSE}
+(function() {
+  GITHUB_PAT_bak <- Sys.getenv("GITHUB_PAT")
+  Sys.setenv(GITHUB_PAT = Sys.getenv("GITHUB_UNIL_PAT"))
+  on.exit(Sys.setenv(GITHUB_PAT = GITHUB_PAT_bak))
+  "modulr/private_GitHubEnterprise_module" %imports% 
+    "https://github.unil.ch/api/v3/gists/1afa4770670975d70806c2153aac50a9"
+})()
+```
+
+Let us assume that the following module is worth publishing:
+
+```{r, results='hide'}
+"modulr/release_gist_example" %provides% "Hello World!"
+```
+
+To release this module as a modulr gear on GitHub's Gist, simply use `release_gear_as_gist`:
+
+```r
+release_gear_as_gist()
+```
+
+```{r, echo=FALSE, eval=.__not_travis_nor_cran__}
+g <- release_gear_as_gist(browse = FALSE)
+```
+
+```{r, include=FALSE, eval=!.__not_travis_nor_cran__}
+g <- list(html_url = "<URL>")
+```
+
+The module is then publicly available here: `r g[["html_url"]]`.
 
 ## Testing
 
@@ -1064,8 +1011,90 @@ if (.__name__ == "__main__")
 
 ## Experimental features
 
+### Futures
+
+Using [Henrik Bengtsson's future package](https://cran.r-project.org/web/packages/future), it is possible to evaluate modules asynchronously using various resources available to the user. For instance, evaluation of modules can be eager, lazy, and/or parallelized (on multiple cores and/or on a cluster of machines).
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+modulr::reset()
+library(future)
+```
+
+```{r}
+# How many cores are available?
+availableCores()
+
+"foo" %provides% {
+  future({
+    Sys.sleep(1L)
+    "Hello"
+  }) %plan% multicore
+}
+
+"bar" %provides% {
+  future({
+    Sys.sleep(1L)
+    "World"
+  }) %plan% multicore
+}
+
+"foobar" %requires% list(
+  f = "foo",
+  b = "bar"
+) %provides% {
+  paste0(value(f), " ", value(b), "!")
+}
+
+system.time(print(make("foobar")))
+```
+
+It is often interesting to parallelize an already existing module. `modulr` comes with the handy `futurize` function for this purpose. The following two examples illustrate the difference between eager and lazy orchestrations of parallelized modules.
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+modulr::reset()
+```
+
+```{r}
+"foo" %provides% { Sys.sleep(1L); "Hello" }
+"bar" %provides% { Sys.sleep(1L); "World" }
+"foobar" %requires% list(
+  f = "foo", 
+  b = "bar"
+) %provides% {
+  paste0(f, " ", b, "!")
+}
+
+futurize("foo", strategy = multicore)
+futurize("bar", strategy = multicore)
+
+futurize(
+  "foobar", 
+  name = "foobar/eager", 
+  dependencies = list(f = "foo/future", b = "bar/future"),
+  strategy = eager
+)
+
+system.time(fb_eager <- make("foobar/eager"))
+system.time(print(value(fb_eager)))
+```
+
+```{r}
+touch("foo/future")
+touch("bar/future")
+futurize(
+  "foobar", 
+  name = "foobar/lazy", 
+  dependencies = list(f = "foo/future", b = "bar/future"),
+  strategy = lazy
+)
+
+system.time(fb_lazy <- make("foobar/lazy"))
+Sys.sleep(0.5)
+system.time(print(value(fb_lazy)))
+```
+
+
 ### Package isolation
 
-### _Gears_
 
 ## Coding style
