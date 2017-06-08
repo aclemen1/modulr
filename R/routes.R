@@ -569,13 +569,9 @@
         } else {
           names(which.max(
             is_sub_version &
-              (!strict |
-                 ifelse(
-                   is.null(filepath), TRUE,
-                   finals ==
-                     .parse_name(
-                       .parse_filepath(filepath)[["name"]])[["final"]])))
-          )
+              (!strict | is.null(filepath) | finals ==
+                 .parse_name(
+                   .parse_filepath(filepath)[["name"]])[["final"]])))
         }
       }
     }
