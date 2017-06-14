@@ -5,7 +5,8 @@
 \alias{plot_dependencies}
 \title{Plot Dependencies.}
 \usage{
-plot_dependencies(group, regexp, reserved = TRUE, fontSize = 13L, ...)
+plot_dependencies(group, regexp, reserved = TRUE,
+  render_engine = sankey_engine, ...)
 }
 \arguments{
 \item{group}{A character vector of module names (cf. \code{\link{define}}) to
@@ -17,10 +18,10 @@ used to filter the names of the modules to be plotted.}
 \item{reserved}{A flag. Should special modules with a reserved name be
 considered?}
 
-\item{fontSize}{numeric font size in pixels for the node text labels.}
+\item{render_engine}{A function. Rendering engine used to plot the
+dependencies.}
 
-\item{...}{Further arguments to be passed to
-\code{networkD3::\link[networkD3]{sankeyNetwork}}.}
+\item{...}{Further arguments to be passed to \code{render_engine}.}
 }
 \description{
 Plot the directed acyclic graph (DAG) of modules and dependencies.

@@ -11,6 +11,7 @@ output:
 ```{r, echo=FALSE, results='hide', message=FALSE}
 library(htmltools)
 library(networkD3)
+library(chorddiag)
 library(webshot)
 library(dplyr)
 knitr::opts_chunk$set(
@@ -35,13 +36,7 @@ Sys.setenv(TZ = 'UTC')
 
 # Modulr — A Dependency Injection Framework for R
 
-*Until the forthcoming CRAN submission, the documentation of modulr is "work in progress". Thank you for your understanding.*
-
-## Description
-
 Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share. 
-
-Modulr is widely inspired from Google's [AngularJS](https://angularjs.org/) developpment framework for web applications in Javascript and from Google's [Guice](https://github.com/google/guice) developpment framework for Java. It is also inspired from [GNU Make](https://www.gnu.org/software/make).
 
 ## Hello World!
 
@@ -50,14 +45,17 @@ library(modulr)
 
 # This is our first module definition: 
 # "foo" provides the "Hello" character string.
-"foo" %provides% { "Hello" }
+"foo" %provides% "Hello"
 
 # The module "bar" provides "World".
-"bar" %provides% { "World" }
+"bar" %provides% "World"
 
 # And the module "foobar" requires "foo" and "bar", 
 # and provides a concatenated string.
-"foobar" %requires% list(f = "foo", b = "bar") %provides% {
+"foobar" %requires% list(
+  f = "foo", 
+  b = "bar"
+) %provides% {
   paste0(f, " ", b, "!")
 }
 
@@ -69,7 +67,7 @@ cat(result)
 
 ## Why Dependency Injection?
 
-This section motivates the use of DI in R. It mainly resumes the motivation and explanation given for [Angular's use of DI](https://docs.angularjs.org/guide/di) (credit to Google). For in-depth discussion about DI, see [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection) at Wikipedia, [Inversion of Control](http://martinfowler.com/articles/injection.html) by Martin Fowler, or read about DI in your favorite software design pattern book.
+This section motivates the use of DI in R from a rather academic and theoretical point of view, that should be complemented with a more practical approach, as exposed in the package's vignette for instance (see `vignette("modulr")`). It mainly resumes the motivation and explanation given for [Angular's use of DI](https://docs.angularjs.org/guide/di) (credit to Google). For in-depth discussion about DI, see [Dependency Injection](http://en.wikipedia.org/wiki/Dependency_injection) at Wikipedia, [Inversion of Control](http://martinfowler.com/articles/injection.html) by Martin Fowler, or read about DI in your favorite software design pattern book.
 
 Generally speaking, there are only three ways a component can get a hold of its dependencies:
 
@@ -202,11 +200,11 @@ car$start(); car$drive("120 km/h", "the University of Lausanne"); car$stop()
 
 When modulr _makes_ a module, it asks the ambient injector to create the dependencies. The injector infers the names of the dependencies by examining the module declaration, constructs the related [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) and computes a [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) to produce a well ordered sequence of evaluations. This is all done behind the scenes.
 
-```{r fig1, echo=F}
+```{r fig1, echo=FALSE}
 # Do not try to produce a snapshot on Travis CI or CRAN
 if (!identical(Sys.getenv("TRAVIS"), "true") &&
       identical(Sys.getenv("NOT_CRAN"), "true")) {
-  plot_dependencies() %>%
+  plot_dependencies(render_engine = sankey_engine) %>%
     html_print %>%
     webshot(file = "README-fig1.png", selector = ".sankeyNetwork", delay = 2) %>%
     resize("730x") %>%
@@ -334,6 +332,7 @@ _In alphabetical order._
 * Lev Kuznetsov's [injectoR](http://dfci-cccb.github.io/injectoR) package.
 * Will Landau's [drake](https://github.com/wlandau-lilly/drake) package.
 * Konrad Rudolph's [modules](http://github.com/klmr/modules) package.
+* Sebastian Warnholz's [modules](https://github.com/wahani/modules) package.
 
 ## Code of conduct
 

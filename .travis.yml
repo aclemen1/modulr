@@ -9,6 +9,7 @@ r:
 warnings_are_errors: true
 
 r_github_packages:
+  - mattflor/chorddiag
   - hadley/assertthat
   - hadley/testthat
   - wch/webshot

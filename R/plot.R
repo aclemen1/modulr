@@ -3,13 +3,13 @@
 #' Plot the directed acyclic graph (DAG) of modules and dependencies.
 #'
 #' @inheritParams make
-#' @inheritParams networkD3::sankeyNetwork
 #' @param group A character vector of module names (cf. \code{\link{define}}) to
 #'   include as a subset of the graph nodes.
 #' @param regexp A regular expression. If not missing, the regular expression is
 #'   used to filter the names of the modules to be plotted.
-#' @param ... Further arguments to be passed to
-#'   \code{networkD3::\link[networkD3]{sankeyNetwork}}.
+#' @param render_engine A function. Rendering engine used to plot the
+#'   dependencies.
+#' @param ... Further arguments to be passed to \code{render_engine}.
 #'
 #' @seealso \code{\link{define}} and \code{\link{reset}}.
 #'
@@ -29,18 +29,11 @@
 #' @aliases graph_dependencies
 #' @export
 plot_dependencies <- function(group, regexp, reserved = TRUE,
-                              fontSize = 13L, ...) {
+                              render_engine = sankey_engine,
+                              ...) {
 
   .message_meta("Entering plot_dependencies() ...",
                 verbosity = +Inf)
-
-  # nocov start
-  if (!requireNamespace("networkD3", quietly = TRUE)) {
-    stop("package 'networkD3' is needed for this function to work. ",
-         "Please install it.",
-         call. = FALSE)
-  }
-  # nocov end
 
   if (.is_called_from_within_module()) {
     warning("plot_dependencies is called from within a module.",
@@ -116,7 +109,8 @@ plot_dependencies <- function(group, regexp, reserved = TRUE,
       inc <- rbind(inc, row_to_add)
       rows_not_in_cols <- setdiff(dimnames(inc)[[1L]], dimnames(inc)[[2L]])
       col_to_add <- array(0L, dim = c(nrow(inc), length(rows_not_in_cols)),
-                          dimnames = list(dimnames(inc)[[1L]], rows_not_in_cols))
+                          dimnames =
+                            list(dimnames(inc)[[1L]], rows_not_in_cols))
       inc <- cbind(inc, col_to_add)
 
       for (module in to_collapse) {
@@ -144,22 +138,9 @@ plot_dependencies <- function(group, regexp, reserved = TRUE,
 
     if (isTRUE(nrow(deps) > 0L)) {
 
-      nodes <- unique(unlist(deps[, names(deps) != "value"]))
+      return(do.call(
+        render_engine, args = list(deps = deps, ...)))
 
-      deps$source <-
-        as.integer(factor(deps$module, levels = nodes)) - 1L
-      deps$target <-
-        as.integer(factor(deps$dependency, levels = nodes)) - 1L
-
-      return(networkD3::sankeyNetwork(
-        Links = deps,
-        Nodes = data.frame(node = nodes),
-        Source = "source",
-        Target = "target",
-        NodeID = "node",
-        Value = "value",
-        fontSize = fontSize,
-        ...))
     }
 
   }
@@ -167,6 +148,107 @@ plot_dependencies <- function(group, regexp, reserved = TRUE,
   message("No dependency to graph.")
 
   invisible()
+
+}
+
+#' Plot Dependencies with Sankey Engine.
+#'
+#' Plot the directed acyclic graph (DAG) of modules and dependencies with a
+#' Sankey diagram.
+#'
+#' @inheritParams networkD3::sankeyNetwork
+#' @param deps A data frame of modules and their dependencies.
+#' @param ... Further arguments to be passed to
+#'   \code{networkD3::\link[networkD3]{sankeyNetwork}}.
+#'
+#' @seealso \code{\link{plot_dependencies}}.
+#' @export
+sankey_engine <- function(deps, ...) {
+
+  # nocov start
+  if (!requireNamespace("networkD3", quietly = TRUE)) {
+    stop("package 'networkD3' is needed for this function to work. ",
+         "Please install it.",
+         call. = FALSE)
+  }
+  # nocov end
+
+  args <- list(...)
+
+  if (is.null(args[["fontSize"]])) args[["fontSize"]] <- 13.0
+
+  nodes <- unique(unlist(deps[, names(deps) != "value"]))
+
+  deps$source <-
+    as.integer(factor(deps$module, levels = nodes)) - 1L
+  deps$target <-
+    as.integer(factor(deps$dependency, levels = nodes)) - 1L
+
+  return(do.call(networkD3::sankeyNetwork, args = c(list(
+    Links = deps,
+    Nodes = data.frame(node = nodes),
+    Source = "source",
+    Target = "target",
+    NodeID = "node",
+    Value = "value"), args)))
+
+}
+
+#' Plot Dependencies with Chord Engine.
+#'
+#' Plot the directed acyclic graph (DAG) of modules and dependencies with a
+#' bipartite Chord diagram.
+#'
+#' @inheritParams chorddiag::chorddiag
+#' @param deps A data frame of modules and their dependencies.
+#' @param ... Further arguments to be passed to
+#'   \code{chorddiag::\link[chorddiag]{chorddiag}}.
+#'
+#' @seealso \code{\link{plot_dependencies}}.
+#' @export
+chord_engine <- function(deps, ...) {
+
+  # nocov start
+  if (!requireNamespace("chorddiag", quietly = TRUE)) {
+    stop("package 'chorddiag' is needed for this function to work. ",
+         "Please install it.",
+         call. = FALSE)
+  }
+  if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
+    stop("package 'RColorBrewer' is needed for this function to work. ",
+         "Please install it.",
+         call. = FALSE)
+  }
+  # nocov end
+
+  args <- list(...)
+
+  if (is.null(args[["groupnameFontsize"]]))
+    args[["groupnameFontsize"]] <- 11.0
+
+  if (is.null(args[["groupnamePadding"]]))
+    args[["groupnamePadding"]] <- 10.0
+
+  deps <- deps[c("dependency", "module")]
+  names(deps) <- rev(names(deps))
+  levels <- unique(c(as.character(deps[[1L]]), as.character(deps[[2L]])))
+  deps[[1L]] <- factor(deps[[1L]], levels = levels)
+  deps[[2L]] <- factor(deps[[2L]], levels = levels)
+  deps <- table(deps)
+
+  deps <- deps[rowSums(deps) > 0L, colSums(deps) > 0L, drop = FALSE]
+
+  row_ord <- order(rowSums(deps), rownames(deps))
+  col_ord <- order(-colSums(deps), colnames(deps), decreasing = TRUE)
+
+  do.call(chorddiag::chorddiag, args = c(list(
+    deps[row_ord, col_ord, drop = FALSE],
+    type = "bipartite",
+    showTicks = FALSE,
+
+    groupColors =
+      grDevices::colorRampPalette(RColorBrewer::brewer.pal(9L, "Set1"))(
+        length(levels))), args))
 
 }
 

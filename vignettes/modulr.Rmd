@@ -12,7 +12,8 @@ vignette: >
 
 ```{r, echo = FALSE, message = FALSE, results = 'hide'} 
 library(modulr) 
-library(networkD3) 
+library(networkD3)
+library(chorddiag)
 library(future) 
 library(memoise) 
 library(dplyr) 
@@ -114,12 +115,15 @@ Let us start by defining some modules and dependencies:
 
 "bar" %provides% "World"
 
+"baz" %provides% "!"
+
 "foobar" %requires% list(
   f = "foo", 
-  b = "bar"
+  b = "bar",
+  z = "baz"
 ) %provides% { 
   #' Return a concatenated string. 
-  paste0(f, " ", b, "!") 
+  paste0(f, " ", b, z) 
 } 
 ```
 
@@ -135,14 +139,18 @@ Use `lsmod` to list all defined modules and their properties in a data frame:
 lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified")) 
 ```
 
-In this example, `foobar` relies on two dependencies, and `foo` and `bar` are both injected once. 
-Use `plot_dependencies` to see the tree of dependencies and injections:
+In this example, `foobar` relies on three dependencies, and `foo`, `bar` and `baz` are both injected once. 
+Use `plot_dependencies` to see these relations:
 
 ```{r plot-foobar-deps} 
 plot_dependencies() 
 ```
 
-Use `make` get the resulting object provided by the module:
+```{r plot-foobar-deps-chord} 
+plot_dependencies(render_engine = chord_engine) 
+```
+
+Use `make` to get the resulting object provided by the module:
 
 ```{r} 
 make("foobar")
@@ -178,7 +186,7 @@ make("timestamp")
 with_verbosity(0, make("timestamp")) # temporarily change the verbosity of make
 ```
 
-To force re-evaluation, just `touch` the module:
+Notice the `with_verbosity` wrapper around the call. To force re-evaluation, just `touch` the module:
 
 ```{r}
 touch("timestamp")
@@ -216,7 +224,7 @@ make("timestamp")()
 with_verbosity(0L, make("timestamp")())
 ```
 
-It is important to emphasize that the module is still a singleton: the second `make` call doesn't re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called. Notice the `with_verbosity` wrapper around the call.
+It is important to emphasize that the module is still a singleton: the second `make` call doesn't re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called. 
 
 ### Memoised prototypes
 
