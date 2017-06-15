@@ -32,6 +32,9 @@
   <a href="index.html">Home</a>
 </li>
 <li>
+  <a href="articles/motivation.html">Why DI for R?</a>
+</li>
+<li>
   <a href="articles/modulr.html">Vignette</a>
 </li>
 <li>
@@ -72,7 +75,7 @@
 <p>Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share.</p>
 <div id="hello-world" class="section level2">
 <h2 class="hasAnchor">
-<a href="#hello-world" class="anchor"></a>Hello, world!</h2>
+<a href="#hello-world" class="anchor"></a>“Hello, world!”</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
 <span class="co">#&gt; This is modulr version 0.1.7.9177</span>
 <span class="co">#&gt; </span>
@@ -81,278 +84,45 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     browser</span>
 
-<span class="co"># This is our first module definition: </span>
-<span class="co"># "foo" provides the "Hello" character string.</span>
 <span class="st">"foo"</span> %provides%<span class="st"> "Hello"</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] Defining 'foo' ... OK</span>
 
-<span class="co"># The module "bar" provides "World".</span>
 <span class="st">"bar"</span> %provides%<span class="st"> "World"</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] Defining 'bar' ... OK</span>
 
-<span class="co"># And the module "foobar" requires "foo" and "bar", </span>
-<span class="co"># and provides a concatenated string.</span>
 <span class="st">"foobar"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>, 
   <span class="dt">b =</span> <span class="st">"bar"</span>
 ) %provides%<span class="st"> </span>{
   <span class="kw">paste0</span>(f, <span class="st">", "</span>, <span class="kw">tolower</span>(b), <span class="st">"!"</span>)
 }
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] Defining 'foobar' ... OK</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] Defining 'foobar' ... OK</span>
 
-<span class="co"># "foobar" is evaluated and its result bound to a variable.</span>
-result &lt;-<span class="st"> </span><span class="kw"><a href="reference/make.html">make</a></span>(<span class="st">"foobar"</span>)
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] Making 'foobar' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:47 UTC] DONE ('foobar')</span>
-
-<span class="kw">cat</span>(result)
-<span class="co">#&gt; Hello, world!</span></code></pre></div>
+<span class="kw"><a href="reference/make.html">make</a></span>(<span class="st">"foobar"</span>)
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] Making 'foobar' ...</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
+<span class="co">#&gt; [2017-06-15T16:36:55 UTC] DONE ('foobar')</span>
+<span class="co">#&gt; [1] "Hello, world!"</span></code></pre></div>
 </div>
-<div id="why-dependency-injection" class="section level2">
+<div id="some-advantages" class="section level2">
 <h2 class="hasAnchor">
-<a href="#why-dependency-injection" class="anchor"></a>Why Dependency Injection?</h2>
-<p>This section motivates the use of DI in R from a rather academic and theoretical point of view, that should be complemented with a more practical approach, as exposed in the package’s vignette for instance (see <code><a href="articles/modulr.html">vignette("modulr")</a></code>). It mainly resumes the motivation and explanation given for <a href="https://docs.angularjs.org/guide/di">Angular’s use of DI</a> (credit to Google). For in-depth discussion about DI, see <a href="http://en.wikipedia.org/wiki/Dependency_injection">Dependency Injection</a> at Wikipedia, <a href="http://martinfowler.com/articles/injection.html">Inversion of Control</a> by Martin Fowler, or read about DI in your favorite software design pattern book.</p>
-<p>Generally speaking, there are only three ways a component can get a hold of its dependencies:</p>
-<ol style="list-style-type: decimal">
-<li>The component can create the dependency, typically by binding a new object to an environment in R.</li>
-<li>The component can look up the dependency, by referring to a global variable.</li>
-<li>The component can have the dependency passed to it where it is needed.</li>
-</ol>
-<p>The first two options of creating or looking up dependencies are not optimal because they hard code the dependency to the component. This makes it difficult, if not impossible, to modify the dependencies. This is especially problematic in tests, where it is often desirable to provide mock dependencies for test isolation.</p>
-<p>The third option is the most viable, since it removes the responsibility of locating the dependency from the component. The dependency is simply handed to the component. To illustrate this, let’s build a simplistic car composed of a roaring engine and some gleaming wheels.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This function returns a roaring engine.</span>
-engine_provider &lt;-<span class="st"> </span>function() {
-  <span class="kw">list</span>(
-    <span class="dt">start =</span> function() <span class="kw">message</span>(<span class="st">"Engine started."</span>),
-    <span class="dt">stop =</span> function() <span class="kw">message</span>(<span class="st">"Engine stopped."</span>)
-  )
-}
-
-<span class="co"># This function returns gleaming wheels.</span>
-wheels_provider &lt;-<span class="st"> </span>function() {
-  <span class="kw">list</span>(
-    <span class="dt">roll =</span> function() <span class="kw">message</span>(<span class="st">"Wheels rolling."</span>),
-    <span class="dt">brake =</span> function() <span class="kw">message</span>(<span class="st">"Wheels braking."</span>)
-  )
-}
-
-<span class="co"># This function returns a car provided with an engine and some wheels.</span>
-car_provider &lt;-<span class="st"> </span>function(engine, wheels) {
-  <span class="kw">list</span>(
-    <span class="dt">start =</span> function() {
-      <span class="kw">message</span>(<span class="st">"Car started."</span>)
-      engine$<span class="kw">start</span>()
-    },
-    <span class="dt">drive =</span> function(speed, destination) {
-      wheels$<span class="kw">roll</span>()
-      <span class="kw">message</span>(<span class="st">"Car driving at "</span>, speed, <span class="st">" to "</span>, destination, <span class="st">"."</span>)
-      wheels$<span class="kw">brake</span>()
-    },
-    <span class="dt">stop =</span> function() {
-      engine$<span class="kw">stop</span>()
-      <span class="kw">message</span>(<span class="st">"Car stopped"</span>)
-    }
-  )
-}</code></pre></div>
-<p>In the above example, <code>car_provider</code> is not concerned with creating or locating the <code>engine</code> and <code>wheels</code> dependencies, it is simply handed the <code>engine</code> and <code>wheels</code> when it is called. It is desirable, but it puts the responsibility of getting hold of the dependencies on the code that calls <code>car_provider</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">engine &lt;-<span class="st"> </span><span class="kw">engine_provider</span>()
-wheels &lt;-<span class="st"> </span><span class="kw">wheels_provider</span>()
-car &lt;-<span class="st"> </span><span class="kw">car_provider</span>(engine, wheels)
-
-car$<span class="kw">start</span>()
-<span class="co">#&gt; Car started.</span>
-<span class="co">#&gt; Engine started.</span>
-car$<span class="kw">drive</span>(<span class="st">"50 km/h"</span>, <span class="st">"home"</span>)
-<span class="co">#&gt; Wheels rolling.</span>
-<span class="co">#&gt; Car driving at 50 km/h to home.</span>
-<span class="co">#&gt; Wheels braking.</span>
-car$<span class="kw">stop</span>()
-<span class="co">#&gt; Engine stopped.</span>
-<span class="co">#&gt; Car stopped</span></code></pre></div>
-<p>For instance, if one decides to change <code>wheels</code>, a new dependency has to be explicitly created and passed to <code>car_provider</code>.</p>
-<p>To manage the responsibility of dependency creation, modulr relies on an <em>injector</em>. The injector is a <a href="http://en.wikipedia.org/wiki/Service_locator_pattern">service locator</a> that is responsible for construction and lookup of dependencies. Here is an example of using the injector service:</p>
-<p>Create a new injector that can provide modules.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
-my_injector &lt;-<span class="st"> </span><span class="kw"><a href="reference/injector.html">new_injector</a></span>()</code></pre></div>
-<p>Teach the injector how to build the <code>car</code>, <code>engine</code> and <code>wheels</code> modules. Notice that <code>car</code> is dependent on the <code>engine</code> and <code>wheels</code> modules.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_injector$<span class="kw">provider</span>(
-  <span class="dt">name =</span> <span class="st">"car"</span>, 
-  <span class="dt">dependencies =</span> <span class="kw">list</span>(<span class="dt">engine =</span> <span class="st">"engine"</span>, <span class="dt">wheels =</span> <span class="st">"wheels"</span>), 
-  <span class="dt">provider =</span> car_provider)
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Defining 'car' ... OK</span>
-
-my_injector$<span class="kw">provider</span>(<span class="dt">name =</span> <span class="st">"engine"</span>, <span class="dt">provider =</span> engine_provider)
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Defining 'engine' ... OK</span>
-
-my_injector$<span class="kw">provider</span>(<span class="dt">name =</span> <span class="st">"wheels"</span>, <span class="dt">provider =</span> wheels_provider)
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Defining 'wheels' ... OK</span></code></pre></div>
-<p>Request our <code>car</code> module from the injector.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">car &lt;-<span class="st"> </span>my_injector$<span class="kw"><a href="reference/config.html">get</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] DONE ('car')</span>
-
-car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span class="st">"120 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car$<span class="kw">stop</span>()
-<span class="co">#&gt; Car started.</span>
-<span class="co">#&gt; Engine started.</span>
-<span class="co">#&gt; Wheels rolling.</span>
-<span class="co">#&gt; Car driving at 120 km/h to the University of Lausanne.</span>
-<span class="co">#&gt; Wheels braking.</span>
-<span class="co">#&gt; Engine stopped.</span>
-<span class="co">#&gt; Car stopped</span></code></pre></div>
-<p>In this setting, changing <code>wheels</code> is then straightforward:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_injector$<span class="kw">provider</span>(
-  <span class="dt">name =</span> <span class="st">"wheels"</span>, 
-  <span class="dt">provider =</span> function() {
-    <span class="kw">list</span>(
-      <span class="dt">roll =</span> function() <span class="kw">message</span>(<span class="st">"Brand-new wheels rolling."</span>),
-      <span class="dt">brake =</span> function() <span class="kw">message</span>(<span class="st">"Brand-new wheels braking."</span>)
-    )
-  }
-)
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Re-defining 'wheels' ... OK</span>
-
-car &lt;-<span class="st"> </span>my_injector$<span class="kw"><a href="reference/config.html">get</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] DONE ('car')</span>
-
-car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span class="st">"150 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car$<span class="kw">stop</span>()
-<span class="co">#&gt; Car started.</span>
-<span class="co">#&gt; Engine started.</span>
-<span class="co">#&gt; Brand-new wheels rolling.</span>
-<span class="co">#&gt; Car driving at 150 km/h to the University of Lausanne.</span>
-<span class="co">#&gt; Brand-new wheels braking.</span>
-<span class="co">#&gt; Engine stopped.</span>
-<span class="co">#&gt; Car stopped</span></code></pre></div>
-<p>Notice that the injector did only re-evaluate <code>wheels</code> and <code>car</code>, while <code>engine</code> was kept untouched: modulr treats modules as <a href="https://en.wikipedia.org/wiki/Singleton_pattern">singletons</a>.</p>
-<p>Asking for dependencies solves the issue of hard coding, but it also means that the injector needs to be passed throughout the application. Passing the injector breaks the <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a>. To remedy this, we combine the use of an ambient injector (a default injector is bound to modulr) and a declarative notation, to hand the responsibility of creating modules over the injector, as in this example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"car"</span> %requires%<span class="st"> </span><span class="kw">list</span>(<span class="dt">engine =</span> <span class="st">"engine"</span>, <span class="dt">wheels =</span> <span class="st">"wheels"</span>) %provides%<span class="st"> </span>car_provider
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Defining 'car' ... OK</span>
-
-<span class="st">"engine"</span> %provides%<span class="st"> </span>engine_provider
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Defining 'engine' ... OK</span>
-
-<span class="st">"wheels"</span> %provides%<span class="st"> </span>wheels_provider
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Defining 'wheels' ... OK</span>
-
-car &lt;-<span class="st"> </span><span class="kw"><a href="reference/make.html">make</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:48 UTC] DONE ('car')</span>
-
-car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span class="st">"120 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car$<span class="kw">stop</span>()
-<span class="co">#&gt; Car started.</span>
-<span class="co">#&gt; Engine started.</span>
-<span class="co">#&gt; Wheels rolling.</span>
-<span class="co">#&gt; Car driving at 120 km/h to the University of Lausanne.</span>
-<span class="co">#&gt; Wheels braking.</span>
-<span class="co">#&gt; Engine stopped.</span>
-<span class="co">#&gt; Car stopped</span></code></pre></div>
-<p>When modulr <em>makes</em> a module, it asks the ambient injector to create the dependencies. The injector infers the names of the dependencies by examining the module declaration, constructs the related <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">directed acyclic graph</a> and computes a <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological sort</a> to produce a well ordered sequence of evaluations. This is all done behind the scenes.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Read from right to left to follow the dependencies.</span>
-<span class="kw"><a href="reference/plot_dependencies.html">plot_dependencies</a></span>()</code></pre></div>
-<div class="figure">
-<img src="README-fig1.png">
-</div>
-<p>This is the best outcome. The application code simply declares the dependencies it needs, without having to deal with the injector. This setup does not break the Law of Demeter.</p>
-<p>Finally, here is how the above example typically looks like with the use of modulr DI’s philosophy and implementation:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
-
-<span class="st">"car"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
-  <span class="dt">engine =</span> <span class="st">"engine"</span>
-) %provides%<span class="st"> </span>{
-  <span class="co">#' This module can start, drive and stop a car.</span>
-  <span class="co"># It just returns a list of methods.</span>
-  <span class="kw">list</span>(
-    <span class="dt">start =</span> function() {
-      <span class="kw">message</span>(<span class="st">"Car started."</span>)
-      engine$<span class="kw">start</span>()
-    },
-    <span class="dt">drive =</span> function(speed, destination) {
-      wheels$<span class="kw">roll</span>()
-      <span class="kw">message</span>(<span class="st">"Car driving at "</span>, speed, <span class="st">" to "</span>, destination, <span class="st">"."</span>)
-      wheels$<span class="kw">brake</span>()
-    },
-    <span class="dt">stop =</span> function() {
-      engine$<span class="kw">stop</span>()
-      <span class="kw">message</span>(<span class="st">"Car stopped"</span>)
-    }
-  )
-}
-<span class="co">#&gt; [2017-06-15T15:32:51 UTC] Defining 'car' ... OK</span>
-
-<span class="st">"engine"</span> %provides%<span class="st"> </span>{
-  <span class="co">#' This module can start and stop an engine.</span>
-  <span class="kw">list</span>(
-    <span class="dt">start =</span> function() <span class="kw">message</span>(<span class="st">"Engine started."</span>),
-    <span class="dt">stop =</span> function() <span class="kw">message</span>(<span class="st">"Engine stopped."</span>)
-  )
-}
-<span class="co">#&gt; [2017-06-15T15:32:51 UTC] Defining 'engine' ... OK</span>
-
-<span class="st">"wheels"</span> %provides%<span class="st"> </span>{
-  <span class="co">#' This module can roll and brake wheels.</span>
-  <span class="kw">list</span>(
-    <span class="dt">roll =</span> function() <span class="kw">message</span>(<span class="st">"Wheels rolling."</span>),
-    <span class="dt">brake =</span> function() <span class="kw">message</span>(<span class="st">"Wheels braking."</span>),
-  )
-}
-<span class="co">#&gt; [2017-06-15T15:32:51 UTC] Defining 'wheels' ... OK</span>
-
-<span class="kw"><a href="reference/print_info.html">info</a></span>(<span class="st">"car"</span>) ## `info()` outputs #'-comments (aka docstrings)
-<span class="co">#&gt; This module can start, drive and stop a car.</span>
-
-car %&lt;=%<span class="st"> "car"</span> ## syntactic sugar for `&lt;- make(`
-<span class="co">#&gt; [2017-06-15T15:32:51 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:51 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:51 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-15T15:32:51 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-06-15T15:32:51 UTC] DONE ('car')</span>
-
-car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span class="st">"the speed of light"</span>, <span class="st">"the boundaries of the universe"</span>); car$<span class="kw">stop</span>()
-<span class="co">#&gt; Car started.</span>
-<span class="co">#&gt; Engine started.</span>
-<span class="co">#&gt; Wheels rolling.</span>
-<span class="co">#&gt; Car driving at the speed of light to the boundaries of the universe.</span>
-<span class="co">#&gt; Wheels braking.</span>
-<span class="co">#&gt; Engine stopped.</span>
-<span class="co">#&gt; Car stopped</span></code></pre></div>
-</div>
-<div id="other-advantages" class="section level2">
-<h2 class="hasAnchor">
-<a href="#other-advantages" class="anchor"></a>Other advantages</h2>
+<a href="#some-advantages" class="anchor"></a>Some advantages</h2>
 <ul>
-<li>Modulr helps to circumvent errors occurring in a chain of nested dependent modules, showing <a href="https://en.wikipedia.org/wiki/Breadcrumb_(navigation)">breadcrumbs</a>.</li>
 <li>Modulr is designed to ease production of mocks for testing purpose and is therefore well-suited for <a href="https://en.wikipedia.org/wiki/Test-driven_development">test-driven development</a>.</li>
 <li>Modulr offers <a href="https://en.wikipedia.org/wiki/Docstring">docstrings</a>-like comments for documenting the internals of a module.</li>
 <li>Modulr understands <a href="http://rmarkdown.rstudio.com/">R Markdown</a> and <a href="https://www.statistik.lmu.de/~leisch/Sweave/">Sweave</a>, thanks to Yihui Xie’s <a href="http://yihui.name/knitr/">knitr</a> package.</li>
 <li>Modulr takes advantage of <a href="http://semver.org/">semantic versioning</a> to avoid <em>version lock</em> and <em>version promiscuity</em>.</li>
+<li>Modulr can use <a href="http://github.com">GitHub</a> (repositories and gists) to publish and share modules (so-called <em>gears</em>). See <a href="https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3"><code>modulr/vault</code></a> for an example.</li>
+<li>Modulr helps to circumvent errors occurring in a chain of nested dependent modules, showing <a href="https://en.wikipedia.org/wiki/Breadcrumb_(navigation)">breadcrumbs</a>.</li>
 <li>Modulr allows parallelization using <a href="https://en.wikipedia.org/wiki/Futures_and_promises">futures</a>, thanks to Henrik Bengtsson’s <a href="https://github.com/HenrikBengtsson/future">future</a> package.</li>
 <li>Modulr implements <strong>package isolation</strong> as an experimental feature: following the philosophy of Jim Hester’s <a href="https://github.com/jimhester/withr">withr</a> package, the ‘with_’ method <code><a href="reference/with_no_packages.html">with_no_packages()</a></code> can be used to run code with temporarily no loaded or attached R packages.</li>
-<li>Modulr can use <a href="http://github.com">GitHub</a> (repositories and gists) to publish and share modules (so-called <em>gears</em>). See <a href="https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3"><code>modulr/vault</code></a> for an example.</li>
 </ul>
-<p>Please read the vignette to see examples in action: <code><a href="articles/modulr.html">vignette("modulr")</a></code>.</p>
+<p>Please read the vignettes to see extended examples in action: <code><a href="articles/motivation.html">vignette("motivation")</a></code> and <code><a href="articles/modulr.html">vignette("modulr")</a></code>.</p>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -380,12 +150,12 @@ devtools::<span class="kw">install_github</span>(<span class="st">"hadley/devtoo
 devtools::<span class="kw">install_github</span>(<span class="st">"aclemen1/modulr"</span>)</code></pre></div>
 <p>If you encounter a clear bug, please <a href="https://github.com/aclemen1/modulr/issues">file a minimal reproducible example</a>.</p>
 </div>
-<div id="real-world-application" class="section level2">
+<div id="real-world-applications" class="section level2">
 <h2 class="hasAnchor">
-<a href="#real-world-application" class="anchor"></a>Real world application</h2>
-<p>This is the dependency graph of a module which exposes tidy, exhaustive, statistics-ready, and daily HR data for the <a href="http://www.unil.ch">University of Lausanne</a>, Switzerland. These modules have been developped and are maintained by a small team of Data Scientists. Although not shown here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in <a href="http://www.unil.ch/statistiques">mission critical applications</a> since March 2015.</p>
+<a href="#real-world-applications" class="anchor"></a>Real-world applications</h2>
+<p>This is the dependency graph of a module (on the rightmost side) which exposes tidy, exhaustive, statistics-ready, and daily HR data for the <a href="http://www.unil.ch">University of Lausanne</a>, Switzerland. Although not visible here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in <a href="http://www.unil.ch/statistiques">mission critical applications</a> since March 2015.</p>
 <div class="figure">
-<img src="https://github.com/aclemen1/modulr/raw/master/README-fig2.png">
+<img src="README-fig1.png">
 </div>
 </div>
 <div id="related-approaches" class="section level2">

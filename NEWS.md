@@ -1,8 +1,8 @@
 # `modulr` 0.2.0
 
-## First release
+## First release on CRAN
 
-`modulr` is a Dependency Injection Framework for R. Until now, 
-`modulr` has been exclusively used by the Department of Information Systems and 
-Statistics at the University of Lausanne, Switzerland. This first release brings 
-`modulr` to the vibrant community of R Users.
+`modulr` is a Dependency Injection Framework for R. Until now, `modulr` has been
+exclusively used by the University of Lausanne, Information Systems and 
+Statistics, Switzerland. This first release on CRAN brings `modulr` to the 
+vibrant community of R Users.

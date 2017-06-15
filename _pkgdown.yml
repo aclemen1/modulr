@@ -3,6 +3,8 @@ navbar:
   left:
     - text: "Home"
       href: index.html
+    - text: "Why DI for R?"
+      href: articles/motivation.html
     - text: "Vignette"
       href: articles/modulr.html
     - text: "Reference"
@@ -12,7 +14,3 @@ navbar:
   right:
     - icon: fa-github
       href: https://github.com/aclemen1/modulr
-articles:
-  - title: "Vignette"
-    contents:
-    - modulr

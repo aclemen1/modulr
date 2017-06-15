@@ -38,11 +38,6 @@ knitr::opts_chunk$set(purl = .__not_travis_nor_cran__)
 unlink("gears", recursive = TRUE)
 ```
 
-Modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) 
-(DI) framework for R. It allows to break down sequential programs into discrete, 
-modular units that are loosely coupled, simple to develop, test, reuse and share. 
-See the [README file](https://github.com/aclemen1/modulr) for a short introduction.
-
 ## Anatomy of a module
 
 Modules are defined in a declarative way, using the keywords `%requires%`
@@ -107,7 +102,7 @@ The result contains the computed object exposed by the module. Under the
 hood, the dependencies have been sorted and appropriately made, and their 
 resulting objects injected where required.
 
-## A first example
+## A first working example
 
 ```{r, echo=FALSE, results='hide', message=FALSE} 
 reset() 
@@ -161,7 +156,7 @@ Use `make` to get the resulting object provided by the module:
 make("foobar")
 ```
 
-Voilà! All the depencencies have been evaluated, injected and processed to return the expected `"Hello, world!"`. As a matter of fact, the dependencies form a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) which is topologically sorted in order to determine a well ordering for their evaluation before injection.
+Voilà! All the depencencies have been evaluated, injected and processed to return the expected `"Hello, world!"`. As a matter of fact, the dependencies form a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) which is topologically sorted, just in time to determine a well ordering for their evaluation before injection.
 
 ```{r} 
 lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified")) 

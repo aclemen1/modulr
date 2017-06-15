@@ -4,7 +4,7 @@
 \name{modulr}
 \alias{modulr}
 \alias{modulr-package}
-\title{modulr -- A Dependency Injection Framework for R}
+\title{Modulr: A Dependency Injection Framework for R}
 \description{
 This package contains a Dependency Injection framework for R. It allows to
 organize programs into discrete, modular, and loosely coupled units. By
