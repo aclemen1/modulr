@@ -46,6 +46,24 @@ NULL
 
 .set_injector(injector = .default_injector)
 
+#' With Injector.
+#'
+#' Temporarily use a given injector.
+#'
+#' @param injector An injector (R environment).
+#' @param code Any object. Code to execute with the temporary injector.
+#'
+#' @return The result of the evaluation of the \code{code} argument.
+#'
+#' @seealso \code{\link[withr]{withr}} for examples of 'with_' methods.
+#'
+#' @export
+with_injector <- function(injector, code) {
+  injector_ <- set_injector(injector)
+  on.exit(set_injector(injector_))
+  force(code)
+}
+
 #' @title Create, Set, and Get Injectors (Modulr Internal States).
 #'
 #' @description Create an new injector, set and get the current injector, and
@@ -117,17 +135,10 @@ new_injector <- function() {
 
   .set_injector(injector = injector_)
 
-  injector$get <- function(...) {
-    injector_ <- set_injector(injector)
-    on.exit(set_injector(injector_))
-    make(...)
-  }
-
-  injector$provider <- function(...) {
-    injector_ <- set_injector(injector)
-    on.exit(set_injector(injector_))
-    define(...)
-  }
+  injector$get <- function(...) with_injector(injector, make(...))
+  injector$provider <- function(...) with_injector(injector, define(...))
+  injector$touch <- function(...) with_injector(injector, touch(...))
+  injector$reset <- function(...) with_injector(injector, reset(...))
 
   injector
 }

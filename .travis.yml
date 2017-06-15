@@ -1,10 +1,24 @@
 language: R
 sudo: false
 cache: packages
-r:
-  - oldrel
-  - release
-  - devel
+
+matrix:
+  include:
+    - os: linux
+      r: oldrel
+    - os: linux
+      r: release
+    - os: linux
+      r: devel
+    - os: linux
+      dist: trusty
+      env: R_CODECOV=true
+      r_check_args: '--use-valgrind'
+    - os: osx
+      osx_image: xcode8.3
+    - os: osx
+      osx_image: beta-xcode6.4
+      disable_homebrew: true
 
 warnings_are_errors: true
 
@@ -16,10 +30,15 @@ r_github_packages:
   - jimhester/covr
   - jimhester/lintr
 
-after_success:
-  - Rscript -e 'covr::codecov()'
-
 notifications:
   email:
     on_success: change
     on_failure: change
+
+addons:
+  apt:
+    packages:
+      - valgrind
+
+after_success:
+  - if [[ "${R_CODECOV}" ]]; then Rscript -e 'covr::codecov()'; fi

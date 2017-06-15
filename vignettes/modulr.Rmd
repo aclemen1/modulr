@@ -14,8 +14,9 @@ vignette: >
 library(modulr) 
 library(networkD3)
 library(chorddiag)
+library(RColorBrewer)
 library(future) 
-library(memoise) 
+library(memoise)
 library(dplyr) 
 options(knitr.duplicate.label = 'allow')
 `%<=%` <- modulr::`%<=%` 
@@ -61,11 +62,17 @@ A typical module looks like the following:
 
   # A list of dependencies.
   dependency_1 = "name_of_dependency_1", 
-  dependency_2 = "name_of_dependency_1"
+  dependency_2 = "name_of_dependency_1",
+  ... = "..."
 
 ) %provides% {
 
   #' A recommended docstring intended to document the internals of the module.
+
+  # A section where add-on packages are loaded and attached.
+  library(package_1)
+  library(package_2)
+  library(...)
 
   # Some code that uses the objects `dependency_1` and `dependency_2" 
   # returned by the modules "name_of_dependency_1" and "name_of_dependency_2".
@@ -123,7 +130,7 @@ Let us start by defining some modules and dependencies:
   z = "baz"
 ) %provides% { 
   #' Return a concatenated string. 
-  paste0(f, " ", b, z) 
+  paste0(f, ", ", tolower(b), z) 
 } 
 ```
 
@@ -156,7 +163,7 @@ Use `make` to get the resulting object provided by the module:
 make("foobar")
 ```
 
-Voilà! All the depencencies have been evaluated, injected and processed to return the expected `"Hello World!"`. As a matter of fact, the dependencies form a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) which is topologically sorted in order to determine a well ordering for their evaluation before injection.
+Voilà! All the depencencies have been evaluated, injected and processed to return the expected `"Hello, world!"`. As a matter of fact, the dependencies form a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) which is topologically sorted in order to determine a well ordering for their evaluation before injection.
 
 ```{r} 
 lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified")) 

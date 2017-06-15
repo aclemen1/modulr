@@ -93,6 +93,8 @@
 
   options(.modulr_env$old_modulr_options)
 
+  invisible(NULL)
+
 }
 
 # nocov end

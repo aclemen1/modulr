@@ -12,6 +12,7 @@ output:
 library(htmltools)
 library(networkD3)
 library(chorddiag)
+library(RColorBrewer)
 library(webshot)
 library(dplyr)
 knitr::opts_chunk$set(
@@ -38,7 +39,7 @@ Sys.setenv(TZ = 'UTC')
 
 Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share. 
 
-## Hello World!
+## Hello, world!
 
 ```{r}
 library(modulr)
@@ -56,7 +57,7 @@ library(modulr)
   f = "foo", 
   b = "bar"
 ) %provides% {
-  paste0(f, " ", b, "!")
+  paste0(f, ", ", tolower(b), "!")
 }
 
 # "foobar" is evaluated and its result bound to a variable.
