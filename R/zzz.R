@@ -2,6 +2,9 @@
 .onLoad <- function(libname, pkgname) {
 
   .modulr_env$old_modulr_options <- options(
+    modulr.digits = getOption(
+      "modulr.digits",
+      DEFAULT_DIGITS),
     modulr.ignore_packages =
       getOption(
         "modulr.ignore_packages",

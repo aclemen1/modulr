@@ -173,6 +173,8 @@ make <- function(name = .Last.name, ...) {
 
 }
 
+DEFAULT_DIGITS = 2L
+
 #' @rdname make
 #' @inheritParams define
 #' @param args A list of arguments to be passed to the resulting function, if
@@ -206,7 +208,10 @@ do_make <- function(name = .Last.name, args = list(),
 
   verbosity_level <- get_verbosity()
 
+
   .message_meta(sprintf("Making '%s' ...", name), {
+
+    start_time <- Sys.time()
 
     .message_meta("Visiting and defining dependencies ...", {
 
@@ -370,19 +375,25 @@ do_make <- function(name = .Last.name, args = list(),
   },
   verbosity = 2L)
 
-  .message_meta(sprintf("DONE ('%s')", name), {
+  duration <- Sys.time() - start_time
 
-    if (length(args) > 0L && is.function(instance[["value"]])) {
-      return(do.call(instance[["value"]], args = args,
-                     quote = quote, envir = envir))
-    } else {
-      return(
-        ifelse(instance[["visible"]], identity, invisible)(instance[["value"]])
-      )
-    }
+  .message_meta(
+    sprintf(
+      "DONE ('%s' in %s)", name,
+      format(duration, digits = getOption("modulr.digits",
+                                          default = DEFAULT_DIGITS))), {
 
-  },
-  verbosity = 2L)
+      if (length(args) > 0L && is.function(instance[["value"]])) {
+        return(do.call(instance[["value"]], args = args,
+                       quote = quote, envir = envir))
+      } else {
+        return(
+          ifelse(instance[["visible"]], identity, invisible)(instance[["value"]])
+        )
+      }
+
+    },
+    verbosity = 2L)
 
 }
 

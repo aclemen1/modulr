@@ -8,51 +8,11 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/modulr)](https://cran.r-project.org/package=modulr)
 [![CRAN](http://cranlogs.r-pkg.org/badges/grand-total/modulr)](https://cran.r-project.org/package=modulr)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org/license.html)
-[![Twitter](http://img.shields.io/twitter/url/https/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet?text=modulr%20-%20%20A%20Dependency%20Injection%20Framework%20for%20R)
+[![Twitter](https://img.shields.io/twitter/url/http/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet.html?text=Modulr:%20A%20Dependency%20Injection%20Framework%20for%20R&url=http://github.com/aclemen1/modulr&hashtags=r,dependency-injection)
 
 # Modulr: A Dependency Injection Framework for R
 
 Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share. 
-
-## "Hello, world!"
-
-
-```r
-library(modulr)
-#> This is modulr version 0.1.7.9177
-#> 
-#> Attaching package: 'modulr'
-#> The following object is masked from 'package:base':
-#> 
-#>     browser
-
-"foo" %provides% "Hello"
-#> [2017-06-15T16:36:53 UTC] Defining 'foo' ... OK
-
-"bar" %provides% "World"
-#> [2017-06-15T16:36:53 UTC] Defining 'bar' ... OK
-
-"foobar" %requires% list(
-  f = "foo", 
-  b = "bar"
-) %provides% {
-  paste0(f, ", ", tolower(b), "!")
-}
-#> [2017-06-15T16:36:53 UTC] Defining 'foobar' ... OK
-
-make("foobar")
-#> [2017-06-15T16:36:53 UTC] Making 'foobar' ...
-#> [2017-06-15T16:36:53 UTC] * Visiting and defining dependencies ...
-#> [2017-06-15T16:36:53 UTC] * Constructing dependency graph ... OK
-#> [2017-06-15T16:36:53 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2017-06-15T16:36:53 UTC] * Evaluating new and outdated dependencies ...
-#> [2017-06-15T16:36:53 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
-#> [2017-06-15T16:36:53 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
-#> [2017-06-15T16:36:53 UTC] DONE ('foobar')
-#> [1] "Hello, world!"
-```
-
-## Some advantages
 
 * Modulr is designed to ease production of mocks for testing purpose and is therefore well-suited for [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development).
 * Modulr offers [docstrings](https://en.wikipedia.org/wiki/Docstring)-like comments for documenting the internals of a module.
@@ -63,11 +23,45 @@ make("foobar")
 * Modulr allows parallelization using [futures](https://en.wikipedia.org/wiki/Futures_and_promises), thanks to Henrik Bengtsson's [future](https://github.com/HenrikBengtsson/future) package.
 * Modulr implements __package isolation__ as an experimental feature: following the philosophy of Jim Hester's [withr](https://github.com/jimhester/withr) package, the 'with_' method `with_no_packages()` can be used to run code with temporarily no loaded or attached R packages.
 
-Please read the vignettes to see extended examples in action: `vignette("motivation")` and `vignette("modulr")`.
+Please read the [documentation](https://aclemen1.github.io/modulr) and vignettes (`browseVignettes(package = "modulr")`) to see extended examples in action.
+
+## "Hello, world!"
+
+
+
+
+
+```r
+library(modulr)
+
+"foo" %provides% "Hello"
+#> [2017-06-15T19:04:36 UTC] Defining 'foo' ... OK
+
+"bar" %provides% "World"
+#> [2017-06-15T19:04:36 UTC] Defining 'bar' ... OK
+
+"foobar" %requires% list(
+  f = "foo", 
+  b = "bar"
+) %provides% {
+  paste0(f, ", ", tolower(b), "!")
+}
+#> [2017-06-15T19:04:36 UTC] Defining 'foobar' ... OK
+
+make("foobar")
+#> [2017-06-15T19:04:36 UTC] Making 'foobar' ...
+#> [2017-06-15T19:04:36 UTC] * Visiting and defining dependencies ...
+#> [2017-06-15T19:04:36 UTC] * Constructing dependency graph ... OK
+#> [2017-06-15T19:04:36 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2017-06-15T19:04:36 UTC] * Evaluating new and outdated dependencies ...
+#> [2017-06-15T19:04:36 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
+#> [2017-06-15T19:04:36 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
+#> [2017-06-15T19:04:36 UTC] DONE ('foobar' in 0.045 secs)
+#> [1] "Hello, world!"
+```
 
 ## Installation
 
-<!---
 You can install:
 
 * the latest released version from CRAN with
@@ -75,17 +69,10 @@ You can install:
 ``` r
 install.packages("modulr")
 ```
-* the latest released version from Github with
-``` r
-if (packageVersion("devtools") < 1.8) {
-  install.packages("devtools")
-}
-devtools::install_github("aclemen1/modulr")
-```
 
-* the latest _bleeding edge_ development version from Github with
--->
-```r
+* the latest development version from Github with
+
+``` r
 install.packages("devtools")
 devtools::install_github("hadley/devtools")
 devtools::install_github("aclemen1/modulr")
