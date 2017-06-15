@@ -9,4 +9,3 @@ options_provider_()
 \description{
 Options module which exposes an R environment. See ?options_provider.
 }
-

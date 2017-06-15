@@ -3,6 +3,7 @@
 \name{.SharedEnv}
 \alias{.SharedEnv}
 \alias{sharedenv}
+\alias{sharedenv}
 \title{Shared Environment.}
 \usage{
 .SharedEnv
@@ -23,6 +24,7 @@ The shared environment is bound to the injector being used.
 Do not assign to \code{.SharedEnv} in the workspace, because this will always
 mask the object of the same name in \code{package:modulr}.
 }
+
 \examples{
 .SharedEnv$foo <- "foo"
 "foobar" \%provides\% { function() print(.SharedEnv$foo) }
@@ -33,4 +35,3 @@ make()()
 \seealso{
 \code{\link{injector}}.
 }
-

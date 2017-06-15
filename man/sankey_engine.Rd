@@ -19,4 +19,3 @@ Sankey diagram.
 \seealso{
 \code{\link{plot_dependencies}}.
 }
-

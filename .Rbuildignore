@@ -17,3 +17,5 @@ gears/
 data/
 ^\.modulr_profile
 ^\.github
+^docs$
+^_pkgdown\.yml$

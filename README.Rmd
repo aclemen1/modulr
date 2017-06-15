@@ -28,14 +28,12 @@ Sys.setenv(TZ = 'UTC')
 
 [![Build Status](https://travis-ci.org/aclemen1/modulr.svg?branch=master)](https://travis-ci.org/aclemen1/modulr)
 [![Coverage status](https://codecov.io/github/aclemen1/modulr/coverage.svg?branch=master)](http://codecov.io/github/aclemen1/modulr)
-[![Pending pull-requests](https://githubbadges.herokuapp.com/aclemen1/modulr/pulls.svg?style=flat)](https://github.com/aclemen1/modulr/pulls)
-[![GitHub issues](http://img.shields.io/github/issues-raw/aclemen1/modulr.svg)](http://waffle.io/aclemen1/modulr)
-[![GitHub stars](http://img.shields.io/github/stars/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/stargazers)
-[![GitHub forks](http://img.shields.io/github/forks/aclemen1/modulr.svg)](https://github.com/aclemen1/modulr/network)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/modulr)](https://cran.r-project.org/package=modulr)
+[![CRAN](http://cranlogs.r-pkg.org/badges/grand-total/modulr)](https://cran.r-project.org/package=modulr)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org/license.html)
 [![Twitter](http://img.shields.io/twitter/url/https/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet?text=modulr%20-%20%20A%20Dependency%20Injection%20Framework%20for%20R)
 
-# Modulr — A Dependency Injection Framework for R
+# Modulr: A Dependency Injection Framework for R
 
 Modulr is a Dependency Injection (DI) framework for R which allows to break down sequential programs into discrete, modular units that are loosely coupled, simple to develop, test, debug, maintain, reuse, and share. 
 
@@ -220,7 +218,6 @@ plot_dependencies()
 
 ![](README-fig1.png)
 
-
 This is the best outcome. The application code simply declares the dependencies it needs, without having to deal with the injector. This setup does not break the Law of Demeter.
 
 Finally, here is how the above example typically looks like with the use of modulr DI's philosophy and implementation:
@@ -322,7 +319,7 @@ If you encounter a clear bug, please [file a minimal reproducible example](https
 
 This is the dependency graph of a module which exposes tidy, exhaustive, statistics-ready, and daily HR data for the [University of Lausanne](http://www.unil.ch), Switzerland. These modules have been developped and are maintained by a small team of Data Scientists. Although not shown here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in [mission critical applications](http://www.unil.ch/statistiques) since March 2015.
 
-![](README-fig2.png)
+![](https://github.com/aclemen1/modulr/raw/master/README-fig2.png)
 
 ## Related approaches
 

@@ -655,8 +655,8 @@ touch <- function(name = .Last.name) {
 #' @examples
 #' "foobar" %provides% "Hello World"
 #' "foo" %provides% "Hello"
-#' hit("foo")
-#' hit(foo)
+#' \dontrun{hit("foo")}
+#' \dontrun{hit(foo)}
 #' @export
 hit <- function(name, suffix = getOption("modulr.hit_suffix"),
                 replace = TRUE, execute = FALSE) {

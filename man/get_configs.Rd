@@ -17,4 +17,3 @@ get_configs()
 \seealso{
 \code{\link{config}} and \code{\link{reset}}.
 }
-

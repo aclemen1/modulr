@@ -32,4 +32,3 @@ with_verbosity(-Inf, {
 \code{\link[withr]{withr}} for examples of 'with_' methods,
   \code{\link{get_verbosity}}, and \code{\link{set_verbosity}}.
 }
-

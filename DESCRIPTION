@@ -1,6 +1,6 @@
 Package: modulr
 Type: Package
-Version: 0.1.7.9176
+Version: 0.1.7.9177
 Date: 2017-06-15
 Title: A Dependency Injection Framework for R
 Description: A Dependency Injection Framework to break down sequential
@@ -73,4 +73,4 @@ Collate:
     'zzz.R'
 NeedsCompilation: no
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

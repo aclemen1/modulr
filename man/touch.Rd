@@ -33,6 +33,7 @@ See \code{\link{make}} and \code{\link{module_options}}.
  reset, or perform any other operation from within a module definition that
  may alterate the internal state of modulr.
 }
+
 \examples{
 reset()
 define("foo", NULL, function() format(Sys.time(), "\%H:\%M:\%OS6"))
@@ -70,4 +71,3 @@ make("foo")
   \code{\link{make}}, \code{\link{module_options}},
   and \code{\link{reset}}.
 }
-

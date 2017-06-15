@@ -3,6 +3,7 @@
 \name{list_modules}
 \alias{list_modules}
 \alias{lsmod}
+\alias{lsmod}
 \title{List Defined Modules.}
 \usage{
 list_modules(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
@@ -89,4 +90,3 @@ list_modules(".oo.*", cols = c("weight", "size", "modified", "created"))
 \code{\link{define}}, \code{\link{make}},
   \code{\link{reset}}, and \code{\link{touch}}.
 }
-

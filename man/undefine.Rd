@@ -29,6 +29,7 @@ Undefine a module by dropping it definition from the modulr internal state.
  reset, or perform any other operation from within a module definition that
  may alterate the internal state of modulr.
 }
+
 \examples{
 reset()
 define("foo", NULL, function() "foo")
@@ -41,4 +42,3 @@ list_modules()
 \code{\link{define}}, \code{\link{list_modules}},
   and \code{\link{reset}}.
 }
-

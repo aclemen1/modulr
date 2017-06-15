@@ -27,7 +27,7 @@ library(magrittr)
 
 reset()
 define("foo", NULL, function() {foo <- "bar"; browser()})
-make()
+\dontrun{make()}
 
 reset()
 define("foobar", NULL, function() {
@@ -38,4 +38,3 @@ define("foobar", NULL, function() {
 })
 \dontrun{make()}
 }
-

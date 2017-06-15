@@ -19,4 +19,3 @@ bipartite Chord diagram.
 \seealso{
 \code{\link{plot_dependencies}}.
 }
-

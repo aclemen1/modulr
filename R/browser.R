@@ -33,7 +33,7 @@ prompt_ <- function(fun) {
 #'
 #' reset()
 #' define("foo", NULL, function() {foo <- "bar"; browser()})
-#' make()
+#' \dontrun{make()}
 #'
 #' reset()
 #' define("foobar", NULL, function() {

@@ -21,9 +21,12 @@
 #' define("foobuzz", list(f = "foo", b = "buzz"), function(f, b) NULL)
 #' define("fizz", list(f1 = "foobar", f2 = "foobuz"), function(f1, f2) NULL)
 #' wait <- function() invisible(readline(prompt="Press [enter] to continue"))
-#' plot_dependencies("foobar", reserved = FALSE); wait()
-#' plot_dependencies("foobar"); wait()
-#' plot_dependencies(reserved = FALSE); wait()
+#' plot_dependencies("foobar", reserved = FALSE)
+#' \dontrun{wait()}
+#' plot_dependencies("foobar")
+#' \dontrun{wait()}
+#' plot_dependencies(reserved = FALSE)
+#' \dontrun{wait()}
 #' plot_dependencies()
 #'
 #' @aliases graph_dependencies

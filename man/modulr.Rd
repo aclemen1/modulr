@@ -22,4 +22,3 @@ use \code{library(help = "modulr")}.
 \author{
 Alain Clément-Pavon <\email{alain.clement-pavon@unil.ch}>
 }
-

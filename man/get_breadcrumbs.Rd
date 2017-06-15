@@ -41,4 +41,3 @@ define("foobar", list(bar = "bar"), function(bar) bar())
 \code{\link{reactivate_breadcrumbs}}, \code{\link{define}},
 \code{\link{make}}, and \code{\link{reset}}.
 }
-

@@ -5,11 +5,11 @@
 \alias{config}
 \alias{get}
 \alias{get_all}
-\alias{maps_config}
-\alias{paths_config}
-\alias{root_config}
-\alias{set}
 \alias{unset}
+\alias{set}
+\alias{root_config}
+\alias{paths_config}
+\alias{maps_config}
 \title{Configurations.}
 \format{A list of getters and setters for a configuration.
  \preformatted{
@@ -36,6 +36,7 @@ Getters and setters for various injector configurations.
 \item{\code{drop}}{A flag. Should previous options be dropped and replaced?}
 }
 }
+
 \examples{
 reset()
 root_config$get_all()
@@ -50,4 +51,3 @@ root_config$get_all()
 \code{\link{define}}, \code{\link{get_configs}}, and \code{\link{reset}}.
 }
 \keyword{datasets}
-

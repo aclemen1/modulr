@@ -40,6 +40,7 @@ tangled into R code, which is in turn evaluated.
  reset, or perform any other operation from within a module definition that
  may alterate the internal state of modulr.
 }
+
 \examples{
 reset()
 tmp_dir <- tempfile("modulr_")
@@ -58,4 +59,3 @@ load_module("foo")
   \code{\link{maps_config}}, \code{\link{paths_config}}, and
   \code{\link{reset}}.
 }
-

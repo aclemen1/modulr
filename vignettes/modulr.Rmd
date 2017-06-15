@@ -38,8 +38,6 @@ knitr::opts_chunk$set(purl = .__not_travis_nor_cran__)
 unlink("gears", recursive = TRUE)
 ```
 
-# Introduction
-
 Modulr is a [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) 
 (DI) framework for R. It allows to break down sequential programs into discrete, 
 modular units that are loosely coupled, simple to develop, test, reuse and share. 

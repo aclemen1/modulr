@@ -25,7 +25,7 @@ matrix:
       r_build_args: '--no-build-vignettes'
       r_check_args: '--ignore-vignettes'
     - os: osx
-      osx_image: xcode6.4
+      osx_image: beta-xcode6.4
       disable_homebrew: true
       latex: false
       r_build_args: '--no-build-vignettes'

@@ -28,4 +28,3 @@ define("foobar", list(bar = "bar"), function(bar) bar())
 \dontrun{make()}
 
 }
-

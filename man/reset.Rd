@@ -28,6 +28,7 @@ Reset the modulr internal state: definitions and configurations are dropped,
  reset, or perform any other operation from within a module definition that
  may alterate the internal state of modulr.
 }
+
 \examples{
 reset()
 define("foo", NULL, function() NULL)
@@ -49,4 +50,3 @@ list_stashes()
   \code{\link{reset}}, \code{\link{root_config}},
   \code{\link{set_verbosity}}, and \code{\link{stash}}.
 }
-

@@ -59,4 +59,3 @@ release_gear_as_gist("foo")}
 \code{\link{define}}, \code{\link{prepare_gear}}, and
   \code{\link{reset}}.
 }
-

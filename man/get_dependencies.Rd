@@ -34,6 +34,7 @@ Get the list of declared dependencies of a module.
  reset, or perform any other operation from within a module definition that
  may alterate the internal state of modulr.
 }
+
 \examples{
 reset()
 define("foo", NULL, function() "foo")
@@ -58,4 +59,3 @@ unlink(tmp_dir, recursive = TRUE)
 \code{\link{define}}, \code{\link{make}}, \code{\link{reset}},
   and \code{\link{root_config}}.
 }
-

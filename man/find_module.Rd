@@ -76,4 +76,3 @@ unlink(tmp_dir, recursive = TRUE)
   \code{\link{maps_config}}, \code{\link{reset}}, and
   \code{\link{root_config}},
 }
-

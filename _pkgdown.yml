@@ -1,0 +1,18 @@
+navbar:
+  title: "modulr"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Vignette"
+      href: articles/modulr.html
+    - text: "Reference"
+      href: reference/index.html
+    - text: "News"
+      href: news/index.html
+  right:
+    - icon: fa-github
+      href: https://github.com/aclemen1/modulr
+articles:
+  - title: "Vignette"
+    contents:
+    - modulr

@@ -40,13 +40,13 @@ See \code{\link{make}} and \code{\link{module_options}}.
  reset, or perform any other operation from within a module definition that
  may alterate the internal state of modulr.
 }
+
 \examples{
 "foobar" \%provides\% "Hello World"
 "foo" \%provides\% "Hello"
-hit("foo")
-hit(foo)
+\dontrun{hit("foo")}
+\dontrun{hit(foo)}
 }
 \seealso{
 \code{\link{make}}.
 }
-

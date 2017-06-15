@@ -42,6 +42,7 @@ A digest is useful for comparing two modules. For instance, in order to know
  reset, or perform any other operation from within a module definition that
  may alterate the internal state of modulr.
 }
+
 \examples{
 reset()
 define("foo", NULL, function() NULL)
@@ -61,4 +62,3 @@ unlink(tmp_dir, recursive = TRUE)
 \seealso{
 \code{\link{define}} and \code{\link{root_config}}.
 }
-

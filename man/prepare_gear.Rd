@@ -55,4 +55,3 @@ cat(prepare_gear("foo", url = "https://example.org/gears/foo"), sep = "\\n")
 \code{\link{define}}, \code{\link{release_gear_as_gist}}, \code{\link{info}},
   and \code{\link{reset}}.
 }
-

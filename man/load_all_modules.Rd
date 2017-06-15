@@ -34,6 +34,7 @@ Load or reload all modules which are defined in the named directory.
  reset, or perform any other operation from within a module definition that
  may alterate the internal state of modulr.
 }
+
 \examples{
 reset()
 tmp_dir <- tempfile("modulr_")
@@ -51,4 +52,3 @@ unlink(tmp_dir, recursive = TRUE)
 \code{\link{load_module}}, \code{\link{make_all}}, and
   \code{\link{reset}}.
 }
-

@@ -26,6 +26,7 @@ Other actions on modules do not alter the value of \code{.Last.name}.
 Do not assign to \code{.Last.name} in the workspace, because this will always
 mask the object of the same name in \code{package:modulr}.
 }
+
 \examples{
 define("foo", NULL, function() NULL)
 .Last.name
@@ -37,4 +38,3 @@ make("bar/test")
 \seealso{
 \code{\link{define}}.
 }
-

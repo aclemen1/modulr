@@ -20,4 +20,3 @@ Temporarily use a given injector.
 \seealso{
 \code{\link[withr]{withr}} for examples of 'with_' methods.
 }
-
