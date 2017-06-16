@@ -74,16 +74,6 @@ make("foobar")
 
 ## Installation
 
-You can install:
-
-* the latest released version from CRAN with
-
-``` r
-install.packages("modulr")
-```
-
-* the latest development version from Github with
-
 ``` r
 install.packages("devtools")
 devtools::install_github("hadley/devtools")
@@ -91,12 +81,13 @@ devtools::install_github("aclemen1/modulr")
 ```
 
 If you encounter a clear bug, please [file a minimal reproducible example](https://github.com/aclemen1/modulr/issues).
+For questions and other discussion, please use the [modulr mailing list](https://groups.google.com/forum/#!forum/modulr-talk).
 
 ## Real-world applications
 
+![](https://github.com/aclemen1/modulr/raw/master/README-fig1.png)
+   
 This is the dependency graph of a module (on the rightmost side) which exposes tidy, exhaustive, statistics-ready, and daily HR data for the [University of Lausanne](http://www.unil.ch), Switzerland. Although not visible here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in [mission critical applications](http://www.unil.ch/statistiques) since March 2015.
-
-![](README-fig1.png)
 
 ## Related approaches
 

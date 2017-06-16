@@ -90,10 +90,10 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
 
 <span class="st">"foo"</span> %provides%<span class="st"> "Hello"</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] Defining 'foo' ... OK</span>
 
 <span class="st">"bar"</span> %provides%<span class="st"> "World"</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] Defining 'bar' ... OK</span>
 
 <span class="st">"foobar"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>, 
@@ -101,42 +101,32 @@
 ) %provides%<span class="st"> </span>{
   <span class="kw">paste0</span>(f, <span class="st">", "</span>, <span class="kw">tolower</span>(b), <span class="st">"!"</span>)
 }
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] Defining 'foobar' ... OK</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] Defining 'foobar' ... OK</span>
 
 <span class="kw"><a href="reference/make.html">make</a></span>(<span class="st">"foobar"</span>)
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] Making 'foobar' ...</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
-<span class="co">#&gt; [2017-06-15T19:03:39 UTC] DONE ('foobar' in 0.043 secs)</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] Making 'foobar' ...</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
+<span class="co">#&gt; [2017-06-16T05:33:26 UTC] DONE ('foobar' in 0.045 secs)</span>
 <span class="co">#&gt; [1] "Hello, world!"</span></code></pre></div>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install:</p>
-<ul>
-<li>the latest released version from CRAN with</li>
-</ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"modulr"</span>)</code></pre></div>
-<ul>
-<li>the latest development version from Github with</li>
-</ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
 devtools::<span class="kw">install_github</span>(<span class="st">"hadley/devtools"</span>)
 devtools::<span class="kw">install_github</span>(<span class="st">"aclemen1/modulr"</span>)</code></pre></div>
-<p>If you encounter a clear bug, please <a href="https://github.com/aclemen1/modulr/issues">file a minimal reproducible example</a>.</p>
+<p>If you encounter a clear bug, please <a href="https://github.com/aclemen1/modulr/issues">file a minimal reproducible example</a>. For questions and other discussion, please use the <a href="https://groups.google.com/forum/#!forum/modulr-talk">modulr mailing list</a>.</p>
 </div>
 <div id="real-world-applications" class="section level2">
 <h2 class="hasAnchor">
 <a href="#real-world-applications" class="anchor"></a>Real-world applications</h2>
-<p>This is the dependency graph of a module (on the rightmost side) which exposes tidy, exhaustive, statistics-ready, and daily HR data for the <a href="http://www.unil.ch">University of Lausanne</a>, Switzerland. Although not visible here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in <a href="http://www.unil.ch/statistiques">mission critical applications</a> since March 2015.</p>
-<div class="figure">
-<img src="README-fig1.png">
-</div>
+<p><img src="https://github.com/aclemen1/modulr/raw/master/README-fig1.png">  <br>
+This is the dependency graph of a module (on the rightmost side) which exposes tidy, exhaustive, statistics-ready, and daily HR data for the <a href="http://www.unil.ch">University of Lausanne</a>, Switzerland. Although not visible here, many of these modules are reused in other projects. The University of Lausanne has been running modulr in <a href="http://www.unil.ch/statistiques">mission critical applications</a> since March 2015.</p>
 </div>
 <div id="related-approaches" class="section level2">
 <h2 class="hasAnchor">
