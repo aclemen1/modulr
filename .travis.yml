@@ -20,11 +20,13 @@ matrix:
             - valgrind
     - os: osx
       osx_image: xcode8.3
+      disable_homebrew: true
       latex: false
       r_build_args: '--no-build-vignettes'
       r_check_args: '--ignore-vignettes'
     - os: osx
       osx_image: xcode7.3
+      disable_homebrew: true
       latex: false
       r_build_args: '--no-build-vignettes'
       r_check_args: '--ignore-vignettes'
@@ -51,4 +53,4 @@ notifications:
     on_failure: change
 
 after_success:
-  - if [[ "${R_CODECOV}" ]]; then Rscript -e 'covr::codecov()'; fi
+  - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi

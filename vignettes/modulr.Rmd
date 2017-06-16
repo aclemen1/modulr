@@ -36,7 +36,6 @@ set.seed(1234L)
   identical(Sys.getenv("BUILD"), "true") &&
   !identical(Sys.getenv("TRAVIS"), "true") && 
   identical(Sys.getenv("NOT_CRAN"), "true")
-knitr::opts_chunk$set(purl = .__build__)
 unlink("gears", recursive = TRUE)
 ```
 
@@ -760,8 +759,8 @@ To illustrate the situation where some test fails, let us consider a faulty vers
 }
 ```
 
-```{r}
-try(make_tests())
+```{r, error=TRUE, purl=FALSE}
+make_tests()
 ```
 
 ### Module with _mocked_ dependencies

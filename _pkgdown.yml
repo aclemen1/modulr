@@ -14,3 +14,6 @@ navbar:
   right:
     - icon: fa-github
       href: https://github.com/aclemen1/modulr
+template:
+  params:
+    ganalytics: UA-36176577-2

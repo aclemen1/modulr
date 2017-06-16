@@ -34,6 +34,18 @@
 <![endif]-->
 
 
+<!-- Google analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-36176577-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
   </head>
 
   <body>
@@ -142,7 +154,7 @@ returned path can be absolute or relative to a root directory.</p>
 <span class='no'>root_config</span>$<span class='fu'><a href='config.html'>set</a></span>(<span class='no'>tmp_dir</span>)
 <span class='fu'><a href='set_verbosity.html'>set_verbosity</a></span>(<span class='fl'>1L</span>)
 <span class='fu'>find_path</span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt;                                         foo 
-#&gt; "/tmp/RtmpeuuMj8/modulr_231650373fdb/foo.R" </div><div class='input'><span class='fu'>unlink</span>(<span class='no'>tmp_dir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+#&gt; "/tmp/RtmpdrZnx2/modulr_2510766a4508/foo.R" </div><div class='input'><span class='fu'>unlink</span>(<span class='no'>tmp_dir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'><a href='reset.html'>reset</a></span>()
 <span class='no'>tmp_dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempfile</span>(<span class='st'>"modulr_"</span>)

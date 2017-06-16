@@ -35,10 +35,10 @@ Please read the [documentation](https://aclemen1.github.io/modulr) and vignettes
 library(modulr)
 
 "foo" %provides% "Hello"
-#> [2017-06-16T10:35:39 UTC] Defining 'foo' ... OK
+#> [2017-06-16T13:56:58 UTC] Defining 'foo' ... OK
 
 "bar" %provides% "World"
-#> [2017-06-16T10:35:39 UTC] Defining 'bar' ... OK
+#> [2017-06-16T13:56:58 UTC] Defining 'bar' ... OK
 
 "foobar" %requires% list(
   f = "foo", 
@@ -46,17 +46,17 @@ library(modulr)
 ) %provides% {
   paste0(f, ", ", tolower(b), "!")
 }
-#> [2017-06-16T10:35:39 UTC] Defining 'foobar' ... OK
+#> [2017-06-16T13:56:58 UTC] Defining 'foobar' ... OK
 
 make("foobar")
-#> [2017-06-16T10:35:39 UTC] Making 'foobar' ...
-#> [2017-06-16T10:35:39 UTC] * Visiting and defining dependencies ...
-#> [2017-06-16T10:35:39 UTC] * Constructing dependency graph ... OK
-#> [2017-06-16T10:35:39 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2017-06-16T10:35:39 UTC] * Evaluating new and outdated dependencies ...
-#> [2017-06-16T10:35:39 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
-#> [2017-06-16T10:35:39 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
-#> [2017-06-16T10:35:39 UTC] DONE ('foobar' in 0.043 secs)
+#> [2017-06-16T13:56:58 UTC] Making 'foobar' ...
+#> [2017-06-16T13:56:58 UTC] * Visiting and defining dependencies ...
+#> [2017-06-16T13:56:58 UTC] * Constructing dependency graph ... OK
+#> [2017-06-16T13:56:58 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2017-06-16T13:56:58 UTC] * Evaluating new and outdated dependencies ...
+#> [2017-06-16T13:56:58 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
+#> [2017-06-16T13:56:58 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
+#> [2017-06-16T13:56:58 UTC] DONE ('foobar' in 0.044 secs)
 #> [1] "Hello, world!"
 ```
 

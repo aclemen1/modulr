@@ -34,6 +34,18 @@
 <![endif]-->
 
 
+<!-- Google analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-36176577-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
   </head>
 
   <body>
@@ -177,23 +189,30 @@ under the given <code>namespace</code> parameter.</p>
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt; [1] memoise_1.1.0     modulr_0.1.7.9180
+#&gt;  [1] modulr_0.1.7.9181     tibble_1.3.3          ggplot2_2.1.0        
+#&gt;  [4] testthat_1.0.2        assertthat_0.2.0.9000 PKI_0.1-3            
+#&gt;  [7] base64enc_0.1-3       dplyr_0.4.1           memoise_1.1.0        
+#&gt; [10] future_1.0.1          RColorBrewer_1.1-2    chorddiag_0.1.1      
+#&gt; [13] networkD3_0.2.13     
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
-#&gt;  [1] igraph_1.0.1          Rcpp_0.12.11          rstudioapi_0.6       
-#&gt;  [4] whisker_0.3-2         knitr_1.16            xml2_1.1.1           
-#&gt;  [7] magrittr_1.5          roxygen2_6.0.1        devtools_1.12.0.9000 
-#&gt; [10] usethis_0.0.0.9000    pkgload_0.0.0.9000    R6_2.2.1             
-#&gt; [13] chorddiag_0.1.1       rlang_0.1.1.9000      pooh_0.3-2           
-#&gt; [16] httr_1.2.1            stringr_1.2.0         networkD3_0.2.13     
-#&gt; [19] tools_3.2.5           withr_1.0.2           htmltools_0.3.6      
-#&gt; [22] commonmark_1.2        yaml_2.1.14           assertthat_0.2.0.9000
-#&gt; [25] rprojroot_1.2         digest_0.6.12         tibble_1.3.3         
-#&gt; [28] pkgdown_0.1.0.9000    crayon_1.3.2          callr_1.0.0          
-#&gt; [31] purrr_0.2.2.2         htmlwidgets_0.8       testthat_1.0.2       
-#&gt; [34] evaluate_0.10         rmarkdown_1.5         stringi_1.1.5        
-#&gt; [37] desc_1.1.0            backports_1.1.0       highlight_0.4.7.1    
-#&gt; [40] jsonlite_1.5         </div><div class='input'><span class='fu'>not_run</span>({
+#&gt;  [1] gistr_0.3.6          purrr_0.2.2.2        listenv_0.6.0       
+#&gt;  [4] colorspace_1.2-6     htmltools_0.3.6      usethis_0.0.0.9000  
+#&gt;  [7] yaml_2.1.14          rlang_0.1.1.9000     pkgdown_0.1.0.9000  
+#&gt; [10] withr_1.0.2          DBI_0.6              plyr_1.8.4          
+#&gt; [13] stringr_1.2.0        munsell_0.4.3        commonmark_1.2      
+#&gt; [16] gtable_0.2.0         devtools_1.12.0.9000 htmlwidgets_0.8     
+#&gt; [19] codetools_0.2-14     evaluate_0.10        labeling_0.3        
+#&gt; [22] knitr_1.16           callr_1.0.0          highlight_0.4.7.1   
+#&gt; [25] parallel_3.2.5       curl_2.1             Rcpp_0.12.11        
+#&gt; [28] backports_1.1.0      scales_0.4.0         desc_1.1.0          
+#&gt; [31] pkgload_0.0.0.9000   jsonlite_1.5         digest_0.6.12       
+#&gt; [34] stringi_1.1.5        grid_3.2.5           rprojroot_1.2       
+#&gt; [37] pooh_0.3-2           tools_3.2.5          magrittr_1.5        
+#&gt; [40] crayon_1.3.2         whisker_0.3-2        xml2_1.1.1          
+#&gt; [43] rmarkdown_1.5        httr_1.2.1           roxygen2_6.0.1      
+#&gt; [46] rstudioapi_0.6       R6_2.2.1             globals_0.7.0       
+#&gt; [49] igraph_1.0.1        </div><div class='input'><span class='fu'>not_run</span>({
   <span class='fu'>with_no_packages</span>({
     <span class='fu'>message</span>(<span class='st'>"Look mum, no packages!"</span>)
     <span class='fu'>print</span>(<span class='fu'>sessionInfo</span>())
@@ -215,23 +234,30 @@ under the given <code>namespace</code> parameter.</p>
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt; [1] memoise_1.1.0     modulr_0.1.7.9180
+#&gt;  [1] modulr_0.1.7.9181     tibble_1.3.3          ggplot2_2.1.0        
+#&gt;  [4] testthat_1.0.2        assertthat_0.2.0.9000 PKI_0.1-3            
+#&gt;  [7] base64enc_0.1-3       dplyr_0.4.1           memoise_1.1.0        
+#&gt; [10] future_1.0.1          RColorBrewer_1.1-2    chorddiag_0.1.1      
+#&gt; [13] networkD3_0.2.13     
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
-#&gt;  [1] igraph_1.0.1          Rcpp_0.12.11          rstudioapi_0.6       
-#&gt;  [4] whisker_0.3-2         knitr_1.16            xml2_1.1.1           
-#&gt;  [7] magrittr_1.5          roxygen2_6.0.1        devtools_1.12.0.9000 
-#&gt; [10] usethis_0.0.0.9000    pkgload_0.0.0.9000    R6_2.2.1             
-#&gt; [13] chorddiag_0.1.1       rlang_0.1.1.9000      pooh_0.3-2           
-#&gt; [16] httr_1.2.1            stringr_1.2.0         networkD3_0.2.13     
-#&gt; [19] tools_3.2.5           withr_1.0.2           htmltools_0.3.6      
-#&gt; [22] commonmark_1.2        yaml_2.1.14           assertthat_0.2.0.9000
-#&gt; [25] rprojroot_1.2         digest_0.6.12         tibble_1.3.3         
-#&gt; [28] pkgdown_0.1.0.9000    crayon_1.3.2          callr_1.0.0          
-#&gt; [31] purrr_0.2.2.2         htmlwidgets_0.8       testthat_1.0.2       
-#&gt; [34] evaluate_0.10         rmarkdown_1.5         stringi_1.1.5        
-#&gt; [37] desc_1.1.0            backports_1.1.0       highlight_0.4.7.1    
-#&gt; [40] jsonlite_1.5         </div><div class='input'>
+#&gt;  [1] gistr_0.3.6          purrr_0.2.2.2        listenv_0.6.0       
+#&gt;  [4] colorspace_1.2-6     htmltools_0.3.6      usethis_0.0.0.9000  
+#&gt;  [7] yaml_2.1.14          rlang_0.1.1.9000     pkgdown_0.1.0.9000  
+#&gt; [10] withr_1.0.2          DBI_0.6              plyr_1.8.4          
+#&gt; [13] stringr_1.2.0        munsell_0.4.3        commonmark_1.2      
+#&gt; [16] gtable_0.2.0         devtools_1.12.0.9000 htmlwidgets_0.8     
+#&gt; [19] codetools_0.2-14     evaluate_0.10        labeling_0.3        
+#&gt; [22] knitr_1.16           callr_1.0.0          highlight_0.4.7.1   
+#&gt; [25] parallel_3.2.5       curl_2.1             Rcpp_0.12.11        
+#&gt; [28] backports_1.1.0      scales_0.4.0         desc_1.1.0          
+#&gt; [31] pkgload_0.0.0.9000   jsonlite_1.5         digest_0.6.12       
+#&gt; [34] stringi_1.1.5        grid_3.2.5           rprojroot_1.2       
+#&gt; [37] pooh_0.3-2           tools_3.2.5          magrittr_1.5        
+#&gt; [40] crayon_1.3.2         whisker_0.3-2        xml2_1.1.1          
+#&gt; [43] rmarkdown_1.5        httr_1.2.1           roxygen2_6.0.1      
+#&gt; [46] rstudioapi_0.6       R6_2.2.1             globals_0.7.0       
+#&gt; [49] igraph_1.0.1        </div><div class='input'>
 <span class='fu'>print</span>(<span class='fu'>sessionInfo</span>())</div><div class='output co'>#&gt; R version 3.2.5 (2016-04-14)
 #&gt; Platform: x86_64-pc-linux-gnu (64-bit)
 #&gt; Running under: Red Hat Enterprise Linux
@@ -248,23 +274,30 @@ under the given <code>namespace</code> parameter.</p>
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt; [1] memoise_1.1.0     modulr_0.1.7.9180
+#&gt;  [1] modulr_0.1.7.9181     tibble_1.3.3          ggplot2_2.1.0        
+#&gt;  [4] testthat_1.0.2        assertthat_0.2.0.9000 PKI_0.1-3            
+#&gt;  [7] base64enc_0.1-3       dplyr_0.4.1           memoise_1.1.0        
+#&gt; [10] future_1.0.1          RColorBrewer_1.1-2    chorddiag_0.1.1      
+#&gt; [13] networkD3_0.2.13     
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
-#&gt;  [1] igraph_1.0.1          Rcpp_0.12.11          rstudioapi_0.6       
-#&gt;  [4] whisker_0.3-2         knitr_1.16            xml2_1.1.1           
-#&gt;  [7] magrittr_1.5          roxygen2_6.0.1        devtools_1.12.0.9000 
-#&gt; [10] usethis_0.0.0.9000    pkgload_0.0.0.9000    R6_2.2.1             
-#&gt; [13] chorddiag_0.1.1       rlang_0.1.1.9000      pooh_0.3-2           
-#&gt; [16] httr_1.2.1            stringr_1.2.0         networkD3_0.2.13     
-#&gt; [19] tools_3.2.5           withr_1.0.2           htmltools_0.3.6      
-#&gt; [22] commonmark_1.2        yaml_2.1.14           assertthat_0.2.0.9000
-#&gt; [25] rprojroot_1.2         digest_0.6.12         tibble_1.3.3         
-#&gt; [28] pkgdown_0.1.0.9000    crayon_1.3.2          callr_1.0.0          
-#&gt; [31] purrr_0.2.2.2         htmlwidgets_0.8       testthat_1.0.2       
-#&gt; [34] evaluate_0.10         rmarkdown_1.5         stringi_1.1.5        
-#&gt; [37] desc_1.1.0            backports_1.1.0       highlight_0.4.7.1    
-#&gt; [40] jsonlite_1.5         </div><div class='input'><span class='fu'>not_run</span>({
+#&gt;  [1] gistr_0.3.6          purrr_0.2.2.2        listenv_0.6.0       
+#&gt;  [4] colorspace_1.2-6     htmltools_0.3.6      usethis_0.0.0.9000  
+#&gt;  [7] yaml_2.1.14          rlang_0.1.1.9000     pkgdown_0.1.0.9000  
+#&gt; [10] withr_1.0.2          DBI_0.6              plyr_1.8.4          
+#&gt; [13] stringr_1.2.0        munsell_0.4.3        commonmark_1.2      
+#&gt; [16] gtable_0.2.0         devtools_1.12.0.9000 htmlwidgets_0.8     
+#&gt; [19] codetools_0.2-14     evaluate_0.10        labeling_0.3        
+#&gt; [22] knitr_1.16           callr_1.0.0          highlight_0.4.7.1   
+#&gt; [25] parallel_3.2.5       curl_2.1             Rcpp_0.12.11        
+#&gt; [28] backports_1.1.0      scales_0.4.0         desc_1.1.0          
+#&gt; [31] pkgload_0.0.0.9000   jsonlite_1.5         digest_0.6.12       
+#&gt; [34] stringi_1.1.5        grid_3.2.5           rprojroot_1.2       
+#&gt; [37] pooh_0.3-2           tools_3.2.5          magrittr_1.5        
+#&gt; [40] crayon_1.3.2         whisker_0.3-2        xml2_1.1.1          
+#&gt; [43] rmarkdown_1.5        httr_1.2.1           roxygen2_6.0.1      
+#&gt; [46] rstudioapi_0.6       R6_2.2.1             globals_0.7.0       
+#&gt; [49] igraph_1.0.1        </div><div class='input'><span class='fu'>not_run</span>({
   <span class='fu'>with_packages</span>(<span class='st'>"~/my_packages"</span>, {
    <span class='kw'>if</span> (!<span class='st'>"pooh"</span> <span class='kw'>%in%</span> <span class='fu'>rownames</span>(<span class='fu'>installed.packages</span>()))
      <span class='kw'>utils</span><span class='kw'>::</span><span class='fu'>install.packages</span>(<span class='st'>"pooh"</span>)
@@ -288,23 +321,30 @@ under the given <code>namespace</code> parameter.</p>
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt; [1] memoise_1.1.0     modulr_0.1.7.9180
+#&gt;  [1] modulr_0.1.7.9181     tibble_1.3.3          ggplot2_2.1.0        
+#&gt;  [4] testthat_1.0.2        assertthat_0.2.0.9000 PKI_0.1-3            
+#&gt;  [7] base64enc_0.1-3       dplyr_0.4.1           memoise_1.1.0        
+#&gt; [10] future_1.0.1          RColorBrewer_1.1-2    chorddiag_0.1.1      
+#&gt; [13] networkD3_0.2.13     
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
-#&gt;  [1] igraph_1.0.1          Rcpp_0.12.11          rstudioapi_0.6       
-#&gt;  [4] whisker_0.3-2         knitr_1.16            xml2_1.1.1           
-#&gt;  [7] magrittr_1.5          roxygen2_6.0.1        devtools_1.12.0.9000 
-#&gt; [10] usethis_0.0.0.9000    pkgload_0.0.0.9000    R6_2.2.1             
-#&gt; [13] chorddiag_0.1.1       rlang_0.1.1.9000      pooh_0.3-2           
-#&gt; [16] httr_1.2.1            stringr_1.2.0         networkD3_0.2.13     
-#&gt; [19] tools_3.2.5           withr_1.0.2           htmltools_0.3.6      
-#&gt; [22] commonmark_1.2        yaml_2.1.14           assertthat_0.2.0.9000
-#&gt; [25] rprojroot_1.2         digest_0.6.12         tibble_1.3.3         
-#&gt; [28] pkgdown_0.1.0.9000    crayon_1.3.2          callr_1.0.0          
-#&gt; [31] purrr_0.2.2.2         htmlwidgets_0.8       testthat_1.0.2       
-#&gt; [34] evaluate_0.10         rmarkdown_1.5         stringi_1.1.5        
-#&gt; [37] desc_1.1.0            backports_1.1.0       highlight_0.4.7.1    
-#&gt; [40] jsonlite_1.5         </div><div class='input'>
+#&gt;  [1] gistr_0.3.6          purrr_0.2.2.2        listenv_0.6.0       
+#&gt;  [4] colorspace_1.2-6     htmltools_0.3.6      usethis_0.0.0.9000  
+#&gt;  [7] yaml_2.1.14          rlang_0.1.1.9000     pkgdown_0.1.0.9000  
+#&gt; [10] withr_1.0.2          DBI_0.6              plyr_1.8.4          
+#&gt; [13] stringr_1.2.0        munsell_0.4.3        commonmark_1.2      
+#&gt; [16] gtable_0.2.0         devtools_1.12.0.9000 htmlwidgets_0.8     
+#&gt; [19] codetools_0.2-14     evaluate_0.10        labeling_0.3        
+#&gt; [22] knitr_1.16           callr_1.0.0          highlight_0.4.7.1   
+#&gt; [25] parallel_3.2.5       curl_2.1             Rcpp_0.12.11        
+#&gt; [28] backports_1.1.0      scales_0.4.0         desc_1.1.0          
+#&gt; [31] pkgload_0.0.0.9000   jsonlite_1.5         digest_0.6.12       
+#&gt; [34] stringi_1.1.5        grid_3.2.5           rprojroot_1.2       
+#&gt; [37] pooh_0.3-2           tools_3.2.5          magrittr_1.5        
+#&gt; [40] crayon_1.3.2         whisker_0.3-2        xml2_1.1.1          
+#&gt; [43] rmarkdown_1.5        httr_1.2.1           roxygen2_6.0.1      
+#&gt; [46] rstudioapi_0.6       R6_2.2.1             globals_0.7.0       
+#&gt; [49] igraph_1.0.1        </div><div class='input'>
 <span class='co'>## in file "foos/foobar.R"</span>
 <span class='st'>"foos/foobar"</span> <span class='kw'>%provides%</span> {
  <span class='fu'>print</span>(<span class='fu'>sessionInfo</span>())
@@ -318,7 +358,7 @@ under the given <code>namespace</code> parameter.</p>
    <span class='fu'>print</span>(<span class='fu'>sessionInfo</span>())
  })
 <span class='fu'>print</span>(<span class='fu'>sessionInfo</span>())
-}</div><div class='output co'>#&gt; [2017-06-16T12:35:54 CEST] Defining 'foos/foobar' ... OK</div><div class='input'><span class='co'>## EOF</span>
+}</div><div class='output co'>#&gt; [2017-06-16T13:57:14 UTC] Defining 'foos/foobar' ... OK</div><div class='input'><span class='co'>## EOF</span>
 <span class='co'>## Not run: make()</span>
 
 <span class='co'>## in file "foos/foobaz.R"</span>
@@ -334,7 +374,7 @@ under the given <code>namespace</code> parameter.</p>
    <span class='fu'>print</span>(<span class='fu'>sessionInfo</span>())
  })
 <span class='fu'>print</span>(<span class='fu'>sessionInfo</span>())
-}</div><div class='output co'>#&gt; [2017-06-16T12:35:54 CEST] Defining 'foos/foobaz' ... OK</div><div class='input'>## EOF
+}</div><div class='output co'>#&gt; [2017-06-16T13:57:14 UTC] Defining 'foos/foobaz' ... OK</div><div class='input'>## EOF
 ## Not run: make()
 
 </div></pre>

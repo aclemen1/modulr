@@ -19,3 +19,4 @@ data/
 ^\.github
 ^docs$
 ^_pkgdown\.yml$
+^MAKE.R$
