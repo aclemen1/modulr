@@ -90,10 +90,10 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
 
 <span class="st">"foo"</span> %provides%<span class="st"> "Hello"</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] Defining 'foo' ... OK</span>
 
 <span class="st">"bar"</span> %provides%<span class="st"> "World"</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] Defining 'bar' ... OK</span>
 
 <span class="st">"foobar"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>, 
@@ -101,17 +101,17 @@
 ) %provides%<span class="st"> </span>{
   <span class="kw">paste0</span>(f, <span class="st">", "</span>, <span class="kw">tolower</span>(b), <span class="st">"!"</span>)
 }
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] Defining 'foobar' ... OK</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] Defining 'foobar' ... OK</span>
 
 <span class="kw"><a href="reference/make.html">make</a></span>(<span class="st">"foobar"</span>)
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] Making 'foobar' ...</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
-<span class="co">#&gt; [2017-06-16T05:33:26 UTC] DONE ('foobar' in 0.045 secs)</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] Making 'foobar' ...</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
+<span class="co">#&gt; [2017-06-16T10:35:40 UTC] DONE ('foobar' in 0.044 secs)</span>
 <span class="co">#&gt; [1] "Hello, world!"</span></code></pre></div>
 </div>
 <div id="installation" class="section level2">

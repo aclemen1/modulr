@@ -32,9 +32,11 @@ knitr::opts_chunk$set(
   fig.align = "center"
 ) 
 set.seed(1234L) 
-.__not_travis_nor_cran__ <- !identical(Sys.getenv("TRAVIS"), "true") && 
-    identical(Sys.getenv("NOT_CRAN"), "true")
-knitr::opts_chunk$set(purl = .__not_travis_nor_cran__)
+.__build__ <- 
+  identical(Sys.getenv("BUILD"), "true") &&
+  !identical(Sys.getenv("TRAVIS"), "true") && 
+  identical(Sys.getenv("NOT_CRAN"), "true")
+knitr::opts_chunk$set(purl = .__build__)
 unlink("gears", recursive = TRUE)
 ```
 
@@ -644,7 +646,7 @@ Finally, private Gists and [GitHub Enterprise](https://enterprise.github.com) us
   "https://github.unil.ch/api/v3/gists/1afa4770670975d70806c2153aac50a9"
 ```
 
-```{r, eval=.__not_travis_nor_cran__, echo=FALSE}
+```{r, eval=.__build__, echo=FALSE}
 (function() {
   GITHUB_PAT_bak <- Sys.getenv("GITHUB_PAT")
   Sys.setenv(GITHUB_PAT = Sys.getenv("GITHUB_UNIL_PAT"))
@@ -666,11 +668,11 @@ To release this module as a modulr gear on GitHub's Gist, simply use `release_ge
 release_gear_as_gist()
 ```
 
-```{r, echo=FALSE, eval=.__not_travis_nor_cran__}
+```{r, echo=FALSE, eval=.__build__}
 g <- release_gear_as_gist(browse = FALSE)
 ```
 
-```{r, include=FALSE, eval=!.__not_travis_nor_cran__}
+```{r, include=FALSE, eval=!.__build__}
 g <- list(html_url = "<URL>")
 ```
 
