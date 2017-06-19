@@ -40,10 +40,10 @@
 
   if (!is.null(expr)) {
     tryCatch({
-      result <- force(expr)
+      force(expr)
     },
     error = function(e) {
-      ok_msg <- "FAILED"
+      ok_msg <<- "FAILED"
     })
   }
 

@@ -137,7 +137,8 @@ get_packages_manifest <- function(ignore = NULL, ignore_base = TRUE) {
 .load <- function(pkg, loc) {
   .message_meta(sprintf("Loading %s", sQuote(pkg)), {
     suppressWarnings(suppressMessages(loadNamespace(pkg, lib.loc = loc)))
-  }, ok = TRUE, verbosity = 2L)
+  },
+  ok = TRUE, verbosity = 2L)
 }
 
 .detach_ <- function(pkg) {
@@ -149,7 +150,8 @@ get_packages_manifest <- function(ignore = NULL, ignore_base = TRUE) {
 .detach <- function(pkg) {
   .message_meta(sprintf("Detaching %s", sQuote(pkg)), {
     .detach_(pkg)
-  }, ok = TRUE, verbosity = 2L)
+  },
+  ok = TRUE, verbosity = 2L)
 }
 
 .unload_ <- function(pkg, loc) {
@@ -159,14 +161,16 @@ get_packages_manifest <- function(ignore = NULL, ignore_base = TRUE) {
 .unload <- function(pkg, loc) {
   .message_meta(sprintf("Unloading %s", sQuote(pkg)), {
     .unload_(pkg, loc)
-  }, ok = TRUE, verbosity = 2L)
+  },
+  ok = TRUE, verbosity = 2L)
 }
 
 .forget <- function(pkg, loc) {
   .message_meta(sprintf("Forgetting %s", sQuote(pkg)), {
     .detach_(pkg)
     .unload_(pkg, loc)
-  }, ok = TRUE, verbosity = 2L)
+  },
+  ok = TRUE, verbosity = 2L)
 }
 
 .sort <- function(ops, domain) {
@@ -207,7 +211,8 @@ get_packages_manifest <- function(ignore = NULL, ignore_base = TRUE) {
   .message_meta(sprintf("Attaching %s at position %d", sQuote(pkg), pos), {
     suppressWarnings(suppressMessages(library(pkg, lib.loc = loc, pos = pos,
                                               character.only = TRUE)))
-  }, ok = TRUE, verbosity = 2L)
+  },
+  ok = TRUE, verbosity = 2L)
 }
 
 .do_ops <- function(ops, domain) {
@@ -303,7 +308,8 @@ isolate_from_packages <- function(ignore = NULL, ignore_base = TRUE) {
       from = get_packages_manifest(ignore = ignore, ignore_base = ignore_base),
       to = .minimal_pkgs_manifest(ignore = ignore, ignore_base = ignore_base))
 
-  }, verbosity = 1L)
+  },
+  verbosity = 1L)
   .message_meta("Isolated from loaded and attached packages.", verbosity = 1L)
 
   .modulr_env$.Last.packages_manifest <- old_pkgs
@@ -330,13 +336,15 @@ restore_packages <- function(manifest = .Last.packages_manifest,
     if (restore_lib_paths)
       .message_meta("Restoring library paths", {
         .libPaths(manifest[["lib_paths"]])
-      }, ok = TRUE, verbosity = 2L)
+      },
+      ok = TRUE, verbosity = 2L)
     .set_pkgs(
       from = get_packages_manifest(
         ignore = manifest[["ignore"]],
         ignore_base = manifest[["ignore_base"]]),
       to = manifest)
-  }, verbosity = 1L)
+  },
+  verbosity = 1L)
   .message_meta(
     "Previously attached and loaded packages restored.",
     verbosity = 1L)
