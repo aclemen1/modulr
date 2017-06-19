@@ -1,3 +1,4 @@
+*~
 *.o
 src/*.o-*
 *.so
@@ -14,8 +15,15 @@ inst/doc
 *.Rds
 /vignettes/*.R
 /vignettes/figures
+/vignettes/old_lib
+/vignettes/new_lib
+/vignettes/modules/**/lib
 *_SECRET_*
 README.html
 README_files
 .modulr_profile.R
 /.github/*.html
+/inst/modules/new_lib/**
+/inst/modules/old_lib/**
+/inst/modules/**/lib
+MAKE.R

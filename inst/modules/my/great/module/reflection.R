@@ -1,4 +1,4 @@
-# File: modules/my/great/module/reflection.R
+# File: ./modules/my/great/module/reflection.R
 
 library(modulr)
 

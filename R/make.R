@@ -173,7 +173,7 @@ make <- function(name = .Last.name, ...) {
 
 }
 
-DEFAULT_DIGITS = 2L
+DEFAULT_DIGITS <- 2L
 
 #' @rdname make
 #' @inheritParams define
@@ -347,7 +347,7 @@ do_make <- function(name = .Last.name, args = list(),
                             c(ordered_name, "instance")]] <- instance
                           .modulr_env$injector$registry[[
                             c(ordered_name, "duration")]] <-
-                            as.numeric(Sys.time() - timestamp)
+                            Sys.time() - timestamp
                           .modulr_env$injector$registry[[
                             c(ordered_name, "instanciated")]] <- TRUE
                           .modulr_env$injector$registry[[
@@ -388,7 +388,8 @@ do_make <- function(name = .Last.name, args = list(),
                        quote = quote, envir = envir))
       } else {
         return(
-          ifelse(instance[["visible"]], identity, invisible)(instance[["value"]])
+          ifelse(instance[["visible"]], identity, invisible)(
+            instance[["value"]])
         )
       }
 
@@ -685,17 +686,18 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix"),
       root_config$get_all()[[1L]],
       function(path) {
         if (.dir_exists(path)) normalizePath(path) else NA_character_
-      }, FUN.VALUE = "character")))
+      },
+      FUN.VALUE = "character")))
   candidates <-
     unique(list.files(
       path = roots,
       pattern = sprintf(".*(?:%s).*\\.[rR](?:(?:md)|(?:nw))?$", name_string),
       ignore.case = TRUE, recursive = TRUE, full.names = TRUE))
   modules <- unique(c(
-    list_modules(sprintf("/?[^/]*(?:%s)[^/]*$", name_string),
+    list_modules(sprintf("/?[^/]*(?:%s)[^/]*$", name_string),  # Exclude Linting
                  wide = FALSE, cols = "name"),
     grep(
-      sprintf("/?[^/]*(?:%s)[^/]*$", name_string),
+      sprintf("/?[^/]*(?:%s)[^/]*$", name_string),  # Exclude Linting
       as.vector(stats::na.omit(vapply(candidates, function(candidate) {
         name <- .extract_name(candidate, strict = TRUE)
         if (is.null(name)) NA_character_ else name

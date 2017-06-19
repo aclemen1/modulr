@@ -196,7 +196,8 @@ list_modules <-
         do.call(c, Map(function(name) {
           url <- .modulr_env$injector$registry[[c(name, "url")]]
           if (is.null(url)) NA_character_ else url
-        }, flat))
+        },
+        flat))
 
       versions <-
         do.call(c, Map(function(name)

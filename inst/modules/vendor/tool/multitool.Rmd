@@ -1,4 +1,4 @@
-<!--- File: modules/vendor/tool/multitool.Rmd -->
+<!--- File: ./modules/vendor/tool/multitool.Rmd -->
 
 # Module `vendor/tool/multitool`
 

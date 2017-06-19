@@ -11,7 +11,6 @@ test_that("import_module imports modules", {
     expect_equal(import_module("module", "fake_url"), "remote")
   )
   reset()
-#  unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,

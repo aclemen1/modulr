@@ -300,7 +300,7 @@ release_gear_as_gist <- function(name = .Last.name, load = TRUE,
   g <- testthat::with_mock(
     `gistr:::ghbase` = function() endpoint, {
 
-      auth <- gistr::gist_auth()
+      gistr::gist_auth()
 
       file <- gsub("/", "-", name)
 
@@ -364,7 +364,7 @@ release_gear_as_gist <- function(name = .Last.name, load = TRUE,
 
           g <- gistr::gist_create(
             code = {
-              '# First commit.'
+              "# First commit."
             },
             description = sprintf("'%s' (modulr gear)", name),
             filename = filename, browse = FALSE)
@@ -377,7 +377,7 @@ release_gear_as_gist <- function(name = .Last.name, load = TRUE,
 
         g <- gistr::gist_create(
           code = {
-            '# First commit.'
+            "# First commit."
           },
           description = sprintf("'%s' (modulr gear)", name),
           filename = filename, browse = FALSE)

@@ -121,8 +121,8 @@ plot_dependencies <- function(group, regexp, reserved = TRUE,
         col <- unname(inc[, module])
         if (any(col == 1L)) {
           inc[col == 1L, ] <-
-          pmax(inc[col == 1L, , drop = FALSE],
-               t(array(li, rev(dim(inc[col == 1L, , drop = FALSE])))))
+          pmax(inc[col == 1L, TRUE, drop = FALSE],
+               t(array(li, rev(dim(inc[col == 1L, TRUE, drop = FALSE])))))
         }
         inc <- inc[dimnames(inc)[[1L]] != module, dimnames(inc)[[2L]] != module]
       }
@@ -202,10 +202,9 @@ sankey_engine <- function(deps, ...) {
 #' Plot the directed acyclic graph (DAG) of modules and dependencies with a
 #' bipartite Chord diagram.
 #'
-#' @inheritParams chorddiag::chorddiag
 #' @param deps A data frame of modules and their dependencies.
 #' @param ... Further arguments to be passed to
-#'   \code{chorddiag::\link[chorddiag]{chorddiag}}.
+#'   \code{chorddiag::chorddiag}.
 #'
 #' @seealso \code{\link{plot_dependencies}}.
 #' @export

@@ -11,13 +11,16 @@ vignette: >
 ---
 
 ```{r, echo = FALSE, message = FALSE, results = 'hide'} 
+set.seed(1234L) 
+modules_path <- file.path(
+  if (grepl("/docs/", getwd(), fixed = TRUE)) file.path("..", "..") else "..", 
+  "inst", "modules")
 library(modulr) 
 library(networkD3)
 library(chorddiag)
 library(RColorBrewer)
-library(future) 
 library(memoise)
-library(dplyr) 
+library(devtools)
 options(knitr.duplicate.label = 'allow')
 `%<=%` <- modulr::`%<=%` 
 Sys.setlocale("LC_TIME", "en_DK.UTF-8") 
@@ -31,15 +34,21 @@ knitr::opts_chunk$set(
   out.width = "90%", 
   fig.align = "center"
 ) 
-set.seed(1234L) 
-.__build__ <- 
-  identical(Sys.getenv("BUILD"), "true") &&
-  !identical(Sys.getenv("TRAVIS"), "true") && 
-  identical(Sys.getenv("NOT_CRAN"), "true")
-unlink("gears", recursive = TRUE)
+BUILD <- 
+  identical(tolower(Sys.getenv("BUILD")), "true") &&
+  !identical(tolower(Sys.getenv("TRAVIS")), "true") && 
+  identical(tolower(Sys.getenv("NOT_CRAN")), "true")
+knitr::opts_chunk$set(purl = BUILD)
+gears_path <- file.path(tempdir(), "gears")
+unlink(gears_path, recursive = TRUE)
+options(modulr.gears_path = gears_path)
+reset <- function() {
+  modulr::reset()
+  root_config$set(modules_path)
+}
 ```
 
-## Anatomy of a module
+# Anatomy of a module
 
 Modules are defined in a declarative way, using the keywords `%requires%`
 and `%provides%`, and have four main components:
@@ -103,7 +112,7 @@ The result contains the computed object exposed by the module. Under the
 hood, the dependencies have been sorted and appropriately made, and their 
 resulting objects injected where required.
 
-## A first working example
+# A first working example
 
 ```{r, echo=FALSE, results='hide', message=FALSE} 
 reset() 
@@ -163,9 +172,9 @@ Voilà! All the depencencies have been evaluated, injected and processed to retu
 lsmod(cols = c("name", "type", "dependencies", "uses", "size", "modified")) 
 ```
 
-## Types of modules
+# Types of modules
 
-### Singletons
+## Singletons
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -205,7 +214,7 @@ Any change of the module's definition (even its docstrings) will be detected:
 make("timestamp")
 ```
 
-### Prototypes
+## Prototypes
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -227,7 +236,7 @@ with_verbosity(0L, make("timestamp")())
 
 It is important to emphasize that the module is still a singleton: the second `make` call doesn't re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called. 
 
-### Memoised prototypes
+## Memoised prototypes
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 reset()
@@ -326,12 +335,12 @@ touch("foo")
 system.time(make("foo"))
 ```
 
-### Lists
+## Lists
 
 It is often useful for a module to expose several (immutable, cf. infra) objects at once by returning a list.
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
+reset()
 ```
 
 ```{r}
@@ -353,12 +362,12 @@ ts$now()
 ts$tomorrow()
 ```
 
-### Environments
+## Environments
 
 It is often useful for a module to expose several mutable objects at once by returning an environment.
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
+reset()
 ```
 
 ```{r}
@@ -427,7 +436,26 @@ widget_A$switch_color()
 config$color
 ```
 
-## Semantic Versioning (SemVer)
+It is also possible to use the __shared environment__ associated to every injector:
+
+```{r}
+"widget_B_prime" %provides% {
+  list(
+    switch_shape = function()
+      .SharedEnv$shape <- 
+        if (.SharedEnv$shape == "circle") "square" else "circle"
+  )
+}
+
+widget_B_prime <- make()
+
+.SharedEnv$shape <- "circle"
+widget_B_prime$switch_shape()
+.SharedEnv$shape
+```
+
+
+# Semantic Versioning (SemVer)
 
 The modulr package offers [Semantic Versioning](http://semver.org) capabilities: 
 every module can live in several versions numbers of the form `x.y.z`, where _x_, _y_, 
@@ -456,7 +484,7 @@ Here are some examples among `foo#1.2.3`, `foo#1.2.4`, `foo#1.3.0`:
 * `foo#^1.3.1` and `foo#^1.4` refer to nothing, and
 * `foo#>=1.1.0`, `foo#>=1.5`, and `foo#>=0` (aka _latest_) refer to `foo#1.3.0`.
 
-### Initial scenario: no versioning
+## Initial scenario: no versioning
 
 There is a good chance that your initial scenario contains no versioned module.
 
@@ -484,7 +512,7 @@ system.time(make("complex_module")())
 In this scenario, `great_module` does what it is supposed to do, but clearly not very efficiently. 
 You then decide to work on a new version that improves its performance.
 
-### Setting-up versioning
+## Setting-up versioning
 
 First, we clone `great_module` with an initial version number.
 
@@ -532,17 +560,17 @@ make("complex_module")()
 ```
 
 
-## Location of modules
+# Location of modules
 
 Modules can be defined in several locations: in-memory, on-disk in its own file or along another module's file, and remotely on GitHub's Gist or via the HTTP(S) protocol.
 
-### In-memory
+## In-memory
 
 This is the most direct method to define a module. This is also the most volatile, 
 since the lifespan of the module is limited to the R session.
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
+reset()
 ```
 
 ```{r}
@@ -550,10 +578,10 @@ modulr::reset()
 lsmod(cols = c("name", "storage", "along", "filepath", "url"))
 ```
 
-### On-disk
+## On-disk
 
 ```{r include=FALSE}
-modulr::reset()
+reset()
 ```
 
 This is the way to go when a module is intended to be reused. In such a case, 
@@ -562,7 +590,7 @@ path and name are closely related to the module's name.
 
 For instance, the following module definition is stored in the R file `swissknife.R`, under the sub-directory `vendor/tool` of the `./modules` directory.
 
-```{r, code=readLines(file.path("modules", "vendor", "tool", "swissknife.R")), eval = FALSE}
+```{r, code=readLines(file.path(modules_path, "vendor", "tool", "swissknife.R")), eval = FALSE}
 ```
 
 When a module is invoked, modulr searches for it in-memory first, then on-disk if necessary. There are several default __root__ places where modulr looks for the module's file: `./modules/`, `./module/`, `./libs/`, `./lib/`, and `./`. This behaviour can be configured with the help of `root_config`.
@@ -580,7 +608,7 @@ my_swissknife %<=% "vendor/tool/swissknife"
 This also works with R Markdown `.Rmd` and R Sweave `.Rnw` files.
 
 ```{r echo=FALSE, comment='', highlight=TRUE}
-cat(readLines(file.path("modules", "vendor", "tool", "multitool.Rmd")), sep = "\n")
+cat(readLines(file.path(modules_path, "vendor", "tool", "multitool.Rmd")), sep = "\n")
 ```
 
 ```{r}
@@ -593,15 +621,15 @@ lsmod(cols = c("name", "storage", "along", "filepath", "url"))
 
 Along a principal module, it is possible to define other related modules, for instance mock-ups and testing modules (cf. infra).
 
-### Remote (_modulr gears_)
+## Remote (_modulr gears_)
 
 ```{r include=FALSE}
-modulr::reset()
+reset()
 ```
 
 Using GitHub's [Gist](https://gist.github.com) is a simple way to share modules with others. To illustrate this, let us consider the following remote module, aka __modulr gear__: [https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3](https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3).
 
-```{r}
+```{r, eval=BUILD}
 "modulr/vault" %imports% "https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3"
 ```
 
@@ -615,7 +643,7 @@ lsmod(cols = c("name", "storage", "along", "filepath", "url"))
 
 To use a remote module as a dependency, just import it where needed (even in a remote module).
 
-```{r}
+```{r, eval=BUILD}
 "modulr/vault" %imports% "3fcc508cb40ddac6c1e3"
 
 "module/using/a/gear" %requires% list(
@@ -645,7 +673,7 @@ Finally, private Gists and [GitHub Enterprise](https://enterprise.github.com) us
   "https://github.unil.ch/api/v3/gists/1afa4770670975d70806c2153aac50a9"
 ```
 
-```{r, eval=.__build__, echo=FALSE}
+```{r, eval=BUILD, echo=FALSE}
 (function() {
   GITHUB_PAT_bak <- Sys.getenv("GITHUB_PAT")
   Sys.setenv(GITHUB_PAT = Sys.getenv("GITHUB_UNIL_PAT"))
@@ -667,24 +695,24 @@ To release this module as a modulr gear on GitHub's Gist, simply use `release_ge
 release_gear_as_gist()
 ```
 
-```{r, echo=FALSE, eval=.__build__}
+```{r, echo=FALSE, eval=BUILD}
 g <- release_gear_as_gist(browse = FALSE)
 ```
 
-```{r, include=FALSE, eval=!.__build__}
+```{r, include=FALSE, eval=!BUILD}
 g <- list(html_url = "<URL>")
 ```
 
 The module is then publicly available here: `r g[["html_url"]]`.
 
-## Testing
+# Testing
 
 Testing is a very important aspect of programming and modulr is well-suited for this purpose.
 
-### Single module
+## Single module
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
+reset()
 ```
 
 Let us consider the following module, exposing a function which computes the first
@@ -763,10 +791,10 @@ To illustrate the situation where some test fails, let us consider a faulty vers
 make_tests()
 ```
 
-### Module with _mocked_ dependencies
+## Module with _mocked_ dependencies
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
+reset()
 ```
 
 Let us consider the following module, which relies on RStudio's [cranlogs](https://github.com/metacran/cranlogs) 
@@ -782,7 +810,7 @@ package to request the list of top downloaded packages from their CRAN mirror.
 ```
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
+reset()
 "get_top_downloads" %provides% {
   function(...) {
     structure(
@@ -888,7 +916,7 @@ make_tests()
 As a last example, it is considered a good practice to provide all __modulr gears__ with appropriate tests, as illustrated by [https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3](https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3).
 
 ```{r, include=FALSE}
-modulr::reset()
+reset()
 ```
 
 ```{r}
@@ -896,15 +924,15 @@ modulr::reset()
 make_tests()
 ```
 
-## Special variables
+# Special variables
 
-### `.Last.name`
+## `.Last.name`
 
 When a module is defined, touched, or made, its name is always assigned to `.Last.name`.
 The special variable `.Last.name` is also used as a default parameter for `make`, `touch`, and `undefine`.
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
+reset()
 ```
 
 ```{r}
@@ -919,16 +947,16 @@ touch()
 undefine()
 ```
 
-### Module's metadata
+## Module's metadata
 
 ```{r echo=FALSE, results='hide', message=FALSE, warning=FALSE, cache=FALSE}
-modulr::reset()
+reset()
 ```
 
 Every module has access to some of its metadata: name, version, file path (when on-disk), etc. 
 The following module illustrates this feature and is self-explanatory.
 
-```{r, code=readLines(file.path("modules", "my", "great", "module", "reflection.R")), eval = FALSE}
+```{r, code=readLines(file.path(modules_path, "my", "great", "module", "reflection.R")), eval = FALSE}
 ```
 
 ```{r}
@@ -936,7 +964,7 @@ with_verbosity(0L, make("my/great/module/reflection"))
 ```
 
 
-## The special module `modulr`
+# The special module `modulr`
 
 The modulr package defines a special module named `modulr` that can be injected in any
 module. The purpose of this special module is to give access to useful helper 
@@ -946,11 +974,11 @@ functions related to the module into which it is injected.
 info("modulr")
 ```
 
-### Messages
+## Messages
 
 TODO
 
-### Post-evaluation hook
+## Post-evaluation hook
 
 There are situations where a post-evaluation hook is needed. For instance, to define 
 an ephemeral module that can be evaluated only once, or to define a so-called _no-scoped_ 
@@ -997,7 +1025,7 @@ Sys.sleep(1L)
 make("no_scoped")
 ```
 
-## Scripting
+# Scripting
 
 Turning a bunch of modules working perfectly well together into a script is a 
 very common situation, that can be handled with the help of the following boilerplate code:
@@ -1018,92 +1046,4 @@ if (.__name__ == "__main__")
   make()()
 ```
 
-## Experimental features
-
-### Futures
-
-Using [Henrik Bengtsson's future package](https://cran.r-project.org/web/packages/future), it is possible to evaluate modules asynchronously using various resources available to the user. For instance, evaluation of modules can be eager, lazy, and/or parallelized (on multiple cores and/or on a cluster of machines).
-
-```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
-library(future)
-```
-
-```{r}
-# How many cores are available?
-availableCores()
-
-"foo" %provides% {
-  future({
-    Sys.sleep(1L)
-    "Hello"
-  }) %plan% multicore
-}
-
-"bar" %provides% {
-  future({
-    Sys.sleep(1L)
-    "World"
-  }) %plan% multicore
-}
-
-"foobar" %requires% list(
-  f = "foo",
-  b = "bar"
-) %provides% {
-  paste0(value(f), " ", value(b), "!")
-}
-
-system.time(print(make("foobar")))
-```
-
-It is often interesting to parallelize an already existing module. `modulr` comes with the handy `futurize` function for this purpose. The following two examples illustrate the difference between eager and lazy orchestrations of parallelized modules.
-
-```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
-modulr::reset()
-```
-
-```{r}
-"foo" %provides% { Sys.sleep(1L); "Hello" }
-"bar" %provides% { Sys.sleep(1L); "World" }
-"foobar" %requires% list(
-  f = "foo", 
-  b = "bar"
-) %provides% {
-  paste0(f, " ", b, "!")
-}
-
-futurize("foo", strategy = multicore)
-futurize("bar", strategy = multicore)
-
-futurize(
-  "foobar", 
-  name = "foobar/eager", 
-  dependencies = list(f = "foo/future", b = "bar/future"),
-  strategy = eager
-)
-
-system.time(fb_eager <- make("foobar/eager"))
-system.time(print(value(fb_eager)))
-```
-
-```{r}
-touch("foo/future")
-touch("bar/future")
-futurize(
-  "foobar", 
-  name = "foobar/lazy", 
-  dependencies = list(f = "foo/future", b = "bar/future"),
-  strategy = lazy
-)
-
-system.time(fb_lazy <- make("foobar/lazy"))
-Sys.sleep(0.5)
-system.time(print(value(fb_lazy)))
-```
-
-
-### Package isolation
-
-
-## Coding style
+# Coding style

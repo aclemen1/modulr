@@ -91,7 +91,8 @@ import_url__ <- function(path) {
 
       tryCatch({
         result <- httr::GET(url, ...)
-      }, error = function(e) {
+      },
+      error = function(e) {
         stop(e$message, call. = FALSE)
       })
 
@@ -265,7 +266,7 @@ import_module <- function(name, url, ..., digest = NULL,
                  sprintf("with digest '%s' ", digest),
                  ""),
           url)
-      }, {
+      }, {  # Exclude Linting
 
         path <- file.path(
           getOption("modulr.gears_path"),
@@ -377,7 +378,8 @@ import_module <- function(name, url, ..., digest = NULL,
         versions,
         parsed_version[["version"]],
         parsed_version[["symbol"]]), 1L)
-    }, scripts)
+    },
+    scripts)
 
     script_name <-
       names(utils::tail(.filter_versions(

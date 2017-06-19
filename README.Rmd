@@ -9,6 +9,7 @@ output:
 <!-- README.md is generated from README.Rmd. Please edit the .Rmd file -->
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
+set.seed(1234L) 
 library(htmltools)
 library(networkD3)
 library(chorddiag)
@@ -30,7 +31,7 @@ Sys.setenv(TZ = 'UTC')
 [![Coverage status](https://codecov.io/github/aclemen1/modulr/coverage.svg?branch=master)](http://codecov.io/github/aclemen1/modulr)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/modulr)](https://cran.r-project.org/package=modulr)
 [![CRAN](http://cranlogs.r-pkg.org/badges/grand-total/modulr)](https://cran.r-project.org/package=modulr)
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org/license.html)
+[![License](https://img.shields.io/:license-mit-blue.svg)](http://aclemen1.mit-license.org/license.html)
 [![Twitter](https://img.shields.io/twitter/url/http/github.com/aclemen1/modulr.svg?style=social)](https://twitter.com/intent/tweet.html?text=Modulr:%20A%20Dependency%20Injection%20Framework%20for%20R&url=http://github.com/aclemen1/modulr&hashtags=r,dependency-injection)
 
 # Modulr: A Dependency Injection Framework for R
@@ -39,7 +40,7 @@ Modulr is a Dependency Injection (DI) framework for R which allows to break down
 
 * Modulr is designed to ease production of mocks for testing purpose and is therefore well-suited for [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development).
 * Modulr offers [docstrings](https://en.wikipedia.org/wiki/Docstring)-like comments for documenting the internals of a module.
-* Modulr understands [R Markdown](http://rmarkdown.rstudio.com/) and [Sweave](https://www.statistik.lmu.de/~leisch/Sweave/), thanks to Yihui Xie's [knitr](http://yihui.name/knitr/) package.
+* Modulr understands [R Markdown](http://rmarkdown.rstudio.com/) and [Sweave](https://leisch.userweb.mwn.de/Sweave/), thanks to Yihui Xie's [knitr](http://yihui.name/knitr/) package.
 * Modulr takes advantage of [semantic versioning](http://semver.org/) to avoid _version lock_ and _version promiscuity_.
 * Modulr can use [GitHub](http://github.com) (repositories and gists) to publish and share modules (so-called _gears_). See [`modulr/vault`](https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3) for an example.
 * Modulr helps to circumvent errors occurring in a chain of nested dependent modules, showing [breadcrumbs](https://en.wikipedia.org/wiki/Breadcrumb_(navigation)).

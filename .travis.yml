@@ -6,10 +6,16 @@ matrix:
   include:
     - os: linux
       r: oldrel
+      r_build_args: '--no-build-vignettes'
+      r_check_args: '--no-vignettes'
     - os: linux
       r: release
+      r_build_args: '--no-build-vignettes'
+      r_check_args: '--no-vignettes'
     - os: linux
       r: devel
+      r_build_args: '--no-build-vignettes'
+      r_check_args: '--no-vignettes'
     - os: linux
       dist: trusty
       env: R_CODECOV=true
@@ -23,21 +29,21 @@ matrix:
       disable_homebrew: true
       latex: false
       r_build_args: '--no-build-vignettes'
-      r_check_args: '--ignore-vignettes'
+      r_check_args: '--no-vignettes'
     - os: osx
       osx_image: xcode7.3
       disable_homebrew: true
       latex: false
       r_build_args: '--no-build-vignettes'
-      r_check_args: '--ignore-vignettes'
+      r_check_args: '--no-vignettes'
     - os: osx
       osx_image: beta-xcode6.4
       disable_homebrew: true
       latex: false
       r_build_args: '--no-build-vignettes'
-      r_check_args: '--ignore-vignettes'
+      r_check_args: '--no-vignettes'
 
-warnings_are_errors: true
+warnings_are_errors: false
 
 r_github_packages:
   - mattflor/chorddiag

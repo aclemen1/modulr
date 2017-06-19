@@ -70,7 +70,10 @@
   <a href="../articles/motivation.html">Why DI for R?</a>
 </li>
 <li>
-  <a href="../articles/modulr.html">Vignette</a>
+  <a href="../articles/modulr.html">Introduction</a>
+</li>
+<li>
+  <a href="../articles/experimental.html">Experimental</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -144,21 +147,31 @@ option is set.</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Resetting modulr state ... OK</div><div class='input'>
-<span class='st'>"foo/config"</span> <span class='kw'>%provides%</span> <span class='fu'>options_provider</span>(<span class='kw'>upper</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Defining 'foo/config' ... OK</div><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Resetting modulr state ... OK</div><div class='input'>
+<span class='st'>"foo/config"</span> <span class='kw'>%provides%</span> <span class='fu'>options_provider</span>(<span class='kw'>upper</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Defining 'foo/config' ... OK</div><div class='input'>
 <span class='st'>"foo"</span> <span class='kw'>%requires%</span> <span class='fu'>list</span>(<span class='kw'>config</span> <span class='kw'>=</span> <span class='st'>"foo/config"</span>) <span class='kw'>%provides%</span> {
   <span class='kw'>function</span>() <span class='fu'>casefold</span>(<span class='st'>"foo"</span>, <span class='kw'>upper</span> <span class='kw'>=</span> <span class='no'>config</span>$<span class='no'>upper</span>)
-}</div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Defining 'foo' ... OK</div><div class='input'>
-<span class='no'>foo</span> <span class='kw'>%&lt;=%</span> <span class='st'>"foo"</span></div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Making 'foo' ...
-#&gt; [2017-06-16T13:57:10 UTC] * Visiting and defining dependencies ...</div><div class='output co'>#&gt; <span class='error'>Error: "foo" is not defined.</span></div><div class='input'><span class='fu'>foo</span>()</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): could not find function "foo"</span></div><div class='input'>
-<span class='no'>config</span> <span class='kw'>%&lt;=%</span> <span class='st'>"foo/config"</span></div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Making 'foo/config' ...
-#&gt; [2017-06-16T13:57:10 UTC] * Visiting and defining dependencies ...</div><div class='output co'>#&gt; <span class='error'>Error: "foo/config" is not defined.</span></div><div class='input'><span class='no'>config</span>$<span class='no'>upper</span> <span class='kw'>&lt;-</span> <span class='fl'>TRUE</span>
-<span class='fu'>foo</span>()</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): could not find function "foo"</span></div><div class='input'>
+}</div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Defining 'foo' ... OK</div><div class='input'>
+<span class='no'>foo</span> <span class='kw'>%&lt;=%</span> <span class='st'>"foo"</span></div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Making 'foo' ...
+#&gt; [2017-06-19T15:30:44 CEST] * Visiting and defining dependencies ...
+#&gt; [2017-06-19T15:30:44 CEST] * Constructing dependency graph ... OK
+#&gt; [2017-06-19T15:30:44 CEST] * Evaluating #1/1 (layer #1/1): 'foo/config' ...
+#&gt; [2017-06-19T15:30:44 CEST] DONE ('foo' in 0.031 secs)</div><div class='input'><span class='fu'>foo</span>()</div><div class='output co'>#&gt; [1] "foo"</div><div class='input'>
+<span class='no'>config</span> <span class='kw'>%&lt;=%</span> <span class='st'>"foo/config"</span></div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Making 'foo/config' ...
+#&gt; [2017-06-19T15:30:44 CEST] * Visiting and defining dependencies ...
+#&gt; [2017-06-19T15:30:44 CEST] * Constructing dependency graph ... OK
+#&gt; [2017-06-19T15:30:44 CEST] DONE ('foo/config' in 0.015 secs)</div><div class='input'><span class='no'>config</span>$<span class='no'>upper</span> <span class='kw'>&lt;-</span> <span class='fl'>TRUE</span>
+<span class='fu'>foo</span>()</div><div class='output co'>#&gt; [1] "FOO"</div><div class='input'>
 <span class='st'>"foo/config"</span> <span class='kw'>%provides_options%</span> <span class='fu'>list</span>(<span class='kw'>upper</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='no'>foo</span> <span class='kw'>%&lt;=%</span> <span class='st'>"foo"</span></div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Making 'foo' ...
-#&gt; [2017-06-16T13:57:10 UTC] * Visiting and defining dependencies ...</div><div class='output co'>#&gt; <span class='error'>Error: "foo" is not defined.</span></div><div class='input'><span class='fu'>foo</span>()</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): could not find function "foo"</span></div><div class='input'>
-<span class='fu'><a href='touch.html'>touch</a></span>(<span class='st'>"foo/config"</span>)</div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Touching 'foo/config' ... OK</div><div class='input'><span class='st'>"foo/config"</span> <span class='kw'>%provides_options%</span> <span class='fu'>list</span>(<span class='kw'>upper</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Re-defining 'foo/config' ... OK</div><div class='input'><span class='no'>foo</span> <span class='kw'>%&lt;=%</span> <span class='st'>"foo"</span></div><div class='output co'>#&gt; [2017-06-16T13:57:10 UTC] Making 'foo' ...
-#&gt; [2017-06-16T13:57:10 UTC] * Visiting and defining dependencies ...</div><div class='output co'>#&gt; <span class='error'>Error: "foo" is not defined.</span></div><div class='input'><span class='fu'>foo</span>()</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): could not find function "foo"</span></div><div class='input'>
+<span class='no'>foo</span> <span class='kw'>%&lt;=%</span> <span class='st'>"foo"</span></div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Making 'foo' ...
+#&gt; [2017-06-19T15:30:44 CEST] * Visiting and defining dependencies ...
+#&gt; [2017-06-19T15:30:44 CEST] * Constructing dependency graph ... OK
+#&gt; [2017-06-19T15:30:44 CEST] DONE ('foo' in 0.027 secs)</div><div class='input'><span class='fu'>foo</span>()</div><div class='output co'>#&gt; [1] "FOO"</div><div class='input'>
+<span class='fu'><a href='touch.html'>touch</a></span>(<span class='st'>"foo/config"</span>)</div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Touching 'foo/config' ... OK</div><div class='input'><span class='st'>"foo/config"</span> <span class='kw'>%provides_options%</span> <span class='fu'>list</span>(<span class='kw'>upper</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Re-defining 'foo/config' ... OK</div><div class='input'><span class='no'>foo</span> <span class='kw'>%&lt;=%</span> <span class='st'>"foo"</span></div><div class='output co'>#&gt; [2017-06-19T15:30:44 CEST] Making 'foo' ...
+#&gt; [2017-06-19T15:30:44 CEST] * Visiting and defining dependencies ...
+#&gt; [2017-06-19T15:30:44 CEST] * Constructing dependency graph ... OK
+#&gt; [2017-06-19T15:30:44 CEST] * Evaluating #1/1 (layer #1/1): 'foo/config' ...
+#&gt; [2017-06-19T15:30:44 CEST] DONE ('foo' in 0.031 secs)</div><div class='input'><span class='fu'>foo</span>()</div><div class='output co'>#&gt; [1] "foo"</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

@@ -44,7 +44,10 @@
   <a href="../articles/motivation.html">Why DI for R?</a>
 </li>
 <li>
-  <a href="../articles/modulr.html">Vignette</a>
+  <a href="../articles/modulr.html">Introduction</a>
+</li>
+<li>
+  <a href="../articles/experimental.html">Experimental</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -148,7 +151,7 @@ car$<span class="kw">stop</span>()
 <p>To manage the responsibility of dependency creation, modulr relies on an <em>injector</em>. The injector is a <a href="http://en.wikipedia.org/wiki/Service_locator_pattern">service locator</a> that is responsible for construction and lookup of dependencies. Here is an example of using the injector service:</p>
 <p>Create a new injector that can provide modules.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
-<span class="co">#&gt; This is modulr version 0.1.7.9181</span>
+<span class="co">#&gt; This is modulr version 0.1.7.9184</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'modulr'</span>
 <span class="co">#&gt; The following object is masked from 'package:base':</span>
@@ -160,23 +163,23 @@ my_injector &lt;-<span class="st"> </span><span class="kw"><a href="../reference
   <span class="dt">name =</span> <span class="st">"car"</span>, 
   <span class="dt">dependencies =</span> <span class="kw">list</span>(<span class="dt">engine =</span> <span class="st">"engine"</span>, <span class="dt">wheels =</span> <span class="st">"wheels"</span>), 
   <span class="dt">provider =</span> car_provider)
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'car' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:26 UTC] Defining 'car' ... OK</span>
 
 my_injector$<span class="kw">provider</span>(<span class="dt">name =</span> <span class="st">"engine"</span>, <span class="dt">provider =</span> engine_provider)
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'engine' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:26 UTC] Defining 'engine' ... OK</span>
 
 my_injector$<span class="kw">provider</span>(<span class="dt">name =</span> <span class="st">"wheels"</span>, <span class="dt">provider =</span> wheels_provider)
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'wheels' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-06-19T13:31:26 UTC] Defining 'wheels' ... OK</span></code></pre></div>
 <p>Request our <code>car</code> module from the injector.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">car &lt;-<span class="st"> </span>my_injector$<span class="kw"><a href="../reference/config.html">get</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] DONE ('car' in 0.042 secs)</span>
+<span class="co">#&gt; [2017-06-19T13:31:26 UTC] Making 'car' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:26 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] DONE ('car' in 0.041 secs)</span>
 
 car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span class="st">"120 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car$<span class="kw">stop</span>()
 <span class="co">#&gt; Car started.</span>
@@ -196,16 +199,16 @@ car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span cla
     )
   }
 )
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Re-defining 'wheels' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Re-defining 'wheels' ... OK</span>
 
 car &lt;-<span class="st"> </span>my_injector$<span class="kw"><a href="../reference/config.html">get</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] DONE ('car' in 0.032 secs)</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Making 'car' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] DONE ('car' in 0.032 secs)</span>
 
 car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span class="st">"150 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car$<span class="kw">stop</span>()
 <span class="co">#&gt; Car started.</span>
@@ -222,23 +225,23 @@ car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span cla
 <a href="#relying-on-a-framework" class="anchor"></a>Relying on a framework</h2>
 <p>Asking for dependencies solves the issue of hard coding, but it also means that the injector needs to be passed throughout the application. Passing the injector breaks the <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a>. To remedy this, we combine the use of an ambient injector (a default injector is bound to modulr) and a declarative notation, to hand the responsibility of creating modules over the injector, as in this example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"car"</span> %requires%<span class="st"> </span><span class="kw">list</span>(<span class="dt">engine =</span> <span class="st">"engine"</span>, <span class="dt">wheels =</span> <span class="st">"wheels"</span>) %provides%<span class="st"> </span>car_provider
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'car' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Defining 'car' ... OK</span>
 
 <span class="st">"engine"</span> %provides%<span class="st"> </span>engine_provider
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'engine' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Defining 'engine' ... OK</span>
 
 <span class="st">"wheels"</span> %provides%<span class="st"> </span>wheels_provider
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'wheels' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Defining 'wheels' ... OK</span>
 
 car &lt;-<span class="st"> </span><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] DONE ('car' in 0.036 secs)</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Making 'car' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] DONE ('car' in 0.035 secs)</span>
 
 car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span class="st">"120 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car$<span class="kw">stop</span>()
 <span class="co">#&gt; Car started.</span>
@@ -251,8 +254,8 @@ car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span cla
 <p>When modulr <em>makes</em> a module, it asks the ambient injector to create the dependencies. The injector infers the names of the dependencies by examining the module declaration, constructs the related <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">directed acyclic graph</a> and computes a <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological sort</a> to produce a well ordered sequence of evaluations. This is all done behind the scenes.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Read from right to left to follow the dependencies.</span>
 <span class="kw"><a href="../reference/plot_dependencies.html">plot_dependencies</a></span>()</code></pre></div>
-<div id="htmlwidget-1c919b6137223e5dfd7c" style="width:90%;height:480px;" class="sankeyNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1c919b6137223e5dfd7c">{"x":{"links":{"source":[0,1],"target":[2,2],"value":[1,1]},"nodes":{"name":["engine","wheels","car"],"group":["engine","wheels","car"]},"options":{"NodeID":"node","NodeGroup":"node","LinkGroup":null,"colourScale":"d3.scale.category20()","fontSize":13,"fontFamily":null,"nodeWidth":15,"nodePadding":10,"units":"","margin":{"top":null,"right":null,"bottom":null,"left":null},"iterations":32}},"evals":[],"jsHooks":[]}</script><p>This is the best outcome. The application code simply declares the dependencies it needs, without having to deal with the injector. This setup does not break the Law of Demeter.</p>
+<div id="htmlwidget-9f9b9fdca3023baa83b1" style="width:90%;height:480px;" class="sankeyNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9f9b9fdca3023baa83b1">{"x":{"links":{"source":[0,1],"target":[2,2],"value":[1,1]},"nodes":{"name":["engine","wheels","car"],"group":["engine","wheels","car"]},"options":{"NodeID":"node","NodeGroup":"node","LinkGroup":null,"colourScale":"d3.scale.category20()","fontSize":13,"fontFamily":null,"nodeWidth":15,"nodePadding":10,"units":"","margin":{"top":null,"right":null,"bottom":null,"left":null},"iterations":32}},"evals":[],"jsHooks":[]}</script><p>This is the best outcome. The application code simply declares the dependencies it needs, without having to deal with the injector. This setup does not break the Law of Demeter.</p>
 <p>Finally, here is how the above example typically looks like with the use of modulr DI’s philosophy and implementation:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
 
@@ -277,7 +280,7 @@ car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span cla
     }
   )
 }
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'car' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Defining 'car' ... OK</span>
 
 <span class="st">"engine"</span> %provides%<span class="st"> </span>{
   <span class="co">#' This module can start and stop an engine.</span>
@@ -286,7 +289,7 @@ car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span cla
     <span class="dt">stop =</span> function() <span class="kw">message</span>(<span class="st">"Engine stopped."</span>)
   )
 }
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'engine' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Defining 'engine' ... OK</span>
 
 <span class="st">"wheels"</span> %provides%<span class="st"> </span>{
   <span class="co">#' This module can roll and brake wheels.</span>
@@ -295,17 +298,17 @@ car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span cla
     <span class="dt">brake =</span> function() <span class="kw">message</span>(<span class="st">"Wheels braking."</span>)
   )
 }
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Defining 'wheels' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Defining 'wheels' ... OK</span>
 
 <span class="kw"><a href="../reference/print_info.html">info</a></span>(<span class="st">"car"</span>) ## `info()` outputs #'-comments (aka docstrings)
 <span class="co">#&gt; This module can start, drive and stop a car.</span>
 
 car %&lt;=%<span class="st"> "car"</span> ## syntactic sugar for `&lt;- make(`
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-06-16T13:57:43 UTC] DONE ('car' in 0.022 secs)</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] Making 'car' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...</span>
+<span class="co">#&gt; [2017-06-19T13:31:27 UTC] DONE ('car' in 0.022 secs)</span>
 
 car$<span class="kw">start</span>(); car$<span class="kw">drive</span>(<span class="st">"the speed of light"</span>, <span class="st">"the boundaries of the universe"</span>); car$<span class="kw">stop</span>()
 <span class="co">#&gt; Car started.</span>

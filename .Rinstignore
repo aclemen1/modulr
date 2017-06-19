@@ -1,0 +1,3 @@
+modules/new_lib/.*
+modules/old_lib/.*
+modules/.*/lib

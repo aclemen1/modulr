@@ -71,21 +71,21 @@ print(sessionInfo())
 print(sessionInfo())
 \dontrun{
 with_packages("~/my_packages", {
- if (!"pooh" \%in\% rownames(installed.packages()))
+ if (!"pooh" \%in\% rownames(utils::installed.packages()))
    utils::install.packages("pooh")
  library(pooh)
  print(sessionInfo())
 })}
 print(sessionInfo())
 
-## in file "foos/foobar.R"
+## In file "foos/foobar.R"  # Exclude Linting
 "foos/foobar" \%provides\% {
  print(sessionInfo())
  with_module_packages({
-   if (!"devtools" \%in\% rownames(installed.packages()))
+   if (!"devtools" \%in\% rownames(utils::installed.packages()))
      utils::install.packages("devtools")
    library(devtools)
-   if (!"pooh" \%in\% rownames(installed.packages()))
+   if (!"pooh" \%in\% rownames(utils::installed.packages()))
      devtools::install_version("pooh", "0.2")
    library(pooh)
    print(sessionInfo())
@@ -95,14 +95,14 @@ print(sessionInfo())
 ## EOF
 \dontrun{make()}
 
-## in file "foos/foobaz.R"
+## In file "foos/foobaz.R"  # Exclude Linting
 "foos/foobaz" \%provides\% {
  print(sessionInfo())
  with_namespace_packages("foos", {
-   if (!"devtools" \%in\% rownames(installed.packages()))
+   if (!"devtools" \%in\% rownames(utils::installed.packages()))
      utils::install.packages("devtools")
    library(devtools)
-   if (!"pooh" \%in\% rownames(installed.packages()))
+   if (!"pooh" \%in\% rownames(utils::installed.packages()))
      devtools::install_version("pooh", "0.3")
    library(pooh)
    print(sessionInfo())

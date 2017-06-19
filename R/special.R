@@ -385,4 +385,3 @@ options_provider_ <- function() {
     `%provides%`(lhs, options_provider(options))),
     envir = parent.frame(1L))
 }
-

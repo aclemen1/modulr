@@ -333,7 +333,11 @@ sharedenv <- function() {
   .modulr_env$injector$shared_env
 }
 
-globalVariables(c(".Last.name", ".SharedEnv", ".__name__"))
+globalVariables(c(
+  ".Last.name",
+  ".Last.packages_manifest",
+  ".SharedEnv",
+  ".__name__"))
 
 if (utils::packageVersion("assertthat") >= package_version("0.1.0.99")) {
   assert_that <- assertthat::assert_that

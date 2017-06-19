@@ -164,3 +164,13 @@ assertthat::on_failure(.is_defined_regular) <- function(call, env) {
       !is.expression(object) &&
       !is.language(object))
 }
+
+# Test if object is a packages manifest
+.is_packages_manifest <- function(manifest) {
+  inherits(manifest, "packages_manifest")
+}
+
+assertthat::on_failure(.is_packages_manifest) <- function(call, env) {
+  paste0(deparse(eval(call$name, envir = env)),
+         " is not a packages manifest.")
+}

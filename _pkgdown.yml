@@ -5,8 +5,10 @@ navbar:
       href: index.html
     - text: "Why DI for R?"
       href: articles/motivation.html
-    - text: "Vignette"
+    - text: "Introduction"
       href: articles/modulr.html
+    - text: "Experimental"
+      href: articles/experimental.html
     - text: "Reference"
       href: reference/index.html
     - text: "News"

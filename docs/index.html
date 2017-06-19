@@ -44,7 +44,10 @@
   <a href="articles/motivation.html">Why DI for R?</a>
 </li>
 <li>
-  <a href="articles/modulr.html">Vignette</a>
+  <a href="articles/modulr.html">Introduction</a>
+</li>
+<li>
+  <a href="articles/experimental.html">Experimental</a>
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
@@ -85,7 +88,7 @@
 <ul>
 <li>Modulr is designed to ease production of mocks for testing purpose and is therefore well-suited for <a href="https://en.wikipedia.org/wiki/Test-driven_development">test-driven development</a>.</li>
 <li>Modulr offers <a href="https://en.wikipedia.org/wiki/Docstring">docstrings</a>-like comments for documenting the internals of a module.</li>
-<li>Modulr understands <a href="http://rmarkdown.rstudio.com/">R Markdown</a> and <a href="https://www.statistik.lmu.de/~leisch/Sweave/">Sweave</a>, thanks to Yihui Xie’s <a href="http://yihui.name/knitr/">knitr</a> package.</li>
+<li>Modulr understands <a href="http://rmarkdown.rstudio.com/">R Markdown</a> and <a href="https://leisch.userweb.mwn.de/Sweave/">Sweave</a>, thanks to Yihui Xie’s <a href="http://yihui.name/knitr/">knitr</a> package.</li>
 <li>Modulr takes advantage of <a href="http://semver.org/">semantic versioning</a> to avoid <em>version lock</em> and <em>version promiscuity</em>.</li>
 <li>Modulr can use <a href="http://github.com">GitHub</a> (repositories and gists) to publish and share modules (so-called <em>gears</em>). See <a href="https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3"><code>modulr/vault</code></a> for an example.</li>
 <li>Modulr helps to circumvent errors occurring in a chain of nested dependent modules, showing <a href="https://en.wikipedia.org/wiki/Breadcrumb_(navigation)">breadcrumbs</a>.</li>
@@ -99,10 +102,10 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
 
 <span class="st">"foo"</span> %provides%<span class="st"> "Hello"</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:30:32 UTC] Defining 'foo' ... OK</span>
 
 <span class="st">"bar"</span> %provides%<span class="st"> "World"</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] Defining 'bar' ... OK</span>
 
 <span class="st">"foobar"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>, 
@@ -110,17 +113,17 @@
 ) %provides%<span class="st"> </span>{
   <span class="kw">paste0</span>(f, <span class="st">", "</span>, <span class="kw">tolower</span>(b), <span class="st">"!"</span>)
 }
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] Defining 'foobar' ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] Defining 'foobar' ... OK</span>
 
 <span class="kw"><a href="reference/make.html">make</a></span>(<span class="st">"foobar"</span>)
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] Making 'foobar' ...</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
-<span class="co">#&gt; [2017-06-16T13:56:59 UTC] DONE ('foobar' in 0.042 secs)</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] Making 'foobar' ...</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
+<span class="co">#&gt; [2017-06-19T13:30:33 UTC] DONE ('foobar' in 0.043 secs)</span>
 <span class="co">#&gt; [1] "Hello, world!"</span></code></pre></div>
 </div>
 <div id="installation" class="section level2">
@@ -180,7 +183,7 @@ This is the dependency graph of a module (on the rightmost side) which exposes t
 <li><a href="http://codecov.io/github/aclemen1/modulr"><img src="https://codecov.io/github/aclemen1/modulr/coverage.svg?branch=master" alt="Coverage status"></a></li>
 <li><a href="https://cran.r-project.org/package=modulr"><img src="http://www.r-pkg.org/badges/version/modulr" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://cran.r-project.org/package=modulr"><img src="http://cranlogs.r-pkg.org/badges/grand-total/modulr" alt="CRAN"></a></li>
-<li><a href="http://aclemen1.mit-license.org/license.html"><img src="http://img.shields.io/:license-mit-blue.svg" alt="License"></a></li>
+<li><a href="http://aclemen1.mit-license.org/license.html"><img src="https://img.shields.io/:license-mit-blue.svg" alt="License"></a></li>
 <li><a href="https://twitter.com/intent/tweet.html?text=Modulr:%20A%20Dependency%20Injection%20Framework%20for%20R&amp;url=http://github.com/aclemen1/modulr&amp;hashtags=r,dependency-injection"><img src="https://img.shields.io/twitter/url/http/github.com/aclemen1/modulr.svg?style=social" alt="Twitter"></a></li>
 </ul>
 </div>

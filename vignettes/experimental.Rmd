@@ -1,0 +1,263 @@
+--- 
+title: 
+  "Experimental features" 
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: > 
+  %\VignetteIndexEntry{Experimental features} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}{inputenc} 
+---
+
+```{r, echo = FALSE, message = FALSE, results = 'hide'} 
+set.seed(1234L) 
+modules_path <- file.path(
+  if (grepl("/docs/", getwd(), fixed = TRUE)) file.path("..", "..") else "..", 
+  "inst", "modules")
+library(modulr) 
+library(networkD3)
+library(chorddiag)
+library(RColorBrewer)
+library(future) 
+library(memoise)
+options(knitr.duplicate.label = 'allow')
+`%<=%` <- modulr::`%<=%` 
+Sys.setlocale("LC_TIME", "en_DK.UTF-8")
+Sys.setenv(TZ = 'UTC') 
+knitr::opts_chunk$set(
+  collapse = TRUE, 
+  comment = "#>", 
+  fig.path = "./figures/experimental-",
+  fig.width = 6.0, 
+  fig.height = 4.0, 
+  out.width = "90%", 
+  fig.align = "center"
+) 
+set.seed(1234L) 
+BUILD <- 
+  identical(tolower(Sys.getenv("BUILD")), "true") &&
+  !identical(tolower(Sys.getenv("TRAVIS")), "true") && 
+  identical(tolower(Sys.getenv("NOT_CRAN")), "true")
+knitr::opts_chunk$set(purl = BUILD)
+options(repos = "http://cran.us.r-project.org")
+reset <- function() {
+  modulr::reset()
+  root_config$set(modules_path)
+}
+```
+
+# Futures
+
+Using [Henrik Bengtsson's future package](https://CRAN.R-project.org/package=future), it is possible to evaluate modules asynchronously using various resources available to the user. For instance, evaluation of modules can be eager, lazy, and/or parallelized (on multiple cores and/or on a cluster of machines).
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+reset()
+library(future)
+```
+
+```{r}
+# How many cores are available?
+availableCores()
+
+"foo" %provides% {
+  future({
+    Sys.sleep(1L)
+    "Hello"
+  }) %plan% multicore
+}
+
+"bar" %provides% {
+  future({
+    Sys.sleep(1L)
+    "World"
+  }) %plan% multicore
+}
+
+"foobar" %requires% list(
+  f = "foo",
+  b = "bar"
+) %provides% {
+  paste0(value(f), " ", value(b), "!")
+}
+
+system.time(print(make("foobar")))
+```
+
+It is often interesting to parallelize an already existing module. `modulr` comes with the handy `futurize` function for this purpose. The following two examples illustrate the difference between eager and lazy orchestrations of parallelized modules.
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+reset()
+```
+
+```{r}
+"foo" %provides% { Sys.sleep(1L); "Hello" }
+"bar" %provides% { Sys.sleep(1L); "World" }
+"foobar" %requires% list(
+  f = "foo", 
+  b = "bar"
+) %provides% {
+  paste0(f, " ", b, "!")
+}
+
+futurize("foo", strategy = multicore)
+futurize("bar", strategy = multicore)
+
+futurize(
+  "foobar", 
+  name = "foobar/eager", 
+  dependencies = list(f = "foo/future", b = "bar/future"),
+  strategy = eager
+)
+
+system.time(fb_eager <- make("foobar/eager"))
+system.time(print(value(fb_eager)))
+```
+
+```{r}
+touch("foo/future")
+touch("bar/future")
+futurize(
+  "foobar", 
+  name = "foobar/lazy", 
+  dependencies = list(f = "foo/future", b = "bar/future"),
+  strategy = lazy
+)
+
+system.time(fb_lazy <- make("foobar/lazy"))
+Sys.sleep(0.5)
+system.time(print(value(fb_lazy)))
+```
+
+
+# Package isolation
+
+```{r, include=FALSE, eval=BUILD}
+original_manifest <- get_packages_manifest()
+```
+
+Let us consider the following situation: most of your code rely on an old version of dplyr, say 0.4.1, and you want to migrate progressively to the latest version available on CRAN, say 0.7.0. How two different versions of dplyr can cohabitate in your ecosystem? __Package isolation__ is an experimental feature allowing to isolate a portion of code, for example a module, from already loaded and attached packages.
+
+## Using other packages
+
+Let us assume that dplyr_0.4.1 is installed in the current library paths:
+
+```{r, include=FALSE, eval=BUILD}
+dir.create(file.path(modules_path, "old_lib"), showWarnings = FALSE)
+withr::with_libpaths(file.path(modules_path, "old_lib"), {
+  if (!"devtools" %in% rownames(installed.packages()))
+    install.packages("devtools", quiet = TRUE)
+  if (!"dplyr" %in% rownames(installed.packages()))
+    devtools::install_version("dplyr", "0.4.1", quiet = TRUE)
+})
+dir.create(file.path(modules_path, "new_lib"), showWarnings = FALSE)
+withr::with_libpaths(file.path(modules_path, "new_lib"), {
+  if (!"dplyr" %in% rownames(installed.packages()))
+    devtools::install_version("dplyr", "0.7.0", quiet = TRUE)
+})
+```
+
+```{r, include=FALSE}
+old_libPaths <- .libPaths(c(file.path(modules_path, "old_lib"), .libPaths()))
+```
+
+```{r, eval=BUILD}
+library(dplyr)  # version 0.4.1, installed in the library paths
+print(sessionInfo())
+```
+
+This is the current code using dplyr_0.4.1, where `arrange` applies by default to every element of the group:
+
+```{r, eval=BUILD}
+cars %>% 
+  group_by(speed) %>% 
+  arrange(desc(dist)) %>% 
+  ungroup %>% 
+  head
+```
+
+Let us isolate from all the loaded and attached packages (except the so-called _base_ packages and a few others, like modulr itself, obviously):
+
+```{r, eval=BUILD}
+isolate_from_packages()
+```
+
+This function returns a _packages manifest_ containing all the necessary information to restore the situation. The last manifest produced by `isolate_from_packages` is available from the `.Last.packages_manifest` variable and is used by `restore_packages` (see _infra_).
+
+Let us now suppose that dplyr_0.7.0 and its dependencies have been installed in the dedicated "./new_lib" directory. We can then change the library path to point to `./new_lib`, and attach the packages as usual:
+
+```r
+.libPaths("./new_lib")
+library(dplyr)  # version 0.7.0, installed in "./new_lib"
+print(sessionInfo())
+```
+
+```{r, echo=FALSE, eval=BUILD}
+.libPaths(file.path(modules_path, "new_lib"))
+library(dplyr)
+print(sessionInfo())
+```
+
+Thus, the following code uses dplyr_0.7.0: a tibble is returned instead of a data frame and the verb `arrange` requires a parameter (`.by_group = TRUE`) to apply to every element of the group:
+
+```{r, eval=BUILD}
+cars %>% 
+  group_by(speed) %>% 
+  arrange(desc(dist), .by_group = TRUE) %>% 
+  ungroup %>% 
+  head
+```
+
+Finally, we can restore the previously attached and loaded packages (by default, the previous library paths are also restored), based by default on the last manifest:
+
+```{r, eval=BUILD}
+restore_packages()
+print(sessionInfo())
+```
+
+```{r, include=FALSE}
+.libPaths(old_libPaths)
+```
+
+## Temporarily using other packages
+
+The `with_packages` function allows to isolate temporarily a portion of code, so that the previous example simply becomes: 
+
+```r
+with_verbosity(1L, with_packages("./new_lib", {
+  library(dplyr)
+  cars %>% 
+    group_by(speed) %>% 
+    arrange(desc(dist), .by_group = TRUE) %>% 
+    ungroup %>% 
+    as.data.frame(stringsAsFactors = FALSE) %>% 
+    head
+}))
+```
+
+```{r, echo=FALSE, eval=BUILD}
+with_verbosity(1L, with_packages(file.path(modules_path, "new_lib"), {
+  library(dplyr)
+  cars %>% 
+    group_by(speed) %>% 
+    arrange(desc(dist), .by_group = TRUE) %>% 
+    ungroup %>% 
+    as.data.frame(stringsAsFactors = FALSE) %>% 
+    head
+}))
+```
+
+When working with modules, it is sometimes useful to associate a specific library to an on-disk module with `with_module_packages` or to a namespace of modules with `with_namespace_packages`.
+
+In the following example, `with_module_packages` temporarily sets the library path to the sub-directory ``r file.path("lib", sprintf("%s-library", R.version$platform), sprintf("%s.%s", R.version$major, strsplit(R.version$minor, ".", fixed = TRUE)[[1L]][1L]))`` of the directory `experimental/arranged_cars`.
+
+```{r, code=readLines(file.path(modules_path, "experimental", "arranged_cars.R")), eval = FALSE}
+```
+
+```{r, eval=BUILD}
+make("experimental/arranged_cars")
+```
+
+```{r, include=FALSE, eval=BUILD}
+restore_packages(original_manifest)
+```

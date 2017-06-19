@@ -36,10 +36,19 @@
   if (verbose && !is.null(msg))
     .modulr_env$injector$.message_level <- level + 1L
 
-  if (!is.null(expr)) eval(expr)
+  ok_msg <- "OK"
+
+  if (!is.null(expr)) {
+    tryCatch({
+      result <- force(expr)
+    },
+    error = function(e) {
+      ok_msg <- "FAILED"
+    })
+  }
 
   if (ok && verbose && !is.null(msg)) {
-    cat("OK\n")
+    cat(paste0(ok_msg, "\n"))
   }
 
 }
@@ -91,9 +100,9 @@
     out <- paste0(out, paste0(kwargs[["core"]], collapse = ""))
 
     if ("appendLF" %in% names(kwargs)) {
-      appendLF <- kwargs[["appendLF"]]
+      appendLF <- kwargs[["appendLF"]] # Exclude Linting
     } else {
-      appendLF <- TRUE
+      appendLF <- TRUE # Exclude Linting
     }
 
     kwargs[["fun"]](out, appendLF = appendLF) # Exclude Linting

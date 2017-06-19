@@ -10,7 +10,7 @@ chord_engine(deps, ...)
 \item{deps}{A data frame of modules and their dependencies.}
 
 \item{...}{Further arguments to be passed to
-\code{chorddiag::\link[chorddiag]{chorddiag}}.}
+\code{chorddiag::chorddiag}.}
 }
 \description{
 Plot the directed acyclic graph (DAG) of modules and dependencies with a

@@ -519,8 +519,9 @@
 .extract_name <- function(filepath = NULL, text = NULL, namespace = NULL,
                           version = NA, strict = FALSE) {
 
-  assert_that((!is.null(text) && assertthat::is.string(text)) ||
-                (!is.null(filepath) && file.exists(filepath)))
+  assert_that(
+    (!is.null(text) && assertthat::is.string(text)) ||
+      (!is.null(filepath) && file.exists(filepath)))
   assert_that(is.null(namespace) || .is_namespace(namespace))
   assert_that(is.na(version) || .is_version(version))
   assert_that(assertthat::is.flag(strict))

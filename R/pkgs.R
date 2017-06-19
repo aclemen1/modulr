@@ -15,7 +15,15 @@
   attached = logical(0L),
   stringsAsFactors = FALSE)
 
-.get_pkgs_manifest <- function(ignore, ignore_base = TRUE) {
+#' @export
+get_packages_manifest <- function(ignore = NULL, ignore_base = TRUE) {
+
+  assert_that(
+    is.null(ignore) || is.character(ignore),
+    assertthat::is.flag(ignore_base)
+  )
+
+  ignore <- union(ignore, getOption("modulr.ignore_packages"))
 
   search_locs <- stats::setNames(dirname(searchpaths()), search())
   pkgs_locs <- search_locs[grepl("^package:", names(search_locs))]
@@ -65,11 +73,14 @@
 
   is_ignored <- (ignore_base & pkgs[["base"]]) | pkgs[["pkg"]] %in% ignore
 
-  list(
+  structure(list(
     pkgs = pkgs[!is_ignored, ],
     ignored = pkgs[is_ignored, ],
-    domain = names(search_locs)
-  )
+    domain = names(search_locs),
+    ignore = ignore,
+    ignore_base = ignore_base,
+    lib_paths = .libPaths()
+  ), class = "packages_manifest")
 
 }
 
@@ -123,44 +134,39 @@
 
 }
 
-.catch_error_wrapper <- function(f, ok_cb = function(...) message("OK"),
-                                 err_cb = function(...) message("FAILED")) {
-  function(...) {
-    tryCatch({
-      result <- suppressWarnings(suppressMessages(f(...)))
-      ok_cb(result)
-    },
-    error = function(e) {
-      err_cb(e)
-    })
-  }
+.load <- function(pkg, loc) {
+  .message_meta(sprintf("Loading %s", sQuote(pkg)), {
+    suppressWarnings(suppressMessages(loadNamespace(pkg, lib.loc = loc)))
+  }, ok = TRUE, verbosity = 2L)
 }
 
-.load <- function(pkg, loc) {
-  message("Loading ", pkg, " ... ", appendLF = FALSE)
-  .catch_error_wrapper(loadNamespace)(pkg, lib.loc = loc)
+.detach_ <- function(pkg) {
+  suppressWarnings(suppressMessages(detach(
+    paste("package", pkg, sep = ":"), character.only = TRUE,
+    unload = FALSE, force = TRUE)))
 }
 
 .detach <- function(pkg) {
-  message("Detaching ", sQuote(pkg), " ... ", appendLF = FALSE)
-  .catch_error_wrapper(detach)(
-    paste("package", pkg, sep = ":"), character.only = TRUE,
-    unload = FALSE, force = TRUE)
+  .message_meta(sprintf("Detaching %s", sQuote(pkg)), {
+    .detach_(pkg)
+  }, ok = TRUE, verbosity = 2L)
+}
+
+.unload_ <- function(pkg, loc) {
+  suppressWarnings(suppressMessages(devtools::unload(file.path(loc, pkg))))
 }
 
 .unload <- function(pkg, loc) {
-  message("Unloading ", sQuote(pkg), " ... ", appendLF = FALSE)
-  .catch_error_wrapper(devtools::unload)(file.path(loc, pkg))
+  .message_meta(sprintf("Unloading %s", sQuote(pkg)), {
+    .unload_(pkg, loc)
+  }, ok = TRUE, verbosity = 2L)
 }
 
 .forget <- function(pkg, loc) {
-  message("Forgetting ", sQuote(pkg), " ... ", appendLF = FALSE)
-  .catch_error_wrapper(
-    function(pkg, loc) {
-      .detach(pkg)
-      .unload(pkg, loc)
-    }
-  )(pkg, loc)
+  .message_meta(sprintf("Forgetting %s", sQuote(pkg)), {
+    .detach_(pkg)
+    .unload_(pkg, loc)
+  }, ok = TRUE, verbosity = 2L)
 }
 
 .sort <- function(ops, domain) {
@@ -198,10 +204,10 @@
 .attach_require <- function(pkg, loc, domain) {
   pkg_ <- paste("package", pkg, sep = ":")
   pos <- match(pkg_, intersect(domain, unique(c(pkg_, search()))))
-  message("Attaching ", sQuote(pkg), " at position ", pos, " ... ",
-          appendLF = FALSE)
-  .catch_error_wrapper(library)(pkg, lib.loc = loc, pos = pos,
-                                character.only = TRUE)
+  .message_meta(sprintf("Attaching %s at position %d", sQuote(pkg), pos), {
+    suppressWarnings(suppressMessages(library(pkg, lib.loc = loc, pos = pos,
+                                              character.only = TRUE)))
+  }, ok = TRUE, verbosity = 2L)
 }
 
 .do_ops <- function(ops, domain) {
@@ -242,8 +248,8 @@
 
 }
 
-.minimal_pkgs_manifest <- function(ignore) {
-  manifest <- .get_pkgs_manifest(ignore = ignore, ignore_base = TRUE)
+.minimal_pkgs_manifest <- function(ignore, ignore_base = TRUE) {
+  manifest <- get_packages_manifest(ignore = ignore, ignore_base = ignore_base)
   manifest[["pkgs"]] <- .empty_manifest_pkgs
   manifest
 }
@@ -254,6 +260,86 @@
   .do_ops(ops, domain = to[["domain"]])
 
   invisible(from)
+
+}
+
+#' @export
+isolate_from_packages <- function(ignore = NULL, ignore_base = TRUE) {
+
+  # nocov start
+  if (!requireNamespace("devtools", quietly = TRUE)) {
+    stop("package 'devtools' is needed for this function to work. ",
+         "Please install it.",
+         call. = FALSE)
+  }
+  # nocov end
+
+  assert_that(
+    is.null(ignore) || is.character(ignore),
+    assertthat::is.flag(ignore_base))
+
+  .message_meta("Isolating from loaded and attached packages ...", {
+
+    ignore <- union(ignore, getOption("modulr.ignore_packages"))
+
+    if (length(ignore) == 1L) {
+      .message_meta(
+        sprintf(
+          "Ignoring%s package %s.",
+          if (ignore_base) " base packages and" else "",
+          sQuote(ignore)),
+        verbosity = 2L)
+    } else if (length(ignore) >= 2L) {
+      .message_meta(
+        sprintf(
+          "Ignoring%s %d packages: %s.",
+          if (ignore_base) " base packages and" else "",
+          length(ignore),
+          paste(sQuote(sort(ignore)), collapse = ", ")),
+        verbosity = 2L)
+    }
+
+    old_pkgs <- .set_pkgs(
+      from = get_packages_manifest(ignore = ignore, ignore_base = ignore_base),
+      to = .minimal_pkgs_manifest(ignore = ignore, ignore_base = ignore_base))
+
+  }, verbosity = 1L)
+  .message_meta("Isolated from loaded and attached packages.", verbosity = 1L)
+
+  .modulr_env$.Last.packages_manifest <- old_pkgs
+
+  invisible(old_pkgs)
+
+}
+
+#' @export
+restore_packages <- function(manifest = .Last.packages_manifest,
+                             restore_lib_paths = TRUE) {
+
+  # nocov start
+  if (!requireNamespace("devtools", quietly = TRUE)) {
+    stop("package 'devtools' is needed for this function to work. ",
+         "Please install it.",
+         call. = FALSE)
+  }
+  # nocov end
+
+  assert_that(.is_packages_manifest(manifest))
+
+  .message_meta("Restoring previously attached and loaded packages ...", {
+    if (restore_lib_paths)
+      .message_meta("Restoring library paths", {
+        .libPaths(manifest[["lib_paths"]])
+      }, ok = TRUE, verbosity = 2L)
+    .set_pkgs(
+      from = get_packages_manifest(
+        ignore = manifest[["ignore"]],
+        ignore_base = manifest[["ignore_base"]]),
+      to = manifest)
+  }, verbosity = 1L)
+  .message_meta(
+    "Previously attached and loaded packages restored.",
+    verbosity = 1L)
 
 }
 
@@ -302,21 +388,21 @@
 #' print(sessionInfo())
 #' \dontrun{
 #' with_packages("~/my_packages", {
-#'  if (!"pooh" %in% rownames(installed.packages()))
+#'  if (!"pooh" %in% rownames(utils::installed.packages()))
 #'    utils::install.packages("pooh")
 #'  library(pooh)
 #'  print(sessionInfo())
 #' })}
 #' print(sessionInfo())
 #'
-#' ## in file "foos/foobar.R"
+#' ## In file "foos/foobar.R"  # Exclude Linting
 #' "foos/foobar" %provides% {
 #'  print(sessionInfo())
 #'  with_module_packages({
-#'    if (!"devtools" %in% rownames(installed.packages()))
+#'    if (!"devtools" %in% rownames(utils::installed.packages()))
 #'      utils::install.packages("devtools")
 #'    library(devtools)
-#'    if (!"pooh" %in% rownames(installed.packages()))
+#'    if (!"pooh" %in% rownames(utils::installed.packages()))
 #'      devtools::install_version("pooh", "0.2")
 #'    library(pooh)
 #'    print(sessionInfo())
@@ -326,14 +412,14 @@
 #' ## EOF
 #' \dontrun{make()}
 #'
-#' ## in file "foos/foobaz.R"
+#' ## In file "foos/foobaz.R"  # Exclude Linting
 #' "foos/foobaz" %provides% {
 #'  print(sessionInfo())
 #'  with_namespace_packages("foos", {
-#'    if (!"devtools" %in% rownames(installed.packages()))
+#'    if (!"devtools" %in% rownames(utils::installed.packages()))
 #'      utils::install.packages("devtools")
 #'    library(devtools)
-#'    if (!"pooh" %in% rownames(installed.packages()))
+#'    if (!"pooh" %in% rownames(utils::installed.packages()))
 #'      devtools::install_version("pooh", "0.3")
 #'    library(pooh)
 #'    print(sessionInfo())
@@ -347,20 +433,11 @@
 #' @export
 with_no_packages <- function(code, ignore = NULL) {
 
-  # nocov start
-  if (!requireNamespace("devtools", quietly = TRUE)) {
-    stop("package 'devtools' is needed for this function to work. ",
-         "Please install it.",
-         call. = FALSE)
-  }
-  # nocov end
+  assert_that(
+    is.null(ignore) || is.character(ignore))
 
-  ignore <- unique(c(ignore, getOption("modulr.ignore_packages")))
-
-  old_pkgs <- .set_pkgs(
-    from = .get_pkgs_manifest(ignore),
-    to = .minimal_pkgs_manifest(ignore))
-  on.exit(.set_pkgs(from = .get_pkgs_manifest(ignore), to = old_pkgs))
+  old_pkgs <- isolate_from_packages(ignore = ignore)
+  on.exit(restore_packages(old_pkgs))
   force(code)
 }
 
@@ -368,15 +445,13 @@ with_no_packages <- function(code, ignore = NULL) {
 #' @export
 without_packages <- with_no_packages
 
-.with_libpaths <- function (new, code)
-{
-    old <- .set_libpaths(paths = new)
-    on.exit(.libPaths(old))
-    force(code)
+.with_libpaths <- function(new, code) {
+  old <- .set_libpaths(paths = new)
+  on.exit(.libPaths(old))
+  force(code)
 }
 
-.set_libpaths <- function (paths)
-{
+.set_libpaths <- function(paths) {
   old <- .libPaths()
   if (!is.null(paths)) {
     paths <- normalizePath(paths, mustWork = TRUE)
@@ -386,7 +461,7 @@ without_packages <- with_no_packages
 }
 
 # Thanks to Henrik Bengtsson's R.utils::findSourceTraceback() method.
-.source_trace <- function () {
+.source_trace <- function() {
 
   srcfile_list <- list()
 
@@ -419,7 +494,8 @@ without_packages <- with_no_packages
       warning("Unknown class of 'srcfile': ", class(srcfile)[1L])
     }
     pathname
-  }, FUN.VALUE = "character")
+  },
+  FUN.VALUE = "character")
 
   names(srcfile_list) <- paths
 
@@ -434,7 +510,8 @@ without_packages <- with_no_packages
 #' @export
 with_packages <- function(lib_path, code, ...) {
 
-  assert_that(assertthat::is.string(lib_path))
+  assert_that(
+    assertthat::is.string(lib_path))
 
   if (!.dir_exists(lib_path)) {
     dir.create(lib_path, recursive = TRUE)
@@ -446,6 +523,7 @@ with_packages <- function(lib_path, code, ...) {
 #' @rdname with_no_packages
 #' @export
 with_module_packages <- function(code, ...) {
+
   lib_path <- NULL
   name <- .get_0(".__name__", envir = parent.frame())
   file <-
@@ -468,7 +546,7 @@ with_module_packages <- function(code, ...) {
         sprintf("%s-library", R.version$platform),
         sprintf("%s.%s",
                 R.version$major,
-                strsplit(R.version$minor, ".", fixed = TRUE)[[1]][1]))
+                strsplit(R.version$minor, ".", fixed = TRUE)[[1L]][1L]))
     with_packages(lib_path = lib_path, code = code, ...)
   } else {
     stop(paste("Module packages are not available for in-memory modules",
@@ -497,6 +575,10 @@ with_module_packages <- function(code, ...) {
 #'   namespace of the module to be used as path for the packages library.
 #' @export
 with_namespace_packages <- function(namespace, code, ...) {
+
+  assert_that(
+    assertthat::is.string(namespace))
+
   lib_path <- NULL
   name <- .get_0(".__name__", envir = parent.frame())
   path <-
@@ -514,7 +596,7 @@ with_namespace_packages <- function(namespace, code, ...) {
         sprintf("%s-library", R.version$platform),
         sprintf("%s.%s",
                 R.version$major,
-                strsplit(R.version$minor, ".", fixed = TRUE)[[1]][1]))
+                strsplit(R.version$minor, ".", fixed = TRUE)[[1L]][1L]))
     with_packages(new = lib_path, code = code, ...)
   } else {
     stop(paste("Namespace packages are not available for in-memory modules",
@@ -522,4 +604,18 @@ with_namespace_packages <- function(namespace, code, ...) {
   }
 }
 
-DEFAULT_IGNORE_PACKAGES <- c("modulr", "devtools", "shiny", "knitr")
+DEFAULT_IGNORE_PACKAGES <- c(
+  "assertthat",
+  "curl",
+  "devtools",
+  "digest",
+  "httr",
+  "jsonlite",
+  "knitr",
+  "modulr",
+  "memoise",
+  "pooh",
+  "rmarkdown",
+  "rstudioapi",
+  "stringi"
+)

@@ -1,4 +1,4 @@
-# File: modules/vendor/tool/swissknife.R
+# File: ./modules/vendor/tool/swissknife.R
 
 library(modulr)
 
