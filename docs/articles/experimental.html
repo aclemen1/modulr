@@ -47,6 +47,12 @@
   <a href="../articles/modulr.html">Introduction</a>
 </li>
 <li>
+  <a href="../articles/testing.html">Unit Testing</a>
+</li>
+<li>
+  <a href="../articles/packages.html">Using modulr in packages</a>
+</li>
+<li>
   <a href="../articles/experimental.html">Experimental</a>
 </li>
 <li>
@@ -97,7 +103,7 @@
     <span class="st">"Hello"</span>
   }) %plan%<span class="st"> </span>multicore
 }
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] Defining 'foo' ... OK</span>
 
 <span class="st">"bar"</span> %provides%<span class="st"> </span>{
   <span class="kw">future</span>({
@@ -105,7 +111,7 @@
     <span class="st">"World"</span>
   }) %plan%<span class="st"> </span>multicore
 }
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] Defining 'bar' ... OK</span>
 
 <span class="st">"foobar"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>,
@@ -113,37 +119,37 @@
 ) %provides%<span class="st"> </span>{
   <span class="kw">paste0</span>(<span class="kw">value</span>(f), <span class="st">" "</span>, <span class="kw">value</span>(b), <span class="st">"!"</span>)
 }
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] Defining 'foobar' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] Defining 'foobar' ... OK</span>
 
 <span class="kw">system.time</span>(<span class="kw">print</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foobar"</span>)))
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] Making 'foobar' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:22 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] DONE ('foobar' in 1.1 secs)</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] Making 'foobar' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:33 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] DONE ('foobar' in 1.1 secs)</span>
 <span class="co">#&gt; [1] "Hello World!"</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.049   0.008   1.056</span></code></pre></div>
+<span class="co">#&gt;   0.051   0.006   1.068</span></code></pre></div>
 <p>It is often interesting to parallelize an already existing module. <code>modulr</code> comes with the handy <code>futurize</code> function for this purpose. The following two examples illustrate the difference between eager and lazy orchestrations of parallelized modules.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"foo"</span> %provides%<span class="st"> </span>{ <span class="kw">Sys.sleep</span>(1L); <span class="st">"Hello"</span> }
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] Defining 'foo' ... OK</span>
 <span class="st">"bar"</span> %provides%<span class="st"> </span>{ <span class="kw">Sys.sleep</span>(1L); <span class="st">"World"</span> }
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] Defining 'bar' ... OK</span>
 <span class="st">"foobar"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>, 
   <span class="dt">b =</span> <span class="st">"bar"</span>
 ) %provides%<span class="st"> </span>{
   <span class="kw">paste0</span>(f, <span class="st">" "</span>, b, <span class="st">"!"</span>)
 }
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] Defining 'foobar' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] Defining 'foobar' ... OK</span>
 
 <span class="kw"><a href="../reference/futurize.html">futurize</a></span>(<span class="st">"foo"</span>, <span class="dt">strategy =</span> multicore)
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] Defining 'foo/future' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] Defining 'foo/future' ... OK</span>
 <span class="kw"><a href="../reference/futurize.html">futurize</a></span>(<span class="st">"bar"</span>, <span class="dt">strategy =</span> multicore)
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] Defining 'bar/future' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] Defining 'bar/future' ... OK</span>
 
 <span class="kw"><a href="../reference/futurize.html">futurize</a></span>(
   <span class="st">"foobar"</span>, 
@@ -151,51 +157,51 @@
   <span class="dt">dependencies =</span> <span class="kw">list</span>(<span class="dt">f =</span> <span class="st">"foo/future"</span>, <span class="dt">b =</span> <span class="st">"bar/future"</span>),
   <span class="dt">strategy =</span> eager
 )
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] Defining 'foobar/eager' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] Defining 'foobar/eager' ... OK</span>
 
 <span class="kw">system.time</span>(fb_eager &lt;-<span class="st"> </span><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foobar/eager"</span>))
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] Making 'foobar/eager' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] ** Evaluating #1/2 (layer #1/1): 'bar/future' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:23 UTC] ** Evaluating #2/2 (layer #1/1): 'foo/future' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] DONE ('foobar/eager' in 1.1 secs)</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] Making 'foobar/eager' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] ** Evaluating #1/2 (layer #1/1): 'bar/future' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:34 UTC] ** Evaluating #2/2 (layer #1/1): 'foo/future' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:35 UTC] DONE ('foobar/eager' in 1.1 secs)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.091   0.021   1.099</span>
+<span class="co">#&gt;   0.103   0.010   1.100</span>
 <span class="kw">system.time</span>(<span class="kw">print</span>(<span class="kw">value</span>(fb_eager)))
 <span class="co">#&gt; [1] "Hello World!"</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.000   0.000   0.001</span></code></pre></div>
+<span class="co">#&gt;       0       0       0</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/touch.html">touch</a></span>(<span class="st">"foo/future"</span>)
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] Touching 'foo/future' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:35 UTC] Touching 'foo/future' ... OK</span>
 <span class="kw"><a href="../reference/touch.html">touch</a></span>(<span class="st">"bar/future"</span>)
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] Touching 'bar/future' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:35 UTC] Touching 'bar/future' ... OK</span>
 <span class="kw"><a href="../reference/futurize.html">futurize</a></span>(
   <span class="st">"foobar"</span>, 
   <span class="dt">name =</span> <span class="st">"foobar/lazy"</span>, 
   <span class="dt">dependencies =</span> <span class="kw">list</span>(<span class="dt">f =</span> <span class="st">"foo/future"</span>, <span class="dt">b =</span> <span class="st">"bar/future"</span>),
   <span class="dt">strategy =</span> lazy
 )
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] Defining 'foobar/lazy' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] Defining 'foobar/lazy' ... OK</span>
 
 <span class="kw">system.time</span>(fb_lazy &lt;-<span class="st"> </span><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foobar/lazy"</span>))
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] Making 'foobar/lazy' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] ** Evaluating #1/2 (layer #1/1): 'bar/future' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] ** Evaluating #2/2 (layer #1/1): 'foo/future' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:24 UTC] DONE ('foobar/lazy' in 0.051 secs)</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] Making 'foobar/lazy' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] ** Evaluating #1/2 (layer #1/1): 'bar/future' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] ** Evaluating #2/2 (layer #1/1): 'foo/future' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:36 UTC] DONE ('foobar/lazy' in 0.054 secs)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.043   0.009   0.053</span>
+<span class="co">#&gt;   0.046   0.010   0.056</span>
 <span class="kw">Sys.sleep</span>(<span class="fl">0.5</span>)
 <span class="kw">system.time</span>(<span class="kw">print</span>(<span class="kw">value</span>(fb_lazy)))
 <span class="co">#&gt; [1] "Hello World!"</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.004   0.006   0.433</span></code></pre></div>
+<span class="co">#&gt;   0.005   0.004   0.434</span></code></pre></div>
 </div>
 <div id="package-isolation" class="section level1">
 <h1 class="hasAnchor">
@@ -233,7 +239,7 @@
 <span class="co">#&gt; other attached packages:</span>
 <span class="co">#&gt; [1] dplyr_0.4.1        memoise_1.1.0      future_1.0.1      </span>
 <span class="co">#&gt; [4] RColorBrewer_1.1-2 chorddiag_0.1.1    networkD3_0.2.13  </span>
-<span class="co">#&gt; [7] modulr_0.1.7.9185 </span>
+<span class="co">#&gt; [7] modulr_0.1.7.9186 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
 <span class="co">#&gt;  [1] igraph_1.0.1          Rcpp_0.12.11          rstudioapi_0.6       </span>
@@ -261,30 +267,30 @@
 <span class="co">#&gt; 6     9   10</span></code></pre></div>
 <p>Let us isolate from all the loaded and attached packages (except the so-called <em>base</em> packages and a few others, like modulr itself, obviously):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">isolate_from_packages</span>()
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] Isolating from loaded and attached packages ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Ignoring base packages and 13 packages: 'assertthat', 'curl', 'devtools', 'digest', 'httr', 'jsonlite', 'knitr', 'memoise', 'modulr', 'pooh', 'rmarkdown', 'rstudioapi', 'stringi'.</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Forgetting 'dplyr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Forgetting 'future' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Forgetting 'RColorBrewer' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Forgetting 'chorddiag' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Forgetting 'networkD3' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Unloading 'igraph' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Unloading 'Rcpp' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Unloading 'magrittr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Unloading 'stringr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Unloading 'globals' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Unloading 'DBI' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:26 UTC] * Unloading 'withr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'htmltools' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'lazyeval' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'yaml' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'rprojroot' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'htmlwidgets' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'codetools' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'evaluate' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'backports' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'listenv' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] Isolated from loaded and attached packages.</span></code></pre></div>
+<span class="co">#&gt; [2017-06-21T21:58:37 UTC] Isolating from loaded and attached packages ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:37 UTC] * Ignoring base packages and 13 packages: 'assertthat', 'curl', 'devtools', 'digest', 'httr', 'jsonlite', 'knitr', 'memoise', 'modulr', 'pooh', 'rmarkdown', 'rstudioapi', 'stringi'.</span>
+<span class="co">#&gt; [2017-06-21T21:58:37 UTC] * Forgetting 'dplyr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:37 UTC] * Forgetting 'future' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:37 UTC] * Forgetting 'RColorBrewer' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:37 UTC] * Forgetting 'chorddiag' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:37 UTC] * Forgetting 'networkD3' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'igraph' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'Rcpp' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'magrittr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'stringr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'globals' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'DBI' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'withr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'htmltools' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'lazyeval' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'yaml' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'rprojroot' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'htmlwidgets' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'codetools' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'evaluate' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'backports' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] * Unloading 'listenv' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:38 UTC] Isolated from loaded and attached packages.</span></code></pre></div>
 <p>This function returns a <em>packages manifest</em> containing all the necessary information to restore the situation. The last manifest produced by <code>isolate_from_packages</code> is available from the <code>.Last.packages_manifest</code> variable and is used by <code>restore_packages</code> (see <em>infra</em>).</p>
 <p>Let us now suppose that dplyr_0.7.0 and its dependencies have been installed in the dedicated “./new_lib” directory. We can then change the library path to point to <code>./new_lib</code>, and attach the packages as usual:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">.libPaths</span>(<span class="st">"./new_lib"</span>)
@@ -314,7 +320,7 @@
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt; [1] dplyr_0.7.0       memoise_1.1.0     modulr_0.1.7.9185
+#&gt; [1] dplyr_0.7.0       memoise_1.1.0     modulr_0.1.7.9186
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
 #&gt;  [1] Rcpp_0.12.11          rstudioapi_0.6        magrittr_1.5         
@@ -340,39 +346,39 @@
 <span class="co">#&gt; 6     9    10</span></code></pre></div>
 <p>Finally, we can restore the previously attached and loaded packages (by default, the previous library paths are also restored), based by default on the last manifest:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">restore_packages</span>()
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] Restoring previously attached and loaded packages ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Restoring library paths ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Forgetting 'dplyr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'Rcpp' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:27 UTC] * Unloading 'magrittr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Unloading 'R6' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Unloading 'rlang' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Unloading 'stringr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Unloading 'tibble' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Unloading 'glue' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Unloading 'evaluate' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'listenv' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'backports' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'evaluate' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'codetools' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'htmlwidgets' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'rprojroot' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'yaml' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'lazyeval' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'htmltools' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'withr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'DBI' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'globals' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'stringr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'magrittr' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'Rcpp' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Loading 'igraph' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Attaching 'dplyr' at position 2 ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Attaching 'future' at position 4 ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Attaching 'RColorBrewer' at position 5 ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Attaching 'chorddiag' at position 6 ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] * Attaching 'networkD3' at position 7 ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:28 UTC] Previously attached and loaded packages restored.</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] Restoring previously attached and loaded packages ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Restoring library paths ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Forgetting 'dplyr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Unloading 'Rcpp' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Unloading 'magrittr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Unloading 'R6' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Unloading 'rlang' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Unloading 'stringr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Unloading 'tibble' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Unloading 'glue' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Unloading 'evaluate' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'listenv' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'backports' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'evaluate' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'codetools' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'htmlwidgets' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'rprojroot' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'yaml' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'lazyeval' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'htmltools' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'withr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:39 UTC] * Loading 'DBI' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Loading 'globals' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Loading 'stringr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Loading 'magrittr' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Loading 'Rcpp' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Loading 'igraph' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Attaching 'dplyr' at position 2 ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Attaching 'future' at position 4 ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Attaching 'RColorBrewer' at position 5 ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Attaching 'chorddiag' at position 6 ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] * Attaching 'networkD3' at position 7 ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:40 UTC] Previously attached and loaded packages restored.</span>
 <span class="kw">print</span>(<span class="kw">sessionInfo</span>())
 <span class="co">#&gt; R version 3.2.5 (2016-04-14)</span>
 <span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span>
@@ -392,7 +398,7 @@
 <span class="co">#&gt; other attached packages:</span>
 <span class="co">#&gt; [1] dplyr_0.4.1        memoise_1.1.0      future_1.0.1      </span>
 <span class="co">#&gt; [4] RColorBrewer_1.1-2 chorddiag_0.1.1    networkD3_0.2.13  </span>
-<span class="co">#&gt; [7] modulr_0.1.7.9185 </span>
+<span class="co">#&gt; [7] modulr_0.1.7.9186 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
 <span class="co">#&gt;  [1] Rcpp_0.12.11          tools_3.2.5           digest_0.6.12        </span>
@@ -418,8 +424,8 @@
 <span class="st">    </span><span class="kw">as.data.frame</span>(<span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>) %&gt;%<span class="st"> </span>
 <span class="st">    </span>head
 }))</code></pre></div>
-<pre><code>#&gt; [2017-06-19T19:32:28 UTC] Isolating from loaded and attached packages ...
-#&gt; [2017-06-19T19:32:30 UTC] Isolated from loaded and attached packages.
+<pre><code>#&gt; [2017-06-21T21:58:40 UTC] Isolating from loaded and attached packages ...
+#&gt; [2017-06-21T21:58:42 UTC] Isolated from loaded and attached packages.
 #&gt; 
 #&gt; Attaching package: 'dplyr'
 #&gt; The following objects are masked from 'package:stats':
@@ -428,8 +434,8 @@
 #&gt; The following objects are masked from 'package:base':
 #&gt; 
 #&gt;     intersect, setdiff, setequal, union
-#&gt; [2017-06-19T19:32:30 UTC] Restoring previously attached and loaded packages ...
-#&gt; [2017-06-19T19:32:31 UTC] Previously attached and loaded packages restored.
+#&gt; [2017-06-21T21:58:42 UTC] Restoring previously attached and loaded packages ...
+#&gt; [2017-06-21T21:58:43 UTC] Previously attached and loaded packages restored.
 #&gt;   speed dist
 #&gt; 1     4   10
 #&gt; 2     4    2
@@ -457,10 +463,10 @@
   }))
 }</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"experimental/arranged_cars"</span>)
-<span class="co">#&gt; [2017-06-19T19:32:31 UTC] Making 'experimental/arranged_cars' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:31 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:31 UTC] ** Defining 'experimental/arranged_cars' ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:31 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:43 UTC] Making 'experimental/arranged_cars' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:43 UTC] ** Defining 'experimental/arranged_cars' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:43 UTC] * Constructing dependency graph ... OK</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'dplyr'</span>
 <span class="co">#&gt; The following objects are masked from 'package:stats':</span>
@@ -469,7 +475,7 @@
 <span class="co">#&gt; The following objects are masked from 'package:base':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     intersect, setdiff, setequal, union</span>
-<span class="co">#&gt; [2017-06-19T19:32:35 UTC] DONE ('experimental/arranged_cars' in 3.6 secs)</span>
+<span class="co">#&gt; [2017-06-21T21:58:47 UTC] DONE ('experimental/arranged_cars' in 3.6 secs)</span>
 <span class="co">#&gt;   speed dist</span>
 <span class="co">#&gt; 1     4   10</span>
 <span class="co">#&gt; 2     4    2</span>

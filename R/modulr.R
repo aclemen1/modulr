@@ -33,11 +33,14 @@ NULL
 
 .default_injector <- .initialize_injector()
 
+# TODO rewrite with "with_injector"
 .default_injector$get <- function(...) {
   injector_ <- set_default_injector()
   on.exit(set_injector(injector_))
   make(...)
 }
+
+# TODO rewrite with "with_injector"
 .default_injector$provider <- function(...) {
   injector_ <- set_default_injector()
   on.exit(set_injector(injector_))

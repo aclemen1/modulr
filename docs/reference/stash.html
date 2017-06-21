@@ -73,6 +73,12 @@
   <a href="../articles/modulr.html">Introduction</a>
 </li>
 <li>
+  <a href="../articles/testing.html">Unit Testing</a>
+</li>
+<li>
+  <a href="../articles/packages.html">Using modulr in packages</a>
+</li>
+<li>
   <a href="../articles/experimental.html">Experimental</a>
 </li>
 <li>
@@ -161,18 +167,18 @@ the stack.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()
-<span class='fu'>remove_stash</span>(<span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [2017-06-19T19:32:19 UTC] Removing all stashes ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2017-06-19T19:32:19 UTC] Defining 'foo' ... OK</div><div class='input'><span class='fu'>stash</span>(<span class='st'>"'foo' only"</span>)</div><div class='output co'>#&gt; [2017-06-19T19:32:19 UTC] Stashing modulr state, stash #1 ... OK</div><div class='input'><span class='fu'>list_stashes</span>()</div><div class='output co'>#&gt;   id               timestamp    comment
-#&gt; 1  1 2017-06-19T19:32:19 UTC 'foo' only</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"bar"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2017-06-19T19:32:19 UTC] Defining 'bar' ... OK</div><div class='input'><span class='fu'>stash</span>(<span class='st'>"'foo' and 'bar'"</span>)</div><div class='output co'>#&gt; [2017-06-19T19:32:19 UTC] Stashing modulr state, stash #2 ... OK</div><div class='input'><span class='fu'>list_stashes</span>()</div><div class='output co'>#&gt;   id               timestamp         comment
-#&gt; 1  1 2017-06-19T19:32:19 UTC      'foo' only
-#&gt; 2  2 2017-06-19T19:32:19 UTC 'foo' and 'bar'</div><div class='input'><span class='fu'><a href='list_modules.html'>list_modules</a></span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses      size
+<span class='fu'>remove_stash</span>(<span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:31 UTC] Removing all stashes ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:31 UTC] Defining 'foo' ... OK</div><div class='input'><span class='fu'>stash</span>(<span class='st'>"'foo' only"</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:31 UTC] Stashing modulr state, stash #1 ... OK</div><div class='input'><span class='fu'>list_stashes</span>()</div><div class='output co'>#&gt;   id               timestamp    comment
+#&gt; 1  1 2017-06-21T21:58:31 UTC 'foo' only</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"bar"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:31 UTC] Defining 'bar' ... OK</div><div class='input'><span class='fu'>stash</span>(<span class='st'>"'foo' and 'bar'"</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:31 UTC] Stashing modulr state, stash #2 ... OK</div><div class='input'><span class='fu'>list_stashes</span>()</div><div class='output co'>#&gt;   id               timestamp         comment
+#&gt; 1  1 2017-06-21T21:58:31 UTC      'foo' only
+#&gt; 2  2 2017-06-21T21:58:31 UTC 'foo' and 'bar'</div><div class='input'><span class='fu'><a href='list_modules.html'>list_modules</a></span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses      size
 #&gt; 1  bar    &lt;NA&gt; in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0    0 888 bytes
 #&gt; 2  foo    &lt;NA&gt; in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0    0 888 bytes
 #&gt;   lines                modified
-#&gt; 1     2 2017-06-19T19:32:19 UTC
-#&gt; 2     2 2017-06-19T19:32:19 UTC</div><div class='input'><span class='fu'>unstash</span>(<span class='fl'>1L</span>)</div><div class='output co'>#&gt; [2017-06-19T19:32:19 UTC] Unstashing modulr state, stash #1 ... OK</div><div class='input'><span class='fu'><a href='list_modules.html'>list_modules</a></span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses      size
+#&gt; 1     2 2017-06-21T21:58:31 UTC
+#&gt; 2     2 2017-06-21T21:58:31 UTC</div><div class='input'><span class='fu'>unstash</span>(<span class='fl'>1L</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:31 UTC] Unstashing modulr state, stash #1 ... OK</div><div class='input'><span class='fu'><a href='list_modules.html'>list_modules</a></span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses      size
 #&gt; 1  foo    &lt;NA&gt; in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0    0 888 bytes
 #&gt;   lines                modified
-#&gt; 1     2 2017-06-19T19:32:19 UTC</div><div class='input'>
+#&gt; 1     2 2017-06-21T21:58:31 UTC</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

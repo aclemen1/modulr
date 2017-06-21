@@ -1,0 +1,191 @@
+--- 
+title: 
+  "Using modulr in packages" 
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: > 
+  %\VignetteIndexEntry{Using modulr in packages} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}{inputenc} 
+---
+
+```{r, echo = FALSE, message = FALSE, results = 'hide'}
+set.seed(1234L)
+modules_path <- file.path(
+  if (grepl("/docs/", getwd(), fixed = TRUE)) file.path("..", "..") else "..",
+  "inst", "modules")
+library(modulr)
+library(networkD3)
+library(chorddiag)
+library(RColorBrewer)
+library(memoise)
+library(devtools)
+options(knitr.duplicate.label = 'allow')
+`%<=%` <- modulr::`%<=%`
+Sys.setlocale("LC_TIME", "en_DK.UTF-8")
+Sys.setenv(TZ = 'UTC')
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "./figures/modulr-",
+  fig.width = 6.0,
+  fig.height = 4.0,
+  out.width = "90%",
+  fig.align = "center"
+)
+BUILD <-
+  identical(tolower(Sys.getenv("BUILD")), "true") &&
+  !identical(tolower(Sys.getenv("TRAVIS")), "true") &&
+  identical(tolower(Sys.getenv("NOT_CRAN")), "true")
+knitr::opts_chunk$set(purl = BUILD)
+gears_path <- file.path(tempdir(), "gears")
+unlink(gears_path, recursive = TRUE)
+options(modulr.gears_path = gears_path)
+reset <- function() {
+  modulr::reset()
+  root_config$set(modules_path)
+}
+```
+
+A package can import modulr for its own usage. There are then essentially two different and complementary ways to exploit all of the modulr features: for the limited scope of the _internals_ of the package itself and/or for an exported usage.
+
+# Internal scope
+
+In this use case, modules are defined and used _inside_ the package's namespace, without interference with any usage that could be made of modulr _outside_ of the package. Something ressembling the following lines of code should then appear in your `./R` package files:
+
+```r
+# File: ./R/init.R
+
+#' @import modulr
+NULL
+
+my_package_injector <- get_default_injector()
+set_verbosity(0L)
+```
+
+Notice that we are using [Roxygen2](https://github.com/klutometis/roxygen)'s `@import` tag here to easily populate the `NAMESPACE` file of the package with an appropriate `import` field (the `@importFrom` tag could also import only a selected subset of exported methods from modulr), so that the prefix `modulr::` can be omitted in front of modulr methods (in particular for syntactic sugars like `%provides%` and `%requires%`, see _infra_).
+
+It is also important to make sure that this portion of code is loaded before defining and using modules, which is guaranteed by the `@include` tag (or by manually specifying a collation order in the `NAMESPACE` file):
+
+```r
+# File: ./R/greetings.R
+
+#' @include init.R
+NULL
+
+"hello" %provides% "Hello"
+
+"world" %provides% "World"
+
+"greetings" %requires% list(
+  hello = "hello",
+  world = "world"
+) %provides% {
+  paste0(hello, ", ", tolower(world), "!")
+}
+
+#' @export
+greetings <- function() {
+  with_injector(my_package_injector, make("greetings"))
+}
+```
+
+Notice the `with_injector` wrapper around `make("greetings")` in the body of the exported `greetings` function: since `greetings` is suscpetible to be called from outside of the package's namespace, it is important to specify explicitely that the `make` call relies on the package's default injector captured in the `./R/init.R` file. 
+
+It is also possible to use the injector's `get` method:
+
+```r
+#' @export
+greetings <- function() {
+  my_package_injector$get("greetings")
+}
+```
+
+Notice that none of the modules is directly exposed by the package:
+
+```r
+library(my_package)
+lsmod()
+```
+
+```{r, echo = FALSE}
+modulr::reset()
+lsmod()
+```
+
+
+# Exported usage
+
+In this situation, the package is intended to provide the user with a predefined set of modules. In this example, we define the `"foobar"` module and expose it to the user once the package is loaded:
+
+```r
+# File: ./R/zzz.R
+
+.onLoad <- function(libname, pkgname) {
+
+  with_injector(get_default_injector(), {
+    set_verbosity(0L)
+    "foobar" %provides% "FOOBAR"
+  })
+  
+  invisible(NULL)
+
+}
+```
+
+When the package is loaded, the `"foobar"` module is defined within the scope of the default modulr injector situated outside of the package's namespace. It is then accessible by the user of the package:
+
+```r
+library(my_package)
+lsmod()
+```
+
+```{r, echo = FALSE}
+modulr::set_verbosity(0L)
+define("foobar", NULL, "FOOBAR")
+lsmod()
+```
+
+# Modules in `inst/modules`
+
+Finally, it is possible to define an entire set of on-disk modules at once in the `./inst/modules` directory. For instance:
+
+```r
+# File: ./inst/modules/foo.R
+
+"foo" %provides% "FOO"
+```
+
+In this case, it is necessary to add the path of the `modules` sub-directory of the installed package to the modulr's root paths. The `system.file` function is tailored for this kind of situation:
+
+```r
+# File: ./R/zzz.R
+
+.onLoad <- function(libname, pkgname) {
+
+  # ...
+
+  with_injector(get_default_injector(), {
+    root_config$set(c(
+      root_config$get_all()[[1L]], 
+      system.file("modules", package = "my_package")))
+  })
+  
+  invisible(NULL)
+
+}
+```
+
+Once the package is loaded, the installed `modules` directory is then reachable:
+
+```r
+library(my_package)
+make("foo")
+```
+
+```{r, echo = FALSE}
+modulr::reset()
+"foo" %provides% "FOO"
+make("foo")
+```

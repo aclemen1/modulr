@@ -73,6 +73,14 @@ library(modulr)
 make("foobar")
 ```
 
+## Further readings
+
+* [Why a DI framework for R?](https://aclemen1.github.io/modulr/articles/motivation.html)
+* [Introduction to modulr](https://aclemen1.github.io/modulr/articles/modulr.html)
+* [Unit testing](https://aclemen1.github.io/modulr/articles/testing.html)
+* [Using modulr in packages](https://aclemen1.github.io/modulr/articles/packages.html)
+* [Experimental features](https://aclemen1.github.io/modulr/articles/experimental.html)
+
 ## Installation
 
 ``` r

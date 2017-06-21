@@ -7,6 +7,10 @@ navbar:
       href: articles/motivation.html
     - text: "Introduction"
       href: articles/modulr.html
+    - text: "Unit Testing"
+      href: articles/testing.html
+    - text: "Using modulr in packages"
+      href: articles/packages.html
     - text: "Experimental"
       href: articles/experimental.html
     - text: "Reference"

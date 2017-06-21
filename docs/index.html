@@ -47,6 +47,12 @@
   <a href="articles/modulr.html">Introduction</a>
 </li>
 <li>
+  <a href="articles/testing.html">Unit Testing</a>
+</li>
+<li>
+  <a href="articles/packages.html">Using modulr in packages</a>
+</li>
+<li>
   <a href="articles/experimental.html">Experimental</a>
 </li>
 <li>
@@ -102,10 +108,10 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
 
 <span class="st">"foo"</span> %provides%<span class="st"> "Hello"</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] Defining 'foo' ... OK</span>
 
 <span class="st">"bar"</span> %provides%<span class="st"> "World"</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] Defining 'bar' ... OK</span>
 
 <span class="st">"foobar"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>, 
@@ -113,18 +119,29 @@
 ) %provides%<span class="st"> </span>{
   <span class="kw">paste0</span>(f, <span class="st">", "</span>, <span class="kw">tolower</span>(b), <span class="st">"!"</span>)
 }
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] Defining 'foobar' ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] Defining 'foobar' ... OK</span>
 
 <span class="kw"><a href="reference/make.html">make</a></span>(<span class="st">"foobar"</span>)
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] Making 'foobar' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
-<span class="co">#&gt; [2017-06-19T19:32:06 UTC] DONE ('foobar' in 0.044 secs)</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] Making 'foobar' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
+<span class="co">#&gt; [2017-06-21T21:58:17 UTC] DONE ('foobar' in 0.044 secs)</span>
 <span class="co">#&gt; [1] "Hello, world!"</span></code></pre></div>
+</div>
+<div id="further-readings" class="section level2">
+<h2 class="hasAnchor">
+<a href="#further-readings" class="anchor"></a>Further readings</h2>
+<ul>
+<li><a href="https://aclemen1.github.io/modulr/articles/motivation.html">Why a DI framework for R?</a></li>
+<li><a href="https://aclemen1.github.io/modulr/articles/modulr.html">Introduction to modulr</a></li>
+<li><a href="https://aclemen1.github.io/modulr/articles/testing.html">Unit testing</a></li>
+<li><a href="https://aclemen1.github.io/modulr/articles/packages.html">Using modulr in packages</a></li>
+<li><a href="https://aclemen1.github.io/modulr/articles/experimental.html">Experimental features</a></li>
+</ul>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">

@@ -1,0 +1,268 @@
+--- 
+title: 
+  "Unit testing" 
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: > 
+  %\VignetteIndexEntry{Unit testing} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}{inputenc} 
+---
+
+```{r, echo = FALSE, message = FALSE, results = 'hide'}
+set.seed(1234L)
+modules_path <- file.path(
+  if (grepl("/docs/", getwd(), fixed = TRUE)) file.path("..", "..") else "..",
+  "inst", "modules")
+library(modulr)
+library(networkD3)
+library(chorddiag)
+library(RColorBrewer)
+library(memoise)
+library(devtools)
+options(knitr.duplicate.label = 'allow')
+`%<=%` <- modulr::`%<=%`
+Sys.setlocale("LC_TIME", "en_DK.UTF-8")
+Sys.setenv(TZ = 'UTC')
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "./figures/modulr-",
+  fig.width = 6.0,
+  fig.height = 4.0,
+  out.width = "90%",
+  fig.align = "center"
+)
+BUILD <-
+  identical(tolower(Sys.getenv("BUILD")), "true") &&
+  !identical(tolower(Sys.getenv("TRAVIS")), "true") &&
+  identical(tolower(Sys.getenv("NOT_CRAN")), "true")
+knitr::opts_chunk$set(purl = BUILD)
+gears_path <- file.path(tempdir(), "gears")
+unlink(gears_path, recursive = TRUE)
+options(modulr.gears_path = gears_path)
+reset <- function() {
+  modulr::reset()
+  root_config$set(modules_path)
+}
+```
+
+[Unit testing](https://en.wikipedia.org/wiki/Unit_testing) is a very important aspect of programming and modulr is well-suited for this purpose.
+
+# Single module
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+reset()
+```
+
+Let us consider the following module, exposing a function which computes the first
+terms of the infinite sequence of powers of $2$: $2^0=1$, $2^1=2$, $2^2=4$, $2^3=8$, etc.
+
+```{r}
+"powers_of_2" %provides% {
+  function(terms = 10L) {
+    2L ^ (seq_len(terms) - 1L)
+  }
+}
+```
+
+For all $n\geq1$, let $(x_1, ..., x_n)$ the sequence consisting of the first $n$ powers of $2$. Let us suppose that we want to perform elementary tests on some of these sequences: a. $x_1=1$, b. $x_n=2^{n-1}$, and c. $x_{i+1} = 2x_i$ for all $1\leq i\leq n-1$.
+
+Let us then define `powers_of_2/test`, a dedicated module for testing `powers_of_2` using Hadley Wickham's [testthat](https://github.com/hadley/testthat) package.
+
+```{r}
+"powers_of_2/test" %requires% list(
+  powers_of_2 = "powers_of_2"
+) %provides% {
+  library(testthat)
+  test_that("First term is 1", {
+    for (terms in sample(1L:50L, 3L, replace = FALSE)) {
+      expect_equal(
+        powers_of_2(terms)[1L],
+        1L
+      )
+    }
+  })
+  test_that("Last term is as expected", {
+    for (terms in sample(1L:50L, 3L, replace = FALSE)) {
+      expect_equal(
+        tail(powers_of_2(terms), 1L),
+        2L ^ (terms - 1L)
+      )
+    }
+  })
+  test_that("Any two consecutive terms are as expected", {
+    for (terms in sample(2L:50L, 3L, replace = FALSE)) {
+      series <- powers_of_2(terms)
+      for (index in sample(1L:(terms - 1L), min(10L, (terms - 1L)), 
+                           replace = FALSE)) {
+        expect_equal(series[index] * 2, series[index + 1L])
+      }
+    }
+  })
+}
+```
+
+In order to run the tests, it is sufficient to evaluate this module.
+
+```{r}
+make("powers_of_2/test")
+```
+
+It is also possible to run all available tests.
+
+```{r}
+make_tests()
+```
+
+To illustrate the situation where some test fails, let us consider a faulty version of `powers_of_2`.
+
+```{r}
+"powers_of_2" %provides% {
+  function(terms = 10L) {
+    sequence <- 2L ^ (seq_len(terms) - 1L)
+    # This is a faulty version.
+    sequence[1L] <- 0L
+  }
+}
+```
+
+```{r, error=TRUE, purl=FALSE}
+make_tests()
+```
+
+# Mock dependencies
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+reset()
+```
+
+Let us consider the following module, which relies on RStudio's [cranlogs](https://github.com/metacran/cranlogs) 
+package to request the list of top downloaded packages from their CRAN mirror.
+
+```r
+"get_top_downloads" %provides% {
+  library(cranlogs)
+  function(when = "last-week", count = 100L) {
+    cran_top_downloads(when = when, count = count)
+  }
+}
+```
+
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+reset()
+"get_top_downloads" %provides% {
+  function(...) {
+    structure(
+      list(
+        rank = 1:10, 
+        package = c(
+          "Rcpp", "ggplot2", "tibble", "stringi", "stringr", "lazyeval", 
+          "digest", "R6", "curl", "DBI"), 
+        count = c(103853L, 98595L, 91533L, 83672L, 80901L, 80409L, 78169L, 
+                  77429L, 77094L, 74321L), 
+        from = structure(c(17291, 17291, 17291, 17291, 17291, 17291, 17291, 
+                           17291, 17291, 17291), class = "Date"), 
+        to = structure(c(17297, 17297, 17297, 17297, 17297, 17297, 17297, 
+                         17297, 17297, 17297), class = "Date")), 
+      .Names = c("rank", "package", "count", "from", "to"), 
+      row.names = c(NA, -10L), 
+      class = "data.frame")
+  }
+}
+```
+
+The following module uses Hadley Wickham's [ggplot2](https://github.com/tidyverse/ggplot2) package to plot the list of top downloaded packages.
+
+```{r plot-top-downloads}
+"plot_top_downloads" %requires% list(
+  get_top_downloads = "get_top_downloads"
+) %provides% {
+  library(ggplot2)
+  function(when = "last-week", count = 10L) {
+    top_downloads <- get_top_downloads(when = when, count = count)
+
+    ggplot(data = top_downloads, 
+           aes(x = top_downloads$package, y = top_downloads$count)) + 
+      theme_light() + 
+      theme(axis.text.x = element_text(angle = 90.0, hjust = 1.0)) + 
+      geom_bar(stat = "identity") + 
+      scale_x_discrete(limits = top_downloads$package) +
+      labs(
+        title = sprintf(
+          "Top %d Downloads (%s, RStudio's CRAN mirror)", 
+          count,
+          format(unique(top_downloads$to), format = "%Y-%m-%d")), 
+        x = "Package", y = "Count")
+    
+  }
+}
+
+plot_top_downloads %<=% "plot_top_downloads"
+
+plot_top_downloads()
+```
+
+Testing this module directly would require to be connected on the internet and would stress the RStudio's remote API, which is very bad practice. In order to avoid such prohibited behaviour, it is recommended to define new modules that _mock_ the original functionalities.
+
+```{r}
+"get_top_downloads/mock" %provides% {
+  library(tibble)
+  function(...) {
+    tribble(
+      ~rank, ~package, ~count, ~from, ~to,
+      1L, "Rcpp", 105000L, as.Date("2017-05-05"), as.Date("2017-05-11"),
+      2L, "ggplot2", 100000L, as.Date("2017-05-05"), as.Date("2017-05-11"),
+      3L, "tibble", 90000L, as.Date("2017-05-05"), as.Date("2017-05-11")
+    )
+  }
+}
+```
+
+```{r}
+"plot_top_downloads/mock" %requires% list(
+  get_top_downloads = "get_top_downloads/mock"
+) %provides% get_provider("plot_top_downloads")
+```
+
+Notice the use of `get_provider("plot_top_downloads")` in the second definition: `plot_top_downloads/mock` requires `get_top_downloads/mock`, a mock version of `get_top_downloads`, but provides the same features as `plot_top_downloads`; change the definition of `plot_top_downloads` and it will change the definition of `plot_top_downloads/mock` at the same time.
+
+Along the lines of the first example, you can then define a testing module.
+
+```{r}
+"plot_top_downloads/test" %requires% list(
+  plot_top_downloads = "plot_top_downloads/mock"
+) %provides% {
+  library(testthat)
+  plot <- plot_top_downloads()
+  test_that("X-Axis is labelled 'Package'", {
+    expect_identical(plot$labels$x, "Package")
+  })
+  test_that("Y-Axis is labelled 'Count'", {
+    expect_identical(plot$labels$y, "Count")
+  })
+  test_that("Plot layers match expectations", {
+    expect_is(plot$layers[[1L]], "ggproto")
+    expect_is(plot$layers[[1L]]$geom, "GeomBar")
+    expect_is(plot$layers[[1L]]$stat, "StatIdentity")
+  })
+}
+```
+
+```{r}
+make_tests()
+```
+
+# Testing _modulr gears_
+
+As a last example, it is considered a good practice to provide all __modulr gears__ with appropriate tests, as illustrated by [https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3](https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3).
+
+```{r, include=FALSE}
+reset()
+```
+
+```{r}
+"modulr/vault" %imports% "3fcc508cb40ddac6c1e3"
+make_tests()
+```
