@@ -26,19 +26,19 @@ matrix:
             - valgrind
     - os: osx
       osx_image: xcode8.3
-      disable_homebrew: true
+      brew_packages: openssl
       latex: false
       r_build_args: '--no-build-vignettes'
       r_check_args: '--no-vignettes'
     - os: osx
       osx_image: xcode7.3
-      disable_homebrew: true
+      brew_packages: openssl
       latex: false
       r_build_args: '--no-build-vignettes'
       r_check_args: '--no-vignettes'
     - os: osx
       osx_image: beta-xcode6.4
-      disable_homebrew: true
+      brew_packages: openssl
       latex: false
       r_build_args: '--no-build-vignettes'
       r_check_args: '--no-vignettes'
