@@ -1,4 +1,4 @@
-# Compute a SHA-1 digest of an R object
+# Compute a digest of an R object
 .hash <- function(object) {
 
   digest::digest(object, algo = "xxhash64")

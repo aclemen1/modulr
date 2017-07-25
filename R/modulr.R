@@ -27,27 +27,14 @@ NULL
   injector
 }
 
+.default_injector <- .initialize_injector()
+
 .set_injector <- function(injector) {
   .modulr_env$injector <- injector
 }
 
-.default_injector <- .initialize_injector()
-
-# TODO rewrite with "with_injector"
-.default_injector$get <- function(...) {
-  injector_ <- set_default_injector()
-  on.exit(set_injector(injector_))
-  make(...)
-}
-
-# TODO rewrite with "with_injector"
-.default_injector$provider <- function(...) {
-  injector_ <- set_default_injector()
-  on.exit(set_injector(injector_))
-  define(...)
-}
-
 .set_injector(injector = .default_injector)
+
 
 #' With Injector.
 #'
@@ -163,6 +150,14 @@ set_injector <- function(injector = new_injector()) {
   .set_injector(injector = injector)
 
   injector_
+}
+
+.default_injector$get <- function(...) {
+  with_injector(get_default_injector(), make(...))
+}
+
+.default_injector$get <- function(...) {
+  with_injector(get_default_injector(), define(...))
 }
 
 #' @rdname injector

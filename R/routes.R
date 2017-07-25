@@ -70,7 +70,10 @@
   },
   candidates)
 
-  if (length(candidates) == 0L) return(name)
+  if (length(candidates) == 0L) return(list(
+    name = name,
+    scope_name = scope_name,
+    resolved = name))
 
   maximum_length <- max(unlist(Map(
     function(candidate) {

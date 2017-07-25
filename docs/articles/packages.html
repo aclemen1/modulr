@@ -101,7 +101,7 @@
 my_package_injector &lt;-<span class="st"> </span><span class="kw"><a href="../reference/injector.html">get_default_injector</a></span>()
 <span class="kw"><a href="../reference/set_verbosity.html">set_verbosity</a></span>(0L)</code></pre></div>
 <p>Notice that we are using <a href="https://github.com/klutometis/roxygen">Roxygen2</a>’s <code>@import</code> tag here to easily populate the <code>NAMESPACE</code> file of the package with an appropriate <code>import</code> field (the <code>@importFrom</code> tag could also import only a selected subset of exported methods from modulr), so that the prefix <code>modulr::</code> can be omitted in front of modulr methods (in particular for syntactic sugars like <code>%provides%</code> and <code>%requires%</code>, see <em>infra</em>).</p>
-<p>It is also important to make sure that this portion of code is loaded before defining and using modules, which is guaranteed by the <code>@include</code> tag (or by manually specifying a collation order in the <code>NAMESPACE</code> file):</p>
+<p>It is also important to make sure that this portion of code is loaded before defining and using modules, which is guaranteed by the <code>@include</code> tag (or by manually specifying a collation order in the <code>NAMESPACE</code> file), as shown in the following example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># File: ./R/greetings.R</span>
 
 <span class="co">#' @include init.R</span>
@@ -119,24 +119,24 @@ my_package_injector &lt;-<span class="st"> </span><span class="kw"><a href="../r
 }
 
 <span class="co">#' @export</span>
-greetings &lt;-<span class="st"> </span>function() {
+say_hello &lt;-<span class="st"> </span>function() {
   <span class="kw"><a href="../reference/with_injector.html">with_injector</a></span>(my_package_injector, <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"greetings"</span>))
 }</code></pre></div>
-<p>Notice the <code>with_injector</code> wrapper around <code><a href="../reference/make.html">make("greetings")</a></code> in the body of the exported <code>greetings</code> function: since <code>greetings</code> is suscpetible to be called from outside of the package’s namespace, it is important to specify explicitely that the <code>make</code> call relies on the package’s default injector captured in the <code>./R/init.R</code> file.</p>
+<p>Notice the <code>with_injector</code> wrapper around <code><a href="../reference/make.html">make("greetings")</a></code> in the body of the exported <code>say_hello</code> function: since <code>say_hello</code> is suscpetible to be called from outside of the package’s namespace, it is important to specify explicitely that the <code>make</code> call relies on the package’s default injector captured in the <code>./R/init.R</code> file.</p>
 <p>It is also possible to use the injector’s <code>get</code> method:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#' @export</span>
-greetings &lt;-<span class="st"> </span>function() {
+say_hello &lt;-<span class="st"> </span>function() {
   my_package_injector$<span class="kw"><a href="../reference/config.html">get</a></span>(<span class="st">"greetings"</span>)
 }</code></pre></div>
 <p>Notice that none of the modules is directly exposed by the package:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(my_package)
-<span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>()</code></pre></div>
-<pre><code>#&gt; [2017-06-21T21:59:06 UTC] Resetting modulr state ... OK</code></pre>
+(modulr::<span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>())</code></pre></div>
+<pre><code>#&gt; NULL</code></pre>
 </div>
 <div id="exported-usage" class="section level1">
 <h1 class="hasAnchor">
 <a href="#exported-usage" class="anchor"></a>Exported usage</h1>
-<p>In this situation, the package is intended to provide the user with a predefined set of modules. In this example, we define the <code>"foobar"</code> module and expose it to the user once the package is loaded:</p>
+<p>In this situation, the package is intended to provide the user with a predefined set of modules. The following example shows how to use the <code>.onLoad</code> hook function to define a module, just before sealing the namespace of the package and processing exports:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># File: ./R/zzz.R</span>
 
 .onLoad &lt;-<span class="st"> </span>function(libname, pkgname) {
@@ -151,11 +151,11 @@ greetings &lt;-<span class="st"> </span>function() {
 }</code></pre></div>
 <p>When the package is loaded, the <code>"foobar"</code> module is defined within the scope of the default modulr injector situated outside of the package’s namespace. It is then accessible by the user of the package:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(my_package)
-<span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>()</code></pre></div>
+modulr::<span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>()</code></pre></div>
 <pre><code>#&gt;     name version   storage along type weight calls dependencies uses
 #&gt; 1 foobar    &lt;NA&gt; in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0    0
 #&gt;        size lines                modified
-#&gt; 1 152 bytes     2 2017-06-21T21:59:06 UTC</code></pre>
+#&gt; 1 152 bytes     2 2017-07-25T19:15:39 UTC</code></pre>
 </div>
 <div id="modules-in-instmodules" class="section level1">
 <h1 class="hasAnchor">
@@ -163,6 +163,8 @@ greetings &lt;-<span class="st"> </span>function() {
 </h1>
 <p>Finally, it is possible to define an entire set of on-disk modules at once in the <code>./inst/modules</code> directory. For instance:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># File: ./inst/modules/foo.R</span>
+
+<span class="kw">library</span>(modulr)
 
 <span class="st">"foo"</span> %provides%<span class="st"> "FOO"</span></code></pre></div>
 <p>In this case, it is necessary to add the path of the <code>modules</code> sub-directory of the installed package to the modulr’s root paths. The <code>system.file</code> function is tailored for this kind of situation:</p>
@@ -183,12 +185,13 @@ greetings &lt;-<span class="st"> </span>function() {
 }</code></pre></div>
 <p>Once the package is loaded, the installed <code>modules</code> directory is then reachable:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(my_package)
-<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foo"</span>)</code></pre></div>
-<pre><code>#&gt; [2017-06-21T21:59:06 UTC] Defining 'foo' ... OK
-#&gt; [2017-06-21T21:59:06 UTC] Making 'foo' ...
-#&gt; [2017-06-21T21:59:06 UTC] * Visiting and defining dependencies ...
-#&gt; [2017-06-21T21:59:06 UTC] * Constructing dependency graph ... OK
-#&gt; [2017-06-21T21:59:06 UTC] DONE ('foo' in 0.018 secs)
+modulr::<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foo"</span>)</code></pre></div>
+<pre><code>#&gt; [2017-07-25T19:15:39 UTC] Resetting modulr state ... OK
+#&gt; [2017-07-25T19:15:39 UTC] Defining 'foo' ... OK
+#&gt; [2017-07-25T19:15:39 UTC] Making 'foo' ...
+#&gt; [2017-07-25T19:15:39 UTC] * Visiting and defining dependencies ...
+#&gt; [2017-07-25T19:15:39 UTC] * Constructing dependency graph ... OK
+#&gt; [2017-07-25T19:15:39 UTC] DONE ('foo' in 0.019 secs)
 #&gt; [1] "FOO"</code></pre>
 </div>
 </div>

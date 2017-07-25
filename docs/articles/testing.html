@@ -98,7 +98,7 @@
     2L ^<span class="st"> </span>(<span class="kw">seq_len</span>(terms) -<span class="st"> </span>1L)
   }
 }
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] Defining 'powers_of_2' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Defining 'powers_of_2' ... OK</span></code></pre></div>
 <p>For all <span class="math inline">\(n\geq1\)</span>, let <span class="math inline">\((x_1, ..., x_n)\)</span> the sequence consisting of the first <span class="math inline">\(n\)</span> powers of <span class="math inline">\(2\)</span>. Let us suppose that we want to perform elementary tests on some of these sequences: a. <span class="math inline">\(x_1=1\)</span>, b. <span class="math inline">\(x_n=2^{n-1}\)</span>, and c. <span class="math inline">\(x_{i+1} = 2x_i\)</span> for all <span class="math inline">\(1\leq i\leq n-1\)</span>.</p>
 <p>Let us then define <code>powers_of_2/test</code>, a dedicated module for testing <code>powers_of_2</code> using Hadley Wickham’s <a href="https://github.com/hadley/testthat">testthat</a> package.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"powers_of_2/test"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
@@ -131,20 +131,20 @@
     }
   })
 }
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] Defining 'powers_of_2/test' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Defining 'powers_of_2/test' ... OK</span></code></pre></div>
 <p>In order to run the tests, it is sufficient to evaluate this module.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"powers_of_2/test"</span>)
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] Making 'powers_of_2/test' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Evaluating #1/1 (layer #1/1): 'powers_of_2' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] DONE ('powers_of_2/test' in 0.085 secs)</span></code></pre></div>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Making 'powers_of_2/test' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Evaluating #1/1 (layer #1/1): 'powers_of_2' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] DONE ('powers_of_2/test' in 0.085 secs)</span></code></pre></div>
 <p>It is also possible to run all available tests.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make_tests</a></span>()
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] Making 'powers_of_2/test' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] DONE ('powers_of_2/test' in 0.025 secs)</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Making 'powers_of_2/test' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] DONE ('powers_of_2/test' in 0.023 secs)</span>
 <span class="co">#&gt; PASSED.</span></code></pre></div>
 <p>To illustrate the situation where some test fails, let us consider a faulty version of <code>powers_of_2</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"powers_of_2"</span> %provides%<span class="st"> </span>{
@@ -154,12 +154,12 @@
     sequence[1L] &lt;-<span class="st"> </span>0L
   }
 }
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] Re-defining 'powers_of_2' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Re-defining 'powers_of_2' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make_tests</a></span>()
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] Making 'powers_of_2/test' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Evaluating #1/1 (layer #1/1): 'powers_of_2' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Making 'powers_of_2/test' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Evaluating #1/1 (layer #1/1): 'powers_of_2' ...</span>
 <span class="co">#&gt; Error: Test failed: 'First term is 1'</span>
 <span class="co">#&gt; * powers_of_2(terms)[1L] not equal to 1.</span>
 <span class="co">#&gt; 1/1 mismatches</span>
@@ -207,14 +207,14 @@
     
   }
 }
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] Defining 'plot_top_downloads' ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Defining 'plot_top_downloads' ... OK</span>
 
 plot_top_downloads %&lt;=%<span class="st"> "plot_top_downloads"</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] Making 'plot_top_downloads' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] * Evaluating #1/1 (layer #1/1): 'get_top_downloads' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:07 UTC] DONE ('plot_top_downloads' in 0.18 secs)</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Making 'plot_top_downloads' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Evaluating #1/1 (layer #1/1): 'get_top_downloads' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] DONE ('plot_top_downloads' in 0.3 secs)</span>
 
 <span class="kw">plot_top_downloads</span>()</code></pre></div>
 <p><img src="figures/modulr-plot-top-downloads-1.png" width="90%" style="display: block; margin: auto;"></p>
@@ -230,11 +230,11 @@ plot_top_downloads %&lt;=%<span class="st"> "plot_top_downloads"</span>
     )
   }
 }
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] Defining 'get_top_downloads/mock' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Defining 'get_top_downloads/mock' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"plot_top_downloads/mock"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
   <span class="dt">get_top_downloads =</span> <span class="st">"get_top_downloads/mock"</span>
 ) %provides%<span class="st"> </span><span class="kw"><a href="../reference/get_provider.html">get_provider</a></span>(<span class="st">"plot_top_downloads"</span>)
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] Defining 'plot_top_downloads/mock' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Defining 'plot_top_downloads/mock' ... OK</span></code></pre></div>
 <p>Notice the use of <code><a href="../reference/get_provider.html">get_provider("plot_top_downloads")</a></code> in the second definition: <code>plot_top_downloads/mock</code> requires <code>get_top_downloads/mock</code>, a mock version of <code>get_top_downloads</code>, but provides the same features as <code>plot_top_downloads</code>; change the definition of <code>plot_top_downloads</code> and it will change the definition of <code>plot_top_downloads/mock</code> at the same time.</p>
 <p>Along the lines of the first example, you can then define a testing module.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"plot_top_downloads/test"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
@@ -254,16 +254,16 @@ plot_top_downloads %&lt;=%<span class="st"> "plot_top_downloads"</span>
     <span class="kw">expect_is</span>(plot$layers[[1L]]$stat, <span class="st">"StatIdentity"</span>)
   })
 }
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] Defining 'plot_top_downloads/test' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Defining 'plot_top_downloads/test' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make_tests</a></span>()
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] Making 'plot_top_downloads/test' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] * Sorting 2 dependencies with 2 relations ... on 2 layers, OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] ** Evaluating #1/2 (layer #1/2): 'get_top_downloads/mock' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] ** Evaluating #2/2 (layer #2/2): 'plot_top_downloads/mock' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] DONE ('plot_top_downloads/test' in 0.13 secs)</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Making 'plot_top_downloads/test' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] * Sorting 2 dependencies with 2 relations ... on 2 layers, OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] ** Evaluating #1/2 (layer #1/2): 'get_top_downloads/mock' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] ** Evaluating #2/2 (layer #2/2): 'plot_top_downloads/mock' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] DONE ('plot_top_downloads/test' in 0.079 secs)</span>
 <span class="co">#&gt; PASSED. You're #1.</span></code></pre></div>
 </div>
 <div id="testing-modulr-gears" class="section level1">
@@ -272,28 +272,28 @@ plot_top_downloads %&lt;=%<span class="st"> "plot_top_downloads"</span>
 </h1>
 <p>As a last example, it is considered a good practice to provide all <strong>modulr gears</strong> with appropriate tests, as illustrated by <a href="https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3" class="uri">https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3</a>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"modulr/vault"</span> %imports%<span class="st"> "3fcc508cb40ddac6c1e3"</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] Importing 'modulr/vault' from gist ID '3fcc508cb40ddac6c1e3' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] * Found 1 file(s) with R flavour (see https://gist.github.com/3fcc508cb40ddac6c1e3).</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] * Installing gear at '/tmp/RtmpYRqw23/gears/modulr/vault/f208585f94b94591'.</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] DONE ('modulr/vault')</span>
-<span class="co">#&gt; [2017-06-21T21:59:08 UTC] Defining 'modulr/vault/example_SECRET_' ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] Defining 'modulr/vault/example' ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] Defining 'modulr/vault#0.1.0' ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] Defining 'modulr/vault#0.1.0/mock' ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] Defining 'modulr/vault#0.1.0/test' ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] Digest of 'modulr/vault#0.1.0' is '390032bb2476c24e'.</span>
+<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Importing 'modulr/vault' from gist ID '3fcc508cb40ddac6c1e3' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Found 1 file(s) with R flavour (see https://gist.github.com/3fcc508cb40ddac6c1e3).</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Installing gear at '/tmp/RtmphggHwL/gears/modulr/vault/b91b13dfae696a19'.</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] DONE ('modulr/vault')</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault/example_SECRET_' ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault/example' ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault#0.1.0' ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault#0.1.0/mock' ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault#0.1.0/test' ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Digest of 'modulr/vault#0.1.0' is '390032bb2476c24e'.</span>
 <span class="kw"><a href="../reference/make.html">make_tests</a></span>()
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] Making 'modulr/vault#0.1.0/test' ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-06-21T21:59:09 UTC] * Evaluating #1/1 (layer #1/1): 'modulr/vault#0.1.0/mock' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Making 'modulr/vault#0.1.0/test' ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Evaluating #1/1 (layer #1/1): 'modulr/vault#0.1.0/mock' ...</span>
 <span class="co">#&gt; Loading required package: base64enc</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'assertthat'</span>
 <span class="co">#&gt; The following object is masked from 'package:tibble':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     has_name</span>
-<span class="co">#&gt; [2017-06-21T21:59:17 UTC] DONE ('modulr/vault#0.1.0/test' in 8.3 secs)</span>
+<span class="co">#&gt; [2017-07-25T19:15:50 UTC] DONE ('modulr/vault#0.1.0/test' in 7.8 secs)</span>
 <span class="co">#&gt; PASSED.</span></code></pre></div>
 </div>
 </div>

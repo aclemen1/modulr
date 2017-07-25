@@ -196,41 +196,41 @@ takes place.</p></dd>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2017-06-21T21:58:23 UTC] Resetting modulr state ... OK</div><div class='input'><span class='fu'>list_modules</span>()
-<span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='fu'>Sys.sleep</span>(<span class='fl'>1L</span>))</div><div class='output co'>#&gt; [2017-06-21T21:58:23 UTC] Defining 'foo' ... OK</div><div class='input'><span class='fu'>list_modules</span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses   size lines
+    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2017-07-25T19:14:56 UTC] Resetting modulr state ... OK</div><div class='input'><span class='fu'>list_modules</span>()
+<span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='fu'>Sys.sleep</span>(<span class='fl'>1L</span>))</div><div class='output co'>#&gt; [2017-07-25T19:14:56 UTC] Defining 'foo' ... OK</div><div class='input'><span class='fu'>list_modules</span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses   size lines
 #&gt; 1  foo    &lt;NA&gt; in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0    0 1.1 Kb     2
 #&gt;                  modified
-#&gt; 1 2017-06-21T21:58:23 UTC</div><div class='input'><span class='fu'>list_modules</span>(<span class='kw'>reserved</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;                name    version   storage along type weight calls dependencies
+#&gt; 1 2017-07-25T19:14:56 UTC</div><div class='input'><span class='fu'>list_modules</span>(<span class='kw'>reserved</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;                name    version   storage along type weight calls dependencies
 #&gt; 1               foo       &lt;NA&gt; in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0
-#&gt; 2 modulr#0.1.7.9186 0.1.7.9186 in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0
+#&gt; 2 modulr#0.1.7.9187 0.1.7.9187 in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0
 #&gt;   uses   size lines                modified
-#&gt; 1    0 1.1 Kb     2 2017-06-21T21:58:23 UTC
-#&gt; 2    0 116 Kb    66 2017-06-21T21:58:23 UTC</div><div class='input'><span class='fu'>list_modules</span>(<span class='kw'>reserved</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>wide</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [1] "foo"               "modulr#0.1.7.9186"</div><div class='input'><span class='fu'>invisible</span>(<span class='fu'><a href='make.html'>make</a></span>(<span class='st'>"foo"</span>))</div><div class='output co'>#&gt; [2017-06-21T21:58:23 UTC] Making 'foo' ...
-#&gt; [2017-06-21T21:58:23 UTC] * Visiting and defining dependencies ...
-#&gt; [2017-06-21T21:58:23 UTC] * Constructing dependency graph ... OK
-#&gt; [2017-06-21T21:58:24 UTC] DONE ('foo' in 1 secs)</div><div class='input'><span class='fu'>list_modules</span>(<span class='kw'>reserved</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>full</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;                name    version   storage filepath  url along type  weight calls
+#&gt; 1    0 1.1 Kb     2 2017-07-25T19:14:56 UTC
+#&gt; 2    0 116 Kb    66 2017-07-25T19:14:56 UTC</div><div class='input'><span class='fu'>list_modules</span>(<span class='kw'>reserved</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>wide</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [1] "foo"               "modulr#0.1.7.9187"</div><div class='input'><span class='fu'>invisible</span>(<span class='fu'><a href='make.html'>make</a></span>(<span class='st'>"foo"</span>))</div><div class='output co'>#&gt; [2017-07-25T19:14:56 UTC] Making 'foo' ...
+#&gt; [2017-07-25T19:14:56 UTC] * Visiting and defining dependencies ...
+#&gt; [2017-07-25T19:14:56 UTC] * Constructing dependency graph ... OK
+#&gt; [2017-07-25T19:14:57 UTC] DONE ('foo' in 1 secs)</div><div class='input'><span class='fu'>list_modules</span>(<span class='kw'>reserved</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>full</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;                name    version   storage filepath  url along type  weight calls
 #&gt; 1               foo       &lt;NA&gt; in-memory     &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt; NULL 0 bytes     1
-#&gt; 2 modulr#0.1.7.9186 0.1.7.9186 in-memory     &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt; &lt;NA&gt;    &lt;NA&gt;     0
+#&gt; 2 modulr#0.1.7.9187 0.1.7.9187 in-memory     &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt; &lt;NA&gt;    &lt;NA&gt;     0
 #&gt;   dependencies uses   size lines chars                 created
-#&gt; 1            0    0 1.1 Kb     2    25 2017-06-21T21:58:23 UTC
-#&gt; 2            0    0 116 Kb    66  3165 2017-06-21T21:58:23 UTC
+#&gt; 1            0    0 1.1 Kb     2    25 2017-07-25T19:14:56 UTC
+#&gt; 2            0    0 116 Kb    66  3165 2017-07-25T19:14:56 UTC
 #&gt;                  modified duration           digest
-#&gt; 1 2017-06-21T21:58:24 UTC 1.000267 a7a826f201a387b4
-#&gt; 2 2017-06-21T21:58:23 UTC       NA 74a025959c822597</div><div class='input'><span class='fu'>list_modules</span>(
+#&gt; 1 2017-07-25T19:14:57 UTC 1.000271 a7a826f201a387b4
+#&gt; 2 2017-07-25T19:14:56 UTC       NA 74a025959c822597</div><div class='input'><span class='fu'>list_modules</span>(
   <span class='kw'>reserved</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>formatted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>cols</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"weight"</span>, <span class='st'>"size"</span>, <span class='st'>"modified"</span>, <span class='st'>"created"</span>))</div><div class='output co'>#&gt;                name weight   size            modified             created
-#&gt; 1               foo      0   1104 2017-06-21 21:58:24 2017-06-21 21:58:23
-#&gt; 2 modulr#0.1.7.9186   &lt;NA&gt; 118744 2017-06-21 21:58:23 2017-06-21 21:58:23</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"bar"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='fu'>Sys.sleep</span>(<span class='fl'>1L</span>))</div><div class='output co'>#&gt; [2017-06-21T21:58:24 UTC] Defining 'bar' ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foobar"</span>, <span class='fu'>list</span>(<span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"foo"</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='st'>"bar"</span>), <span class='kw'>function</span>(<span class='no'>f</span>, <span class='no'>b</span>) <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:24 UTC] Defining 'foobar' ... OK</div><div class='output co'>#&gt; <span class='warning'>Warning: [2017-06-21T21:58:24 UTC] Possibly 2 unused dependencies: ‘f’, ‘b’.</span></div><div class='input'><span class='fu'>invisible</span>(<span class='fu'><a href='make.html'>make</a></span>(<span class='st'>"foobar"</span>))</div><div class='output co'>#&gt; [2017-06-21T21:58:24 UTC] Making 'foobar' ...
-#&gt; [2017-06-21T21:58:24 UTC] * Visiting and defining dependencies ...
-#&gt; [2017-06-21T21:58:24 UTC] * Constructing dependency graph ... OK
-#&gt; [2017-06-21T21:58:24 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#&gt; [2017-06-21T21:58:24 UTC] * Evaluating new and outdated dependencies ...
-#&gt; [2017-06-21T21:58:24 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
-#&gt; [2017-06-21T21:58:25 UTC] DONE ('foobar' in 1 secs)</div><div class='input'><span class='fu'>Sys.sleep</span>(<span class='fl'>1L</span>)
-<span class='fu'><a href='touch.html'>touch</a></span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:26 UTC] Touching 'foo' ... OK</div><div class='input'><span class='fu'>list_modules</span>(<span class='st'>".oo.*"</span>, <span class='kw'>cols</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"weight"</span>, <span class='st'>"size"</span>, <span class='st'>"modified"</span>, <span class='st'>"created"</span>))</div><div class='output co'>#&gt;     name  weight   size                modified                 created
-#&gt; 1    foo    &lt;NA&gt; 1.1 Kb 2017-06-21T21:58:26 UTC 2017-06-21T21:58:23 UTC
-#&gt; 2 foobar 0 bytes 1.2 Kb 2017-06-21T21:58:25 UTC 2017-06-21T21:58:24 UTC</div><div class='input'>
+#&gt; 1               foo      0   1104 2017-07-25 19:14:57 2017-07-25 19:14:56
+#&gt; 2 modulr#0.1.7.9187   &lt;NA&gt; 118744 2017-07-25 19:14:56 2017-07-25 19:14:56</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"bar"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='fu'>Sys.sleep</span>(<span class='fl'>1L</span>))</div><div class='output co'>#&gt; [2017-07-25T19:14:57 UTC] Defining 'bar' ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foobar"</span>, <span class='fu'>list</span>(<span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"foo"</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='st'>"bar"</span>), <span class='kw'>function</span>(<span class='no'>f</span>, <span class='no'>b</span>) <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2017-07-25T19:14:57 UTC] Defining 'foobar' ... OK</div><div class='output co'>#&gt; <span class='warning'>Warning: [2017-07-25T19:14:57 UTC] Possibly 2 unused dependencies: ‘f’, ‘b’.</span></div><div class='input'><span class='fu'>invisible</span>(<span class='fu'><a href='make.html'>make</a></span>(<span class='st'>"foobar"</span>))</div><div class='output co'>#&gt; [2017-07-25T19:14:57 UTC] Making 'foobar' ...
+#&gt; [2017-07-25T19:14:57 UTC] * Visiting and defining dependencies ...
+#&gt; [2017-07-25T19:14:57 UTC] * Constructing dependency graph ... OK
+#&gt; [2017-07-25T19:14:57 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#&gt; [2017-07-25T19:14:57 UTC] * Evaluating new and outdated dependencies ...
+#&gt; [2017-07-25T19:14:57 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
+#&gt; [2017-07-25T19:14:58 UTC] DONE ('foobar' in 1 secs)</div><div class='input'><span class='fu'>Sys.sleep</span>(<span class='fl'>1L</span>)
+<span class='fu'><a href='touch.html'>touch</a></span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt; [2017-07-25T19:14:59 UTC] Touching 'foo' ... OK</div><div class='input'><span class='fu'>list_modules</span>(<span class='st'>".oo.*"</span>, <span class='kw'>cols</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"weight"</span>, <span class='st'>"size"</span>, <span class='st'>"modified"</span>, <span class='st'>"created"</span>))</div><div class='output co'>#&gt;     name  weight   size                modified                 created
+#&gt; 1    foo    &lt;NA&gt; 1.1 Kb 2017-07-25T19:14:59 UTC 2017-07-25T19:14:56 UTC
+#&gt; 2 foobar 0 bytes 1.2 Kb 2017-07-25T19:14:58 UTC 2017-07-25T19:14:57 UTC</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

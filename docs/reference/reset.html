@@ -154,15 +154,14 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>reset</span>()</div><div class='output co'>#&gt; [2017-06-21T21:58:30 UTC] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:30 UTC] Defining 'foo' ... OK</div><div class='input'><span class='no'>root_config</span>$<span class='fu'><a href='config.html'>set</a></span>(<span class='st'>"./foobar"</span>)
-<span class='fu'><a href='stash.html'>stash</a></span>(<span class='kw'>comment</span> <span class='kw'>=</span> <span class='st'>"foo stash"</span>)</div><div class='output co'>#&gt; [2017-06-21T21:58:30 UTC] Stashing modulr state, stash #1 ... OK</div><div class='input'><span class='fu'><a href='set_verbosity.html'>set_verbosity</a></span>(+<span class='fl'>Inf</span>)
-<span class='fu'>reset</span>()</div><div class='output co'>#&gt; [2017-06-21T21:58:30 UTC] Entering reset() ...
-#&gt; [2017-06-21T21:58:30 UTC] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='list_modules.html'>list_modules</a></span>()
+    <pre class="examples"><div class='input'><span class='fu'>reset</span>()</div><div class='output co'>#&gt; [2017-07-25T19:15:03 UTC] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2017-07-25T19:15:03 UTC] Defining 'foo' ... OK</div><div class='input'><span class='no'>root_config</span>$<span class='fu'><a href='config.html'>set</a></span>(<span class='st'>"./foobar"</span>)
+<span class='fu'><a href='stash.html'>stash</a></span>(<span class='kw'>comment</span> <span class='kw'>=</span> <span class='st'>"foo stash"</span>)</div><div class='output co'>#&gt; [2017-07-25T19:15:03 UTC] Stashing modulr state, stash #1 ... OK</div><div class='input'><span class='fu'><a href='set_verbosity.html'>set_verbosity</a></span>(+<span class='fl'>Inf</span>)
+<span class='fu'>reset</span>()</div><div class='output co'>#&gt; [2017-07-25T19:15:03 UTC] Entering reset() ...
+#&gt; [2017-07-25T19:15:03 UTC] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='list_modules.html'>list_modules</a></span>()
 <span class='fu'><a href='stash.html'>list_stashes</a></span>()</div><div class='output co'>#&gt;   id               timestamp   comment
-#&gt; 1  1 2017-06-21T21:58:30 UTC foo stash</div><div class='input'><span class='no'>root_config</span>$<span class='fu'><a href='config.html'>get_all</a></span>()</div><div class='output co'>#&gt; [[1]]
-#&gt; [1] "../inst/modules"
-#&gt; </div><div class='input'><span class='no'>.Last.name</span></div><div class='output co'>#&gt; NULL</div><div class='input'><span class='fu'>reset</span>(<span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='error'>Error in reset(all = TRUE): unused argument (all = TRUE)</span></div><div class='input'><span class='fu'><a href='stash.html'>list_stashes</a></span>()</div><div class='output co'>#&gt;   id               timestamp   comment
-#&gt; 1  1 2017-06-21T21:58:30 UTC foo stash</div><div class='input'>
+#&gt; 1  1 2017-07-25T19:15:03 UTC foo stash</div><div class='input'><span class='no'>root_config</span>$<span class='fu'><a href='config.html'>get_all</a></span>()</div><div class='output co'>#&gt; [[1]]
+#&gt; [1] "modules" "module"  "libs"    "lib"     "."      
+#&gt; </div><div class='input'><span class='no'>.Last.name</span></div><div class='output co'>#&gt; NULL</div><div class='input'><span class='fu'>reset</span>(<span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [2017-07-25T19:15:03 UTC] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='stash.html'>list_stashes</a></span>()</div><div class='output co'>#&gt; <span class='message'>No stash found.</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

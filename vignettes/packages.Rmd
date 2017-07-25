@@ -15,7 +15,7 @@ set.seed(1234L)
 modules_path <- file.path(
   if (grepl("/docs/", getwd(), fixed = TRUE)) file.path("..", "..") else "..",
   "inst", "modules")
-library(modulr)
+# library(modulr)
 library(networkD3)
 library(chorddiag)
 library(RColorBrewer)
@@ -44,7 +44,7 @@ unlink(gears_path, recursive = TRUE)
 options(modulr.gears_path = gears_path)
 reset <- function() {
   modulr::reset()
-  root_config$set(modules_path)
+  modulr::root_config$set(modules_path)
 }
 ```
 
@@ -66,7 +66,7 @@ set_verbosity(0L)
 
 Notice that we are using [Roxygen2](https://github.com/klutometis/roxygen)'s `@import` tag here to easily populate the `NAMESPACE` file of the package with an appropriate `import` field (the `@importFrom` tag could also import only a selected subset of exported methods from modulr), so that the prefix `modulr::` can be omitted in front of modulr methods (in particular for syntactic sugars like `%provides%` and `%requires%`, see _infra_).
 
-It is also important to make sure that this portion of code is loaded before defining and using modules, which is guaranteed by the `@include` tag (or by manually specifying a collation order in the `NAMESPACE` file):
+It is also important to make sure that this portion of code is loaded before defining and using modules, which is guaranteed by the `@include` tag (or by manually specifying a collation order in the `NAMESPACE` file), as shown in the following example:
 
 ```r
 # File: ./R/greetings.R
@@ -86,18 +86,18 @@ NULL
 }
 
 #' @export
-greetings <- function() {
+say_hello <- function() {
   with_injector(my_package_injector, make("greetings"))
 }
 ```
 
-Notice the `with_injector` wrapper around `make("greetings")` in the body of the exported `greetings` function: since `greetings` is suscpetible to be called from outside of the package's namespace, it is important to specify explicitely that the `make` call relies on the package's default injector captured in the `./R/init.R` file. 
+Notice the `with_injector` wrapper around `make("greetings")` in the body of the exported `say_hello` function: since `say_hello` is suscpetible to be called from outside of the package's namespace, it is important to specify explicitely that the `make` call relies on the package's default injector captured in the `./R/init.R` file. 
 
 It is also possible to use the injector's `get` method:
 
 ```r
 #' @export
-greetings <- function() {
+say_hello <- function() {
   my_package_injector$get("greetings")
 }
 ```
@@ -106,18 +106,18 @@ Notice that none of the modules is directly exposed by the package:
 
 ```r
 library(my_package)
-lsmod()
+(modulr::lsmod())
 ```
 
 ```{r, echo = FALSE}
-modulr::reset()
-lsmod()
+modulr::with_verbosity(0L, modulr::reset())
+(modulr::lsmod())
 ```
 
 
 # Exported usage
 
-In this situation, the package is intended to provide the user with a predefined set of modules. In this example, we define the `"foobar"` module and expose it to the user once the package is loaded:
+In this situation, the package is intended to provide the user with a predefined set of modules. The following example shows how to use the `.onLoad` hook function to define a module, just before sealing the namespace of the package and processing exports:
 
 ```r
 # File: ./R/zzz.R
@@ -138,13 +138,14 @@ When the package is loaded, the `"foobar"` module is defined within the scope of
 
 ```r
 library(my_package)
-lsmod()
+modulr::lsmod()
 ```
 
 ```{r, echo = FALSE}
-modulr::set_verbosity(0L)
-define("foobar", NULL, "FOOBAR")
-lsmod()
+modulr::with_verbosity(0L, {
+  modulr::define("foobar", NULL, "FOOBAR")
+  modulr::lsmod()
+})
 ```
 
 # Modules in `inst/modules`
@@ -153,6 +154,8 @@ Finally, it is possible to define an entire set of on-disk modules at once in th
 
 ```r
 # File: ./inst/modules/foo.R
+
+library(modulr)
 
 "foo" %provides% "FOO"
 ```
@@ -181,11 +184,11 @@ Once the package is loaded, the installed `modules` directory is then reachable:
 
 ```r
 library(my_package)
-make("foo")
+modulr::make("foo")
 ```
 
 ```{r, echo = FALSE}
 modulr::reset()
-"foo" %provides% "FOO"
-make("foo")
+modulr::define("foo", NULL, "FOO")
+modulr::make("foo")
 ```
