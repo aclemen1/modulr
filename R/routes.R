@@ -338,21 +338,21 @@
     assert_that(assertthat::has_attr(versions, "names"))
     Map(assert_that, Map(assertthat::has_attr, versions, "storage"),
         msg = "'storage' attribute missing.")
-    versions <- lapply(names(versions), function(name) {
-      version <- c(versions[[name]])
-      storage <- attr(versions[[name]], "storage")
+    versions <- lapply(seq_along(versions), function(idx) {
+      version <- c(versions[[idx]])
+      storage <- attr(versions[[idx]], "storage")
       node <- list(
         storage = storage,
         version = version
       )
       if (storage == "on-disk") {
         node[["storage"]] <- "on-disk"
-        node[["filepath"]] <- name
+        node[["filepath"]] <- names(versions)[idx]
         node[["name"]] <- NA_character_
       } else {
         node[["storage"]] <- "in-memory"
         node[["filepath"]] <- NA_character_
-        node[["name"]] <- name
+        node[["name"]] <- names(versions)[idx]
       }
       node
     })
@@ -704,13 +704,15 @@
   for (idx in seq_along(on_disk_candidates)) {
     filepath <- on_disk_candidates[[idx]][["filepath"]]
     version <- on_disk_candidates[[idx]][["version"]]
-    extracted_name <- .extract_name(
+    extracted_names <- .extract_name(
       filepath, namespace = parsed_name[["namespace"]], version = version)
-    if (!is.null(extracted_name)) {
-      parsed_extracted_name <- .parse_name(extracted_name)
-      node <- on_disk_candidates[[idx]]
-      node[["version"]] <- parsed_extracted_name[["version"]]
-      on_disk_versions <- c(list(node), on_disk_versions)
+    if (!is.null(extracted_names)) {
+      for (extracted_name in extracted_names) {
+        parsed_extracted_name <- .parse_name(extracted_name)
+        node <- on_disk_candidates[[idx]]
+        node[["version"]] <- parsed_extracted_name[["version"]]
+        on_disk_versions <- c(list(node), on_disk_versions)
+      }
     }
   }
 
