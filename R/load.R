@@ -46,6 +46,7 @@
           loaded <- TRUE
         },
         error = function(e) {
+          base::browser() # TODO remove
           rollback()
           e$message <- sprintf("%s Rolling back.", e$message)
           on.exit(try(stop(e), silent = TRUE))
@@ -60,6 +61,7 @@
           loaded <- TRUE
         },
         error = function(e) {
+          base::browser() # TODO remove
           rollback()
           e$message <- sprintf("%s Rolling back.", e$message)
           stop(e)
@@ -101,6 +103,7 @@
         loaded <- TRUE
       },
       error = function(e) {
+        base::browser() # TODO remove
         rollback()
         e$message <- sprintf("%s Rolling back.", e$message)
         stop(e)
