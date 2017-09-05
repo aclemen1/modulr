@@ -742,7 +742,8 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix"),
       } else ans <- 1L
       if (ans %in% seq_along(bindings)) {
         # nocov start
-        if (requireNamespace("rstudioapi", quietly = TRUE)) {
+        if (requireNamespace("rstudioapi", quietly = TRUE) &&
+            rstudioapi::isAvailable()) {
           rstudioapi::sendToConsole(cmds[ans], execute = execute)
         } else if (execute) {
           assign(
@@ -752,10 +753,10 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix"),
           message("Module evaluation result bound to ",
                   sQuote(bindings[ans]), ".")
         } else {
-          print(cmds[ans])
+          cat(paste0(cmds[ans], "\n"))
         }
         # nocov end
-        break;
+        break
       }
     }
   }
