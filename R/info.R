@@ -117,7 +117,7 @@
 #' @aliases docstring info
 #' @export
 print_info <- function(name = .Last.name,
-                       line_numbers = F, sep = "\n",
+                       line_numbers = FALSE, sep = "\n",
                        load = TRUE) {
 
   assert_that(
