@@ -40,8 +40,6 @@
                 envir = wrapper_env) # nocov
           if (last_error != geterrmessage()) {
             stop(sub("\n$", "", geterrmessage()), call. = FALSE)
-          } else {
-            try(stop(last_error, call. = FALSE), silent = TRUE)
           }
           loaded <- TRUE
         },
@@ -61,7 +59,6 @@
           loaded <- TRUE
         },
         error = function(e) {
-          base::browser() # TODO remove
           rollback()
           e$message <- sprintf("%s Rolling back.", e$message)
           stop(e)
@@ -103,7 +100,6 @@
         loaded <- TRUE
       },
       error = function(e) {
-        base::browser() # TODO remove
         rollback()
         e$message <- sprintf("%s Rolling back.", e$message)
         stop(e)
