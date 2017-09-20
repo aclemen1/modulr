@@ -35,10 +35,10 @@ Please read the [documentation](https://aclemen1.github.io/modulr) and vignettes
 library(modulr)
 
 "foo" %provides% "Hello"
-#> [2017-07-25T19:14:49 UTC] Defining 'foo' ... OK
+#> [2017-09-20T10:36:33 UTC] Defining 'foo' ... OK
 
 "bar" %provides% "World"
-#> [2017-07-25T19:14:49 UTC] Defining 'bar' ... OK
+#> [2017-09-20T10:36:33 UTC] Defining 'bar' ... OK
 
 "foobar" %requires% list(
   f = "foo", 
@@ -46,17 +46,17 @@ library(modulr)
 ) %provides% {
   paste0(f, ", ", tolower(b), "!")
 }
-#> [2017-07-25T19:14:49 UTC] Defining 'foobar' ... OK
+#> [2017-09-20T10:36:33 UTC] Defining 'foobar' ... OK
 
 make("foobar")
-#> [2017-07-25T19:14:49 UTC] Making 'foobar' ...
-#> [2017-07-25T19:14:49 UTC] * Visiting and defining dependencies ...
-#> [2017-07-25T19:14:49 UTC] * Constructing dependency graph ... OK
-#> [2017-07-25T19:14:49 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2017-07-25T19:14:49 UTC] * Evaluating new and outdated dependencies ...
-#> [2017-07-25T19:14:49 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
-#> [2017-07-25T19:14:49 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
-#> [2017-07-25T19:14:49 UTC] DONE ('foobar' in 0.044 secs)
+#> [2017-09-20T10:36:33 UTC] Making 'foobar' ...
+#> [2017-09-20T10:36:33 UTC] * Visiting and defining dependencies ...
+#> [2017-09-20T10:36:33 UTC] * Constructing dependency graph ... OK
+#> [2017-09-20T10:36:33 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2017-09-20T10:36:33 UTC] * Evaluating new and outdated dependencies ...
+#> [2017-09-20T10:36:33 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
+#> [2017-09-20T10:36:33 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
+#> [2017-09-20T10:36:33 UTC] DONE ('foobar' in 0.05 secs)
 #> [1] "Hello, world!"
 ```
 
@@ -89,6 +89,7 @@ This is the dependency graph of a module (on the rightmost side) which exposes t
 
 _In alphabetical order._
 
+* Zebulun Arendsee's [rmonad](https://github.com/arendsee/rmonad) package.
 * Rich FitzJohn's [remake](http://github.com/richfitz/remake) package.
 * Robert Krzyzanowski's [director](https://github.com/syberia/director) package.
 * Lev Kuznetsov's [injectoR](http://dfci-cccb.github.io/injectoR) package.

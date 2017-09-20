@@ -93,20 +93,20 @@
 <h1 class="hasAnchor">
 <a href="#single-module" class="anchor"></a>Single module</h1>
 <p>Let us consider the following module, exposing a function which computes the first terms of the infinite sequence of powers of <span class="math inline">\(2\)</span>: <span class="math inline">\(2^0=1\)</span>, <span class="math inline">\(2^1=2\)</span>, <span class="math inline">\(2^2=4\)</span>, <span class="math inline">\(2^3=8\)</span>, etc.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"powers_of_2"</span> %provides%<span class="st"> </span>{
-  function(<span class="dt">terms =</span> 10L) {
-    2L ^<span class="st"> </span>(<span class="kw">seq_len</span>(terms) -<span class="st"> </span>1L)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"powers_of_2"</span> <span class="op">%provides%</span><span class="st"> </span>{
+  <span class="cf">function</span>(<span class="dt">terms =</span> 10L) {
+    2L <span class="op">^</span><span class="st"> </span>(<span class="kw">seq_len</span>(terms) <span class="op">-</span><span class="st"> </span>1L)
   }
 }
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Defining 'powers_of_2' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] Defining 'powers_of_2' ... OK</span></code></pre></div>
 <p>For all <span class="math inline">\(n\geq1\)</span>, let <span class="math inline">\((x_1, ..., x_n)\)</span> the sequence consisting of the first <span class="math inline">\(n\)</span> powers of <span class="math inline">\(2\)</span>. Let us suppose that we want to perform elementary tests on some of these sequences: a. <span class="math inline">\(x_1=1\)</span>, b. <span class="math inline">\(x_n=2^{n-1}\)</span>, and c. <span class="math inline">\(x_{i+1} = 2x_i\)</span> for all <span class="math inline">\(1\leq i\leq n-1\)</span>.</p>
 <p>Let us then define <code>powers_of_2/test</code>, a dedicated module for testing <code>powers_of_2</code> using Hadley Wickham’s <a href="https://github.com/hadley/testthat">testthat</a> package.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"powers_of_2/test"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"powers_of_2/test"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">powers_of_2 =</span> <span class="st">"powers_of_2"</span>
-) %provides%<span class="st"> </span>{
+) <span class="op">%provides%</span><span class="st"> </span>{
   <span class="kw">library</span>(testthat)
   <span class="kw">test_that</span>(<span class="st">"First term is 1"</span>, {
-    for (terms in <span class="kw">sample</span>(1L:50L, 3L, <span class="dt">replace =</span> <span class="ot">FALSE</span>)) {
+    <span class="cf">for</span> (terms <span class="cf">in</span> <span class="kw">sample</span>(1L<span class="op">:</span>50L, 3L, <span class="dt">replace =</span> <span class="ot">FALSE</span>)) {
       <span class="kw">expect_equal</span>(
         <span class="kw">powers_of_2</span>(terms)[1L],
         1L
@@ -114,52 +114,52 @@
     }
   })
   <span class="kw">test_that</span>(<span class="st">"Last term is as expected"</span>, {
-    for (terms in <span class="kw">sample</span>(1L:50L, 3L, <span class="dt">replace =</span> <span class="ot">FALSE</span>)) {
+    <span class="cf">for</span> (terms <span class="cf">in</span> <span class="kw">sample</span>(1L<span class="op">:</span>50L, 3L, <span class="dt">replace =</span> <span class="ot">FALSE</span>)) {
       <span class="kw">expect_equal</span>(
         <span class="kw">tail</span>(<span class="kw">powers_of_2</span>(terms), 1L),
-        2L ^<span class="st"> </span>(terms -<span class="st"> </span>1L)
+        2L <span class="op">^</span><span class="st"> </span>(terms <span class="op">-</span><span class="st"> </span>1L)
       )
     }
   })
   <span class="kw">test_that</span>(<span class="st">"Any two consecutive terms are as expected"</span>, {
-    for (terms in <span class="kw">sample</span>(2L:50L, 3L, <span class="dt">replace =</span> <span class="ot">FALSE</span>)) {
+    <span class="cf">for</span> (terms <span class="cf">in</span> <span class="kw">sample</span>(2L<span class="op">:</span>50L, 3L, <span class="dt">replace =</span> <span class="ot">FALSE</span>)) {
       series &lt;-<span class="st"> </span><span class="kw">powers_of_2</span>(terms)
-      for (index in <span class="kw">sample</span>(1L:(terms -<span class="st"> </span>1L), <span class="kw">min</span>(10L, (terms -<span class="st"> </span>1L)), 
+      <span class="cf">for</span> (index <span class="cf">in</span> <span class="kw">sample</span>(1L<span class="op">:</span>(terms <span class="op">-</span><span class="st"> </span>1L), <span class="kw">min</span>(10L, (terms <span class="op">-</span><span class="st"> </span>1L)), 
                            <span class="dt">replace =</span> <span class="ot">FALSE</span>)) {
-        <span class="kw">expect_equal</span>(series[index] *<span class="st"> </span><span class="dv">2</span>, series[index +<span class="st"> </span>1L])
+        <span class="kw">expect_equal</span>(series[index] <span class="op">*</span><span class="st"> </span><span class="dv">2</span>, series[index <span class="op">+</span><span class="st"> </span>1L])
       }
     }
   })
 }
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Defining 'powers_of_2/test' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] Defining 'powers_of_2/test' ... OK</span></code></pre></div>
 <p>In order to run the tests, it is sufficient to evaluate this module.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"powers_of_2/test"</span>)
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Making 'powers_of_2/test' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Evaluating #1/1 (layer #1/1): 'powers_of_2' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] DONE ('powers_of_2/test' in 0.085 secs)</span></code></pre></div>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] Making 'powers_of_2/test' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] * Evaluating #1/1 (layer #1/1): 'powers_of_2' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] DONE ('powers_of_2/test' in 0.089 secs)</span></code></pre></div>
 <p>It is also possible to run all available tests.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make_tests</a></span>()
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Making 'powers_of_2/test' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] DONE ('powers_of_2/test' in 0.023 secs)</span>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] Making 'powers_of_2/test' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:32 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] DONE ('powers_of_2/test' in 0.022 secs)</span>
 <span class="co">#&gt; PASSED.</span></code></pre></div>
 <p>To illustrate the situation where some test fails, let us consider a faulty version of <code>powers_of_2</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"powers_of_2"</span> %provides%<span class="st"> </span>{
-  function(<span class="dt">terms =</span> 10L) {
-    sequence &lt;-<span class="st"> </span>2L ^<span class="st"> </span>(<span class="kw">seq_len</span>(terms) -<span class="st"> </span>1L)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"powers_of_2"</span> <span class="op">%provides%</span><span class="st"> </span>{
+  <span class="cf">function</span>(<span class="dt">terms =</span> 10L) {
+    sequence &lt;-<span class="st"> </span>2L <span class="op">^</span><span class="st"> </span>(<span class="kw">seq_len</span>(terms) <span class="op">-</span><span class="st"> </span>1L)
     <span class="co"># This is a faulty version.</span>
     sequence[1L] &lt;-<span class="st"> </span>0L
   }
 }
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Re-defining 'powers_of_2' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Re-defining 'powers_of_2' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make_tests</a></span>()
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Making 'powers_of_2/test' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Evaluating #1/1 (layer #1/1): 'powers_of_2' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Making 'powers_of_2/test' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Evaluating #1/1 (layer #1/1): 'powers_of_2' ...</span>
 <span class="co">#&gt; Error: Test failed: 'First term is 1'</span>
 <span class="co">#&gt; * powers_of_2(terms)[1L] not equal to 1.</span>
 <span class="co">#&gt; 1/1 mismatches</span>
@@ -178,92 +178,92 @@
 <h1 class="hasAnchor">
 <a href="#mock-dependencies" class="anchor"></a>Mock dependencies</h1>
 <p>Let us consider the following module, which relies on RStudio’s <a href="https://github.com/metacran/cranlogs">cranlogs</a> package to request the list of top downloaded packages from their CRAN mirror.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"get_top_downloads"</span> %provides%<span class="st"> </span>{
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"get_top_downloads"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="kw">library</span>(cranlogs)
-  function(<span class="dt">when =</span> <span class="st">"last-week"</span>, <span class="dt">count =</span> 100L) {
+  <span class="cf">function</span>(<span class="dt">when =</span> <span class="st">"last-week"</span>, <span class="dt">count =</span> 100L) {
     <span class="kw">cran_top_downloads</span>(<span class="dt">when =</span> when, <span class="dt">count =</span> count)
   }
 }</code></pre></div>
 <p>The following module uses Hadley Wickham’s <a href="https://github.com/tidyverse/ggplot2">ggplot2</a> package to plot the list of top downloaded packages.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"plot_top_downloads"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"plot_top_downloads"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">get_top_downloads =</span> <span class="st">"get_top_downloads"</span>
-) %provides%<span class="st"> </span>{
+) <span class="op">%provides%</span><span class="st"> </span>{
   <span class="kw">library</span>(ggplot2)
-  function(<span class="dt">when =</span> <span class="st">"last-week"</span>, <span class="dt">count =</span> 10L) {
+  <span class="cf">function</span>(<span class="dt">when =</span> <span class="st">"last-week"</span>, <span class="dt">count =</span> 10L) {
     top_downloads &lt;-<span class="st"> </span><span class="kw">get_top_downloads</span>(<span class="dt">when =</span> when, <span class="dt">count =</span> count)
 
     <span class="kw">ggplot</span>(<span class="dt">data =</span> top_downloads, 
-           <span class="kw">aes</span>(<span class="dt">x =</span> top_downloads$package, <span class="dt">y =</span> top_downloads$count)) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">theme_light</span>() +<span class="st"> </span>
-<span class="st">      </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="fl">90.0</span>, <span class="dt">hjust =</span> <span class="fl">1.0</span>)) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">"identity"</span>) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">scale_x_discrete</span>(<span class="dt">limits =</span> top_downloads$package) +
+           <span class="kw">aes</span>(<span class="dt">x =</span> top_downloads<span class="op">$</span>package, <span class="dt">y =</span> top_downloads<span class="op">$</span>count)) <span class="op">+</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">theme_light</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="fl">90.0</span>, <span class="dt">hjust =</span> <span class="fl">1.0</span>)) <span class="op">+</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">"identity"</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">scale_x_discrete</span>(<span class="dt">limits =</span> top_downloads<span class="op">$</span>package) <span class="op">+</span>
 <span class="st">      </span><span class="kw">labs</span>(
         <span class="dt">title =</span> <span class="kw">sprintf</span>(
           <span class="st">"Top %d Downloads (%s, RStudio's CRAN mirror)"</span>, 
           count,
-          <span class="kw">format</span>(<span class="kw">unique</span>(top_downloads$to), <span class="dt">format =</span> <span class="st">"%Y-%m-%d"</span>)), 
+          <span class="kw">format</span>(<span class="kw">unique</span>(top_downloads<span class="op">$</span>to), <span class="dt">format =</span> <span class="st">"%Y-%m-%d"</span>)), 
         <span class="dt">x =</span> <span class="st">"Package"</span>, <span class="dt">y =</span> <span class="st">"Count"</span>)
     
   }
 }
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Defining 'plot_top_downloads' ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Defining 'plot_top_downloads' ... OK</span>
 
-plot_top_downloads %&lt;=%<span class="st"> "plot_top_downloads"</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] Making 'plot_top_downloads' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:40 UTC] * Evaluating #1/1 (layer #1/1): 'get_top_downloads' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] DONE ('plot_top_downloads' in 0.3 secs)</span>
+plot_top_downloads <span class="op">%&lt;=%</span><span class="st"> "plot_top_downloads"</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Making 'plot_top_downloads' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Evaluating #1/1 (layer #1/1): 'get_top_downloads' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] DONE ('plot_top_downloads' in 0.19 secs)</span>
 
 <span class="kw">plot_top_downloads</span>()</code></pre></div>
 <p><img src="figures/modulr-plot-top-downloads-1.png" width="90%" style="display: block; margin: auto;"></p>
 <p>Testing this module directly would require to be connected on the internet and would stress the RStudio’s remote API, which is very bad practice. In order to avoid such prohibited behaviour, it is recommended to define new modules that <em>mock</em> the original functionalities.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"get_top_downloads/mock"</span> %provides%<span class="st"> </span>{
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"get_top_downloads/mock"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="kw">library</span>(tibble)
-  function(...) {
+  <span class="cf">function</span>(...) {
     <span class="kw">tribble</span>(
-      ~rank, ~package, ~count, ~from, ~to,
+      <span class="op">~</span>rank, <span class="op">~</span>package, <span class="op">~</span>count, <span class="op">~</span>from, <span class="op">~</span>to,
       1L, <span class="st">"Rcpp"</span>, 105000L, <span class="kw">as.Date</span>(<span class="st">"2017-05-05"</span>), <span class="kw">as.Date</span>(<span class="st">"2017-05-11"</span>),
       2L, <span class="st">"ggplot2"</span>, 100000L, <span class="kw">as.Date</span>(<span class="st">"2017-05-05"</span>), <span class="kw">as.Date</span>(<span class="st">"2017-05-11"</span>),
       3L, <span class="st">"tibble"</span>, 90000L, <span class="kw">as.Date</span>(<span class="st">"2017-05-05"</span>), <span class="kw">as.Date</span>(<span class="st">"2017-05-11"</span>)
     )
   }
 }
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Defining 'get_top_downloads/mock' ... OK</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"plot_top_downloads/mock"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Defining 'get_top_downloads/mock' ... OK</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"plot_top_downloads/mock"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">get_top_downloads =</span> <span class="st">"get_top_downloads/mock"</span>
-) %provides%<span class="st"> </span><span class="kw"><a href="../reference/get_provider.html">get_provider</a></span>(<span class="st">"plot_top_downloads"</span>)
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Defining 'plot_top_downloads/mock' ... OK</span></code></pre></div>
+) <span class="op">%provides%</span><span class="st"> </span><span class="kw"><a href="../reference/get_provider.html">get_provider</a></span>(<span class="st">"plot_top_downloads"</span>)
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Defining 'plot_top_downloads/mock' ... OK</span></code></pre></div>
 <p>Notice the use of <code><a href="../reference/get_provider.html">get_provider("plot_top_downloads")</a></code> in the second definition: <code>plot_top_downloads/mock</code> requires <code>get_top_downloads/mock</code>, a mock version of <code>get_top_downloads</code>, but provides the same features as <code>plot_top_downloads</code>; change the definition of <code>plot_top_downloads</code> and it will change the definition of <code>plot_top_downloads/mock</code> at the same time.</p>
 <p>Along the lines of the first example, you can then define a testing module.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"plot_top_downloads/test"</span> %requires%<span class="st"> </span><span class="kw">list</span>(
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"plot_top_downloads/test"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">plot_top_downloads =</span> <span class="st">"plot_top_downloads/mock"</span>
-) %provides%<span class="st"> </span>{
+) <span class="op">%provides%</span><span class="st"> </span>{
   <span class="kw">library</span>(testthat)
   plot &lt;-<span class="st"> </span><span class="kw">plot_top_downloads</span>()
   <span class="kw">test_that</span>(<span class="st">"X-Axis is labelled 'Package'"</span>, {
-    <span class="kw">expect_identical</span>(plot$labels$x, <span class="st">"Package"</span>)
+    <span class="kw">expect_identical</span>(plot<span class="op">$</span>labels<span class="op">$</span>x, <span class="st">"Package"</span>)
   })
   <span class="kw">test_that</span>(<span class="st">"Y-Axis is labelled 'Count'"</span>, {
-    <span class="kw">expect_identical</span>(plot$labels$y, <span class="st">"Count"</span>)
+    <span class="kw">expect_identical</span>(plot<span class="op">$</span>labels<span class="op">$</span>y, <span class="st">"Count"</span>)
   })
   <span class="kw">test_that</span>(<span class="st">"Plot layers match expectations"</span>, {
-    <span class="kw">expect_is</span>(plot$layers[[1L]], <span class="st">"ggproto"</span>)
-    <span class="kw">expect_is</span>(plot$layers[[1L]]$geom, <span class="st">"GeomBar"</span>)
-    <span class="kw">expect_is</span>(plot$layers[[1L]]$stat, <span class="st">"StatIdentity"</span>)
+    <span class="kw">expect_is</span>(plot<span class="op">$</span>layers[[1L]], <span class="st">"ggproto"</span>)
+    <span class="kw">expect_is</span>(plot<span class="op">$</span>layers[[1L]]<span class="op">$</span>geom, <span class="st">"GeomBar"</span>)
+    <span class="kw">expect_is</span>(plot<span class="op">$</span>layers[[1L]]<span class="op">$</span>stat, <span class="st">"StatIdentity"</span>)
   })
 }
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Defining 'plot_top_downloads/test' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Defining 'plot_top_downloads/test' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make_tests</a></span>()
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Making 'plot_top_downloads/test' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] * Sorting 2 dependencies with 2 relations ... on 2 layers, OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] ** Evaluating #1/2 (layer #1/2): 'get_top_downloads/mock' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] ** Evaluating #2/2 (layer #2/2): 'plot_top_downloads/mock' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] DONE ('plot_top_downloads/test' in 0.079 secs)</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Making 'plot_top_downloads/test' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Sorting 2 dependencies with 2 relations ... on 2 layers, OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] ** Evaluating #1/2 (layer #1/2): 'get_top_downloads/mock' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] ** Evaluating #2/2 (layer #2/2): 'plot_top_downloads/mock' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] DONE ('plot_top_downloads/test' in 0.08 secs)</span>
 <span class="co">#&gt; PASSED. You're #1.</span></code></pre></div>
 </div>
 <div id="testing-modulr-gears" class="section level1">
@@ -271,29 +271,29 @@ plot_top_downloads %&lt;=%<span class="st"> "plot_top_downloads"</span>
 <a href="#testing-modulr-gears" class="anchor"></a>Testing <em>modulr gears</em>
 </h1>
 <p>As a last example, it is considered a good practice to provide all <strong>modulr gears</strong> with appropriate tests, as illustrated by <a href="https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3" class="uri">https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3</a>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"modulr/vault"</span> %imports%<span class="st"> "3fcc508cb40ddac6c1e3"</span>
-<span class="co">#&gt; [2017-07-25T19:15:41 UTC] Importing 'modulr/vault' from gist ID '3fcc508cb40ddac6c1e3' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Found 1 file(s) with R flavour (see https://gist.github.com/3fcc508cb40ddac6c1e3).</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Installing gear at '/tmp/RtmphggHwL/gears/modulr/vault/b91b13dfae696a19'.</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] DONE ('modulr/vault')</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault/example_SECRET_' ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault/example' ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault#0.1.0' ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault#0.1.0/mock' ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Defining 'modulr/vault#0.1.0/test' ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Digest of 'modulr/vault#0.1.0' is '390032bb2476c24e'.</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"modulr/vault"</span> <span class="op">%imports%</span><span class="st"> "3fcc508cb40ddac6c1e3"</span>
+<span class="co">#&gt; [2017-09-20T10:37:33 UTC] Importing 'modulr/vault' from gist ID '3fcc508cb40ddac6c1e3' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] * Found 1 file(s) with R flavour (see https://gist.github.com/3fcc508cb40ddac6c1e3).</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] * Installing gear at '/tmp/Rtmp6GgHst/gears/modulr/vault/8a5881eb2fd6f5b7'.</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] DONE ('modulr/vault')</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] Defining 'modulr/vault/example_SECRET_' ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] Defining 'modulr/vault/example' ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] Defining 'modulr/vault#0.1.0' ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] Defining 'modulr/vault#0.1.0/mock' ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] Defining 'modulr/vault#0.1.0/test' ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] Digest of 'modulr/vault#0.1.0' is '390032bb2476c24e'.</span>
 <span class="kw"><a href="../reference/make.html">make_tests</a></span>()
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] Making 'modulr/vault#0.1.0/test' ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-07-25T19:15:42 UTC] * Evaluating #1/1 (layer #1/1): 'modulr/vault#0.1.0/mock' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] Making 'modulr/vault#0.1.0/test' ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2017-09-20T10:37:34 UTC] * Evaluating #1/1 (layer #1/1): 'modulr/vault#0.1.0/mock' ...</span>
 <span class="co">#&gt; Loading required package: base64enc</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'assertthat'</span>
 <span class="co">#&gt; The following object is masked from 'package:tibble':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     has_name</span>
-<span class="co">#&gt; [2017-07-25T19:15:50 UTC] DONE ('modulr/vault#0.1.0/test' in 7.8 secs)</span>
+<span class="co">#&gt; [2017-09-20T10:37:42 UTC] DONE ('modulr/vault#0.1.0/test' in 7.9 secs)</span>
 <span class="co">#&gt; PASSED.</span></code></pre></div>
 </div>
 </div>

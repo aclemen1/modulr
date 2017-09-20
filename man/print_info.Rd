@@ -7,10 +7,10 @@
 \alias{info}
 \title{Output Docstring Info.}
 \usage{
-print_info(name = .Last.name, line_numbers = F, sep = "\\n",
+print_info(name = .Last.name, line_numbers = FALSE, sep = "\\n",
   load = TRUE)
 
-info(name = .Last.name, line_numbers = F, sep = "\\n", load = TRUE)
+info(name = .Last.name, line_numbers = FALSE, sep = "\\n", load = TRUE)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).

@@ -102,6 +102,7 @@ This is the dependency graph of a module (on the rightmost side) which exposes t
 
 _In alphabetical order._
 
+* Zebulun Arendsee's [rmonad](https://github.com/arendsee/rmonad) package.
 * Rich FitzJohn's [remake](http://github.com/richfitz/remake) package.
 * Robert Krzyzanowski's [director](https://github.com/syberia/director) package.
 * Lev Kuznetsov's [injectoR](http://dfci-cccb.github.io/injectoR) package.
