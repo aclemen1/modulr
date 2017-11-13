@@ -459,13 +459,16 @@ with_verbosity <- function(level, code) {
 DEFAULT_DEPARSE_MAX_LINES_IN_PIPES <- 2L
 
 DEFAULT_ROOT_CONFIG <- c(
-  "/etc/modulr.d",
-  if (nzchar(Sys.getenv("HOME"))) file.path(Sys.getenv("HOME"), ".modulr"),
   ".",
   "modules",
   "module",
   "libs",
-  "lib")
+  "lib",
+  if (nzchar(Sys.getenv("HOME")))
+    file.path(Sys.getenv("HOME"), ".modulr"),
+  if (nzchar(Sys.getenv("R_HOME")))
+    file.path(Sys.getenv("R_HOME"), "etc", "modulr.d")
+  )
 
 PRAISE <- c(
   "Outstanding",
