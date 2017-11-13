@@ -31,11 +31,11 @@
             rstudioapi::isAvailable()) {
 
         # nocov start
+        # Seems that tryCatch is unable to catch errors happening in an
+        # RStudio's debugSource call (version 0.98.1103).
+        try(stop("fake error", call. = FALSE), silent = TRUE)
+        last_error <- geterrmessage()
         tryCatch({
-          # Seems that tryCatch is unable to catch errors happening in an
-          # RStudio's debugSource call (version 0.98.1103).
-          try(stop("fake error", call. = FALSE), silent = TRUE)
-          last_error <- geterrmessage()
           local(do.call("debugSource", args = list(path, echo = FALSE)),
                 envir = wrapper_env) # nocov
           if (last_error != geterrmessage()) {
