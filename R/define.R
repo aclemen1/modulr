@@ -706,7 +706,7 @@ reset <- function(all = FALSE, .verbose = TRUE) {
 
       define_modulr()
 
-      root_config$set(DEFAULT_ROOT_CONFIG)
+      root_config$set(eval(DEFAULT_ROOT_CONFIG))
 
     },
     ok = TRUE, verbosity = 2L)

@@ -121,7 +121,7 @@ new_injector <- function() {
 
   if (!.is_defined("modulr")) define_modulr()
 
-  root_config$set(DEFAULT_ROOT_CONFIG)
+  root_config$set(eval(DEFAULT_ROOT_CONFIG))
 
   .set_injector(injector = injector_)
 
@@ -458,7 +458,7 @@ with_verbosity <- function(level, code) {
 
 DEFAULT_DEPARSE_MAX_LINES_IN_PIPES <- 2L
 
-DEFAULT_ROOT_CONFIG <- c(
+DEFAULT_ROOT_CONFIG <- quote(c(
   ".",
   "modules",
   "module",
@@ -468,7 +468,7 @@ DEFAULT_ROOT_CONFIG <- c(
     file.path(Sys.getenv("HOME"), ".modulr"),
   if (nzchar(Sys.getenv("R_HOME")))
     file.path(Sys.getenv("R_HOME"), "etc", "modulr.d")
-  )
+  ))
 
 PRAISE <- c(
   "Outstanding",
