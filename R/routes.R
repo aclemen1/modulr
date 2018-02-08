@@ -421,7 +421,7 @@
   if (file.exists(file)) {
     con <- file(file, open = "r")
     on.exit(close(con))
-    readLines(con)
+    grep("^[[:space:]]*#", readLines(con), value = TRUE, invert = TRUE)
   }
 }, ~memoise::timeout(3L))
 
@@ -473,7 +473,7 @@
                      list.files(path = path, pattern = pattern,
                                 full.names = TRUE, include.dirs = include.dirs))
           if (length(files_) > 0L) {
-            if (!is.null(exclude_globs))
+            if (length(exclude_globs) > 0L)
               files_ <-
                 files_[!apply(
                   matrix(Vectorize(grepl, vectorize.args = "pattern")(
