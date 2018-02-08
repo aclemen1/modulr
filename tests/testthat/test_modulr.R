@@ -9,7 +9,7 @@ test_that("new_injector returns a new injector", {
       "reset", "touch", "shared_env"),
     ignore.order = TRUE)
   expect_named(injector$registry, c(MODULR_NAME), ignore.order = TRUE)
-  expect_equal(injector$config[[".__root__"]][[1]], DEFAULT_ROOT_CONFIG)
+  expect_equal(injector$config[[".__root__"]][[1]], eval(DEFAULT_ROOT_CONFIG))
 })
 
 test_that("get_default_injector returns the default injector", {

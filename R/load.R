@@ -279,7 +279,8 @@ load_all_modules <- function(
 
     if (!(name %in% visited_dependencies)) {
 
-      loaded_module <- stats::setNames(names(load_module(name)), name)
+      loaded_module <-
+        stats::setNames(names(load_module(name)), name)
 
       visited_dependencies <<- c(visited_dependencies, loaded_module)
 

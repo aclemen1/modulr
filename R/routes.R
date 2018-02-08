@@ -168,6 +168,12 @@
   paste(strsplit(name, "/", fixed = TRUE)[[1L]], collapse = .Platform$file.sep)
 }
 
+# Transform a module name to a path (with file separators replacing '/''s).
+.name_to_first_path <- function(name) {
+  assert_that(.is_conform(name))
+  strsplit(name, "/", fixed = TRUE)[[1L]][1L]
+}
+
 # Transform a path into a module name (with '/'s replacing file separators).
 .path_to_name <- function(path) {
   name <-
@@ -410,6 +416,15 @@
 .cumpaste <- function(x, sep = " ")
   Reduce(function(x1, x2) paste(x1, x2, sep = sep), x, accumulate = TRUE)
 
+.parse_modulrignore_file <- memoise::memoise(function(path) {
+  file <- file.path(path, ".modulrignore")
+  if (file.exists(file)) {
+    con <- file(file, open = "r")
+    on.exit(close(con))
+    readLines(con)
+  }
+}, ~memoise::timeout(3L))
+
 # Find all in-memory and on-disk candidates for a given module name.
 .resolve_candidates <- function(name, scope_name = NULL, absolute = TRUE,
                                 extensions = c(".R", ".r",
@@ -439,18 +454,35 @@
 
   files <- c()
   for (root in roots) {
-    path <- .remove_trailing_filesep(
-      file.path(root, .name_to_path(parsed_name[["initials"]])))
-    walks <- c("", .cumpaste(
-      strsplit(path, split = .Platform$file.sep, fixed = TRUE)[[1L]],
-      sep = .Platform$file.sep))
-    if (!any(file.exists(file.path(walks, "__IGNORE__")))) {
-      files_ <-
-        ifelse(absolute, normalizePath,
-               Vectorize(.remove_duplicate_filesep, "path"))(
-                 list.files(path = path, pattern = pattern,
-                            full.names = TRUE, include.dirs = include.dirs))
-      files <- c(files, files_)
+    if (.dir_exists(root)) {
+
+      exclude_globs <-
+        .parse_modulrignore_file(
+          file.path(root, .name_to_first_path(parsed_name[["initials"]])))
+
+      path <- .remove_trailing_filesep(
+        file.path(root, .name_to_path(parsed_name[["initials"]])))
+      if (.dir_exists(path)) {
+        walks <- c("", .cumpaste(
+          strsplit(path, split = .Platform$file.sep, fixed = TRUE)[[1L]],
+          sep = .Platform$file.sep))
+        if (!any(file.exists(file.path(walks, "__IGNORE__")))) {
+          files_ <-
+            ifelse(absolute, normalizePath,
+                   Vectorize(.remove_duplicate_filesep, "path"))(
+                     list.files(path = path, pattern = pattern,
+                                full.names = TRUE, include.dirs = include.dirs))
+          if (length(files_) > 0L) {
+            if (!is.null(exclude_globs))
+              files_ <-
+                files_[!apply(
+                  matrix(Vectorize(grepl, vectorize.args = "pattern")(
+                    glob2rx(file.path(normalizePath(root), exclude_globs)),
+                    lapply(files_, normalizePath)), ncol = length(exclude_globs)), 1L, any)]
+            files <- c(files, files_)
+          }
+        }
+      }
     }
   }
 
@@ -665,7 +697,6 @@
     return(extract_(parsed, strict = strict))
 
   }
-
 
 }
 
