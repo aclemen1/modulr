@@ -27,3 +27,4 @@ README_files
 /inst/modules/old_lib/**
 /inst/modules/**/lib
 MAKE.R
+/docs/**/*.R

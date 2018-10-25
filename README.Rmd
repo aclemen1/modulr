@@ -1,12 +1,10 @@
 ---
 output:
   html_document:
-    keep_md: yes
-    self_contained: no
     variant: markdown_github
+    self_contained: no
+    keep_md: yes
 ---
-
-<!-- README.md is generated from README.Rmd. Please edit the .Rmd file -->
 
 ```{r, echo=FALSE, results='hide', message=FALSE}
 set.seed(1234L) 

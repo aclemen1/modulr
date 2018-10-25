@@ -1,15 +1,3 @@
----
-output:
-  html_document:
-    keep_md: yes
-    self_contained: no
-    variant: markdown_github
----
-
-<!-- README.md is generated from README.Rmd. Please edit the .Rmd file -->
-
-
-
 [![Build Status](https://travis-ci.org/aclemen1/modulr.svg?branch=master)](https://travis-ci.org/aclemen1/modulr)
 [![Coverage status](https://codecov.io/github/aclemen1/modulr/coverage.svg?branch=master)](http://codecov.io/github/aclemen1/modulr)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/modulr)](https://cran.r-project.org/package=modulr)
@@ -42,10 +30,10 @@ Please read the [documentation](https://aclemen1.github.io/modulr) and vignettes
 library(modulr)
 
 "foo" %provides% "Hello"
-#> [2018-10-25T19:36:41 UTC] Defining 'foo' ... OK
+#> [2018-10-25T20:57:32 UTC] Defining 'foo' ... OK
 
 "bar" %provides% "World"
-#> [2018-10-25T19:36:41 UTC] Defining 'bar' ... OK
+#> [2018-10-25T20:57:32 UTC] Defining 'bar' ... OK
 
 "foobar" %requires% list(
   f = "foo", 
@@ -53,17 +41,17 @@ library(modulr)
 ) %provides% {
   paste0(f, ", ", tolower(b), "!")
 }
-#> [2018-10-25T19:36:41 UTC] Defining 'foobar' ... OK
+#> [2018-10-25T20:57:32 UTC] Defining 'foobar' ... OK
 
 make("foobar")
-#> [2018-10-25T19:36:41 UTC] Making 'foobar' ...
-#> [2018-10-25T19:36:41 UTC] * Visiting and defining dependencies ...
-#> [2018-10-25T19:36:41 UTC] * Constructing dependency graph ... OK
-#> [2018-10-25T19:36:41 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
-#> [2018-10-25T19:36:41 UTC] * Evaluating new and outdated dependencies ...
-#> [2018-10-25T19:36:41 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
-#> [2018-10-25T19:36:41 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
-#> [2018-10-25T19:36:41 UTC] DONE ('foobar' in 0.084 secs)
+#> [2018-10-25T20:57:32 UTC] Making 'foobar' ...
+#> [2018-10-25T20:57:32 UTC] * Visiting and defining dependencies ...
+#> [2018-10-25T20:57:32 UTC] * Constructing dependency graph ... OK
+#> [2018-10-25T20:57:32 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK
+#> [2018-10-25T20:57:32 UTC] * Evaluating new and outdated dependencies ...
+#> [2018-10-25T20:57:32 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...
+#> [2018-10-25T20:57:32 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...
+#> [2018-10-25T20:57:32 UTC] DONE ('foobar' in 0.085 secs)
 #> [1] "Hello, world!"
 ```
 
