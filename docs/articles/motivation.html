@@ -157,7 +157,7 @@ car<span class="op">$</span><span class="kw">stop</span>()
 <p>To manage the responsibility of dependency creation, modulr relies on an <em>injector</em>. The injector is a <a href="http://en.wikipedia.org/wiki/Service_locator_pattern">service locator</a> that is responsible for construction and lookup of dependencies. Here is an example of using the injector service:</p>
 <p>Create a new injector that can provide modules.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
-<span class="co">#&gt; This is modulr version 0.1.7.9192</span>
+<span class="co">#&gt; This is modulr version 0.1.7.9203</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'modulr'</span>
 <span class="co">#&gt; The following object is masked from 'package:base':</span>
@@ -169,23 +169,23 @@ my_injector &lt;-<span class="st"> </span><span class="kw"><a href="../reference
   <span class="dt">name =</span> <span class="st">"car"</span>, 
   <span class="dt">dependencies =</span> <span class="kw">list</span>(<span class="dt">engine =</span> <span class="st">"engine"</span>, <span class="dt">wheels =</span> <span class="st">"wheels"</span>), 
   <span class="dt">provider =</span> car_provider)
-<span class="co">#&gt; [2017-09-20T10:37:28 UTC] Defining 'car' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] Defining 'car' ... OK</span>
 
 my_injector<span class="op">$</span><span class="kw">provider</span>(<span class="dt">name =</span> <span class="st">"engine"</span>, <span class="dt">provider =</span> engine_provider)
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Defining 'engine' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] Defining 'engine' ... OK</span>
 
 my_injector<span class="op">$</span><span class="kw">provider</span>(<span class="dt">name =</span> <span class="st">"wheels"</span>, <span class="dt">provider =</span> wheels_provider)
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Defining 'wheels' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] Defining 'wheels' ... OK</span></code></pre></div>
 <p>Request our <code>car</code> module from the injector.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">car &lt;-<span class="st"> </span>my_injector<span class="op">$</span><span class="kw"><a href="../reference/config.html">get</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] DONE ('car' in 0.043 secs)</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] Making 'car' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] DONE ('car' in 0.068 secs)</span>
 
 car<span class="op">$</span><span class="kw">start</span>(); car<span class="op">$</span><span class="kw">drive</span>(<span class="st">"120 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car<span class="op">$</span><span class="kw">stop</span>()
 <span class="co">#&gt; Car started.</span>
@@ -205,16 +205,16 @@ car<span class="op">$</span><span class="kw">start</span>(); car<span class="op"
     )
   }
 )
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Re-defining 'wheels' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:33 UTC] Re-defining 'wheels' ... OK</span>
 
 car &lt;-<span class="st"> </span>my_injector<span class="op">$</span><span class="kw"><a href="../reference/config.html">get</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] DONE ('car' in 0.042 secs)</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Making 'car' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] DONE ('car' in 0.056 secs)</span>
 
 car<span class="op">$</span><span class="kw">start</span>(); car<span class="op">$</span><span class="kw">drive</span>(<span class="st">"150 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car<span class="op">$</span><span class="kw">stop</span>()
 <span class="co">#&gt; Car started.</span>
@@ -231,23 +231,23 @@ car<span class="op">$</span><span class="kw">start</span>(); car<span class="op"
 <a href="#relying-on-a-framework" class="anchor"></a>Relying on a framework</h2>
 <p>Asking for dependencies solves the issue of hard coding, but it also means that the injector needs to be passed throughout the application. Passing the injector breaks the <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a>. To remedy this, we combine the use of an ambient injector (a default injector is bound to modulr) and a declarative notation, to hand the responsibility of creating modules over the injector, as in this example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"car"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(<span class="dt">engine =</span> <span class="st">"engine"</span>, <span class="dt">wheels =</span> <span class="st">"wheels"</span>) <span class="op">%provides%</span><span class="st"> </span>car_provider
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Defining 'car' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Defining 'car' ... OK</span>
 
 <span class="st">"engine"</span> <span class="op">%provides%</span><span class="st"> </span>engine_provider
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Defining 'engine' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Defining 'engine' ... OK</span>
 
 <span class="st">"wheels"</span> <span class="op">%provides%</span><span class="st"> </span>wheels_provider
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Defining 'wheels' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Defining 'wheels' ... OK</span>
 
 car &lt;-<span class="st"> </span><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"car"</span>)
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] DONE ('car' in 0.036 secs)</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Making 'car' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] DONE ('car' in 0.057 secs)</span>
 
 car<span class="op">$</span><span class="kw">start</span>(); car<span class="op">$</span><span class="kw">drive</span>(<span class="st">"120 km/h"</span>, <span class="st">"the University of Lausanne"</span>); car<span class="op">$</span><span class="kw">stop</span>()
 <span class="co">#&gt; Car started.</span>
@@ -266,7 +266,8 @@ car<span class="op">$</span><span class="kw">start</span>(); car<span class="op"
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
 
 <span class="st">"car"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
-  <span class="dt">engine =</span> <span class="st">"engine"</span>
+  <span class="dt">engine =</span> <span class="st">"engine"</span>,
+  <span class="dt">wheels =</span> <span class="st">"wheels"</span>
 ) <span class="op">%provides%</span><span class="st"> </span>{
   <span class="co">#' This module can start, drive and stop a car.</span>
   <span class="co"># It just returns a list of methods.</span>
@@ -286,7 +287,7 @@ car<span class="op">$</span><span class="kw">start</span>(); car<span class="op"
     }
   )
 }
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Defining 'car' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Defining 'car' ... OK</span>
 
 <span class="st">"engine"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="co">#' This module can start and stop an engine.</span>
@@ -295,7 +296,7 @@ car<span class="op">$</span><span class="kw">start</span>(); car<span class="op"
     <span class="dt">stop =</span> <span class="cf">function</span>() <span class="kw">message</span>(<span class="st">"Engine stopped."</span>)
   )
 }
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Defining 'engine' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Defining 'engine' ... OK</span>
 
 <span class="st">"wheels"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="co">#' This module can roll and brake wheels.</span>
@@ -304,17 +305,20 @@ car<span class="op">$</span><span class="kw">start</span>(); car<span class="op"
     <span class="dt">brake =</span> <span class="cf">function</span>() <span class="kw">message</span>(<span class="st">"Wheels braking."</span>)
   )
 }
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Defining 'wheels' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Defining 'wheels' ... OK</span>
 
 <span class="kw"><a href="../reference/print_info.html">info</a></span>(<span class="st">"car"</span>) ## `info()` outputs #'-comments (aka docstrings)
 <span class="co">#&gt; This module can start, drive and stop a car.</span>
 
 car <span class="op">%&lt;=%</span><span class="st"> "car"</span> ## syntactic sugar for `&lt;- make(`
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] Making 'car' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] * Evaluating #1/1 (layer #1/1): 'engine' ...</span>
-<span class="co">#&gt; [2017-09-20T10:37:29 UTC] DONE ('car' in 0.025 secs)</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] Making 'car' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] ** Evaluating #1/2 (layer #1/1): 'wheels' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] ** Evaluating #2/2 (layer #1/1): 'engine' ...</span>
+<span class="co">#&gt; [2018-10-25T19:37:34 UTC] DONE ('car' in 0.056 secs)</span>
 
 car<span class="op">$</span><span class="kw">start</span>(); car<span class="op">$</span><span class="kw">drive</span>(<span class="st">"the speed of light"</span>, <span class="st">"the boundaries of the universe"</span>); car<span class="op">$</span><span class="kw">stop</span>()
 <span class="co">#&gt; Car started.</span>

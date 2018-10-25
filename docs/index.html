@@ -108,10 +108,10 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr)
 
 <span class="st">"foo"</span> <span class="op">%provides%</span><span class="st"> "Hello"</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] Defining 'foo' ... OK</span>
 
 <span class="st">"bar"</span> <span class="op">%provides%</span><span class="st"> "World"</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] Defining 'bar' ... OK</span>
 
 <span class="st">"foobar"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>, 
@@ -119,17 +119,17 @@
 ) <span class="op">%provides%</span><span class="st"> </span>{
   <span class="kw">paste0</span>(f, <span class="st">", "</span>, <span class="kw">tolower</span>(b), <span class="st">"!"</span>)
 }
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] Defining 'foobar' ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] Defining 'foobar' ... OK</span>
 
 <span class="kw"><a href="reference/make.html">make</a></span>(<span class="st">"foobar"</span>)
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] Making 'foobar' ...</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
-<span class="co">#&gt; [2017-09-20T10:36:36 UTC] DONE ('foobar' in 0.048 secs)</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] Making 'foobar' ...</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] * Sorting 2 dependencies with 2 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] ** Evaluating #1/2 (layer #1/1): 'bar' ...</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] ** Evaluating #2/2 (layer #1/1): 'foo' ...</span>
+<span class="co">#&gt; [2018-10-25T19:36:42 UTC] DONE ('foobar' in 0.073 secs)</span>
 <span class="co">#&gt; [1] "Hello, world!"</span></code></pre></div>
 </div>
 <div id="further-readings" class="section level2">
