@@ -8,7 +8,6 @@
 \alias{\%=>>\%}
 \alias{do_make}
 \alias{do.make}
-\alias{do.make}
 \alias{make_all}
 \alias{make_tests}
 \alias{make_all_tests}

@@ -49,7 +49,7 @@ reset <- function() {
 
 # Futures
 
-Using [Henrik Bengtsson's future package](https://CRAN.R-project.org/package=future), it is possible to evaluate modules asynchronously using various resources available to the user. For instance, evaluation of modules can be eager, lazy, and/or parallelized (on multiple cores and/or on a cluster of machines).
+Using [Henrik Bengtsson's future package](https://CRAN.R-project.org/package=future), it is possible to evaluate modules asynchronously using various resources available to the user. For instance, evaluation of modules can be sequential, lazy, and/or parallelized (on multiple cores and/or on a cluster of machines).
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
 reset()
@@ -84,7 +84,7 @@ availableCores()
 system.time(print(make("foobar")))
 ```
 
-It is often interesting to parallelize an already existing module. `modulr` comes with the handy `futurize` function for this purpose. The following two examples illustrate the difference between eager and lazy orchestrations of parallelized modules.
+It is often interesting to parallelize an already existing module. `modulr` comes with the handy `futurize` function for this purpose. The following two examples illustrate the difference between sequential and lazy orchestrations of parallelized modules.
 
 ```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
 reset()
@@ -105,13 +105,13 @@ futurize("bar", strategy = multicore)
 
 futurize(
   "foobar", 
-  name = "foobar/eager", 
+  name = "foobar/sequential", 
   dependencies = list(f = "foo/future", b = "bar/future"),
-  strategy = eager
+  strategy = sequential
 )
 
-system.time(fb_eager <- make("foobar/eager"))
-system.time(print(value(fb_eager)))
+system.time(fb_sequential <- make("foobar/sequential"))
+system.time(print(value(fb_sequential)))
 ```
 
 ```{r}
@@ -121,7 +121,8 @@ futurize(
   "foobar", 
   name = "foobar/lazy", 
   dependencies = list(f = "foo/future", b = "bar/future"),
-  strategy = lazy
+  strategy = sequential,
+  lazy = TRUE
 )
 
 system.time(fb_lazy <- make("foobar/lazy"))
@@ -152,8 +153,11 @@ withr::with_libpaths(file.path(modules_path, "old_lib"), {
 })
 dir.create(file.path(modules_path, "new_lib"), showWarnings = FALSE)
 withr::with_libpaths(file.path(modules_path, "new_lib"), {
-  if (!"dplyr" %in% rownames(installed.packages()))
+  if (!"dplyr" %in% rownames(installed.packages())) {
+    install.package("stringi", quiet = TRUE)
+    install.package("stringr", quiet = TRUE)
     devtools::install_version("dplyr", "0.7.0", quiet = TRUE)
+  }
 })
 ```
 

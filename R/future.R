@@ -5,6 +5,7 @@
 #' @param dependencies A list of dependencies.
 #' @param strategy The evaluation function (or name of it) to use for resolving
 #'   a future. If NULL, then the current strategy is returned.
+#' @param lazy Is the strategy lazy?
 #' @param ... Further arguments passed to \code{\link{get_provider}}.
 #'
 #' @section Warning:
@@ -14,7 +15,7 @@
 futurize <- function(
   original_name, name = paste(original_name, "future", sep = "/"),
   dependencies = get_dependencies(original_name),
-  strategy = NULL, ...) {
+  strategy = NULL, lazy = FALSE, ...) {
 
   # nocov start
   if (!requireNamespace("future", quietly = TRUE)) {
@@ -47,7 +48,8 @@ futurize <- function(
             )
           )
         },
-        evaluator = strategy)
+        evaluator = strategy,
+        lazy = lazy)
       },
       list(
         provider_ =

@@ -625,5 +625,6 @@ DEFAULT_IGNORE_PACKAGES <- c(
   "pooh",
   "rmarkdown",
   "rstudioapi",
-  "stringi"
+  "stringi",
+  "stringr"
 )

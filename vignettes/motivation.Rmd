@@ -186,7 +186,8 @@ modulr::reset()
 library(modulr)
 
 "car" %requires% list(
-  engine = "engine"
+  engine = "engine",
+  wheels = "wheels"
 ) %provides% {
   #' This module can start, drive and stop a car.
   # It just returns a list of methods.

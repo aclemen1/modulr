@@ -6,10 +6,6 @@
 \alias{\%has_default_options\%}
 \alias{\%has_option\%}
 \alias{\%has_options\%}
-\alias{\%has_default_option\%}
-\alias{\%has_default_options\%}
-\alias{\%has_option\%}
-\alias{\%has_options\%}
 \title{Module Options.}
 \usage{
 module_options(name = .Last.name)

@@ -3,7 +3,6 @@
 \name{.SharedEnv}
 \alias{.SharedEnv}
 \alias{sharedenv}
-\alias{sharedenv}
 \title{Shared Environment.}
 \usage{
 .SharedEnv

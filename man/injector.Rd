@@ -6,11 +6,7 @@
 \alias{set_injector}
 \alias{get_injector}
 \alias{get_default_injector}
-\alias{new_injector}
-\alias{set_injector}
 \alias{set_default_injector}
-\alias{get_injector}
-\alias{get_default_injector}
 \title{Create, Set, and Get Injectors (Modulr Internal States).}
 \usage{
 new_injector()

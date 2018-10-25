@@ -3,7 +3,6 @@
 \name{with_no_packages}
 \alias{with_no_packages}
 \alias{without_packages}
-\alias{without_packages}
 \alias{with_packages}
 \alias{with_module_packages}
 \alias{with_namespace_packages}

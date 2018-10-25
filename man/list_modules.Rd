@@ -3,18 +3,17 @@
 \name{list_modules}
 \alias{list_modules}
 \alias{lsmod}
-\alias{lsmod}
 \title{List Defined Modules.}
 \usage{
 list_modules(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
   formatted = TRUE, absolute = FALSE, cols = c("name", "version",
-  "storage", "along", "type", "weight", "calls", "dependencies", "uses", "size",
-  "lines", "modified"))
+  "storage", "along", "type", "weight", "calls", "dependencies", "uses",
+  "size", "lines", "modified"))
 
 lsmod(regexp, reserved = FALSE, wide = TRUE, full = FALSE,
   formatted = TRUE, absolute = FALSE, cols = c("name", "version",
-  "storage", "along", "type", "weight", "calls", "dependencies", "uses", "size",
-  "lines", "modified"))
+  "storage", "along", "type", "weight", "calls", "dependencies", "uses",
+  "size", "lines", "modified"))
 }
 \arguments{
 \item{regexp}{A regular expression. If not missing, the regular expression

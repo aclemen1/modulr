@@ -4,8 +4,8 @@
 \alias{find_module}
 \title{Find a Module.}
 \usage{
-find_module(name, scope_name = NULL, absolute = TRUE, extensions = c(".R",
-  ".r", ".Rmd", ".rmd", ".Rnw", ".rnw"))
+find_module(name, scope_name = NULL, absolute = TRUE,
+  extensions = c(".R", ".r", ".Rmd", ".rmd", ".Rnw", ".rnw"))
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).

@@ -8,11 +8,6 @@
 \alias{.__namespace__}
 \alias{.__initials__}
 \alias{.__final__}
-\alias{.__version__}
-\alias{.__namespace__}
-\alias{.__initials__}
-\alias{.__final__}
-\alias{.__file__}
 \alias{.__path__}
 \title{Module Metadata.}
 \usage{
