@@ -477,8 +477,10 @@
               files_ <-
                 files_[!apply(
                   matrix(Vectorize(grepl, vectorize.args = "pattern")(
-                    glob2rx(file.path(normalizePath(root), exclude_globs)),
-                    lapply(files_, normalizePath)), ncol = length(exclude_globs)), 1L, any)]
+                    utils::glob2rx(file.path(
+                      normalizePath(root), exclude_globs)),
+                    lapply(files_, normalizePath)),
+                    ncol = length(exclude_globs)), 1L, any)]
             files <- c(files, files_)
           }
         }
