@@ -457,14 +457,16 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
     if (length(missing_formals) == 1L) {
       .message_warn(
         sprintf(
-          "Possibly unused dependency: %s.",
+          "Possibly unused dependency in %s: %s.",
+          sQuote(name),
           sQuote(missing_formals)),
         ok = FALSE, verbosity = 1L)
     } else if (length(missing_formals) >= 2L) {
       .message_warn(
         sprintf(
-          "Possibly %d unused dependencies: %s.",
+          "Possibly %d unused dependencies in %s: %s.",
           length(missing_formals),
+          sQuote(name),
           paste(sQuote(missing_formals), collapse = ", " )),
         ok = FALSE, verbosity = 1L)
     }

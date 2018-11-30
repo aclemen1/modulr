@@ -139,13 +139,13 @@
 <a href="#a-first-working-example" class="anchor"></a>A first working example</h1>
 <p>Let us start by defining some modules and dependencies:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"foo"</span> <span class="op">%provides%</span><span class="st"> "Hello"</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] Defining 'foo' ... OK</span>
 
 <span class="st">"bar"</span> <span class="op">%provides%</span><span class="st"> "World"</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] Defining 'bar' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] Defining 'bar' ... OK</span>
 
 <span class="st">"baz"</span> <span class="op">%provides%</span><span class="st"> "!"</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] Defining 'baz' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] Defining 'baz' ... OK</span>
 
 <span class="st">"foobar"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">f =</span> <span class="st">"foo"</span>, 
@@ -155,17 +155,17 @@
   <span class="co">#' Return a concatenated string. </span>
   <span class="kw">paste0</span>(f, <span class="st">", "</span>, <span class="kw">tolower</span>(b), z) 
 } 
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] Defining 'foobar' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] Defining 'foobar' ... OK</span></code></pre></div>
 <p>Use <code>info</code> to output the docstrings:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/print_info.html">info</a></span>(<span class="st">"foobar"</span>) 
 <span class="co">#&gt; Return a concatenated string.</span></code></pre></div>
 <p>Use <code>lsmod</code> to list all defined modules and their properties in a data frame:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>(<span class="dt">cols =</span> <span class="kw">c</span>(<span class="st">"name"</span>, <span class="st">"type"</span>, <span class="st">"dependencies"</span>, <span class="st">"uses"</span>, <span class="st">"size"</span>, <span class="st">"modified"</span>)) 
 <span class="co">#&gt;     name type dependencies uses      size                modified</span>
-<span class="co">#&gt; 1    bar &lt;NA&gt;            0    1 152 bytes 2018-11-30T14:03:21 UTC</span>
-<span class="co">#&gt; 2    baz &lt;NA&gt;            0    1 152 bytes 2018-11-30T14:03:21 UTC</span>
-<span class="co">#&gt; 3    foo &lt;NA&gt;            0    1 152 bytes 2018-11-30T14:03:21 UTC</span>
-<span class="co">#&gt; 4 foobar &lt;NA&gt;            3    0    5.2 Kb 2018-11-30T14:03:21 UTC</span></code></pre></div>
+<span class="co">#&gt; 1    bar &lt;NA&gt;            0    1 152 bytes 2018-11-30T18:07:38 UTC</span>
+<span class="co">#&gt; 2    baz &lt;NA&gt;            0    1 152 bytes 2018-11-30T18:07:38 UTC</span>
+<span class="co">#&gt; 3    foo &lt;NA&gt;            0    1 152 bytes 2018-11-30T18:07:38 UTC</span>
+<span class="co">#&gt; 4 foobar &lt;NA&gt;            3    0    5.2 Kb 2018-11-30T18:07:38 UTC</span></code></pre></div>
 <p>In this example, <code>foobar</code> relies on three dependencies, and <code>foo</code>, <code>bar</code> and <code>baz</code> are both injected once. Use <code>plot_dependencies</code> to see these relations:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/plot_dependencies.html">plot_dependencies</a></span>() </code></pre></div>
 <div id="htmlwidget-1d9f9b9fdca3023baa83" style="width:90%;height:384px;" class="sankeyNetwork html-widget"></div>
@@ -173,23 +173,23 @@
 <div id="htmlwidget-b18b48ec4ad649442f3b" style="width:90%;height:384px;" class="chorddiag html-widget"></div>
 <script type="application/json" data-for="htmlwidget-b18b48ec4ad649442f3b">{"x":{"matrix":[[0,1,1,1],[1,0,0,0],[1,0,0,0],[1,0,0,0]],"options":{"type":"bipartite","width":null,"height":null,"margin":100,"showGroupnames":true,"groupNames":["foobar","foo","baz","bar"],"groupColors":["#E41A1C","#7E6E85","#E1C62F","#999999"],"groupThickness":0.1,"groupPadding":0.0349065850398866,"groupnamePadding":[10,10,10,10],"groupnameFontsize":11,"groupedgeColor":null,"chordedgeColor":"#808080","categoryNames":["module","dependency"],"categorynamePadding":100,"categorynameFontsize":28,"showTicks":false,"tickInterval":0.1,"ticklabelFontsize":10,"fadeLevel":0.1,"showTooltips":true,"showZeroTooltips":true,"tooltipNames":["foobar","foo","baz","bar"],"tooltipFontsize":12,"tooltipUnit":"","tooltipGroupConnector":" &#x25B6; ","precision":"null","clickAction":null}},"evals":[],"jsHooks":[]}</script><p>Use <code>make</code> to get the resulting object provided by the module:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foobar"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] Making 'foobar' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] * Sorting 3 dependencies with 3 relations ... on 1 layer, OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] * Evaluating new and outdated dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] ** Evaluating #1/3 (layer #1/1): 'baz' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] ** Evaluating #2/3 (layer #1/1): 'bar' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:21 UTC] ** Evaluating #3/3 (layer #1/1): 'foo' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] DONE ('foobar' in 0.071 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] Making 'foobar' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] * Sorting 3 dependencies with 3 relations ... on 1 layer, OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] * Evaluating new and outdated dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] ** Evaluating #1/3 (layer #1/1): 'baz' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] ** Evaluating #2/3 (layer #1/1): 'bar' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] ** Evaluating #3/3 (layer #1/1): 'foo' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] DONE ('foobar' in 0.056 secs)</span>
 <span class="co">#&gt; [1] "Hello, world!"</span></code></pre></div>
 <p>Voilà! All the depencencies have been evaluated, injected and processed to return the expected <code>"Hello, world!"</code>. As a matter of fact, the dependencies form a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">directed acyclic graph</a> which is topologically sorted, just in time to determine a well ordering for their evaluation before injection.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>(<span class="dt">cols =</span> <span class="kw">c</span>(<span class="st">"name"</span>, <span class="st">"type"</span>, <span class="st">"dependencies"</span>, <span class="st">"uses"</span>, <span class="st">"size"</span>, <span class="st">"modified"</span>)) 
 <span class="co">#&gt;     name      type dependencies uses      size                modified</span>
-<span class="co">#&gt; 1    bar character            0    1 152 bytes 2018-11-30T14:03:21 UTC</span>
-<span class="co">#&gt; 2    baz character            0    1 152 bytes 2018-11-30T14:03:21 UTC</span>
-<span class="co">#&gt; 3    foo character            0    1 152 bytes 2018-11-30T14:03:21 UTC</span>
-<span class="co">#&gt; 4 foobar character            3    0    5.2 Kb 2018-11-30T14:03:22 UTC</span></code></pre></div>
+<span class="co">#&gt; 1    bar character            0    1 152 bytes 2018-11-30T18:07:38 UTC</span>
+<span class="co">#&gt; 2    baz character            0    1 152 bytes 2018-11-30T18:07:38 UTC</span>
+<span class="co">#&gt; 3    foo character            0    1 152 bytes 2018-11-30T18:07:38 UTC</span>
+<span class="co">#&gt; 4 foobar character            3    0    5.2 Kb 2018-11-30T18:07:38 UTC</span></code></pre></div>
 </div>
 <div id="types-of-modules" class="section level1">
 <h1 class="hasAnchor">
@@ -202,38 +202,38 @@
   <span class="co">#' Return a string containing a timestamp.</span>
   <span class="kw">format</span>(<span class="kw">Sys.time</span>(), <span class="st">"%H:%M:%OS6"</span>)
 }
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Defining 'timestamp' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] Defining 'timestamp' ... OK</span></code></pre></div>
 <p>Successive <code>make</code> calls on the module will not imply its re-evaluation:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"timestamp"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Making 'timestamp' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] DONE ('timestamp' in 0.02 secs)</span>
-<span class="co">#&gt; [1] "14:03:22.081373"</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] Making 'timestamp' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:38 UTC] DONE ('timestamp' in 0.016 secs)</span>
+<span class="co">#&gt; [1] "18:07:38.985254"</span>
 <span class="kw"><a href="../reference/with_verbosity.html">with_verbosity</a></span>(<span class="dv">0</span>, <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"timestamp"</span>)) <span class="co"># temporarily change the verbosity of make</span>
-<span class="co">#&gt; [1] "14:03:22.081373"</span></code></pre></div>
+<span class="co">#&gt; [1] "18:07:38.985254"</span></code></pre></div>
 <p>Notice the <code>with_verbosity</code> wrapper around the call. To force re-evaluation, just <code>touch</code> the module:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/touch.html">touch</a></span>(<span class="st">"timestamp"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Touching 'timestamp' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] Touching 'timestamp' ... OK</span>
 <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"timestamp"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Making 'timestamp' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] DONE ('timestamp' in 0.019 secs)</span>
-<span class="co">#&gt; [1] "14:03:22.140318"</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] Making 'timestamp' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] DONE ('timestamp' in 0.014 secs)</span>
+<span class="co">#&gt; [1] "18:07:39.031677"</span></code></pre></div>
 <p>Any change of the module’s definition (even its docstrings) will be detected:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"timestamp"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="co">#' Return a string containing a timestamp with more information.</span>
   <span class="kw">format</span>(<span class="kw">Sys.time</span>(), <span class="st">"%Y-%m-%d %H:%M:%OS6"</span>)
 }
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Re-defining 'timestamp' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] Re-defining 'timestamp' ... OK</span>
 
 <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"timestamp"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Making 'timestamp' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] DONE ('timestamp' in 0.019 secs)</span>
-<span class="co">#&gt; [1] "2018-11-30 14:03:22.179975"</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] Making 'timestamp' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] DONE ('timestamp' in 0.014 secs)</span>
+<span class="co">#&gt; [1] "2018-11-30 18:07:39.064259"</span></code></pre></div>
 </div>
 <div id="prototypes" class="section level2">
 <h2 class="hasAnchor">
@@ -242,16 +242,16 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"timestamp"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="cf">function</span>() <span class="kw">format</span>(<span class="kw">Sys.time</span>(), <span class="st">"%H:%M:%OS6"</span>)
 }
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Defining 'timestamp' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] Defining 'timestamp' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"timestamp"</span>)()
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Making 'timestamp' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] DONE ('timestamp' in 0.02 secs)</span>
-<span class="co">#&gt; [1] "14:03:22.243043"</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] Making 'timestamp' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] DONE ('timestamp' in 0.014 secs)</span>
+<span class="co">#&gt; [1] "18:07:39.116888"</span>
 
 <span class="kw"><a href="../reference/with_verbosity.html">with_verbosity</a></span>(0L, <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"timestamp"</span>)())
-<span class="co">#&gt; [1] "14:03:22.268683"</span></code></pre></div>
+<span class="co">#&gt; [1] "18:07:39.134847"</span></code></pre></div>
 <p>It is important to emphasize that the module is still a singleton: the second <code>make</code> call doesn’t re-evaluate. But the function that is returned by the module is itself re-evaluated each time it is called.</p>
 </div>
 <div id="memoised-prototypes" class="section level2">
@@ -273,13 +273,13 @@
 ) <span class="op">%provides%</span><span class="st"> </span>{
   <span class="st">"foo"</span>
 }
-<span class="co">#&gt; Warning: [2018-11-30T14:03:22 UTC] Possibly unused dependency: 'timestamp'.</span>
+<span class="co">#&gt; Warning: [2018-11-30T18:07:39 UTC] Possibly unused dependency: 'timestamp'.</span>
 
 <span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foo"</span>))
-<span class="co">#&gt; [2018-11-30T14:03:22 UTC] Evaluating #1/1 (layer #1/1): 'timestamp' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:39 UTC] Evaluating #1/1 (layer #1/1): 'timestamp' ...</span>
 <span class="co">#&gt; 'timestamp' is evaluated after a (short) pause...</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.038   0.000   1.039</span></code></pre></div>
+<span class="co">#&gt;   0.029   0.003   1.033</span></code></pre></div>
 <p>In this example, <code>timestamp</code> is evaluated even though it is not explicitely used by <code>foo</code>. It just computes a timestamp after a short pause, but it could be virtually very resource-consuming at make-time.</p>
 <p>Let us re-define <code>timestamp</code> as a prototype:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"timestamp"</span> <span class="op">%provides%</span><span class="st"> </span>{
@@ -290,12 +290,12 @@
     <span class="kw">format</span>(<span class="kw">Sys.time</span>(), <span class="st">"%H:%M:%OS6"</span>)
   }
 }
-<span class="co">#&gt; [2018-11-30T14:03:23 UTC] Re-defining 'timestamp' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:40 UTC] Re-defining 'timestamp' ... OK</span>
 
 <span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foo"</span>))
-<span class="co">#&gt; [2018-11-30T14:03:23 UTC] Evaluating #1/1 (layer #1/1): 'timestamp' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:40 UTC] Evaluating #1/1 (layer #1/1): 'timestamp' ...</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.035   0.000   0.036</span></code></pre></div>
+<span class="co">#&gt;   0.026   0.001   0.027</span></code></pre></div>
 <p>Here, the evaluation consists of defining a function that pauses for a while and returns a timestamp, only when the function is explicitely called. Even if the computation encapsulated by the function is very resource-consuming, no evaluation of the returned function takes place at make-time.</p>
 <p>Finally, let us re-define <code>timestamp</code> as a memoised module:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"timestamp"</span> <span class="op">%provides%</span><span class="st"> </span>{
@@ -308,12 +308,12 @@
     }
   )
 }
-<span class="co">#&gt; [2018-11-30T14:03:23 UTC] Re-defining 'timestamp' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:40 UTC] Re-defining 'timestamp' ... OK</span>
 
 <span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foo"</span>))
-<span class="co">#&gt; [2018-11-30T14:03:23 UTC] Evaluating #1/1 (layer #1/1): 'timestamp' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:40 UTC] Evaluating #1/1 (layer #1/1): 'timestamp' ...</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.043   0.001   0.045</span></code></pre></div>
+<span class="co">#&gt;   0.029   0.000   0.030</span></code></pre></div>
 <p>The <code>timestamp</code> module returns a function which will be evaluated only when explicitely called at run-time. Let us re-define <code>foo</code> in order that it effectively uses <code>timestamp</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"foo"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">timestamp =</span> <span class="st">"timestamp"</span>
@@ -321,19 +321,19 @@
   <span class="kw">message</span>(<span class="st">"It is "</span>, <span class="kw">timestamp</span>())
   <span class="st">"foo"</span>
 }
-<span class="co">#&gt; [2018-11-30T14:03:23 UTC] Re-defining 'foo' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:40 UTC] Re-defining 'foo' ... OK</span>
 
 <span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foo"</span>))
 <span class="co">#&gt; 'timestamp' is evaluated after a (short) pause...</span>
-<span class="co">#&gt; It is 14:03:24.804886</span>
+<span class="co">#&gt; It is 18:07:41.619506</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.035   0.001   1.037</span></code></pre></div>
+<span class="co">#&gt;   0.027   0.001   1.030</span></code></pre></div>
 <p>Here, a timestamped message is outputed. Let us force the re-evaluation of <code>foo</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/touch.html">touch</a></span>(<span class="st">"foo"</span>)
 <span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foo"</span>))
-<span class="co">#&gt; It is 14:03:24.804886</span>
+<span class="co">#&gt; It is 18:07:41.619506</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.037   0.000   0.037</span></code></pre></div>
+<span class="co">#&gt;   0.030   0.001   0.031</span></code></pre></div>
 <p>The memoised version of <code>timestamp</code> is evaluated only at run-time, not at make-time; moreover, the string containing the actual timestamp is computed only once and then cached for future calls, avoiding re-evaluation.</p>
 <p>To force re-evaluation of the memoised function exposed by <code>timestamp</code>, use <code>memoise::forget</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">memoise<span class="op">::</span><span class="kw">forget</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"timestamp"</span>))
@@ -341,9 +341,9 @@
 <span class="kw"><a href="../reference/touch.html">touch</a></span>(<span class="st">"foo"</span>)
 <span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"foo"</span>))
 <span class="co">#&gt; 'timestamp' is evaluated after a (short) pause...</span>
-<span class="co">#&gt; It is 14:03:26.077018</span>
+<span class="co">#&gt; It is 18:07:42.871932</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.040   0.000   1.041</span></code></pre></div>
+<span class="co">#&gt;   0.030   0.000   1.031</span></code></pre></div>
 </div>
 <div id="lists" class="section level2">
 <h2 class="hasAnchor">
@@ -358,22 +358,22 @@
     <span class="dt">tomorrow =</span> <span class="cf">function</span>() <span class="kw">now</span>() <span class="op">+</span><span class="st"> </span>86400L
   )
 }
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'timestamps' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] Defining 'timestamps' ... OK</span>
 
 ts <span class="op">%&lt;=%</span><span class="st"> "timestamps"</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'timestamps' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('timestamps' in 0.021 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] Making 'timestamps' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] DONE ('timestamps' in 0.015 secs)</span>
 
 ts<span class="op">$</span>origin
 <span class="co">#&gt; [1] "1970-01-01"</span>
 ts<span class="op">$</span><span class="kw">yesterday</span>()
-<span class="co">#&gt; [1] "2018-11-29 14:03:26 UTC"</span>
+<span class="co">#&gt; [1] "2018-11-29 18:07:42 UTC"</span>
 ts<span class="op">$</span><span class="kw">now</span>()
-<span class="co">#&gt; [1] "2018-11-30 14:03:26 UTC"</span>
+<span class="co">#&gt; [1] "2018-11-30 18:07:42 UTC"</span>
 ts<span class="op">$</span><span class="kw">tomorrow</span>()
-<span class="co">#&gt; [1] "2018-12-01 14:03:26 UTC"</span></code></pre></div>
+<span class="co">#&gt; [1] "2018-12-01 18:07:42 UTC"</span></code></pre></div>
 </div>
 <div id="environments" class="section level2">
 <h2 class="hasAnchor">
@@ -386,13 +386,13 @@ ts<span class="op">$</span><span class="kw">tomorrow</span>()
   env<span class="op">$</span>size &lt;-<span class="st"> </span>13L
   env
 }
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'configuration' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] Defining 'configuration' ... OK</span>
 
 config <span class="op">%&lt;=%</span><span class="st"> "configuration"</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'configuration' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('configuration' in 0.018 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] Making 'configuration' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:42 UTC] DONE ('configuration' in 0.015 secs)</span>
 
 config<span class="op">$</span>color
 <span class="co">#&gt; [1] "blue"</span>
@@ -408,7 +408,7 @@ config<span class="op">$</span>color
       config<span class="op">$</span>color &lt;-<span class="st"> </span><span class="cf">if</span> (config<span class="op">$</span>color <span class="op">==</span><span class="st"> "blue"</span>) <span class="st">"red"</span> <span class="cf">else</span> <span class="st">"blue"</span>
   )
 }
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'widget_A' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Defining 'widget_A' ... OK</span>
 
 <span class="st">"widget_B"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">config =</span> <span class="st">"configuration"</span>
@@ -418,18 +418,18 @@ config<span class="op">$</span>color
       config<span class="op">$</span>shape &lt;-<span class="st"> </span><span class="cf">if</span> (config<span class="op">$</span>shape <span class="op">==</span><span class="st"> "circle"</span>) <span class="st">"square"</span> <span class="cf">else</span> <span class="st">"circle"</span>
   )
 }
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'widget_B' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Defining 'widget_B' ... OK</span>
 
 widget_A <span class="op">%&lt;=%</span><span class="st"> "widget_A"</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'widget_A' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('widget_A' in 0.034 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Making 'widget_A' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] DONE ('widget_A' in 0.026 secs)</span>
 widget_B <span class="op">%&lt;=%</span><span class="st"> "widget_B"</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'widget_B' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('widget_B' in 0.036 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Making 'widget_B' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] DONE ('widget_B' in 0.03 secs)</span>
 
 widget_A<span class="op">$</span><span class="kw">switch_color</span>()
 config<span class="op">$</span>color
@@ -440,25 +440,25 @@ config<span class="op">$</span>shape
 <span class="co">#&gt; [1] "square"</span></code></pre></div>
 <p>The modulr package implements the dedicated syntactic sugar <code>%provides_options%</code> for this frequent purpose.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/undefine.html">undefine</a></span>(<span class="st">"configuration"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Undefining 'configuration' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Undefining 'configuration' ... OK</span>
 
 <span class="st">"configuration"</span> <span class="op">%provides_options%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">shape =</span> <span class="st">"circle"</span>,
   <span class="dt">color =</span> <span class="st">"blue"</span>,
   <span class="dt">size =</span> 13L
 )
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'configuration' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Defining 'configuration' ... OK</span>
 
 config <span class="op">%&lt;=%</span><span class="st"> "configuration"</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'configuration' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('configuration' in 0.017 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Making 'configuration' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] DONE ('configuration' in 0.014 secs)</span>
 widget_A <span class="op">%&lt;=%</span><span class="st"> "widget_A"</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'widget_A' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('widget_A' in 0.035 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Making 'widget_A' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] DONE ('widget_A' in 0.027 secs)</span>
 
 config<span class="op">$</span>color
 <span class="co">#&gt; [1] "blue"</span>
@@ -473,13 +473,13 @@ config<span class="op">$</span>color
 <span class="st">        </span><span class="cf">if</span> (.SharedEnv<span class="op">$</span>shape <span class="op">==</span><span class="st"> "circle"</span>) <span class="st">"square"</span> <span class="cf">else</span> <span class="st">"circle"</span>
   )
 }
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'widget_B_prime' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Defining 'widget_B_prime' ... OK</span>
 
 widget_B_prime &lt;-<span class="st"> </span><span class="kw"><a href="../reference/make.html">make</a></span>()
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'widget_B_prime' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('widget_B_prime' in 0.018 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Making 'widget_B_prime' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] DONE ('widget_B_prime' in 0.014 secs)</span>
 
 .SharedEnv<span class="op">$</span>shape &lt;-<span class="st"> "circle"</span>
 widget_B_prime<span class="op">$</span><span class="kw">switch_shape</span>()
@@ -493,13 +493,13 @@ widget_B_prime<span class="op">$</span><span class="kw">switch_shape</span>()
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"hello"</span> <span class="op">%provides%</span><span class="st"> </span>{
   compiler<span class="op">::</span><span class="kw">compile</span>(<span class="st">"Hello, world!"</span>)
 }
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'hello' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Defining 'hello' ... OK</span>
 
 <span class="kw">eval</span>(<span class="kw"><a href="../reference/make.html">make</a></span>())
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'hello' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('hello' in 0.026 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Making 'hello' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] DONE ('hello' in 0.024 secs)</span>
 <span class="co">#&gt; [1] "Hello, world!"</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"lapply_old"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="co"># Old R version of lapply.</span>
@@ -514,32 +514,32 @@ widget_B_prime<span class="op">$</span><span class="kw">switch_shape</span>()
     <span class="kw">return</span>(rval)
   }
 }
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'lapply_old' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Defining 'lapply_old' ... OK</span>
 
 <span class="st">"lapply_old/compiled"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">lapply_old =</span> <span class="st">"lapply_old"</span>
 ) <span class="op">%provides%</span><span class="st"> </span>{
   compiler<span class="op">::</span><span class="kw">cmpfun</span>(lapply_old)
 }
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Defining 'lapply_old/compiled' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Defining 'lapply_old/compiled' ... OK</span>
 
 lapply_old <span class="op">%&lt;=%</span><span class="st"> "lapply_old"</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'lapply_old' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('lapply_old' in 0.018 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Making 'lapply_old' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] DONE ('lapply_old' in 0.014 secs)</span>
 lapply_old_compiled <span class="op">%&lt;=%</span><span class="st"> "lapply_old/compiled"</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] Making 'lapply_old/compiled' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:26 UTC] DONE ('lapply_old/compiled' in 0.054 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Making 'lapply_old/compiled' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] DONE ('lapply_old/compiled' in 0.051 secs)</span>
 
 <span class="kw">system.time</span>(<span class="cf">for</span> (i <span class="cf">in</span> 1L<span class="op">:</span>10000L) <span class="kw">lapply_old</span>(1L<span class="op">:</span>10L, is.null))
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.283   0.002   0.286</span>
+<span class="co">#&gt;   0.281   0.000   0.282</span>
 <span class="kw">system.time</span>(<span class="cf">for</span> (i <span class="cf">in</span> 1L<span class="op">:</span>10000L) <span class="kw">lapply_old_compiled</span>(1L<span class="op">:</span>10L, is.null))
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.187   0.000   0.187</span></code></pre></div>
+<span class="co">#&gt;   0.189   0.000   0.189</span></code></pre></div>
 </div>
 </div>
 <div id="semantic-versioning-semver" class="section level1">
@@ -588,22 +588,22 @@ lapply_old_compiled <span class="op">%&lt;=%</span><span class="st"> "lapply_old
     <span class="st">"great features"</span>
   }
 }
-<span class="co">#&gt; [2018-11-30T14:03:27 UTC] Defining 'great_module' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:43 UTC] Defining 'great_module' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"complex_module"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">great =</span> <span class="st">"great_module"</span>
 ) <span class="op">%provides%</span><span class="st"> </span>{
   <span class="cf">function</span>() <span class="kw">cat</span>(<span class="kw">paste</span>(<span class="st">"complex module using"</span>, <span class="kw">great</span>()))
 }
-<span class="co">#&gt; [2018-11-30T14:03:27 UTC] Defining 'complex_module' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:44 UTC] Defining 'complex_module' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"complex_module"</span>)())
-<span class="co">#&gt; [2018-11-30T14:03:27 UTC] Making 'complex_module' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:27 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:27 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:27 UTC] * Evaluating #1/1 (layer #1/1): 'great_module' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:27 UTC] DONE ('complex_module' in 0.034 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:44 UTC] Making 'complex_module' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:44 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:44 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:44 UTC] * Evaluating #1/1 (layer #1/1): 'great_module' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:44 UTC] DONE ('complex_module' in 0.029 secs)</span>
 <span class="co">#&gt; complex module using great features</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.033   0.002   1.037</span></code></pre></div>
+<span class="co">#&gt;   0.031   0.000   1.032</span></code></pre></div>
 <p>In this scenario, <code>great_module</code> does what it is supposed to do, but clearly not very efficiently. You then decide to work on a new version that improves its performance.</p>
 </div>
 <div id="setting-up-versioning" class="section level2">
@@ -611,50 +611,50 @@ lapply_old_compiled <span class="op">%&lt;=%</span><span class="st"> "lapply_old
 <a href="#setting-up-versioning" class="anchor"></a>Setting-up versioning</h2>
 <p>First, we clone <code>great_module</code> with an initial version number.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"great_module#0.1.0"</span> <span class="op">%clones%</span><span class="st"> "great_module"</span>
-<span class="co">#&gt; [2018-11-30T14:03:28 UTC] Defining 'great_module#0.1.0' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:45 UTC] Defining 'great_module#0.1.0' ... OK</span></code></pre></div>
 <p>We then adapt the requirements where <code>great_module</code> is injected as a dependency: for <code>complex_module</code>, we decide to accept bug fixes, refactorisations, and new functionalities, as long as the API does not change in an incompatible backward manner.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"complex_module"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">great =</span> <span class="st">"great_module#^0.1.0"</span>
 ) <span class="op">%provides%</span><span class="st"> </span>{
   <span class="cf">function</span>() <span class="kw">cat</span>(<span class="kw">paste</span>(<span class="st">"complex module using"</span>, <span class="kw">great</span>()))
 }
-<span class="co">#&gt; [2018-11-30T14:03:28 UTC] Re-defining 'complex_module' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:45 UTC] Re-defining 'complex_module' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"complex_module"</span>)())
-<span class="co">#&gt; [2018-11-30T14:03:28 UTC] Making 'complex_module' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:28 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:28 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:28 UTC] * Evaluating #1/1 (layer #1/1): 'great_module#0.1.0' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:28 UTC] DONE ('complex_module' in 0.041 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:45 UTC] Making 'complex_module' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:45 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:45 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:45 UTC] * Evaluating #1/1 (layer #1/1): 'great_module#0.1.0' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:45 UTC] DONE ('complex_module' in 0.036 secs)</span>
 <span class="co">#&gt; complex module using great features</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.043   0.000   1.044</span></code></pre></div>
+<span class="co">#&gt;   0.037   0.001   1.039</span></code></pre></div>
 <p>Here is the minor bump of <code>great_module</code>, which is a little bit more efficient.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"great_module#0.2.0"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="co"># Improved internals, same interface</span>
   <span class="cf">function</span>() <span class="st">"great optimisd features"</span>
 }
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] Defining 'great_module#0.2.0' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] Defining 'great_module#0.2.0' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"complex_module"</span>)())
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] Making 'complex_module' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] * Evaluating #1/1 (layer #1/1): 'great_module#0.2.0' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] DONE ('complex_module' in 0.047 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] Making 'complex_module' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] * Evaluating #1/1 (layer #1/1): 'great_module#0.2.0' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] DONE ('complex_module' in 0.041 secs)</span>
 <span class="co">#&gt; complex module using great optimisd features</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.049   0.000   0.049</span></code></pre></div>
+<span class="co">#&gt;   0.042   0.000   0.042</span></code></pre></div>
 <p>And here is the latest bug fix correcting the typo.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"great_module#0.2.1"</span> <span class="op">%provides%</span><span class="st"> </span>{
   <span class="co"># Bug fix</span>
   <span class="cf">function</span>() <span class="st">"great optimised features"</span>
 }
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] Defining 'great_module#0.2.1' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] Defining 'great_module#0.2.1' ... OK</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"complex_module"</span>)()
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] Making 'complex_module' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] * Evaluating #1/1 (layer #1/1): 'great_module#0.2.1' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] DONE ('complex_module' in 0.057 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] Making 'complex_module' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] * Evaluating #1/1 (layer #1/1): 'great_module#0.2.1' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] DONE ('complex_module' in 0.047 secs)</span>
 <span class="co">#&gt; complex module using great optimised features</span></code></pre></div>
 </div>
 </div>
@@ -667,7 +667,7 @@ lapply_old_compiled <span class="op">%&lt;=%</span><span class="st"> "lapply_old
 <a href="#in-memory" class="anchor"></a>In-memory</h2>
 <p>This is the most direct method to define a module. This is also the most volatile, since the lifespan of the module is limited to the R session.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"foo"</span> <span class="op">%provides%</span><span class="st"> "bar"</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] Defining 'foo' ... OK</span>
 <span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>(<span class="dt">cols =</span> <span class="kw">c</span>(<span class="st">"name"</span>, <span class="st">"storage"</span>, <span class="st">"along"</span>, <span class="st">"filepath"</span>, <span class="st">"url"</span>))
 <span class="co">#&gt;   name   storage along filepath  url</span>
 <span class="co">#&gt; 1  foo in-memory  &lt;NA&gt;     &lt;NA&gt; &lt;NA&gt;</span></code></pre></div>
@@ -695,11 +695,11 @@ lapply_old_compiled <span class="op">%&lt;=%</span><span class="st"> "lapply_old
 <span class="co">#&gt; [1] "../../inst/modules"</span></code></pre></div>
 <p>This explains why modulr finds the module <code>vendor/tool/swissknife</code> under the file <code>./modules/vendor/tool/swissknife.R</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_swissknife <span class="op">%&lt;=%</span><span class="st"> "vendor/tool/swissknife"</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] Making 'vendor/tool/swissknife' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] ** Defining 'vendor/tool/swissknife' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] DONE ('vendor/tool/swissknife' in 0.036 secs)</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] Making 'vendor/tool/swissknife' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] ** Defining 'vendor/tool/swissknife' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] DONE ('vendor/tool/swissknife' in 0.035 secs)</span></code></pre></div>
 <p>This also works with R Markdown <code>.Rmd</code> and R Sweave <code>.Rnw</code> files.</p>
 <pre><code>&lt;!--- File: ./modules/vendor/tool/multitool.Rmd --&gt;
 
@@ -716,7 +716,7 @@ library(modulr)
 }
 ```</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/load_module.html">load_module</a></span>(<span class="st">"vendor/tool/multitool"</span>) <span class="co"># load only, do not make</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] Defining 'vendor/tool/multitool' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] Defining 'vendor/tool/multitool' ... OK</span>
 <span class="co">#&gt;                          vendor/tool/multitool </span>
 <span class="co">#&gt; "../../inst/modules/vendor/tool/multitool.Rmd"</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>(<span class="dt">cols =</span> <span class="kw">c</span>(<span class="st">"name"</span>, <span class="st">"storage"</span>, <span class="st">"along"</span>, <span class="st">"filepath"</span>, <span class="st">"url"</span>))
@@ -733,16 +733,16 @@ library(modulr)
 <a href="#remote-modulr-gears" class="anchor"></a>Remote (<em>modulr gears</em>)</h2>
 <p>Using GitHub’s <a href="https://gist.github.com">Gist</a> is a simple way to share modules with others. To illustrate this, let us consider the following remote module, aka <strong>modulr gear</strong>: <a href="https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3" class="uri">https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3</a>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"modulr/vault"</span> <span class="op">%imports%</span><span class="st"> "https://gist.github.com/aclemen1/3fcc508cb40ddac6c1e3"</span>
-<span class="co">#&gt; [2018-11-30T14:03:29 UTC] Importing 'modulr/vault' from gist ID '3fcc508cb40ddac6c1e3' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] * Found 1 file(s) with R flavour (see https://gist.github.com/3fcc508cb40ddac6c1e3).</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] * Installing gear at '/tmp/RtmphXRbBL/gears/modulr/vault/9239c881a5811267'.</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] DONE ('modulr/vault')</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] Defining 'modulr/vault/example_SECRET_' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] Defining 'modulr/vault/example' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] Defining 'modulr/vault#0.1.0' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] Defining 'modulr/vault#0.1.0/mock' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] Defining 'modulr/vault#0.1.0/test' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] Digest of 'modulr/vault#0.1.0' is '390032bb2476c24e'.</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:46 UTC] Importing 'modulr/vault' from gist ID '3fcc508cb40ddac6c1e3' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] * Found 1 file(s) with R flavour (see https://gist.github.com/3fcc508cb40ddac6c1e3).</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] * Installing gear at '/tmp/RtmpE9xKyF/gears/modulr/vault/d4f0872e6d7a00c9'.</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] DONE ('modulr/vault')</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] Defining 'modulr/vault/example_SECRET_' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] Defining 'modulr/vault/example' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] Defining 'modulr/vault#0.1.0' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] Defining 'modulr/vault#0.1.0/mock' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] Defining 'modulr/vault#0.1.0/test' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] Digest of 'modulr/vault#0.1.0' is '390032bb2476c24e'.</span></code></pre></div>
 <p>Notice that only specifiying the gist ID in <code>"modulr/vault" %imports% "3fcc508cb40ddac6c1e3"</code> has the same effect. It is possible to import modules from any URL using the HTTP(S) protocol.</p>
 <p>Once imported, a remote module appears to be in-memory defined.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/list_modules.html">lsmod</a></span>(<span class="dt">cols =</span> <span class="kw">c</span>(<span class="st">"name"</span>, <span class="st">"storage"</span>, <span class="st">"along"</span>, <span class="st">"filepath"</span>, <span class="st">"url"</span>))
@@ -768,15 +768,15 @@ library(modulr)
     <span class="dt">secret =</span> <span class="st">"TWUnCkRAlP70XvmRlnAFrw=="</span>,
     <span class="dt">key =</span> <span class="st">"EaJWzAZjjphu9CoA+MPUVCL8mmMAGp0j6Nbga29kV/A="</span>)
 }
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] Defining 'module/using/a/gear' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] Defining 'module/using/a/gear' ... OK</span>
 
 <span class="kw"><a href="../reference/make.html">make</a></span>()
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] Making 'module/using/a/gear' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] * Evaluating #1/1 (layer #1/1): 'modulr/vault#0.1.0' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] Making 'module/using/a/gear' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] * Evaluating #1/1 (layer #1/1): 'modulr/vault#0.1.0' ...</span>
 <span class="co">#&gt; Loading required package: base64enc</span>
-<span class="co">#&gt; [2018-11-30T14:03:30 UTC] DONE ('module/using/a/gear' in 0.16 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:47 UTC] DONE ('module/using/a/gear' in 0.092 secs)</span>
 <span class="co">#&gt; [1] "passw0rd"</span></code></pre></div>
 <p>Notice that sharing a module is as easy as sending this one-liner code snippet:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modulr); <span class="st">"modulr/vault#^0.1.0"</span> <span class="op">%imports%</span><span class="st"> "3fcc508cb40ddac6c1e3"</span></code></pre></div>
@@ -786,17 +786,17 @@ library(modulr)
 
 <span class="st">"modulr/private_GitHubEnterprise_module"</span> <span class="op">%imports%</span><span class="st"> </span>
 <span class="st">  "https://github.unil.ch/api/v3/gists/1afa4770670975d70806c2153aac50a9"</span></code></pre></div>
-<pre><code>#&gt; [2018-11-30T14:03:31 UTC] Importing 'modulr/private_GitHubEnterprise_module' from gist ID '1afa4770670975d70806c2153aac50a9' (endpoint 'https://github.unil.ch/api/v3') ...
-#&gt; [2018-11-30T14:03:31 UTC] * Found 1 file(s) with R flavour (see https://github.unil.ch/gist/1afa4770670975d70806c2153aac50a9).
-#&gt; [2018-11-30T14:03:31 UTC] * Installing gear at '/tmp/RtmphXRbBL/gears/modulr/private_GitHubEnterprise_module/f5f38e1237bb1ace'.
-#&gt; [2018-11-30T14:03:31 UTC] DONE ('modulr/private_GitHubEnterprise_module')
-#&gt; [2018-11-30T14:03:31 UTC] Defining 'modulr/private_GitHubEnterprise_module' ... OK
-#&gt; [2018-11-30T14:03:31 UTC] Digest of 'modulr/private_GitHubEnterprise_module' is 'efbb8ee38858aaef'.</code></pre>
+<pre><code>#&gt; [2018-11-30T18:07:47 UTC] Importing 'modulr/private_GitHubEnterprise_module' from gist ID '1afa4770670975d70806c2153aac50a9' (endpoint 'https://github.unil.ch/api/v3') ...
+#&gt; [2018-11-30T18:07:47 UTC] * Found 1 file(s) with R flavour (see https://github.unil.ch/gist/1afa4770670975d70806c2153aac50a9).
+#&gt; [2018-11-30T18:07:47 UTC] * Installing gear at '/tmp/RtmpE9xKyF/gears/modulr/private_GitHubEnterprise_module/a09895f039767119'.
+#&gt; [2018-11-30T18:07:47 UTC] DONE ('modulr/private_GitHubEnterprise_module')
+#&gt; [2018-11-30T18:07:47 UTC] Defining 'modulr/private_GitHubEnterprise_module' ... OK
+#&gt; [2018-11-30T18:07:47 UTC] Digest of 'modulr/private_GitHubEnterprise_module' is 'efbb8ee38858aaef'.</code></pre>
 <p>Let us assume that the following module is worth publishing:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"modulr/release_gist_example"</span> <span class="op">%provides%</span><span class="st"> "Hello World!"</span></code></pre></div>
 <p>To release this module as a modulr gear on GitHub’s Gist, simply use <code>release_gear_as_gist</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/release_gear_as_gist.html">release_gear_as_gist</a></span>()</code></pre></div>
-<pre><code>#&gt; [2018-11-30T14:03:31 UTC] Updating 'modulr-release_gist_example.Rmd' in gist ID '91ffa1950571b67d476131873a8a069b'.</code></pre>
+<pre><code>#&gt; [2018-11-30T18:07:48 UTC] Updating 'modulr-release_gist_example.Rmd' in gist ID '91ffa1950571b67d476131873a8a069b'.</code></pre>
 <p>The module is then publicly available here: <a href="https://gist.github.com/91ffa1950571b67d476131873a8a069b" class="uri">https://gist.github.com/91ffa1950571b67d476131873a8a069b</a>.</p>
 </div>
 </div>
@@ -809,23 +809,23 @@ library(modulr)
 </h2>
 <p>When a module is defined, touched, or made, its name is always assigned to <code>.Last.name</code>. The special variable <code>.Last.name</code> is also used as a default parameter for <code>make</code>, <code>touch</code>, and <code>undefine</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"foo"</span> <span class="op">%provides%</span><span class="st"> "bar"</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Defining 'foo' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:49 UTC] Defining 'foo' ... OK</span>
 
 .Last.name
 <span class="co">#&gt; [1] "foo"</span>
 
 <span class="kw"><a href="../reference/make.html">make</a></span>()
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Making 'foo' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] DONE ('foo' in 0.019 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:49 UTC] Making 'foo' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:49 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:49 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:49 UTC] DONE ('foo' in 0.015 secs)</span>
 <span class="co">#&gt; [1] "bar"</span>
 
 <span class="kw"><a href="../reference/touch.html">touch</a></span>()
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Touching 'foo' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:49 UTC] Touching 'foo' ... OK</span>
 
 <span class="kw"><a href="../reference/undefine.html">undefine</a></span>()
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Undefining 'foo' ... OK</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:49 UTC] Undefining 'foo' ... OK</span></code></pre></div>
 </div>
 <div id="modules-metadata" class="section level2">
 <h2 class="hasAnchor">
@@ -875,62 +875,7 @@ library(modulr)
 <a href="#the-special-module-modulr" class="anchor"></a>The special module <code>modulr</code>
 </h1>
 <p>The modulr package defines a special module named <code>modulr</code> that can be injected in any module. The purpose of this special module is to give access to useful helper functions related to the module into which it is injected.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/print_info.html">info</a></span>(<span class="st">"modulr"</span>)
-<span class="co">#&gt; # `modulr`</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Access module helper functions.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; The purpose of this special module is to give access to useful helper</span>
-<span class="co">#&gt; functions related to the module into which it is injected.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ## Methods</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span><span class="al">###</span><span class="co"> `post_evaluation_hook(expr, add = FALSE)`</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Records the expression given as its argument as needing to be executed</span>
-<span class="co">#&gt; when the current module evaluation exits (either naturally or as the</span>
-<span class="co">#&gt; result of an error). If no expression is provided, i.e., the call is</span>
-<span class="co">#&gt; `post_evaluation_hook()`, then the current expression is removed. If</span>
-<span class="co">#&gt; `add` is `TRUE`, `expr` is added after any previously set expressions;</span>
-<span class="co">#&gt; otherwise (the default) `expr` will overwrite any previously set</span>
-<span class="co">#&gt; expressions.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span><span class="al">###</span><span class="co"> `message_info(...)`, `message_warn(...)`, `message_stop(...)`</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Outputs an informative, warning, or critical and stopping message,</span>
-<span class="co">#&gt; prefixed with a timestamp and the module name. Such messages are</span>
-<span class="co">#&gt; particularily useful in modules involved in long chains of dependencies</span>
-<span class="co">#&gt; and workflows.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; ## Deprecated methods</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span><span class="al">###</span><span class="co"> `get_module_name()`</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Returns a string (character vector of lenght one) containing the module</span>
-<span class="co">#&gt; name. Deprecated and kept for backward compatibility. Use `.__name__`</span>
-<span class="co">#&gt; instead.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span><span class="al">###</span><span class="co"> `get_module_version()`</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Returns the numeric version of the module. Deprecated and kept for</span>
-<span class="co">#&gt; backward compatibility. Use `.__version__` instead.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span><span class="al">###</span><span class="co"> `get_module_options()`</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Returns a list containing the module options. Deprecated and kept for</span>
-<span class="co">#&gt; backward compatibility.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span><span class="al">###</span><span class="co"> `get_filename()`</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Returns a string (character vector of lenght one) containing the module</span>
-<span class="co">#&gt; filename. Deprecated and kept for backward compatibility. Use `.__path__`</span>
-<span class="co">#&gt; and/or `.__file__` instead.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span><span class="al">###</span><span class="co"> `get_dirname()`</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Returns a string (character vector of lenght one) containing the module</span>
-<span class="co">#&gt; dirname. Deprecated and kept for backward compatibility. Use `.__path__`</span>
-<span class="co">#&gt; and/or `.__file__` instead.</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/print_info.html">info</a></span>(<span class="st">"modulr"</span>)</code></pre></div>
 <div id="messages" class="section level2">
 <h2 class="hasAnchor">
 <a href="#messages" class="anchor"></a>Messages</h2>
@@ -946,19 +891,19 @@ library(modulr)
   modulr<span class="op">$</span><span class="kw"><a href="../reference/modulr-module.html">post_evaluation_hook</a></span>(<span class="kw"><a href="../reference/undefine.html">undefine</a></span>(<span class="st">"ephemeral"</span>))
   <span class="st">"A butterfly"</span>
 }
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Defining 'ephemeral' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] Defining 'ephemeral' ... OK</span>
 
 <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"ephemeral"</span>) <span class="co"># returns a butterfly</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Making 'ephemeral' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Evaluating #1/1 (layer #1/1): 'modulr#0.1.7.9203' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Undefining 'ephemeral' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] DONE ('ephemeral' in 0.17 secs)</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] Making 'ephemeral' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] * Evaluating #1/1 (layer #1/1): 'modulr#0.1.7.9205' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] * Undefining 'ephemeral' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] DONE ('ephemeral' in 0.16 secs)</span>
 <span class="co">#&gt; [1] "A butterfly"</span>
 <span class="kw">try</span>(<span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"ephemeral"</span>), <span class="dt">silent =</span> <span class="ot">TRUE</span>) <span class="co"># no more</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Making 'ephemeral' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] Making 'ephemeral' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] * Visiting and defining dependencies ...</span>
 <span class="kw">cat</span>(<span class="kw">geterrmessage</span>())
 <span class="co">#&gt; Error : "ephemeral" is not defined.</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"no_scoped"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
@@ -967,23 +912,23 @@ library(modulr)
   modulr<span class="op">$</span><span class="kw"><a href="../reference/modulr-module.html">post_evaluation_hook</a></span>(<span class="kw"><a href="../reference/touch.html">touch</a></span>(<span class="st">"no_scoped"</span>))
   <span class="kw">Sys.time</span>()
 }
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Defining 'no_scoped' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] Defining 'no_scoped' ... OK</span>
 
 <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"no_scoped"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] Making 'no_scoped' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] * Touching 'no_scoped' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:33 UTC] DONE ('no_scoped' in 0.19 secs)</span>
-<span class="co">#&gt; [1] "2018-11-30 14:03:33 UTC"</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] Making 'no_scoped' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] * Touching 'no_scoped' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:50 UTC] DONE ('no_scoped' in 0.18 secs)</span>
+<span class="co">#&gt; [1] "2018-11-30 18:07:50 UTC"</span>
 <span class="kw">Sys.sleep</span>(1L)
 <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"no_scoped"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:34 UTC] Making 'no_scoped' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:34 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] * Touching 'no_scoped' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] DONE ('no_scoped' in 0.18 secs)</span>
-<span class="co">#&gt; [1] "2018-11-30 14:03:35 UTC"</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] Making 'no_scoped' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] * Touching 'no_scoped' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] DONE ('no_scoped' in 0.17 secs)</span>
+<span class="co">#&gt; [1] "2018-11-30 18:07:51 UTC"</span></code></pre></div>
 <p>Notice that the expression passed to the hook is evaluated in the environment in which the module is used. Therefore, a direct call to <code>.__name__</code> would not return the name of the intuitively expected module. The following example illustrates how to circumvent this kind of difficulty.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">"no_scoped"</span> <span class="op">%requires%</span><span class="st"> </span><span class="kw">list</span>(
   <span class="dt">modulr =</span> <span class="st">"modulr"</span>
@@ -991,23 +936,23 @@ library(modulr)
   <span class="kw">eval</span>(<span class="kw">substitute</span>(modulr<span class="op">$</span><span class="kw"><a href="../reference/modulr-module.html">post_evaluation_hook</a></span>(<span class="kw"><a href="../reference/touch.html">touch</a></span>(me)), <span class="kw">list</span>(<span class="dt">me =</span> .__name__)))
   <span class="kw">Sys.time</span>()
 }
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] Re-defining 'no_scoped' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] Re-defining 'no_scoped' ... OK</span>
 
 <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"no_scoped"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] Making 'no_scoped' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] * Touching 'no_scoped' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:35 UTC] DONE ('no_scoped' in 0.18 secs)</span>
-<span class="co">#&gt; [1] "2018-11-30 14:03:35 UTC"</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] Making 'no_scoped' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] * Touching 'no_scoped' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:51 UTC] DONE ('no_scoped' in 0.16 secs)</span>
+<span class="co">#&gt; [1] "2018-11-30 18:07:51 UTC"</span>
 <span class="kw">Sys.sleep</span>(1L)
 <span class="kw"><a href="../reference/make.html">make</a></span>(<span class="st">"no_scoped"</span>)
-<span class="co">#&gt; [2018-11-30T14:03:36 UTC] Making 'no_scoped' ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:36 UTC] * Visiting and defining dependencies ...</span>
-<span class="co">#&gt; [2018-11-30T14:03:36 UTC] * Constructing dependency graph ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:36 UTC] * Touching 'no_scoped' ... OK</span>
-<span class="co">#&gt; [2018-11-30T14:03:36 UTC] DONE ('no_scoped' in 0.17 secs)</span>
-<span class="co">#&gt; [1] "2018-11-30 14:03:36 UTC"</span></code></pre></div>
+<span class="co">#&gt; [2018-11-30T18:07:52 UTC] Making 'no_scoped' ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:52 UTC] * Visiting and defining dependencies ...</span>
+<span class="co">#&gt; [2018-11-30T18:07:52 UTC] * Constructing dependency graph ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:52 UTC] * Touching 'no_scoped' ... OK</span>
+<span class="co">#&gt; [2018-11-30T18:07:52 UTC] DONE ('no_scoped' in 0.19 secs)</span>
+<span class="co">#&gt; [1] "2018-11-30 18:07:52 UTC"</span></code></pre></div>
 </div>
 </div>
 <div id="scripting" class="section level1">

@@ -163,23 +163,23 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] Resetting modulr state ... OK</div><div class='input'><span class='no'>tmp_dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempfile</span>(<span class='st'>"modulr_"</span>)
+    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] Resetting modulr state ... OK</div><div class='input'><span class='no'>tmp_dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempfile</span>(<span class='st'>"modulr_"</span>)
 <span class='fu'>dir.create</span>(<span class='no'>tmp_dir</span>)
 <span class='no'>tmp_file</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='no'>tmp_dir</span>, <span class='st'>"foo.R"</span>)
 <span class='fu'>cat</span>(<span class='st'>'define("foo", NULL, function() print("Hello World!"))'</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmp_file</span>)
 <span class='no'>tmp_file</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='no'>tmp_dir</span>, <span class='st'>"bar.R"</span>)
 <span class='fu'>cat</span>(<span class='st'>'define("bar", NULL, function() print("hELLO wORLD?"))'</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmp_file</span>)
-<span class='fu'>load_all_modules</span>(<span class='no'>tmp_dir</span>)</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] Defining 'bar' ... OK
-#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] Defining 'foo' ... OK</div><div class='input'><span class='fu'><a href='make.html'>make_all</a></span>()</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] Making 'bar' ...
-#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] * Visiting and defining dependencies ...
-#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] * Constructing dependency graph ... OK
+<span class='fu'>load_all_modules</span>(<span class='no'>tmp_dir</span>)</div><div class='output co'>#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] Defining 'bar' ... OK
+#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] Defining 'foo' ... OK</div><div class='input'><span class='fu'><a href='make.html'>make_all</a></span>()</div><div class='output co'>#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] Making 'bar' ...
+#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] * Visiting and defining dependencies ...
+#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] * Constructing dependency graph ... OK
 #&gt; [1] "hELLO wORLD?"
-#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] DONE ('bar' in 0.034 secs)
-#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] Making 'foo' ...
-#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] * Visiting and defining dependencies ...
-#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] * Constructing dependency graph ... OK
+#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] DONE ('bar' in 0.032 secs)
+#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] Making 'foo' ...
+#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] * Visiting and defining dependencies ...
+#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] * Constructing dependency graph ... OK
 #&gt; [1] "Hello World!"
-#&gt; [Fri 30 Nov 2018 03:02:52 PM CET] DONE ('foo' in 0.029 secs)</div><div class='input'><span class='fu'>unlink</span>(<span class='no'>tmp_dir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div></pre>
+#&gt; [Fri 30 Nov 2018 07:07:09 PM CET] DONE ('foo' in 0.026 secs)</div><div class='input'><span class='fu'>unlink</span>(<span class='no'>tmp_dir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
