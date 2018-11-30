@@ -3,7 +3,7 @@
 
   if (!is.null(path)) {
 
-    .modulr_env$injector$.__name__ <- name
+    .modulr_env$injector$.__name__ <- if (is.null(name)) "__noname__" else name
     on.exit(rm(list = ".__name__", pos = .modulr_env$injector))
 
     loaded <- FALSE
@@ -244,7 +244,7 @@ load_module <- function(name = .Last.name) {
 #'
 #' @export
 load_all_modules <- function(
-  path = c("lib", "libs", "module", "modules", "."),
+  path = root_config$get_all()[[1L]],
   pattern = "[^_]\\.[rR][(?:md)|(?:nw)]?$",
   full.names = TRUE,
   recursive = TRUE, ...) {

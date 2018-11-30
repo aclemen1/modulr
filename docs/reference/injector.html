@@ -161,15 +161,15 @@ injector is returned by the <code>get_default_injector</code> function.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2018-10-25T22:57:41 CEST] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2018-10-25T22:57:41 CEST] Defining 'foo' ... OK</div><div class='input'><span class='no'>injector</span> <span class='kw'>&lt;-</span> <span class='fu'>new_injector</span>()
+    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:47 PM CET] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:47 PM CET] Defining 'foo' ... OK</div><div class='input'><span class='no'>injector</span> <span class='kw'>&lt;-</span> <span class='fu'>new_injector</span>()
 <span class='no'>previous_injector</span> <span class='kw'>&lt;-</span> <span class='fu'>set_injector</span>(<span class='no'>injector</span>)
-<span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"bar"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [2018-10-25T22:57:41 CEST] Defining 'bar' ... OK</div><div class='input'><span class='fu'><a href='list_modules.html'>lsmod</a></span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses      size
+<span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"bar"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:47 PM CET] Defining 'bar' ... OK</div><div class='input'><span class='fu'><a href='list_modules.html'>lsmod</a></span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses      size
 #&gt; 1  bar    &lt;NA&gt; in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0    0 888 bytes
-#&gt;   lines                 modified
-#&gt; 1     2 2018-10-25T22:57:41 CEST</div><div class='input'><span class='fu'>set_injector</span>(<span class='no'>previous_injector</span>)</div><div class='output co'>#&gt; &lt;environment: 0x5be9e88&gt;</div><div class='input'><span class='fu'><a href='list_modules.html'>lsmod</a></span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses      size
+#&gt;   lines                        modified
+#&gt; 1     2 Fri 30 Nov 2018 03:02:47 PM CET</div><div class='input'><span class='fu'>set_injector</span>(<span class='no'>previous_injector</span>)</div><div class='output co'>#&gt; &lt;environment: 0x594f520&gt;</div><div class='input'><span class='fu'><a href='list_modules.html'>lsmod</a></span>()</div><div class='output co'>#&gt;   name version   storage along type weight calls dependencies uses      size
 #&gt; 1  foo    &lt;NA&gt; in-memory  &lt;NA&gt; &lt;NA&gt;   &lt;NA&gt;     0            0    0 888 bytes
-#&gt;   lines                 modified
-#&gt; 1     2 2018-10-25T22:57:41 CEST</div><div class='input'>
+#&gt;   lines                        modified
+#&gt; 1     2 Fri 30 Nov 2018 03:02:47 PM CET</div><div class='input'>
 <span class='fu'>not_run</span>({
   <span class='no'>.Last</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>() {
    <span class='co'># Bind the current injector (internal modulr state) to the environment.</span>
@@ -178,14 +178,14 @@ injector is returned by the <code>get_default_injector</code> function.</p>
   <span class='fu'>quit</span>(<span class='kw'>save</span> <span class='kw'>=</span> <span class='st'>"yes"</span>)
 })
 
-<span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2018-10-25T22:57:41 CEST] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='st'>"Hi Bob!"</span>)</div><div class='output co'>#&gt; [2018-10-25T22:57:41 CEST] Defining 'foo' ... OK</div><div class='input'><span class='co'>## Alice saves its injector and sends it to ...</span>
+<span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:47 PM CET] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='st'>"Hi Bob!"</span>)</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:47 PM CET] Defining 'foo' ... OK</div><div class='input'><span class='co'>## Alice saves its injector and sends it to ...</span>
 <span class='fu'>saveRDS</span>(<span class='fu'>get_injector</span>(), <span class='kw'>file</span> <span class='kw'>=</span> <span class='st'>"injector.R"</span>)
 <span class='co'>## ... Bob who restores it.</span>
 <span class='no'>injector</span> <span class='kw'>&lt;-</span> <span class='fu'>readRDS</span>(<span class='st'>"injector.R"</span>)
-<span class='fu'>set_injector</span>(<span class='no'>injector</span>)</div><div class='output co'>#&gt; &lt;environment: 0x93306a8&gt;</div><div class='input'><span class='fu'><a href='make.html'>make</a></span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt; [2018-10-25T22:57:41 CEST] Making 'foo' ...
-#&gt; [2018-10-25T22:57:41 CEST] * Visiting and defining dependencies ...
-#&gt; [2018-10-25T22:57:41 CEST] * Constructing dependency graph ... OK
-#&gt; [2018-10-25T22:57:41 CEST] DONE ('foo' in 0.027 secs)</div><div class='output co'>#&gt; [1] "Hi Bob!"</div><div class='input'>
+<span class='fu'>set_injector</span>(<span class='no'>injector</span>)</div><div class='output co'>#&gt; &lt;environment: 0x7f49510&gt;</div><div class='input'><span class='fu'><a href='make.html'>make</a></span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt; [Fri 30 Nov 2018 03:02:48 PM CET] Making 'foo' ...
+#&gt; [Fri 30 Nov 2018 03:02:48 PM CET] * Visiting and defining dependencies ...
+#&gt; [Fri 30 Nov 2018 03:02:48 PM CET] * Constructing dependency graph ... OK
+#&gt; [Fri 30 Nov 2018 03:02:48 PM CET] DONE ('foo' in 0.027 secs)</div><div class='output co'>#&gt; [1] "Hi Bob!"</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

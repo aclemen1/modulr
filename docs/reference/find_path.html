@@ -162,8 +162,8 @@ returned path can be absolute or relative to a root directory.</p>
 <span class='fu'>cat</span>(<span class='st'>'define("foo", NULL, function() "Hello World!")'</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmp_file</span>)
 <span class='no'>root_config</span>$<span class='fu'><a href='config.html'>set</a></span>(<span class='no'>tmp_dir</span>)
 <span class='fu'><a href='set_verbosity.html'>set_verbosity</a></span>(<span class='fl'>1L</span>)
-<span class='fu'>find_path</span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt;                                        foo 
-#&gt; "/tmp/RtmpWCwr6R/modulr_3f1cbf16fd8/foo.R" </div><div class='input'><span class='fu'>unlink</span>(<span class='no'>tmp_dir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>find_path</span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt;                                         foo 
+#&gt; "/tmp/RtmpwKqsMM/modulr_21ff1013f7b7/foo.R" </div><div class='input'><span class='fu'>unlink</span>(<span class='no'>tmp_dir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'><a href='reset.html'>reset</a></span>()
 <span class='no'>tmp_dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempfile</span>(<span class='st'>"modulr_"</span>)
