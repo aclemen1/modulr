@@ -23,7 +23,8 @@ do.make(name = .Last.name, args = list(), quote = FALSE,
 
 make_all(regexp, reserved = FALSE, error = stop)
 
-make_tests()
+make_tests(pattern = NULL, ignore.case = FALSE, perl = FALSE,
+  fixed = FALSE, useBytes = FALSE, invert = FALSE)
 
 make_all_tests(...)
 }
@@ -61,6 +62,29 @@ is used to filter the names of the modules to be made.}
 considered?}
 
 \item{error}{A function. This function is triggered on error.}
+
+\item{pattern}{character string containing a \link{regular expression}
+    (or character string for \code{fixed = TRUE}) to be matched
+    in the given character vector.  Coerced by
+    \code{\link{as.character}} to a character string if possible.  If a
+    character vector of length 2 or more is supplied, the first element
+    is used with a warning.  Missing values are allowed except for
+    \code{regexpr} and \code{gregexpr}.}
+
+\item{ignore.case}{if \code{FALSE}, the pattern matching is \emph{case
+      sensitive} and if \code{TRUE}, case is ignored during matching.}
+
+\item{perl}{logical.  Should Perl-compatible regexps be used?}
+
+\item{fixed}{logical.  If \code{TRUE}, \code{pattern} is a string to be
+    matched as is.  Overrides all conflicting arguments.}
+
+\item{useBytes}{logical.  If \code{TRUE} the matching is done
+    byte-by-byte rather than character-by-character.  See
+    \sQuote{Details}.}
+
+\item{invert}{logical.  If \code{TRUE} return indices or values for
+    elements that do \emph{not} match.}
 }
 \value{
 The object resulting of the evaluation of the provider function of

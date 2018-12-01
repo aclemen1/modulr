@@ -440,8 +440,11 @@ make_all <- function(regexp, reserved = FALSE, error = stop) {
 
 #' @rdname make
 #' @inheritParams make_all
+#' @inheritParams base::grep
 #' @export
-make_tests <- function() {
+make_tests <- function(
+  pattern = NULL, ignore.case = FALSE,
+  perl = FALSE, fixed = FALSE, useBytes = FALSE, invert = FALSE) {
 
   .message_meta("Entering make_tests() ...",
                 verbosity = +Inf)
@@ -451,7 +454,15 @@ make_tests <- function() {
             call. = FALSE, immediate. = TRUE)
   }
 
-  module_names <- list_modules("\\/tests?$", reserved = FALSE, wide = FALSE)
+  module_names <-
+    list_modules("\\/tests?$", reserved = FALSE, wide = FALSE)
+
+  if (!is.null(pattern)) {
+    module_names <- grep(
+      pattern, module_names, value = TRUE,
+      ignore.case = ignore.case, perl = perl,
+      fixed = fixed, useBytes = useBytes, invert = invert)
+  }
 
   rs <- list()
   for (name in module_names) {
