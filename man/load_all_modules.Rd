@@ -6,7 +6,7 @@
 \usage{
 load_all_modules(path = root_config$get_all()[[1L]],
   pattern = "[^_]\\\\.[Rr](?:md|nw)?$", full.names = TRUE,
-  recursive = TRUE, ...)
+  recursive = TRUE, strict = TRUE, ...)
 }
 \arguments{
 \item{path}{a character vector of full path names; the default
@@ -22,6 +22,8 @@ load_all_modules(path = root_config$get_all()[[1L]],
     If \code{FALSE}, the file names (rather than paths) are returned.}
 
 \item{recursive}{logical.  Should the listing recurse into directories?}
+
+\item{strict}{A flag. Should stop at errors?}
 
 \item{...}{Further arguments to be passed to \code{base::\link[base]{list.files}}.}
 }

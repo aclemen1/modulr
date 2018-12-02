@@ -161,7 +161,7 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2018-12-02T14:57:35 CET] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='st'>"Hello World!"</span>)</div><div class='output co'>#&gt; [2018-12-02T14:57:35 CET] Defining 'foo' ... OK</div><div class='input'><span class='fu'>find_module</span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt; $name
+    <pre class="examples"><div class='input'><span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2018-12-02T17:13:58 CET] Resetting modulr state ... OK</div><div class='input'><span class='fu'><a href='define.html'>define</a></span>(<span class='st'>"foo"</span>, <span class='kw'>NULL</span>, <span class='kw'>function</span>() <span class='st'>"Hello World!"</span>)</div><div class='output co'>#&gt; [2018-12-02T17:13:58 CET] Defining 'foo' ... OK</div><div class='input'><span class='fu'>find_module</span>(<span class='st'>"foo"</span>)</div><div class='output co'>#&gt; $name
 #&gt; [1] "foo"
 #&gt; 
 #&gt; $version
@@ -173,7 +173,7 @@
 #&gt; $filepath
 #&gt; [1] NA
 #&gt; </div><div class='input'>
-<span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2018-12-02T14:57:35 CET] Resetting modulr state ... OK</div><div class='input'><span class='no'>tmp_dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempfile</span>(<span class='st'>"modulr_"</span>)
+<span class='fu'><a href='reset.html'>reset</a></span>()</div><div class='output co'>#&gt; [2018-12-02T17:13:58 CET] Resetting modulr state ... OK</div><div class='input'><span class='no'>tmp_dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempfile</span>(<span class='st'>"modulr_"</span>)
 <span class='fu'>dir.create</span>(<span class='no'>tmp_dir</span>)
 <span class='no'>tmp_file</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='no'>tmp_dir</span>, <span class='st'>"foo.R"</span>)
 <span class='fu'>cat</span>(<span class='st'>'define("foo", NULL, function() "Hello World!")'</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='no'>tmp_file</span>)
@@ -189,7 +189,7 @@
 #&gt; [1] "on-disk"
 #&gt; 
 #&gt; $filepath
-#&gt; [1] "/tmp/RtmpxG72Ok/modulr_7f3614057552/foo.R"
+#&gt; [1] "/tmp/RtmpxG72Ok/modulr_7f36125c478/foo.R"
 #&gt; </div><div class='input'><span class='fu'>unlink</span>(<span class='no'>tmp_dir</span>, <span class='kw'>recursive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'><a href='reset.html'>reset</a></span>()

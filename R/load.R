@@ -220,6 +220,7 @@ load_module <- function(name = .Last.name) {
 #' Load or reload all modules which are defined in the named directory.
 #'
 #' @inheritParams base::list.files
+#' @param strict A flag. Should stop at errors?
 #' @param ... Further arguments to be passed to \code{base::\link[base]{list.files}}.
 #'
 #' @section Warning:
@@ -247,7 +248,9 @@ load_all_modules <- function(
   path = root_config$get_all()[[1L]],
   pattern = "[^_]\\.[Rr](?:md|nw)?$",
   full.names = TRUE,
-  recursive = TRUE, ...) {
+  recursive = TRUE,
+  strict = TRUE,
+  ...) {
 
   .message_meta("Entering load_all_modules() ...",
                 verbosity = +Inf)
@@ -261,8 +264,14 @@ load_all_modules <- function(
     path = path, pattern = pattern,
     full.names = full.names, recursive = recursive, ...)
 
+  loader <- if (strict) {
+    .load_module
+  } else {
+    function(...) try(.load_module(...))
+  }
+
   if (length(files) > 0L)
-    Map(.load_module, files, check = FALSE)
+    Map(loader, files, check = FALSE)
 
   invisible(NULL)
 
