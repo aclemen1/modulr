@@ -5,7 +5,7 @@
 \title{Load All Modules.}
 \usage{
 load_all_modules(path = root_config$get_all()[[1L]],
-  pattern = "[^_]\\\\.[rR][(?:md)|(?:nw)]?$", full.names = TRUE,
+  pattern = "[^_]\\\\.[Rr](?:md|nw)?$", full.names = TRUE,
   recursive = TRUE, ...)
 }
 \arguments{

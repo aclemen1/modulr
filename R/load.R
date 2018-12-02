@@ -245,7 +245,7 @@ load_module <- function(name = .Last.name) {
 #' @export
 load_all_modules <- function(
   path = root_config$get_all()[[1L]],
-  pattern = "[^_]\\.[rR][(?:md)|(?:nw)]?$",
+  pattern = "[^_]\\.[Rr](?:md|nw)?$",
   full.names = TRUE,
   recursive = TRUE, ...) {
 
