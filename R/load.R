@@ -28,7 +28,7 @@
     if (tolower(tools::file_ext(path)) == "r") {
 
       if (interactive() && requireNamespace("rstudioapi", quietly = TRUE) &&
-            rstudioapi::isAvailable()) {
+            rstudioapi::isAvailable() && exists("debugSource")) {
 
         # nocov start
         # Seems that tryCatch is unable to catch errors happening in an
