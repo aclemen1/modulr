@@ -20,5 +20,5 @@ For a complete list of functions,
 use \code{library(help = "modulr")}.
 }
 \author{
-Alain Clément-Pavon <\email{alain.clement-pavon@unil.ch}>
+Alain Clément <\email{alain.clement@unil.ch}>
 }

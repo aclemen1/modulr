@@ -16,7 +16,7 @@
 #'
 #' @docType package
 #' @name modulr
-#' @author Alain Clément-Pavon <\email{alain.clement-pavon@@unil.ch}>
+#' @author Alain Clément <\email{alain.clement@@unil.ch}>
 NULL
 
 .modulr_env <- new.env(parent = emptyenv())

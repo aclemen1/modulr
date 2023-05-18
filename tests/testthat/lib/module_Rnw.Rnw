@@ -23,7 +23,7 @@
 \title{A Minimal Demo of Modulr Gear in LaTeX}
 
 
-\author{Alain Cl\'ement-Pavon}
+\author{Alain Cl\'ement}
 
 \maketitle
 This is a minimal example of gear written with LaTeX and persisted in an Rnw file.

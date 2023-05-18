@@ -11,7 +11,7 @@ There were no ERRORs or WARNINGs.
 There was only a single note, due to the present new submission:
 
 * checking CRAN incoming feasibility ... NOTE
-  Maintainer: ‘Alain Clément-Pavon <alain.clement-pavon@unil.ch>’
+  Maintainer: ‘Alain Clément <alain.clement@unil.ch>’
   New submission
 
   License components with restrictions and base license permitting such:
@@ -19,7 +19,7 @@ There was only a single note, due to the present new submission:
   File 'LICENSE':
     The MIT License (MIT)
   
-    Copyright (c) 2014-2015 Alain Clément-Pavon
+    Copyright (c) 2014-2015 Alain Clément
     
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
