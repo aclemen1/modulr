@@ -48,7 +48,7 @@ define("foo", NULL, function() {
  #' Description goes here.
  NULL
 })
-cat(prepare_gear("foo", url = "https://example.org/gears/foo"), sep = "\\n")
+cat(prepare_gear("foo", url = "https://example.org/gears/foo"), sep = "\n")
 
 }
 \seealso{

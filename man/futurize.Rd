@@ -4,9 +4,14 @@
 \alias{futurize}
 \title{Tweak a module to a future.}
 \usage{
-futurize(original_name, name = paste(original_name, "future", sep = "/"),
-  dependencies = get_dependencies(original_name), strategy = NULL,
-  lazy = FALSE, ...)
+futurize(
+  original_name,
+  name = paste(original_name, "future", sep = "/"),
+  dependencies = get_dependencies(original_name),
+  strategy = NULL,
+  lazy = FALSE,
+  ...
+)
 }
 \arguments{
 \item{original_name}{A module name.}

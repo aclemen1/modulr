@@ -693,12 +693,12 @@ hit <- function(name, suffix = getOption("modulr.hit_suffix"),
   }
   name_string <- as.character(substitute(name))
   roots <-
-    as.vector(stats::na.omit(vapply(
+    unique(as.vector(stats::na.omit(vapply(
       root_config$get_all()[[1L]],
       function(path) {
         if (.dir_exists(path)) normalizePath(path) else NA_character_
       },
-      FUN.VALUE = "character")))
+      FUN.VALUE = "character"))))
   candidates <-
     unique(list.files(
       path = roots,

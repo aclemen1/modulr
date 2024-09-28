@@ -11,13 +11,21 @@
 \alias{paths_config}
 \alias{maps_config}
 \title{Configurations.}
-\format{A list of getters and setters for a configuration.
+\format{
+A list of getters and setters for a configuration.
  \preformatted{
  unset()
  set(..., drop = TRUE)
  get(key)
  get_all()
- }}
+ }
+
+An object of class \code{list} of length 4.
+
+An object of class \code{list} of length 4.
+
+An object of class \code{list} of length 4.
+}
 \usage{
 root_config
 

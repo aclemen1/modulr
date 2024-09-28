@@ -450,7 +450,8 @@
             utils::glob2rx(sprintf("*%s", extensions), trim.head = TRUE))),
     collapse = "|"))
 
-  roots <- unique(c(root_config$get_all()[[1L]], "."))
+  roots <-
+    unique(c(root_config$get_all()[[1L]], "."))
 
   files <- c()
   for (root in roots) {

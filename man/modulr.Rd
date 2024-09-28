@@ -3,7 +3,6 @@
 \docType{package}
 \name{modulr}
 \alias{modulr}
-\alias{modulr-package}
 \title{Modulr: A Dependency Injection Framework for R}
 \description{
 This package contains a Dependency Injection framework for R. It allows to

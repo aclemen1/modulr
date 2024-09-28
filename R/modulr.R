@@ -121,7 +121,7 @@ new_injector <- function() {
 
   if (!.is_defined("modulr")) define_modulr()
 
-  root_config$set(eval(DEFAULT_ROOT_CONFIG))
+  root_config$set(unique(eval(DEFAULT_ROOT_CONFIG)))
 
   .set_injector(injector = injector_)
 
@@ -464,6 +464,16 @@ DEFAULT_ROOT_CONFIG <- quote(c(
   "module",
   "libs",
   "lib",
+  if (requireNamespace("rstudioapi", quietly = TRUE))
+    tryCatch({
+      file.path(rstudioapi::getActiveProject(), c(
+        ".",
+        "modules",
+        "module",
+        "libs",
+        "lib"
+      ))
+    }, error = function(...) NULL),
   if (nzchar(Sys.getenv("HOME")))
     file.path(Sys.getenv("HOME"), ".modulr"),
   if (nzchar(Sys.getenv("R_HOME")))

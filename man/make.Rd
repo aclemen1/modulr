@@ -15,16 +15,30 @@
 \usage{
 make(name = .Last.name, ...)
 
-do_make(name = .Last.name, args = list(), quote = FALSE,
-  envir = parent.frame(1L))
+do_make(
+  name = .Last.name,
+  args = list(),
+  quote = FALSE,
+  envir = parent.frame(1L)
+)
 
-do.make(name = .Last.name, args = list(), quote = FALSE,
-  envir = parent.frame(1L))
+do.make(
+  name = .Last.name,
+  args = list(),
+  quote = FALSE,
+  envir = parent.frame(1L)
+)
 
 make_all(regexp, reserved = FALSE, error = stop)
 
-make_tests(pattern = NULL, ignore.case = FALSE, perl = FALSE,
-  fixed = FALSE, useBytes = FALSE, invert = FALSE)
+make_tests(
+  pattern = NULL,
+  ignore.case = FALSE,
+  perl = FALSE,
+  fixed = FALSE,
+  useBytes = FALSE,
+  invert = FALSE
+)
 
 make_all_tests(...)
 }
@@ -63,10 +77,10 @@ considered?}
 
 \item{error}{A function. This function is triggered on error.}
 
-\item{pattern}{character string containing a \link{regular expression}
+\item{pattern}{character string containing a \link[base]{regular expression}
     (or character string for \code{fixed = TRUE}) to be matched
     in the given character vector.  Coerced by
-    \code{\link{as.character}} to a character string if possible.  If a
+    \code{\link[base]{as.character}} to a character string if possible.  If a
     character vector of length 2 or more is supplied, the first element
     is used with a warning.  Missing values are allowed except for
     \code{regexpr} and \code{gregexpr}.}

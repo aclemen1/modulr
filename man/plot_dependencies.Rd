@@ -5,8 +5,13 @@
 \alias{graph_dependencies}
 \title{Plot Dependencies.}
 \usage{
-plot_dependencies(group, regexp, reserved = TRUE,
-  render_engine = sankey_engine, ...)
+plot_dependencies(
+  group,
+  regexp,
+  reserved = TRUE,
+  render_engine = sankey_engine,
+  ...
+)
 }
 \arguments{
 \item{group}{A character vector of module names (cf. \code{\link{define}}) to

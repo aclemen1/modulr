@@ -11,7 +11,8 @@
 \alias{get_filename}
 \alias{get_dirname}
 \title{Special Module \code{'modulr'}}
-\format{A list of functions.
+\format{
+A list of functions.
 \preformatted{
 post_evaluation_hook(expr, add = FALSE)
 message_info(...)
@@ -22,7 +23,8 @@ message_stop(...)
 get_module_name()
 get_module_options()
 get_filename()
-get_dirname()}}
+get_dirname()}
+}
 \description{
 Access module helper functions.
 }
@@ -102,7 +104,7 @@ cat(
 'define("foo", list(modulr = "modulr"), function(modulr) {
   modulr$message_info("Module file name: ", .__file__)
   modulr$message_info("Module file path: ", .__path__)
-})', sep = "\\n", file = tmp_file)
+})', sep = "\n", file = tmp_file)
 root_config$set(tmp_dir)
 make("foo")
 unlink(tmp_dir, recursive = TRUE)

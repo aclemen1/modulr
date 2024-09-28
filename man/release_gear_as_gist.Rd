@@ -4,9 +4,16 @@
 \alias{release_gear_as_gist}
 \title{Prepare and Release a Modulr Gear as a Gist on GitHub.}
 \usage{
-release_gear_as_gist(name = .Last.name, load = TRUE, update = TRUE,
-  update_first_found = TRUE, per_page = 100L, max_pages = 10L,
-  endpoint = "https://api.github.com", browse = TRUE)
+release_gear_as_gist(
+  name = .Last.name,
+  load = TRUE,
+  update = TRUE,
+  update_first_found = TRUE,
+  per_page = 100L,
+  max_pages = 10L,
+  endpoint = "https://api.github.com",
+  browse = TRUE
+)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).

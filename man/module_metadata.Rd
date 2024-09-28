@@ -48,7 +48,7 @@ When modulr loads a module file, it assigns the module's name to
 
 \examples{
 # script.R
-"script" \%provides\% { cat("Hello World\\n"); print(.__name__) }
+"script" \%provides\% { cat("Hello World\n"); print(.__name__) }
 if (.__name__ == "main") make()
 # EOF
 \dontrun{source("script.R")}

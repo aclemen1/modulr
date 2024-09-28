@@ -4,8 +4,12 @@
 \alias{hit}
 \title{Interactively Find, Make and Bind a Module.}
 \usage{
-hit(name, suffix = getOption("modulr.hit_suffix"), replace = TRUE,
-  execute = FALSE)
+hit(
+  name,
+  suffix = getOption("modulr.hit_suffix"),
+  replace = TRUE,
+  execute = FALSE
+)
 }
 \arguments{
 \item{name}{A string (character vector of lenght one).

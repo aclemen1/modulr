@@ -4,17 +4,23 @@
 \alias{load_all_modules}
 \title{Load All Modules.}
 \usage{
-load_all_modules(path = root_config$get_all()[[1L]],
-  pattern = "[^_]\\\\.[Rr](?:md|nw)?$", full.names = TRUE,
-  recursive = TRUE, strict = TRUE, ...)
+load_all_modules(
+  path = root_config$get_all()[[1L]],
+  pattern = "[^_]\\\\.[Rr](?:md|nw)?$",
+  full.names = TRUE,
+  recursive = TRUE,
+  strict = TRUE,
+  ...
+)
 }
 \arguments{
 \item{path}{a character vector of full path names; the default
-    corresponds to the working directory, \code{\link{getwd}()}.  Tilde
-    expansion (see \code{\link{path.expand}}) is performed.  Missing
-    values will be ignored.}
+    corresponds to the working directory, \code{\link[base]{getwd}()}.  Tilde
+    expansion (see \code{\link[base]{path.expand}}) is performed.  Missing
+    values will be ignored.  Elements with a marked encoding will
+    be converted to the native encoding.}
 
-\item{pattern}{an optional \link{regular expression}.  Only file names
+\item{pattern}{an optional \link[base]{regular expression}.  Only file names
     which match the regular expression will be returned.}
 
 \item{full.names}{a logical value.  If \code{TRUE}, the directory
