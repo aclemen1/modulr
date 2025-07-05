@@ -27,7 +27,7 @@
     (utils::head(cumsum(c(0L, comment$lengths)) + 1L, -1L))[comment$value]
   ends <- cumsum(comment$lengths)[comment$values]
 
-  line_offset <- as.integer(attr(fun, "srcref", exact = TRUE))[1L]
+  line_offset <- as.integer(base::attr(fun, "srcref", exact = TRUE))[1L]
   line_string_width <- nchar(sprintf("%s", utils::tail(ends, 1L) + line_offset))
 
   for (bloc_idx in 1L:length(starts)) {
@@ -45,7 +45,7 @@
           function(x) x >= 0L,
           vapply(docstring_raw,
                  function(x)
-                   attr(gregexpr("^[ \t]*", x)[[1L]], "match.length"),
+                   base::attr(gregexpr("^[ \t]*", x)[[1L]], "match.length"),
                  FUN.VALUE = 0L)))
 
       docstring_lines <-

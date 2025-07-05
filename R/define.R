@@ -293,14 +293,14 @@ define <- function(name, dependencies = NULL, provider = function() NULL) {
   if (.is_braced_expression(provider_subst)) {
     provider <- eval(call("function", NULL, provider_subst))
     environment(provider) <- enclos
-    src_file <- attr(provider_subst, "srcfile")
+    src_file <- base::attr(provider_subst, "srcfile")
     if (inherits(src_file, "srcfile")) {
-      attr(provider, which = "srcref") <-
+      base::attr(provider, which = "srcref") <-
         srcref(
           src_file,
           c(
-            attr(provider_subst, which = "srcref")[[1L]],
-            attr(provider_subst, which = "wholeSrcref")
+            base::attr(provider_subst, which = "srcref")[[1L]],
+            base::attr(provider_subst, which = "wholeSrcref")
           )[c(1L, 2L, 11L, 12L, 5L, 14L, 7L, 16L)])
     }
   } else if (!is.function(provider) && .is_constant(provider)) {

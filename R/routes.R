@@ -60,7 +60,7 @@
       list(
         map = map,
         start = as.integer(reg),
-        end = as.integer(reg) + attr(reg, "match.length") - 1L)
+        end = as.integer(reg) + base::attr(reg, "match.length") - 1L)
 
     },
     names(mappings))
@@ -204,7 +204,7 @@
       list(
         namespace = namespace_,
         start = as.integer(reg),
-        end = as.integer(reg) + attr(reg, "match.length") - 1L)
+        end = as.integer(reg) + base::attr(reg, "match.length") - 1L)
 
     },
     names(paths_config$get_all()))
@@ -346,7 +346,7 @@
         msg = "'storage' attribute missing.")
     versions <- lapply(seq_along(versions), function(idx) {
       version <- c(versions[[idx]])
-      storage <- attr(versions[[idx]], "storage")
+      storage <- base::attr(versions[[idx]], "storage")
       node <- list(
         storage = storage,
         version = version
@@ -404,7 +404,7 @@
         versions))
     versions <- Map(function(version) {
       node <- version[["version"]]
-      attr(node, "storage") <- version[["storage"]]
+      base::attr(node, "storage") <- version[["storage"]]
       node
     },
     versions)

@@ -44,7 +44,7 @@ if (requireNamespace("lintr", quietly = TRUE)) {
                                        one_of("/", "\\")), "")
                 x
               })
-              attr(lints, "path") <- path
+              base::attr(lints, "path") <- path
             }
             class(lints) <- "lints"
             lints

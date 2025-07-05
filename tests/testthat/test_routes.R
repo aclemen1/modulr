@@ -932,12 +932,12 @@ test_that(".flatten_versions and .unflatten_versions are inverses", {
   expect_equal(.unflatten_versions(list()), list())
   na_version <- numeric_version("", strict = FALSE)
   na_in_memory <- na_version
-  attr(na_in_memory, "storage") <- "in-memory"
+  base::attr(na_in_memory, "storage") <- "in-memory"
   v101 <- numeric_version("1.0.1")
   v101_in_memory <- v101
-  attr(v101_in_memory, "storage") <- "in-memory"
+  base::attr(v101_in_memory, "storage") <- "in-memory"
   v101_on_disk <- v101
-  attr(v101_on_disk, "storage") <- "on-disk"
+  base::attr(v101_on_disk, "storage") <- "on-disk"
   expect_error(
     .unflatten_versions(stats::setNames(list(na_version), c("na_version"))))
   expect_equal(
@@ -1056,7 +1056,7 @@ test_that(".filter_versions filters versions", {
     list(na_version)
   )
   na_in_memory <- na_version
-  attr(na_in_memory, "storage") <- "in-memory"
+  base::attr(na_in_memory, "storage") <- "in-memory"
   expect_equal(
     .filter_versions(
       list(
@@ -1066,7 +1066,7 @@ test_that(".filter_versions filters versions", {
     list(na_in_memory)
   )
   na_on_disk <- na_version
-  attr(na_on_disk, "storage") <- "on-disk"
+  base::attr(na_on_disk, "storage") <- "on-disk"
   expect_equal(
     .filter_versions(
       list(
@@ -1101,9 +1101,9 @@ test_that(".filter_versions filters versions", {
   v111 <- numeric_version("1.1.1")
   v200 <- numeric_version("2.0.0")
   v101_in_memory <- v101
-  attr(v101_in_memory, "storage") <- "in-memory"
+  base::attr(v101_in_memory, "storage") <- "in-memory"
   v101_on_disk <- v101
-  attr(v101_on_disk, "storage") <- "on-disk"
+  base::attr(v101_on_disk, "storage") <- "on-disk"
   expect_equal(
     .filter_versions(
       list(
@@ -1209,7 +1209,7 @@ test_that(".filter_versions filters versions including NAs", {
     list(na_version)
   )
   na_in_memory <- na_version
-  attr(na_in_memory, "storage") <- "in-memory"
+  base::attr(na_in_memory, "storage") <- "in-memory"
   expect_equal(
     .filter_versions(
       list(
@@ -1219,7 +1219,7 @@ test_that(".filter_versions filters versions including NAs", {
     list(na_in_memory)
   )
   na_on_disk <- na_version
-  attr(na_on_disk, "storage") <- "on-disk"
+  base::attr(na_on_disk, "storage") <- "on-disk"
   expect_equal(
     .filter_versions(
       list(
@@ -1254,9 +1254,9 @@ test_that(".filter_versions filters versions including NAs", {
   v111 <- numeric_version("1.1.1")
   v200 <- numeric_version("2.0.0")
   v101_in_memory <- v101
-  attr(v101_in_memory, "storage") <- "in-memory"
+  base::attr(v101_in_memory, "storage") <- "in-memory"
   v101_on_disk <- v101
-  attr(v101_on_disk, "storage") <- "on-disk"
+  base::attr(v101_on_disk, "storage") <- "on-disk"
   expect_equal(
     .filter_versions(
       list(
