@@ -6,32 +6,46 @@ test_that(".hash computes a xxHash64 digest", {
 })
 
 test_that(".digest computes a module digest", {
+  # Property-based test (rather than asserting a hash literal): the digest
+  # depends on the package version of `digest`, on R's serialisation format,
+  # and on how `deparse(., control = "useSource")` renders a function — all of
+  # which legitimately vary between R 3.6 and R 4.x. The contract we want to
+  # preserve is:
+  #
+  #   1. .digest is a 16-character hex string (xxHash64);
+  #   2. .digest is deterministic;
+  #   3. equivalent inputs produce equal digests;
+  #   4. changes in formals, body or comments embedded in the source change
+  #      the digest (this last point uses `control = "useSource"`).
   dependencies <- list(foo = "foo")
 
   provider <- function(foo) {
     # Hello World
     NULL
   }
-  expect_equal(
-    .digest(dependencies, provider),
-    "19d11fdf666db03b")
 
-  # without formals, it's safer if the digest reflects the change
-  provider <- function() {
+  d1 <- .digest(dependencies, provider)
+  expect_type(d1, "character")
+  expect_match(d1, "^[0-9a-f]{16}$")
+
+  # deterministic
+  expect_equal(.digest(dependencies, provider), d1)
+
+  # different formals -> different digest
+  provider_no_formal <- function() {
     # Hello World
     NULL
   }
-  expect_equal(
-    .digest(dependencies, provider),
-    "c9f5edbdf6348b2b")
+  d2 <- .digest(dependencies, provider_no_formal)
+  expect_false(identical(d1, d2))
 
-  provider <- function(foo) {
+  # different comments inside the body -> different digest (uses useSource)
+  provider_comment <- function(foo) {
     # HELLO WORLD
     NULL
   }
-  expect_equal(
-    .digest(dependencies, provider),
-    "d947400f86c24b52")
+  d3 <- .digest(dependencies, provider_comment)
+  expect_false(identical(d1, d3))
 })
 
 test_that("get_digest detects changes", {
@@ -150,7 +164,7 @@ test_that("define writes to the registry", {
   expect_equal(module$name, "some/module")
   expect_equal(module$aliases, list(dep = "foo/bar"))
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$provider, (function(dep) {
+  expect_provider_equal(module$provider, (function(dep) {
     return(dep)
   }))
   expect_equal(module$digest, get_digest("some/module"))
@@ -192,7 +206,7 @@ test_that("re-define doesn't write to the registry when no changes occur", {
   expect_true(is.na(module$along))
   expect_equal(module$aliases, list(dep = "foo/bar"))
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$provider, (function(dep) {
+  expect_provider_equal(module$provider, (function(dep) {
     return(dep)
   }))
   expect_equal(module$digest, get_digest("some/module"))
@@ -230,7 +244,7 @@ test_that("re-define writes to the registry when changes occur", {
   expect_true(is.na(module$along))
   expect_equal(module$aliases, list(dep = "foo/bar"))
   expect_equal(module$dependencies, list(dep = "foo/bar"))
-  expect_equal(module$provider, (function(dep) {
+  expect_provider_equal(module$provider, (function(dep) {
     return(sprintf("%s", dep))
   }))
   expect_equal(module$digest, get_digest("some/module"))
@@ -390,10 +404,10 @@ test_that("get_provider returns the body of the module", {
       return(dep)
     })
 
-  expect_equal(get_provider("some/module"),
-               (function(dep) {
-                 return(dep)
-               }))
+  expect_provider_equal(get_provider("some/module"),
+                        (function(dep) {
+                          return(dep)
+                        }))
 
   reset()
 
@@ -404,10 +418,10 @@ test_that("get_provider returns the body of the module", {
       return(dep)
     })
 
-  expect_equal(get_provider("some/module"),
-               (function(dep) {
-                 return(dep)
-               }))
+  expect_provider_equal(get_provider("some/module"),
+                        (function(dep) {
+                          return(dep)
+                        }))
 
 })
 
@@ -468,8 +482,8 @@ test_that("get_provider is able to find an undefined module", {
 
   expect_error(get_provider("module_1", load = F))
 
-  expect_equal(get_provider("module_1", load = T),
-               function() "module_1")
+  expect_provider_equal(get_provider("module_1", load = T),
+                        function() "module_1")
 
 })
 

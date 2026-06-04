@@ -17,6 +17,7 @@ gears/
 data/
 ^\.modulr_profile
 ^\.github
+^\.jj
 ^docs$
 ^_pkgdown\.yml$
 ^MAKE.R$

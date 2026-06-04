@@ -1,6 +1,7 @@
 context("import")
 
 test_that("import_module imports modules", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
@@ -29,6 +30,7 @@ test_that("import_module imports modules", {
   )})
 
 test_that("import_module stores url to the registry", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
@@ -43,6 +45,7 @@ test_that("import_module stores url to the registry", {
 })
 
 test_that("import_module doesn't import defined modules, unless forced", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   define("module1", NULL, function() NULL)
@@ -63,6 +66,7 @@ test_that("import_module doesn't import defined modules, unless forced", {
 })
 
 test_that("import_module loads local modules if they exist", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
@@ -74,6 +78,7 @@ test_that("import_module loads local modules if they exist", {
 })
 
 test_that("import_module fails on non-existing modules", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
@@ -85,6 +90,7 @@ test_that("import_module fails on non-existing modules", {
 })
 
 test_that("import_module fails on existing modules with different name", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
@@ -111,6 +117,7 @@ test_that("import_module fails on existing modules with different name", {
 })
 
 test_that("import_module fails on existing modules with different digest", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
 
@@ -141,6 +148,7 @@ test_that("import_module fails on existing modules with different digest", {
 })
 
 test_that("import_module fails on modules with errors", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   with_mock(
@@ -179,6 +187,7 @@ test_that("import_module calls are warned from within a module", {
 })
 
 test_that("%imports% is a syntactic sugar for `import_module`", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   m1 <- with_mock(
@@ -202,6 +211,7 @@ test_that("%imports% is a syntactic sugar for `import_module`", {
 })
 
 test_that("%digests% %imports% are syntactic sugars for `import_module`", {
+  skip_if_with_mock_defunct()
   reset()
   unlink(DEFAULT_GEARS_PATH, recursive = TRUE)
   define("module", NULL, function() NULL)

@@ -925,6 +925,27 @@ test_that(".extract_name extracts the module name of a module definition", {
                "modulr_test_2")
   expect_null(.extract_name(file, namespace = "modulr_test_foo"))
 
+  # Regression: on R >= 4.3, `&&`/`||` error on length != 1 operands.
+  # A file starting directly with several module/version definitions
+  # sharing the same namespace used to make the fast-path early check
+  # blow up because `extract_(..., n = 2L)` returns a length-> 1 vector
+  # when invoked with a namespace (via .resolve_name).
+  file <- tempfile("modulr_test", fileext = ".R")
+  module_text <- paste(
+    "'foo' %provides% { 0 }",
+    "'foo#1.0.0' %provides% { 1 }",
+    "'foo#2.0.0' %provides% { 2 }",
+    sep = "\n")
+  write(module_text, file)
+  on.exit(unlink(file), add = TRUE)
+  expect_equal(
+    sort(.extract_name(file, namespace = "foo")),
+    c("foo", "foo#1.0.0", "foo#2.0.0"))
+  expect_equal(
+    .extract_name(file, namespace = "foo",
+                  version = numeric_version("1.0.0")),
+    "foo#1.0.0")
+
 })
 
 test_that(".flatten_versions and .unflatten_versions are inverses", {

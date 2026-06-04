@@ -30,3 +30,5 @@ MAKE.R
 /docs/**/*.R
 ..Rcheck/
 scratch/
+/modulr_*.tar.gz
+/tests-detail-*.rds

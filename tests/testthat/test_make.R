@@ -88,7 +88,7 @@ test_that("make writes to the registry", {
   expect_equal(module$name, "some/module")
   expect_equal(module$name, "some/module")
   expect_equal(module$dependencies, list())
-  expect_equal(module$provider, (function() {
+  expect_provider_equal(module$provider, (function() {
     return("foo")
   }))
   expect_equal(module$digest, get_digest("some/module"))

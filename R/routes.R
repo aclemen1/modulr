@@ -669,7 +669,7 @@
       silent = TRUE)
     name <- extract_(parsed, strict = FALSE)
     if (
-      !is.null(name) &&
+      !is.null(name) && length(name) == 1L &&
       name == .parse_name(.parse_filepath(filepath)[["name"]])[["final"]])
       return(name)
 

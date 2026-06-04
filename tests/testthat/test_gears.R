@@ -39,6 +39,7 @@ test_that(".module_to_string returns a string", {
 })
 
 test_that(".import_to_string shows name, digest and url", {
+  skip_if_with_mock_defunct()
   reset()
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
@@ -132,6 +133,7 @@ test_that("prepare_gear shows installation section", {
 })
 
 test_that("prepare_gear shows imports section", {
+  skip_if_with_mock_defunct()
   with_mock(
     `httr::parse_url` = function(...) list(scheme = "http"),
     `httr::GET` = function(...) NULL,
