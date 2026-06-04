@@ -18,9 +18,13 @@ data/
 ^\.modulr_profile
 ^\.github
 ^\.jj
+^dev$
+^devspace\.yaml$
+^justfile$
 ^docs$
 ^_pkgdown\.yml$
 ^MAKE.R$
 ^inst/modules/new_lib/.*
 ^inst/modules/old_lib/.*
 ^inst/modules/.*/lib
+^\.devspace$

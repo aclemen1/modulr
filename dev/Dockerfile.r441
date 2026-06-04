@@ -1,0 +1,38 @@
+# syntax=docker/dockerfile:1.7
+#
+# modulr dev image — R 4.4.1
+#
+# Built once via `devspace build` (or the `just build-441` shortcut).
+# The user library (where iterative `install.packages()` writes) lives on
+# a Persistent Volume mounted at $R_LIBS_USER, so it survives pod recreation
+# but the image itself stays slim.
+FROM rocker/r-ver:4.4.1
+
+ARG CRAN_SNAPSHOT="https://packagemanager.posit.co/cran/2024-09-01"
+
+# System build deps for the package's C/C++ extensions and vignette tooling.
+RUN apt-get update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      ca-certificates curl git less libcurl4-openssl-dev libssl-dev \
+      libxml2-dev make pandoc vim-tiny \
+ && rm -rf /var/lib/apt/lists/*
+
+# Pin the CRAN snapshot site-wide so installs are reproducible.
+RUN echo "options(repos = c(CRAN = '${CRAN_SNAPSHOT}'))" \
+      >> /usr/local/lib/R/etc/Rprofile.site
+
+# Pre-install modulr's Imports + Suggests we actually use in tests/vignettes.
+# Anything else added later by the developer lands in $R_LIBS_USER (the PVC).
+RUN R -e "install.packages(c( \
+      'assertthat','callr','digest','httr','jsonlite','knitr','memoise', \
+      'pooh','rmarkdown','testthat','withr','yaml','rstudioapi','lintr','covr'))"
+
+# Default strict checks: matches the cross-version CI invariant we rely on.
+ENV _R_CHECK_LENGTH_1_LOGIC2_=true \
+    _R_CHECK_LENGTH_1_CONDITION_=true \
+    R_LIBS_USER=/root/R/library
+
+RUN mkdir -p /root/R/library /pkg
+WORKDIR /pkg
+
+CMD ["sleep", "infinity"]

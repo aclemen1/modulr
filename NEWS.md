@@ -39,6 +39,23 @@ Result: full pass on **R 3.6.3** (966 tests, 0 fail, 6 skipped) and on
 6 legitimate skips) under
 `_R_CHECK_LENGTH_1_LOGIC2_=true _R_CHECK_LENGTH_1_CONDITION_=true`.
 
+## Dev environment (developer-only, excluded from the R build)
+
+* New `dev/Dockerfile.r363` / `dev/Dockerfile.r441` images for the two-rung
+  R test matrix, pinned to Posit Package Manager CRAN snapshots
+  contemporary with each R release.
+* New `devspace.yaml` driving a K3S-based DevSpace dev loop: build → deploy
+  → file sync → terminal. Profiles `r363` and `r441` switch the R version.
+  K8s manifests are inlined so DevSpace var substitution reaches the body.
+* New top-level `justfile` orchestrating the whole stack — `just bootstrap`,
+  `just dev [r363|r441]`, `just test [...]`, `just test-all`, `just check`,
+  `just nuke`. All cluster-touching recipes refuse to act on any context
+  other than `colima-modulr-k3s` (belt-and-braces against cross-cluster
+  mishaps).
+* New `dev/README.md` documenting the workflow and trade-offs.
+* `.Rbuildignore` extended (`^dev$`, `^devspace\.yaml$`, `^justfile$`) so
+  these dev artefacts are excluded from the published source tarball.
+
 # `modulr` 0.2.0
 
 ## First release on CRAN

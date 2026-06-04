@@ -1,0 +1,161 @@
+version: v2beta1
+name: modulr-dev
+
+# Profile selection sets R_VERSION + R_TAG together. Default profile = r441.
+vars:
+  R_VERSION: "4.4.1"
+  R_TAG: "441"
+  NAMESPACE: "modulr-dev"
+
+images:
+  modulr-dev:
+    image: modulr-dev-r${R_TAG}
+    tags: ["dev"]
+    dockerfile: ./dev/Dockerfile.r${R_TAG}
+    context: ./dev
+    # K3S uses containerd. When colima exposes its docker socket to the host
+    # (the default with `colima start --kubernetes`), `docker build` populates
+    # the same containerd that K3S reads from, so no manual `ctr import` is
+    # needed.
+    rebuildStrategy: ignoreContextChanges
+
+deployments:
+  modulr-dev:
+    kubectl:
+      # Inlined so DevSpace's variable substitution (${R_TAG}) reaches the
+      # manifest body — substitution is only applied to devspace.yaml itself,
+      # not to files referenced via `manifests:`.
+      inlineManifest: |-
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: modulr-rlib-r${R_TAG}
+          labels:
+            app: modulr-dev
+            r-version: r${R_TAG}
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+        ---
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: modulr-dev-r${R_TAG}
+          labels:
+            app: modulr-dev
+            r-version: r${R_TAG}
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: modulr-dev
+              r-version: r${R_TAG}
+          template:
+            metadata:
+              labels:
+                app: modulr-dev
+                r-version: r${R_TAG}
+            spec:
+              terminationGracePeriodSeconds: 2
+              containers:
+                - name: r
+                  image: modulr-dev-r${R_TAG}:dev
+                  imagePullPolicy: IfNotPresent
+                  command: ["sleep", "infinity"]
+                  workingDir: /pkg
+                  env:
+                    - name: _R_CHECK_LENGTH_1_LOGIC2_
+                      value: "true"
+                    - name: _R_CHECK_LENGTH_1_CONDITION_
+                      value: "true"
+                    - name: R_LIBS_USER
+                      value: /root/R/library
+                  volumeMounts:
+                    - name: pkg
+                      mountPath: /pkg
+                    - name: rlib
+                      mountPath: /root/R/library
+                  resources:
+                    requests:
+                      cpu: "500m"
+                      memory: "1Gi"
+                    limits:
+                      cpu: "4"
+                      memory: "4Gi"
+              volumes:
+                - name: pkg
+                  emptyDir: {}
+                - name: rlib
+                  persistentVolumeClaim:
+                    claimName: modulr-rlib-r${R_TAG}
+
+dev:
+  modulr-dev:
+    labelSelector:
+      app: modulr-dev
+      r-version: r${R_TAG}
+    # Two-way file sync: working tree <-> /pkg in the pod
+    sync:
+      - path: ./:/pkg
+        excludePaths:
+          - .jj/
+          - .git/
+          - .Rproj.user/
+          - .Rcheck/
+          - "**/tests-detail-*.rds"
+          - "modulr_*.tar.gz"
+          - "/dev/k8s/"     # avoid noisy edits round-tripping
+        uploadExcludePaths:
+          - "**/*.rds"
+        printLogs: false
+        onUpload:
+          restartContainer: false
+    terminal:
+      command: |
+        echo
+        echo "  modulr dev shell — R ${R_VERSION}"
+        echo "  Working dir : /pkg (synced from host)"
+        echo "  R user lib  : \$R_LIBS_USER (persistent PVC)"
+        echo "  Tip: \`just\` from inside lists the available recipes."
+        echo
+        exec bash
+
+profiles:
+  - name: r363
+    patches:
+      - op: replace
+        path: vars.R_VERSION
+        value: "3.6.3"
+      - op: replace
+        path: vars.R_TAG
+        value: "363"
+  - name: r441
+    patches:
+      - op: replace
+        path: vars.R_VERSION
+        value: "4.4.1"
+      - op: replace
+        path: vars.R_TAG
+        value: "441"
+
+# Pipelines: invoked via `devspace run-pipeline <name>` or wrapped by Just.
+pipelines:
+  # `devspace dev` -> build, deploy, sync, terminal
+  dev: |-
+    run_dependencies --all
+    create_deployments --all
+    start_dev modulr-dev
+  # `devspace build`
+  build: |-
+    build_images --all -t dev
+  # `devspace deploy`
+  deploy: |-
+    build_images --all -t dev
+    create_deployments --all
+  # `devspace purge` -> tear down everything in the namespace
+  purge: |-
+    stop_dev --all
+    purge_deployments --all

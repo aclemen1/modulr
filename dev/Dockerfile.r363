@@ -1,0 +1,41 @@
+# syntax=docker/dockerfile:1.7
+#
+# modulr dev image — R 3.6.3
+#
+# Used to keep the legacy floor of the test matrix green. Debian Buster is
+# archived, so we re-point apt at archive.debian.org. The CRAN snapshot is
+# pinned around the same date for ABI consistency with the R version.
+FROM rocker/r-ver:3.6.3
+
+ARG CRAN_SNAPSHOT="https://packagemanager.posit.co/cran/2020-03-15"
+
+# Buster has reached EOL — switch apt to the archive mirror and disable
+# the Valid-Until check (otherwise apt-get refuses stale Release files).
+RUN sed -i 's|deb.debian.org|archive.debian.org|g; \
+            s|security.debian.org|archive.debian.org|g; \
+            /buster-updates/d' /etc/apt/sources.list \
+ && echo 'Acquire::Check-Valid-Until "false";' \
+      > /etc/apt/apt.conf.d/99no-check-valid \
+ && apt-get update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      ca-certificates curl git less libcurl4-openssl-dev libssl-dev \
+      libxml2-dev make pandoc vim-tiny \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN echo "options(repos = c(CRAN = '${CRAN_SNAPSHOT}'))" \
+      >> /usr/local/lib/R/etc/Rprofile.site
+
+# Note: lintr/covr 2020 vintage. Skip if they fail to install — they're
+# Suggests-only and not part of the test critical path.
+RUN R -e "install.packages(c( \
+      'assertthat','callr','digest','httr','jsonlite','knitr','memoise', \
+      'pooh','rmarkdown','testthat','withr','yaml','rstudioapi'))"
+
+ENV _R_CHECK_LENGTH_1_LOGIC2_=true \
+    _R_CHECK_LENGTH_1_CONDITION_=true \
+    R_LIBS_USER=/root/R/library
+
+RUN mkdir -p /root/R/library /pkg
+WORKDIR /pkg
+
+CMD ["sleep", "infinity"]

@@ -32,3 +32,4 @@ MAKE.R
 scratch/
 /modulr_*.tar.gz
 /tests-detail-*.rds
+/.devspace/
