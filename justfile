@@ -4,9 +4,9 @@
 #
 # Quickstart:
 #   just bootstrap        # one-shot: colima k3s profile + namespace + first build
-#   just dev              # enter R 4.4.1 dev shell (default)
+#   just dev              # enter R 4.5.3 dev shell (default)
 #   just dev r363         # enter R 3.6.3 dev shell
-#   just test-all         # run the full suite on both R 3.6.3 and R 4.4.1
+#   just test-all         # run the full suite on both R 3.6.3 and R 4.5.3
 #   just teardown         # stop the K3S profile, keep images
 #   just nuke             # full cleanup, including the K3S profile and PVCs
 
@@ -90,23 +90,23 @@ ns-up: _assert-context
 #  Build
 # ──────────────────────────────────────────────────────────────────────────
 
-# Build the dev image for one R version (default: 4.4.1).
-build version="r441": _assert-context
+# Build the dev image for one R version (default: 4.5.3).
+build version="r453": _assert-context
     devspace build --profile {{version}} --namespace {{NS}}
 
-build-all: (build "r363") (build "r441")
+build-all: (build "r363") (build "r453")
 
 # ──────────────────────────────────────────────────────────────────────────
 #  Dev shell
 # ──────────────────────────────────────────────────────────────────────────
 
 # Enter the dev shell. Syncs the working tree, opens bash in the pod.
-# Usage: `just dev` (r441) | `just dev r363`
-dev version="r441": _assert-context
+# Usage: `just dev` (r453) | `just dev r363`
+dev version="r453": _assert-context
     devspace dev --profile {{version}} --namespace {{NS}}
 
 # Open an extra shell against the running pod (without re-syncing).
-shell version="r441": _assert-context
+shell version="r453": _assert-context
     kubectl -n {{NS}} exec -it \
       deploy/modulr-dev-$(echo {{version}} | sed 's/r//') -- bash
 
@@ -115,9 +115,9 @@ shell version="r441": _assert-context
 # ──────────────────────────────────────────────────────────────────────────
 
 # Run the full testthat suite in one R version.
-#   `just test r441`   →  R 4.4.1
+#   `just test r453`   →  R 4.5.3 (default)
 #   `just test r363`   →  R 3.6.3
-test version="r441": _assert-context
+test version="r453": _assert-context
     @just _ensure-running {{version}}
     @TAG=$(echo {{version}} | sed 's/r//'); \
     kubectl -n {{NS}} exec -i deploy/modulr-dev-${TAG} -- bash -lc '\
@@ -135,11 +135,11 @@ test version="r441": _assert-context
                        print(agg, row.names=FALSE); \
                        cat(\"\nTotal: \", sum(df\$nb), \" tests, \", sum(df\$failed), \" failed, \", sum(df\$error), \" errors, \", sum(df\$skipped), \" skipped\n\", sep=\"\")"'
 
-# Run the suite on both R versions, sequentially.
-test-all: (test "r363") (test "r441")
+# Run the suite on every R version, sequentially.
+test-all: (test "r363") (test "r453")
 
 # Run `R CMD check` (slower, catches more things than test_dir alone).
-check version="r441": _assert-context
+check version="r453": _assert-context
     @just _ensure-running {{version}}
     @TAG=$(echo {{version}} | sed 's/r//'); \
     kubectl -n {{NS}} exec -i deploy/modulr-dev-${TAG} -- bash -lc '\

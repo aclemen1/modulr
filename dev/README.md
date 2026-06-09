@@ -1,7 +1,7 @@
 # modulr — dev environment
 
 Reproducible cross-version dev environment for `modulr`, targeting R 3.6.3
-(legacy floor) and R 4.4.1 (current focus). The whole stack runs on a
+(legacy floor) and R 4.5.3 (current focus). The whole stack runs on a
 dedicated [colima](https://github.com/abiosoft/colima) profile with K3S, and
 is driven by [DevSpace](https://devspace.sh) + a top-level `justfile`.
 
@@ -14,7 +14,7 @@ is driven by [DevSpace](https://devspace.sh) + a top-level `justfile`.
 | **DevSpace** | Builds the images, deploys to K3S, syncs your working tree into the pod, opens a terminal. |
 | **`justfile`** | Single user-facing surface (`just dev`, `just test-all`, …). Wraps the above. |
 
-The two pods (`modulr-dev-r363`, `modulr-dev-r441`) each carry a pinned CRAN
+The two pods (`modulr-dev-r363`, `modulr-dev-r453`) each carry a pinned CRAN
 snapshot (Posit Package Manager) contemporary with their R release, so
 package versions are deterministic.
 
@@ -39,7 +39,7 @@ mounting `$HOME` writable), points `kubectl` at it, and creates the
 ## Daily workflow
 
 ```bash
-# Enter the R 4.4.1 dev shell (default). Syncs the working tree on entry
+# Enter the R 4.5.3 dev shell (default). Syncs the working tree on entry
 # and keeps it in sync until you exit.
 just dev
 
@@ -48,12 +48,12 @@ just dev r363
 
 # Quick test runs (do not need an active `just dev` session — they spawn a
 # one-off exec into the deployment).
-just test r441
+just test r453
 just test r363
 just test-all          # both, sequentially
 
 # Full R CMD check (slower).
-just check r441
+just check r453
 
 # Inspect everything.
 just status
@@ -95,14 +95,14 @@ just nuke              # nuclear: delete namespace + colima profile
 The Docker images themselves can be rebuilt via:
 
 ```bash
-just build r441
+just build r453
 just build-all
 ```
 
 ## Trade-offs we accepted
 
 - **Two images**, not a multi-stage hybrid. Debian buster (R 3.6.3) is
-  archived, jammy (R 4.4.1) is current — sharing a base is more pain than
+  archived, the R 4.5 base is current — sharing a base is more pain than
   it's worth.
 - **PVC, not host bind-mount** for the R user library. We saw virtiofs
   flakiness on `/Users/...` from this sandbox. PVCs sit on the colima
@@ -122,4 +122,4 @@ just build-all
 | `Unable to find image …` on `devspace dev` | `just build <version>` then retry |
 | Pod stuck in `ContainerCreating` | `kubectl -n modulr-dev describe pod …` — usually a PVC binding issue, fix with `just nuke-cache` |
 | Sync silently does nothing | Check `devspace logs --provider sync` and exclude paths in `devspace.yaml` |
-| `just test` fails on R 4.4.1 with `with_mock()` defunct errors | Make sure testthat ≤ 3.1.x is in the image, or that `skip_if_with_mock_defunct()` is wired in the tests (already shipped). |
+| `just test` fails on R 4.5.3 with `with_mock()` defunct errors | Already mitigated by `skip_if_with_mock_defunct()` in the test suite. If you see them, make sure the image's `testthat` was installed from a recent CRAN snapshot. |

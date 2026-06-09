@@ -1,10 +1,10 @@
 version: v2beta1
 name: modulr-dev
 
-# Profile selection sets R_VERSION + R_TAG together. Default profile = r441.
+# Profile selection sets R_VERSION + R_TAG together. Default profile = r453.
 vars:
-  R_VERSION: "4.4.1"
-  R_TAG: "441"
+  R_VERSION: "4.5.3"
+  R_TAG: "453"
   NAMESPACE: "modulr-dev"
 
 images:
@@ -132,14 +132,14 @@ profiles:
       - op: replace
         path: vars.R_TAG
         value: "363"
-  - name: r441
+  - name: r453
     patches:
       - op: replace
         path: vars.R_VERSION
-        value: "4.4.1"
+        value: "4.5.3"
       - op: replace
         path: vars.R_TAG
-        value: "441"
+        value: "453"
 
 # Pipelines: invoked via `devspace run-pipeline <name>` or wrapped by Just.
 pipelines:

@@ -1,3 +1,99 @@
+# `modulr` 0.1.7.9216
+
+## Bug fixes
+
+* `modulr::browser()`: stop trapping agentic tooling at a nested
+  `Browse[n+1]>` *while* keeping the user's locals reachable at the
+  prompt across all three modes (plain interactive, magrittr pipe,
+  module body).
+
+  The previous implementation invoked base::browser via
+  `do.call(base::browser, args, envir = parent.frame(1L))` so that the
+  prompt would scope to the caller's frame (locals visible). That
+  same `envir` also armed R's internal RSTEP / RDEBUG flag on the
+  caller's frame, with the consequence that any `{ ... }` block typed
+  at the next `Browse[]>` prompt — including the `ℝ(~{ … })` wrappers
+  issued by `rstudio-cli r send` and similar agentic tools — was
+  interpreted by R as "the next group of statements to step through",
+  landing the user at `Browse[n+1]>` with a `debug at #1: ...` line
+  and no clean way out short of typing `Q`.
+
+  The fix introduces a *sandwich environment*: a freshly-created
+  `new.env(parent = parent.frame(1L))` is passed as `envir =` to the
+  do.call instead of the caller's frame itself. Two consequences:
+
+    - Variable resolution at the prompt chains
+      `wrap -> caller -> ...`, so bare `x`, `m`, `.` etc. resolve
+      against the caller's frame exactly like before.
+    - The debug-stepper bit base::browser arms on `wrap` (`skipCalls`
+      is left at 0, no longer bumped) does not escape: `wrap` is not
+      on R's function-context stack and is garbage-collected the
+      moment modulr::browser returns. The caller's frame is therefore
+      untouched.
+
+  Side note: the `skipCalls = 2` / `8` historically bumped in this
+  function would defeat the sandwich (any non-zero skipCalls climbs
+  onto a caller-stack frame and would re-introduce the leak). It is
+  intentionally removed. The visible cost: `n` and `s` from the
+  initial pause now act like `c` rather than stepping through the
+  caller's next statement — that step-through behaviour was a
+  side-effect of the bug, not a feature. Users who want true
+  step-through can still call `debug()` on the function of interest.
+
+  Structural regression test at `tests/testthat/test-browser-trap.R`
+  pins the contract (no `envir = parent.frame(...)` in any do.call to
+  base::browser). Interactive validation matrix recorded in the
+  commit message.
+
+* `modulr::browser()`: also restore pipe-aware behaviour under
+  magrittr >= 2.0 *and* extend the same contract to the native pipe
+  `|>` (R >= 4.1). The previous detection relied on a `function_list`
+  variable that magrittr 1.x stashed in `parent.frame(2L)`. magrittr 2.x
+  rewrote the pipe machinery (`pipe_eager_lexical`) and dropped that
+  variable, so `lhs %>% modulr::browser() %>% rhs` silently returned
+  `invisible(NULL)` in non-interactive contexts and broke any pipe
+  chain. The native pipe `|>` was never supported at all (it is
+  resolved at parse time, so `x |> modulr::browser()` is
+  indistinguishable from `modulr::browser(x)` at runtime).
+
+  Two complementary changes restore the contract for every pipe variant:
+
+  1. Non-interactive: forward the first positional `...` argument
+     whenever there is one. The LHS of any pipe — magrittr or native —
+     always lands there, so the chain keeps flowing without needing
+     to detect the pipe kind. Direct-call usage like
+     `modulr::browser("text")` is unaffected: base::browser is itself
+     a no-op non-interactively, so any return value is moot.
+
+  2. Interactive: a fresh `.` binding is set on the sandwich env so
+     users can inspect the LHS at the prompt regardless of which
+     pipe brought them there. The rich "surrounding stages" message
+     is restored for both magrittr 1.x and 2.x via a new
+     `.magrittr_pipe_context()` helper that walks `sys.calls()` for
+     the `%>%` expression (magrittr 2.x) and falls back to a
+     parent-frame scan for the legacy `function_list / k` pair
+     (magrittr 1.x). The "current stage" highlighting works on 2.x
+     (`i` derivable from the frame distance to the `%>%` call) and
+     degrades gracefully to a full chain listing on 1.x (the
+     `freduce` loop variable is volatile and not introspectable
+     from the outside; the legacy `i` lookup in original modulr
+     code was already broken silently on magrittr >= 1.5). The
+     native `|>` does not show the rich display at all (it leaves
+     no runtime trace), but `.` and the LHS value remain
+     accessible at the prompt via the explicit binding.
+
+  Regression coverage added in `tests/testthat/test-browser-trap.R`
+  for both pipe flavours (the `|>` test skips on R < 4.1).
+
+## Dev environment
+
+* Replace the R 4.4.1 dev image with R 4.5.3 (now the latest minor R
+  release we routinely test against). The cross-version floor stays at
+  R 3.6.3. `dev/Dockerfile.r441` is removed; `dev/Dockerfile.r453` and
+  the matching `r453` DevSpace profile are added. `justfile`'s default
+  `version` argument is now `r453`, and `just test-all` boucle sur
+  r363 + r453.
+
 # `modulr` 0.1.7.9215
 
 ## Bug fix
