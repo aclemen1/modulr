@@ -190,6 +190,30 @@ browser <- function(...) {
     if (module_name != "__main__") get_breadcrumbs(NULL, verbose = TRUE)
   }
 
+  # Sandwich env and on.exit hooks.
+  #
+  #   wrap : a fresh env whose lexical parent is the caller's frame.
+  #          We pass it as `envir =` to do.call(base::browser, ...) so
+  #          that the prompt's variable resolution chains through to
+  #          the caller's locals (reads work) WITHOUT base::browser
+  #          arming RDEBUG/RSTEP on the caller (the wrap is off-stack
+  #          and is GC'd when we return; no debug-bit can survive).
+  #
+  #   on.exit propagation: a bare `x <- 1` at the prompt would by
+  #          default land in `wrap`, shadowing rather than mutating
+  #          the caller's binding. We copy `wrap`'s contents onto the
+  #          caller right before returning, so mutations persist —
+  #          which is what `base::browser` does natively. Side-effect
+  #          is that NEW names introduced at the prompt also propagate
+  #          (same as `base::browser`).
+  caller <- parent.frame(1L)
+  wrap <- new.env(parent = caller)
+  on.exit({
+    for (.nm in ls(envir = wrap, all.names = TRUE)) {
+      assign(.nm, get(.nm, envir = wrap), envir = caller)
+    }
+  }, add = TRUE)
+
   if (in_pipe) {
     message(
       "Use ", sQuote("."), " to get the left-hand side value of the pipe.")
@@ -202,7 +226,6 @@ browser <- function(...) {
     k <- pipe_ctx$k
     disp <- pipe_ctx$display
     if (is.na(i)) {
-      # 1.x / unknown position — show the whole chain prefixed with `.`.
       message(paste(unlist(c(list("> ."), disp)), collapse = " %>% \n"))
     } else {
       message(paste(unlist(c(
@@ -217,45 +240,23 @@ browser <- function(...) {
       options(deparse.max.lines =
                 max(getOption("modulr.deparse.max.lines.in.pipes"),
                     getOption("deparse.max.lines")))
+    # `add = TRUE` so this stacks atop the propagation on.exit above
+    # rather than replacing it. The pipe contract also demands we
+    # return the LHS so the chain keeps flowing post-`c`.
     on.exit({
       options(deparse.max.lines.bak)
       return(args[[1L]])
-    })
-    # Sandwich env, same rationale as the non-pipe branch below: the env
-    # is lexically chained to the magrittr frame (so `.` and the LHS
-    # value are reachable from the prompt), but it is not itself on the
-    # function-context stack, so any RDEBUG/RSTEP armed on it dies with
-    # us before the caller's next statement runs. We keep skipCalls = 0
-    # (i.e. do not call increment_skipCalls_) for the same reason as
-    # below: any non-zero skipCalls climbs onto the caller's frame and
-    # leaves a stepper bit there.
-    wrap <- new.env(parent = parent.frame(1L))
+    }, add = TRUE)
     do.call(base::browser, args = utils::tail(args, -1L), envir = wrap)
   } else {
-    # Hand off to base::browser through an *intermediate* env (`wrap`)
-    # whose lexical parent is the caller's frame. Two things matter:
-    #
-    #   * `envir = wrap` makes base::browser evaluate prompt input in
-    #     `wrap`. Variable lookups chain `wrap -> caller -> ...`, so
-    #     the user's locals stay reachable (bare `x`, `m`).
-    #
-    #   * skipCalls is NOT bumped. base::browser's `skipCalls` walks up
-    #     the *function context* stack and arms RDEBUG/RSTEP on the
-    #     frame it lands on. With any non-zero skipCalls, that frame is
-    #     the caller's, and the step-tracer survives modulr::browser's
-    #     return — visible as the spurious `Browse[2]>` / `debug at #1:`
-    #     trap when an external tool sends a `{ ... }` block. Keeping
-    #     skipCalls = 0 leaves the debug bit on base::browser's own
-    #     return context (with `wrap` as its env), which is unwound
-    #     before the caller resumes.
-    wrap <- new.env(parent = parent.frame(1L))
-    # Expose the first positional argument as `.` inside `wrap`. magrittr
-    # already binds `.` in its own pipe frame (reachable via the lexical
-    # chain), but the native pipe `|>` (R >= 4.1) is a parse-time
-    # transformation and leaves no such binding behind. Doing it here
-    # gives users a uniform `.` to inspect the LHS regardless of which
-    # pipe was used. Harmless for direct-call usage (the user would not
-    # normally reference `.` there).
+    # Non-pipe non-module. Hand off through the shared `wrap` env
+    # already set up above. Expose the first positional argument as
+    # `.` inside `wrap` so users get a uniform `.` to inspect the LHS
+    # regardless of whether they got here via magrittr (`%>%` exposes
+    # `.` via the lexical chain) or the native `|>` (which leaves no
+    # runtime trace and would otherwise have no `.`). Harmless for
+    # direct-call usage where the user would not normally reference
+    # `.`.
     args_ <- list(...)
     if (length(args_) >= 1L &&
         (is.null(names(args_)) || identical(names(args_)[[1L]], ""))) {

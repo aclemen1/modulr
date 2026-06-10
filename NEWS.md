@@ -1,3 +1,42 @@
+# `modulr` 0.1.7.9217
+
+## Bug fixes (follow-up to 0.1.7.9216)
+
+* `modulr::browser()`: assignments at the `Browse[]>` prompt now
+  persist on the caller's frame, matching `base::browser`'s
+  documented contract.
+
+  Background: 0.1.7.9216 introduced a "sandwich env" so the prompt
+  could see the caller's locals without leaking a debug-stepper bit
+  back into the caller's frame. The trade-off was that a plain
+  `x <- 1` typed at the prompt landed in the sandwich env (which is
+  a child of the caller's frame), shadowing rather than mutating
+  the caller's `x`. Reads kept working through the lexical chain,
+  but writes silently dropped — invisible to humans, fatal to
+  agentic tools that *meant* to patch state mid-debug.
+
+  Fix: an `on.exit` hook now copies every binding present in the
+  sandwich env onto the caller's frame right before
+  `modulr::browser()` returns. Mutations made at the prompt
+  propagate to the caller; new names introduced at the prompt
+  propagate too (same loose semantics as `base::browser` itself).
+  No effect on the sandwich's RDEBUG/RSTEP isolation — the debug
+  bit still lands on the sandwich env and is GC'd with it; the
+  `{ ... }`-block trap remains closed, and `c` still exits cleanly
+  back to the top level. Validated interactively (`user_local <-
+  999; c` ⇒ function returns 1000, not 43) and via the existing
+  sink-stack regression test (50 sequential `modulr::browser()`
+  calls, `sink.number()` delta = 0).
+
+* New regression test in `tests/testthat/test-browser-trap.R`
+  asserts that repeated entry/exit of `modulr::browser()` does not
+  accumulate entries on R's sink stack. This was the most painful
+  downstream symptom on the buggy versions: nested browsers (caused
+  by the original step-flag trap) eventually triggered `Error: sink
+  stack is full`, requiring a full R session restart. With the
+  current design that cascade cannot occur, but the test pins the
+  invariant so a future regression cannot silently re-introduce it.
+
 # `modulr` 0.1.7.9216
 
 ## Bug fixes

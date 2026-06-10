@@ -198,6 +198,26 @@ test_that(".magrittr_pipe_context() returns correct stage indices on 2.x", {
   if (is_2x) expect_equal(r3$i, 3L) else expect_true(is.na(r3$i))
 })
 
+test_that("modulr::browser() does not leak entries onto R's sink stack", {
+  # Regression for the agentic-tooling cascade where the step-flag trap
+  # caused nested browsers to accumulate until `Error: sink stack is full`
+  # made the session unrecoverable (see commit history). Even with the
+  # current sandwich-env design, this guarantee must hold: repeated
+  # entry/exit of modulr::browser must not leave any residual sink.
+  #
+  # We do not actually pause R (base::browser is a no-op in non-interactive
+  # mode), but the non-interactive code path still executes most of
+  # modulr::browser's bookkeeping (on.exit hooks, breadcrumb messages,
+  # etc.) and any sink it would open would leak just as well as in
+  # interactive mode.
+  before <- sink.number()
+  for (i in seq_len(50L)) {
+    modulr::browser()
+  }
+  expect_equal(sink.number(), before,
+               info = "modulr::browser() opened a sink that is not closed.")
+})
+
 test_that("browser() forwards the LHS inside a native `|>` pipe (R >= 4.1)", {
   # The native pipe `|>` is a parse-time transformation: `x |> f()` is
   # parsed straight to `f(x)`, with no runtime trace of `|>`. So we
